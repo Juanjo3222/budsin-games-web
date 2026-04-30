@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budsin AI</title>
-    <link rel="icon" type="image/x-icon" href="https://budsin-games.pages.dev/images.jpeg">
-
+    <title>Claude Interface - Fully Functional</title>
+    <link rel="icon" type="image/jpeg" href="https://budsin-games.pages.dev/images.jpeg">
+    <script src="https://budsin-games.pages.dev/classroom-hotkey.js"></script>
     <!-- <script src="https://js.puter.com/v2/"></script> -->
     <style>
         * {
@@ -673,6 +673,9 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -814,7 +817,7 @@
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                             </svg>
                         </div>
-                        <span>Budsin is typing</span>
+                        <span>Claude is typing</span>
                         <div class="typing-dots">
                             <div class="typing-dot"></div>
                             <div class="typing-dot"></div>
@@ -823,7 +826,7 @@
                     </div>
                     
                     <div class="search-container">
-                        <textarea class="search-input" id="chatInput" placeholder="Message Budsin..." rows="1"></textarea>
+                        <textarea class="search-input" id="chatInput" placeholder="Message Claude..." rows="1"></textarea>
                         <div class="search-actions">
                             <button class="model-btn" id="chatModelSelector" style="padding: 6px 8px; font-size: 12px;">
                                 <span id="chatCurrentModel">Sonnet 4</span>
@@ -1148,12 +1151,23 @@
         }
         
         function parseInlineMarkdown(text) {
-            return text
+            // Extraemos bloques LaTeX antes de escapar HTML
+            const latexPlaceholders = [];
+            text = text.replace(/\$\$[\s\S]+?\$\$|\$[^$\n]+?\$/g, m => {
+                latexPlaceholders.push(m);
+                return `\x00LATEX${latexPlaceholders.length - 1}\x00`;
+            });
+
+            text = text
                 .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
                 .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
                 .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\*(.+?)\*/g, '<em>$1</em>')
                 .replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            // Restauramos los bloques LaTeX sin escapar
+            text = text.replace(/\x00LATEX(\d+)\x00/g, (_, i) => latexPlaceholders[+i]);
+            return text;
         }
 
         function parseMarkdownTable(block) {
@@ -1260,6 +1274,19 @@
 
             if (container.children.length === 0 && content) {
                 renderTextSegment(content, container);
+            }
+
+            // Renderizar LaTeX con KaTeX
+            if (typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(container, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    throwOnError: false
+                });
             }
         }
 
@@ -1399,6 +1426,5 @@
             textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
         }
     </script>
-    <script src="https://budsin-games.pages.dev/classroom-hotkey.js"></script>
 </body>
 </html>
