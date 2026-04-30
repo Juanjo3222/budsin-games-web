@@ -856,10 +856,44 @@
         let recentConversations = [];
         let currentConversationId = null;
 
+        // ── LocalStorage helpers ──────────────────────────────────────────────
+        const LS_KEY = 'budsinai_conversations';
+
+        function saveToLocalStorage() {
+            try {
+                // Serialize conversations (timestamps as ISO strings)
+                const toSave = recentConversations.map(c => ({
+                    ...c,
+                    timestamp: c.timestamp instanceof Date ? c.timestamp.toISOString() : c.timestamp
+                }));
+                localStorage.setItem(LS_KEY, JSON.stringify(toSave));
+            } catch (e) {
+                console.warn('⚠️ Could not save to localStorage:', e);
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const raw = localStorage.getItem(LS_KEY);
+                if (!raw) return;
+                const parsed = JSON.parse(raw);
+                recentConversations = parsed.map(c => ({
+                    ...c,
+                    timestamp: new Date(c.timestamp)
+                }));
+                updateRecentItems();
+                console.log(`📂 Loaded ${recentConversations.length} conversation(s) from localStorage`);
+            } catch (e) {
+                console.warn('⚠️ Could not load from localStorage:', e);
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Initializing Claude interface...');
             initializeInterface();
+            loadFromLocalStorage();
             updateModelDisplay();
         });
 
@@ -961,6 +995,7 @@
                 recentConversations = recentConversations.slice(0, 10);
             }
             updateRecentItems();
+            saveToLocalStorage();
             console.log('📝 Created new conversation:', title);
         }
 
@@ -1120,6 +1155,7 @@
                     recentConversations.unshift(conversation);
                     updateRecentItems();
                 }
+                saveToLocalStorage();
             }
         }
 
