@@ -190,7 +190,7 @@ Firebase se usa únicamente para el conteo de popularidad.
 ## 📝 Changelog
 
 ### v4.6
-* Se agregó **Super Smash Bros 64** al catálogo con portada `smb64.webp`, acceso directo desde el index e integración al sistema de ranking/popularidad.
+* Se agregaron **Super Smash Bros 64**, **Crossy Road**, **Plague Inc** y **Odd Bot Out** al catálogo con portadas propias, acceso directo desde el index e integración al sistema de ranking/popularidad.
 
 ---
 
