@@ -189,13 +189,8 @@ Firebase se usa únicamente para el conteo de popularidad.
 
 ## 📝 Changelog
 
-### v4.5
-* Se agregó **Budsin AI** al portal con portada `ai.jpeg`, acceso directo desde el index e integración al sistema de ranking/popularidad.
-
-### v4.3.0
-* Se agregaron **RubDy, Super Mario Bros, Pac-Man, Super Mario World, Galaga y Centipede Arcade** al catálogo del portal.
-* Las nuevas entradas se integraron al **index** y al sistema de **ranking/popularidad**.
-* El changelog del portal ahora se muestra como **v4.3.0** y no puede cerrarse hasta después de 5 segundos.
+### v4.6
+* Se agregó **Super Smash Bros 64** al catálogo con portada `smb64.webp`, acceso directo desde el index e integración al sistema de ranking/popularidad.
 
 ---
 
