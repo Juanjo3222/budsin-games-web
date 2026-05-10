@@ -3,8 +3,35 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Budsin Games" />
-        <title>Budsin Games</title>
+        <meta name="description" content="Budsin Games: portal de juegos gratis en navegador con experiencia tipo consola. Juega Minecraft, Geometry Dash, Among Us y más de 39 juegos online sin descargar nada." />
+        <meta name="keywords" content="juegos gratis, juegos online, navegador, Minecraft, Geometry Dash, Among Us, juegos sin descargar, portal de juegos, Budsin Games" />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:title" content="Budsin Games — Juega gratis desde el navegador" />
+        <meta property="og:description" content="Más de 39 juegos listos para jugar al instante. Interfaz tipo consola, sin descargas, desde cualquier dispositivo." />
+        <meta property="og:image" content="https://budsin-games.pages.dev/Snapshot18-1.jpg" />
+        <meta property="og:url" content="https://budsin-games.pages.dev" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XB8WJ1MR8D"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XB8WJ1MR8D');
+        </script>
+        <title>Budsin Games — Juegos gratis en el navegador</title>
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Budsin Games",
+            "url": "https://budsin-games.pages.dev",
+            "description": "Portal de juegos gratis en navegador con experiencia tipo consola. Más de 39 juegos para jugar al instante.",
+            "inLanguage": ["es", "en", "pt"],
+            "applicationCategory": "Game"
+        }
+        </script>
         <link rel="icon" type="image/jpeg" href="images.jpeg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -1111,6 +1138,169 @@
                 background: rgba(9, 15, 28, 0.92);
                 border-color: rgba(148, 163, 184, 0.28);
             }
+
+            /* Articulos / Consejos */
+            .articles-section {
+                padding: 22px;
+                border: 1px solid rgba(255, 255, 255, 0.8);
+                border-radius: 40px;
+                background: rgba(255, 255, 255, 0.72);
+                box-shadow: var(--shadow);
+                backdrop-filter: blur(12px);
+                margin-top: 22px;
+            }
+            .articles-head {
+                margin-bottom: 18px;
+            }
+            .articles-kicker {
+                display: inline-flex;
+                margin-bottom: 8px;
+                padding: 7px 12px;
+                border-radius: 999px;
+                background: rgba(45, 174, 255, 0.1);
+                color: var(--blue);
+                font-size: 0.78rem;
+                font-weight: 800;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
+            .articles-head h2 {
+                margin: 0;
+                font-family: "Bebas Neue", sans-serif;
+                font-size: clamp(2rem, 4vw, 2.8rem);
+                letter-spacing: 0.03em;
+            }
+            .articles-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+                gap: 14px;
+            }
+            .article-card {
+                padding: 20px;
+                border-radius: 24px;
+                border: 1px solid var(--line);
+                background: var(--surface-strong);
+                box-shadow: var(--shadow-soft);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+            .article-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 18px 36px rgba(15, 23, 42, 0.1);
+            }
+            .article-icon {
+                font-size: 2rem;
+                margin-bottom: 10px;
+            }
+            .article-card h3 {
+                margin: 0 0 8px;
+                font-size: 1rem;
+                font-weight: 800;
+                line-height: 1.3;
+            }
+            .article-card p {
+                margin: 0;
+                color: var(--muted);
+                font-size: 0.88rem;
+                line-height: 1.65;
+            }
+            .article-link {
+                display: inline-flex;
+                margin-top: 12px;
+                padding: 6px 14px;
+                border-radius: 999px;
+                background: linear-gradient(135deg, var(--red), #ff8c55);
+                color: #fff;
+                font-size: 0.82rem;
+                font-weight: 800;
+                text-decoration: none;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .article-link:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 16px rgba(239, 63, 69, 0.3);
+            }
+            html[data-site-theme="dark"] .articles-section {
+                background: rgba(9, 15, 28, 0.82);
+                border-color: rgba(148, 163, 184, 0.14);
+            }
+            html[data-site-theme="dark"] .articles-head h2 { color: #f1f5f9; }
+            html[data-site-theme="dark"] .articles-kicker { background: rgba(45, 174, 255, 0.18); color: #93dcff; }
+            html[data-site-theme="dark"] .article-card {
+                background: rgba(9, 15, 28, 0.94);
+                border-color: rgba(148, 163, 184, 0.14);
+            }
+            html[data-site-theme="dark"] .article-card h3 { color: #e2e8f0; }
+            html[data-site-theme="dark"] .article-card p { color: #94a3b8; }
+
+            /* Footer */
+            .site-footer {
+                margin-top: 22px;
+                padding: 24px 22px;
+                border-radius: 32px;
+                border: 1px solid rgba(255, 255, 255, 0.8);
+                background: rgba(255, 255, 255, 0.72);
+                box-shadow: var(--shadow-soft);
+                backdrop-filter: blur(12px);
+            }
+            .footer-inner {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+            }
+            .footer-brand {
+                display: flex;
+                flex-direction: column;
+            }
+            .footer-brand strong {
+                font-family: "Bebas Neue", sans-serif;
+                font-size: 1.6rem;
+                letter-spacing: 0.04em;
+                line-height: 1;
+            }
+            .footer-brand span {
+                font-size: 0.82rem;
+                color: var(--muted);
+            }
+            .footer-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .footer-links a {
+                padding: 8px 14px;
+                border-radius: 999px;
+                border: 1px solid var(--line);
+                background: var(--surface-strong);
+                color: var(--text);
+                text-decoration: none;
+                font-size: 0.82rem;
+                font-weight: 700;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .footer-links a:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-soft);
+            }
+            .footer-copy {
+                width: 100%;
+                text-align: center;
+                font-size: 0.78rem;
+                color: var(--muted);
+            }
+            html[data-site-theme="dark"] .site-footer {
+                background: rgba(9, 15, 28, 0.82);
+                border-color: rgba(148, 163, 184, 0.14);
+            }
+            html[data-site-theme="dark"] .footer-brand strong { color: #f1f5f9; }
+            html[data-site-theme="dark"] .footer-brand span { color: #94a3b8; }
+            html[data-site-theme="dark"] .footer-links a {
+                background: rgba(9, 15, 28, 0.92);
+                border-color: rgba(148, 163, 184, 0.28);
+                color: #e2e8f0;
+            }
+            html[data-site-theme="dark"] .footer-copy { color: #94a3b8; }
 
             @media (max-width: 1180px) {
                 .games {
@@ -3242,12 +3432,71 @@
                     >Envia tus sugerencias a Budsin</a
                 >
             </div>
+
+            <section class="articles-section">
+                <div class="articles-head">
+                    <span class="articles-kicker" data-i18n="articlesKicker">Consejos y guías</span>
+                    <h2 data-i18n="articlesTitle">Tips para sacarle más partido al portal</h2>
+                </div>
+                <div class="articles-grid">
+                    <article class="article-card">
+                        <div class="article-icon">🎮</div>
+                        <h3 data-i18n="article1Title">Cómo usar el modo oculto</h3>
+                        <p data-i18n="article1Desc">El Classroom Hotkey te permite ocultar el portal al instante. Configura tu tecla de acceso rápido y una URL de disfraz desde la página de Ajustes. Al pulsar la tecla, el sitio se redirige a la URL que prefieras.</p>
+                        <a href="settings.html" class="article-link" data-i18n="article1Cta">Ir a Ajustes →</a>
+                    </article>
+                    <article class="article-card">
+                        <div class="article-icon">⭐</div>
+                        <h3 data-i18n="article2Title">Guarda tus favoritos</h3>
+                        <p data-i18n="article2Desc">Haz clic en la estrella de cualquier juego para añadirlo a tu lista de favoritos. Los favoritos se guardan automáticamente en tu navegador y aparecen en la sección "Tus juegos" para que los encuentres al instante.</p>
+                    </article>
+                    <article class="article-card">
+                        <div class="article-icon">🔍</div>
+                        <h3 data-i18n="article3Title">Busca y filtra juegos</h3>
+                        <p data-i18n="article3Desc">Usa el buscador en tiempo real para encontrar juegos por nombre. También puedes filtrar por categoría: Acción, Idle, Multiplayer, Clásicos o herramientas. El contador de resultados te muestra cuántos juegos coinciden.</p>
+                    </article>
+                    <article class="article-card">
+                        <div class="article-icon">🌐</div>
+                        <h3 data-i18n="article4Title">Cambia de idioma</h3>
+                        <p data-i18n="article4Desc">El portal está disponible en español, inglés y portugués. Usa el selector de idioma en la esquina superior derecha para cambiar al instante. Tu preferencia quedará guardada para la próxima visita.</p>
+                    </article>
+                </div>
+            </section>
+
+            <footer class="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-brand">
+                        <strong>Budsin Games</strong>
+                        <span data-i18n="footerTagline">Juegos gratis en el navegador</span>
+                    </div>
+                    <nav class="footer-links">
+                        <a href="about.html" data-i18n="footerAbout">Acerca de</a>
+                        <a href="privacidad.html" data-i18n="footerPrivacy">Privacidad</a>
+                        <a href="contacto.html" data-i18n="footerContact">Contacto</a>
+                        <a href="comentarios.html" data-i18n="footerFeedback">Comentarios</a>
+                    </nav>
+                    <small class="footer-copy" data-i18n="footerCopy">© 2026 Budsin Games. Todos los juegos pertenecen a sus respectivos creadores.</small>
+                </div>
+            </footer>
+
             <script
                 async="async"
                 data-cfasync="false"
                 src="https://pl29226955.profitablecpmratenetwork.com/3822757dc469f188bf377ea7050634be/invoke.js"
             ></script>
             <div id="container-3822757dc469f188bf377ea7050634be"></div>
+            <footer style="margin-top:28px;padding:18px 22px;border-radius:24px;border:1px solid var(--line);background:var(--surface);display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:center;font-size:0.85rem;color:var(--muted);">
+                <a href="about.html" style="color:var(--blue);text-decoration:none;font-weight:600;">Acerca de</a>
+                <span style="opacity:0.3;">·</span>
+                <a href="privacidad.html" style="color:var(--blue);text-decoration:none;font-weight:600;">Privacidad</a>
+                <span style="opacity:0.3;">·</span>
+                <a href="terms.html" style="color:var(--blue);text-decoration:none;font-weight:600;">Términos</a>
+                <span style="opacity:0.3;">·</span>
+                <a href="contacto.html" style="color:var(--blue);text-decoration:none;font-weight:600;">Contacto</a>
+                <span style="opacity:0.3;">·</span>
+                <a href="comentarios.html" style="color:var(--blue);text-decoration:none;font-weight:600;">Comentarios</a>
+                <span style="margin-left:auto;opacity:0.5;">Budsin Games © 2026</span>
+            </footer>
         </main>
 
         <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -3417,6 +3666,23 @@
                     shelfRecent: "🕐 Jugado recientemente",
                     noRecent: "Aún no has jugado nada.",
                     categoriesLabel: "Categorías",
+                    articlesKicker: "Consejos y guías",
+                    articlesTitle: "Tips para sacarle más partido al portal",
+                    article1Title: "Cómo usar el modo oculto",
+                    article1Desc: "El Classroom Hotkey te permite ocultar el portal al instante. Configura tu tecla de acceso rápido y una URL de disfraz desde la página de Ajustes. Al pulsar la tecla, el sitio se redirige a la URL que prefieras.",
+                    article1Cta: "Ir a Ajustes →",
+                    article2Title: "Guarda tus favoritos",
+                    article2Desc: "Haz clic en la estrella de cualquier juego para añadirlo a tu lista de favoritos. Los favoritos se guardan automáticamente en tu navegador y aparecen en la sección Tus juegos para que los encuentres al instante.",
+                    article3Title: "Busca y filtra juegos",
+                    article3Desc: "Usa el buscador en tiempo real para encontrar juegos por nombre. También puedes filtrar por categoría: Acción, Idle, Multiplayer, Clásicos o herramientas. El contador de resultados te muestra cuántos juegos coinciden.",
+                    article4Title: "Cambia de idioma",
+                    article4Desc: "El portal está disponible en español, inglés y portugués. Usa el selector de idioma en la esquina superior derecha para cambiar al instante. Tu preferencia quedará guardada para la próxima visita.",
+                    footerTagline: "Juegos gratis en el navegador",
+                    footerAbout: "Acerca de",
+                    footerPrivacy: "Privacidad",
+                    footerContact: "Contacto",
+                    footerFeedback: "Comentarios",
+                    footerCopy: "© 2026 Budsin Games. Todos los juegos pertenecen a sus respectivos creadores.",
                 },
                 en: {
                     htmlLang: "en",
@@ -3476,6 +3742,23 @@
                     shelfRecent: "🕐 Recently played",
                     noRecent: "You haven't played anything yet.",
                     categoriesLabel: "Categories",
+                    articlesKicker: "Tips & guides",
+                    articlesTitle: "Tips to get the most out of the portal",
+                    article1Title: "How to use hidden mode",
+                    article1Desc: "The Classroom Hotkey lets you hide the portal instantly. Set up your shortcut key and a disguise URL from the Settings page. Press the key and the site redirects to your preferred URL.",
+                    article1Cta: "Go to Settings →",
+                    article2Title: "Save your favorites",
+                    article2Desc: "Click the star on any game to add it to your favorites list. Favorites are saved automatically in your browser and appear in the Your Games section for instant access.",
+                    article3Title: "Search and filter games",
+                    article3Desc: "Use the real-time search to find games by name. You can also filter by category: Action, Idle, Multiplayer, Classics, or Tools. The result counter shows matching games.",
+                    article4Title: "Change language",
+                    article4Desc: "The portal is available in Spanish, English, and Portuguese. Use the language picker in the top-right corner to switch instantly. Your preference is saved for your next visit.",
+                    footerTagline: "Free browser games",
+                    footerAbout: "About",
+                    footerPrivacy: "Privacy",
+                    footerContact: "Contact",
+                    footerFeedback: "Feedback",
+                    footerCopy: "© 2026 Budsin Games. All games belong to their respective creators.",
                 },
                 pt: {
                     htmlLang: "pt",
@@ -3535,6 +3818,23 @@
                     shelfRecent: "🕐 Jogado recentemente",
                     noRecent: "Você ainda não jogou nada.",
                     categoriesLabel: "Categorias",
+                    articlesKicker: "Dicas e guias",
+                    articlesTitle: "Dicas para aproveitar melhor o portal",
+                    article1Title: "Como usar o modo oculto",
+                    article1Desc: "O Classroom Hotkey permite ocultar o portal instantaneamente. Configure sua tecla de atalho e uma URL de disfarce na página de Configurações. Ao pressionar a tecla, o site redireciona para a URL desejada.",
+                    article1Cta: "Ir para Configurações →",
+                    article2Title: "Salve seus favoritos",
+                    article2Desc: "Clique na estrela de qualquer jogo para adicioná-lo à sua lista de favoritos. Os favoritos são salvos automaticamente no seu navegador e aparecem na seção Seus Jogos para acesso instantâneo.",
+                    article3Title: "Pesquise e filtre jogos",
+                    article3Desc: "Use a busca em tempo real para encontrar jogos pelo nome. Você também pode filtrar por categoria: Ação, Idle, Multiplayer, Clássicos ou Ferramentas. O contador mostra quantos jogos correspondem.",
+                    article4Title: "Mude o idioma",
+                    article4Desc: "O portal está disponível em espanhol, inglês e português. Use o seletor de idioma no canto superior direito para alternar instantaneamente. Sua preferência será salva para a próxima visita.",
+                    footerTagline: "Jogos grátis no navegador",
+                    footerAbout: "Sobre",
+                    footerPrivacy: "Privacidade",
+                    footerContact: "Contato",
+                    footerFeedback: "Comentários",
+                    footerCopy: "© 2026 Budsin Games. Todos os jogos pertencem a seus respectivos criadores.",
                 },
             };
 

@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/Games-39-blue" />
   <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange" />
-  <img src="https://img.shields.io/badge/Version-4.5-purple" />
+  <img src="https://img.shields.io/badge/Version-5.0-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -125,7 +125,11 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 └── public/
     ├── index.html
     ├── 404.html
+    ├── about.html            ← Acerca de (información del proyecto)
+    ├── contacto.html         ← Contacto y canales de comunicación
+    ├── privacidad.html       ← Política de privacidad
     ├── settings.html
+    ├── comentarios.html
     ├── [juego].html          ← Páginas de cada juego (estructura plana)
     ├── Funkin-HTML-Port-main/  ← Friday Night Funkin (port completo)
     ├── cookie/               ← Cookie Clicker (port completo)
@@ -188,6 +192,13 @@ Firebase se usa únicamente para el conteo de popularidad.
 ---
 
 ## 📝 Changelog
+
+### v5.0
+* Se añadieron páginas de **Acerca de**, **Contacto** y **Política de Privacidad** con contenido sustancial para cumplir con los requisitos de AdSense.
+* Se mejoró el **SEO del sitio**: meta tags, Open Graph, Twitter Cards y datos estructurados (JSON-LD).
+* Se agregó una sección de **artículos/consejos** en la página principal con guías de uso del portal.
+* Se implementó un **footer** consistente en todas las páginas con navegación a políticas y páginas legales.
+* Se mejoró la **página 404** con diseño propio, navegación y estilo acorde al portal.
 
 ### v4.7
 * Se agregaron **Super Smash Bros 64**, **Crossy Road**, **Plague Inc**, **Odd Bot Out** y **Brawl Stars** al catálogo con portadas propias, acceso directo desde el index e integración al sistema de ranking/popularidad.

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Términos de Servicio de Budsin Games. Condiciones de uso del portal de juegos online." />
+        <title>Términos de Servicio · Budsin Games</title>
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XB8WJ1MR8D"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XB8WJ1MR8D');
+        </script>
+        <link rel="icon" type="image/jpeg" href="images.jpeg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;700;800&display=swap" rel="stylesheet" />
+        <style>
+            :root {
+                --bg: #edf1f5;
+                --bg-2: #dfe6ee;
+                --surface: rgba(255,255,255,0.92);
+                --surface-strong: #ffffff;
+                --line: rgba(18,24,38,0.1);
+                --text: #111827;
+                --muted: #5c6678;
+                --red: #ef3f45;
+                --blue: #2daeff;
+                --shadow: 0 24px 64px rgba(15,23,42,0.12);
+                --shadow-soft: 0 16px 36px rgba(15,23,42,0.08);
+            }
+            *, *::before, *::after { box-sizing: border-box; }
+            body {
+                margin: 0; min-height: 100vh;
+                font-family: "Sora", sans-serif;
+                color: var(--text);
+                background: radial-gradient(circle at top center, rgba(255,216,74,0.28), transparent 30%), linear-gradient(180deg, #f7fafc 0%, var(--bg) 55%, var(--bg-2) 100%);
+                overflow-x: hidden;
+            }
+            body::before, body::after {
+                content: ""; position: fixed; top: 24px; bottom: 24px;
+                width: clamp(14px,2.8vw,34px);
+                border-radius: 999px; opacity: 0.95; pointer-events: none; z-index: 0;
+            }
+            body::before { left:14px; background: linear-gradient(180deg,#ff686e 0%,var(--red) 100%); box-shadow: inset 0 0 0 2px rgba(255,255,255,.35); }
+            body::after  { right:14px; background: linear-gradient(180deg,#63d4ff 0%,var(--blue) 100%); box-shadow: inset 0 0 0 2px rgba(255,255,255,.35); }
+            .shell {
+                position: relative; z-index: 1;
+                width: min(960px, calc(100% - 80px));
+                margin: 0 auto; padding: 28px 0 64px;
+            }
+            .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+            .back-link {
+                display: inline-flex; align-items: center; gap: 8px;
+                padding: 10px 18px; border-radius: 999px;
+                border: 1px solid var(--line); background: var(--surface-strong);
+                box-shadow: var(--shadow-soft); color: var(--text);
+                text-decoration: none; font-size: .88rem; font-weight: 700;
+                transition: transform .2s, box-shadow .2s;
+            }
+            .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+            .page-header {
+                padding: 28px 32px; border: 1px solid rgba(255,255,255,.8);
+                border-radius: 36px;
+                background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(246,249,252,.88)), linear-gradient(135deg, rgba(239,63,69,.07), rgba(45,174,255,.07));
+                box-shadow: var(--shadow); margin-bottom: 24px;
+                position: relative; overflow: hidden;
+            }
+            .page-header::after {
+                content: ""; position: absolute; inset: 20px 20px auto auto;
+                width: 160px; height: 160px; border-radius: 40px;
+                background: radial-gradient(circle at 30% 30%, rgba(239,63,69,0.18), transparent 52%), radial-gradient(circle at 70% 70%, rgba(45,174,255,0.16), transparent 46%);
+                transform: rotate(14deg); opacity: 0.85;
+            }
+            .page-kicker {
+                display: inline-flex; margin-bottom: 10px; padding: 7px 12px;
+                border-radius: 999px; background: rgba(239,63,69,0.1);
+                color: var(--red); font-size: 0.78rem; font-weight: 800;
+                letter-spacing: 0.08em; text-transform: uppercase;
+            }
+            .page-header h1 {
+                margin: 0 0 8px; font-family: "Bebas Neue", sans-serif;
+                font-size: clamp(3rem, 8vw, 5.5rem); line-height: 0.92;
+                letter-spacing: 0.04em; position: relative; z-index: 1;
+            }
+            .page-header p {
+                margin: 0; color: var(--muted); line-height: 1.7;
+                font-size: 0.98rem; max-width: 48rem; position: relative; z-index: 1;
+            }
+            .content-card {
+                padding: 28px 32px; border: 1px solid rgba(255,255,255,.8);
+                border-radius: 28px; background: var(--surface);
+                box-shadow: var(--shadow-soft); line-height: 1.8; font-size: 0.95rem;
+            }
+            .content-card h2 {
+                font-family: "Bebas Neue", sans-serif; font-size: 1.8rem;
+                letter-spacing: 0.03em; margin: 28px 0 12px;
+            }
+            .content-card h2:first-child { margin-top: 0; }
+            .content-card h3 { font-size: 1.05rem; font-weight: 800; margin: 20px 0 8px; }
+            .content-card p { margin: 0 0 14px; color: var(--muted); }
+            .content-card ul { margin: 0 0 14px; padding-left: 20px; color: var(--muted); }
+            .content-card li { margin-bottom: 6px; }
+            .content-card a { color: var(--blue); }
+            .content-card strong { color: var(--text); }
+            .last-updated {
+                display: inline-block; margin-top: 20px; padding: 8px 14px;
+                border-radius: 999px; background: rgba(17,24,39,0.05);
+                font-size: 0.82rem; color: var(--muted);
+            }
+            nav.page-links {
+                display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px;
+            }
+            nav.page-links a {
+                display: inline-flex; padding: 10px 18px; border-radius: 999px;
+                background: var(--surface-strong); border: 1px solid var(--line);
+                color: var(--text); text-decoration: none; font-size: 0.88rem; font-weight: 700;
+                transition: transform .2s, box-shadow .2s;
+            }
+            nav.page-links a:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+            @media (max-width: 920px) {
+                body::before, body::after { display: none; }
+                .shell { width: min(100%, calc(100% - 28px)); }
+            }
+            @media (max-width: 680px) {
+                .shell { padding-top: 18px; }
+                .page-header { padding: 20px; border-radius: 28px; }
+                .content-card { padding: 20px; border-radius: 24px; }
+            }
+            html[data-site-theme="dark"] body { color: #e6edf8; }
+            html[data-site-theme="dark"] .back-link { background: rgba(9,15,28,.92); border-color: rgba(148,163,184,.28); color: #e2e8f0; }
+            html[data-site-theme="dark"] .page-header { background: linear-gradient(135deg, rgba(9,15,28,.96), rgba(15,23,42,.92)); border-color: rgba(148,163,184,.14); }
+            html[data-site-theme="dark"] .page-header h1 { color: #f1f5f9; }
+            html[data-site-theme="dark"] .page-header p { color: #94a3b8; }
+            html[data-site-theme="dark"] .page-kicker { background: rgba(255,104,110,.15); color: var(--red); }
+            html[data-site-theme="dark"] .content-card { background: rgba(9,15,28,.88); border-color: rgba(148,163,184,.14); }
+            html[data-site-theme="dark"] .content-card p, html[data-site-theme="dark"] .content-card ul { color: #94a3b8; }
+            html[data-site-theme="dark"] .content-card h2, html[data-site-theme="dark"] .content-card strong { color: #f1f5f9; }
+            html[data-site-theme="dark"] .last-updated { background: rgba(148,163,184,.1); color: #94a3b8; }
+            html[data-site-theme="dark"] nav.page-links a { background: rgba(9,15,28,.92); border-color: rgba(148,163,184,.28); color: #e2e8f0; }
+        </style>
+    </head>
+    <body>
+        <main class="shell">
+            <div class="top">
+                <a class="back-link" href="index.html">← Volver al portal</a>
+            </div>
+            <div class="page-header">
+                <span class="page-kicker">Legal</span>
+                <h1>Términos de Servicio</h1>
+                <p>Condiciones generales de uso del portal Budsin Games. Al utilizar este sitio aceptas los términos aquí descritos.</p>
+            </div>
+            <div class="content-card">
+                <h2>1. Aceptación de los términos</h2>
+                <p>Al acceder y utilizar Budsin Games, aceptas cumplir con estos Términos de Servicio. Si no estás de acuerdo con alguno de estos términos, te recomendamos no utilizar el sitio.</p>
+
+                <h2>2. Descripción del servicio</h2>
+                <p>Budsin Games es un portal web que actúa como agregador de enlaces y emuladores de juegos ejecutables directamente en el navegador. No alojamos ni distribuimos software descargable; todos los juegos se ejecutan del lado del cliente mediante tecnologías web estándar.</p>
+                <p>El sitio se ofrece "tal cual" y no garantizamos la disponibilidad continua del servicio, aunque hacemos nuestro mejor esfuerzo por mantenerlo operativo.</p>
+
+                <h2>3. Uso permitido</h2>
+                <p>Como usuario de Budsin Games, aceptas:</p>
+                <ul>
+                    <li>Utilizar el sitio únicamente con fines legales y de entretenimiento personal.</li>
+                    <li>No intentar vulnerar la seguridad del sitio ni de sus servicios asociados.</li>
+                    <li>No reproducir, distribuir ni explotar comercialmente el contenido del portal sin autorización.</li>
+                    <li>No utilizar el sitio para actividades ilegales o que infrinjan derechos de terceros.</li>
+                </ul>
+
+                <h2>4. Propiedad intelectual</h2>
+                <p>Los juegos, marcas comerciales, logotipos y activos visuales mostrados en Budsin Games son propiedad de sus respectivos creadores y titulares de derechos. Budsin Games actúa únicamente como portal de acceso y no reclama propiedad sobre ninguno de los juegos alojados o enlazados.</p>
+                <p>El código, diseño e interfaz del portal Budsin Games (excluyendo los juegos) es propiedad del desarrollador del portal y no puede ser reproducido sin autorización.</p>
+
+                <h2>5. Enlaces a terceros</h2>
+                <p>El sitio puede contener enlaces a servicios de terceros (Firebase, Google AdSense, Padlet, Cloudflare). No somos responsables de las prácticas de privacidad o el contenido de dichos servicios. Te recomendamos revisar sus políticas respectivas.</p>
+
+                <h2>6. Limitación de responsabilidad</h2>
+                <p>Budsin Games no se hace responsable por:</p>
+                <ul>
+                    <li>Daños directos o indirectos derivados del uso o la imposibilidad de uso del sitio.</li>
+                    <li>Pérdida de datos almacenados en el navegador (favoritos, preferencias) debido a acciones del usuario o fallos técnicos.</li>
+                    <li>El contenido, disponibilidad o funcionamiento de los juevos de terceros enlazados desde el portal.</li>
+                </ul>
+
+                <h2>7. Privacidad</h2>
+                <p>El tratamiento de tus datos se describe en nuestra <a href="privacidad.html">Política de Privacidad</a>. Al usar el sitio, aceptas las prácticas descritas en dicha política.</p>
+
+                <h2>8. Modificaciones</h2>
+                <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Los cambios entrarán en vigor inmediatamente después de su publicación en esta página. Te recomendamos revisar periódicamente los Términos de Servicio.</p>
+
+                <h2>9. Contacto</h2>
+                <p>Si tienes preguntas sobre estos términos, puedes contactarnos a través de nuestra <a href="contacto.html">página de contacto</a>.</p>
+
+                <span class="last-updated">Última actualización: 10 de mayo de 2026</span>
+
+                <nav class="page-links">
+                    <a href="about.html">ℹ️ Acerca de</a>
+                    <a href="privacidad.html">📋 Política de Privacidad</a>
+                    <a href="contacto.html">✉️ Contacto</a>
+                    <a href="comentarios.html">💬 Comentarios</a>
+                </nav>
+            </div>
+        </main>
+        <script src="site-theme.js"></script>
+        <script src="classroom-hotkey.js"></script>
+    </body>
+</html>

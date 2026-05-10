@@ -3,8 +3,17 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="description" content="Budsin Games Settings" />
-        <title>Budsin Games · Ajustes</title>
+        <meta name="description" content="Personaliza el Classroom Hotkey y el comportamiento de Budsin Games. Configura URLs de disfraz, teclas de acceso rápido y más." />
+        <meta name="robots" content="index, follow" />
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XB8WJ1MR8D"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XB8WJ1MR8D');
+        </script>
+        <title>Budsin Games · Ajustes y configuración</title>
         <link rel="icon" type="image/jpeg" href="images.jpeg" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -416,6 +425,61 @@
                 .row-3 { grid-template-columns: 1fr; }
             }
 
+            /* ── Footer ── */
+            .site-footer {
+                margin-top: 22px;
+                padding: 24px 22px;
+                border-radius: 28px;
+                border: 1px solid rgba(255,255,255,.8);
+                background: rgba(255,255,255,.72);
+                box-shadow: var(--shadow-soft);
+                backdrop-filter: blur(12px);
+            }
+            .footer-inner {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+            }
+            .footer-brand {
+                display: flex;
+                flex-direction: column;
+            }
+            .footer-brand strong {
+                font-family: "Bebas Neue", sans-serif;
+                font-size: 1.6rem;
+                letter-spacing: 0.04em;
+                line-height: 1;
+            }
+            .footer-brand span {
+                font-size: 0.82rem;
+                color: var(--muted);
+            }
+            .footer-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .footer-links a {
+                padding: 8px 14px;
+                border-radius: 999px;
+                border: 1px solid var(--line);
+                background: var(--surface-strong);
+                color: var(--text);
+                text-decoration: none;
+                font-size: 0.82rem;
+                font-weight: 700;
+                transition: transform .2s, box-shadow .2s;
+            }
+            .footer-links a:hover { transform: translateY(-2px); box-shadow: var(--shadow-soft); }
+            .footer-copy {
+                width: 100%;
+                text-align: center;
+                font-size: 0.78rem;
+                color: var(--muted);
+            }
+
             /* ────────────────────────────────────────
                Dark mode
             ──────────────────────────────────────── */
@@ -495,6 +559,19 @@
                 background: rgba(240,248,255,.92);
                 color: #0b1220;
             }
+
+            html[data-site-theme="dark"] .site-footer {
+                background: rgba(9,15,28,.82);
+                border-color: rgba(148,163,184,.14);
+            }
+            html[data-site-theme="dark"] .footer-brand strong { color: #f1f5f9; }
+            html[data-site-theme="dark"] .footer-brand span { color: #94a3b8; }
+            html[data-site-theme="dark"] .footer-links a {
+                background: rgba(9,15,28,.92);
+                border-color: rgba(148,163,184,.28);
+                color: #e2e8f0;
+            }
+            html[data-site-theme="dark"] .footer-copy { color: #94a3b8; }
         </style>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
     </head>
@@ -633,6 +710,23 @@
                 </div>
             </div>
 
+            <!-- Footer -->
+            <footer class="site-footer">
+                <div class="footer-inner">
+                    <div class="footer-brand">
+                        <strong>Budsin Games</strong>
+                        <span data-i18n="footerTagline">Juegos gratis en el navegador</span>
+                    </div>
+                    <nav class="footer-links">
+                        <a href="about.html" data-i18n="footerAbout">Acerca de</a>
+                        <a href="privacidad.html" data-i18n="footerPrivacy">Privacidad</a>
+                        <a href="terms.html" data-i18n="footerTerms">Términos</a>
+                        <a href="contacto.html" data-i18n="footerContact">Contacto</a>
+                        <a href="comentarios.html" data-i18n="footerFeedback">Comentarios</a>
+                    </nav>
+                    <small class="footer-copy" data-i18n="footerCopy">© 2026 Budsin Games. Todos los juegos pertenecen a sus respectivos creadores.</small>
+                </div>
+            </footer>
         </div><!-- /.shell -->
 
         <!-- Toast -->
@@ -691,6 +785,13 @@
                     activateLabel: "Activar",
                     activeLabel: "Activa ✓",
                     editLabel: "Editar",
+                    footerTagline: "Juegos gratis en el navegador",
+                    footerAbout: "Acerca de",
+                    footerPrivacy: "Privacidad",
+                    footerTerms: "Términos",
+                    footerContact: "Contacto",
+                    footerFeedback: "Comentarios",
+                    footerCopy: "© 2026 Budsin Games. Todos los juegos pertenecen a sus respectivos creadores.",
                 },
                 en: {
                     htmlLang: "en",
@@ -727,6 +828,13 @@
                     activateLabel: "Activate",
                     activeLabel: "Active ✓",
                     editLabel: "Edit",
+                    footerTagline: "Free browser games",
+                    footerAbout: "About",
+                    footerPrivacy: "Privacy",
+                    footerTerms: "Terms",
+                    footerContact: "Contact",
+                    footerFeedback: "Feedback",
+                    footerCopy: "© 2026 Budsin Games. All games belong to their respective creators.",
                 },
                 pt: {
                     htmlLang: "pt",
@@ -763,6 +871,13 @@
                     activateLabel: "Ativar",
                     activeLabel: "Ativo ✓",
                     editLabel: "Editar",
+                    footerTagline: "Jogos grátis no navegador",
+                    footerAbout: "Sobre",
+                    footerPrivacy: "Privacidade",
+                    footerTerms: "Termos",
+                    footerContact: "Contato",
+                    footerFeedback: "Comentários",
+                    footerCopy: "© 2026 Budsin Games. Todos os jogos pertencem a seus respectivos criadores.",
                 },
             };
 

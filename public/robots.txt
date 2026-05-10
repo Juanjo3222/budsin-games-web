@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://budsin-games.pages.dev/sitemap.xml

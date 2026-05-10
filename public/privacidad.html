@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Política de Privacidad de Budsin Games. Información sobre cómo manejamos tus datos y el uso de cookies y servicios de terceros." />
+        <!-- Google tag (gtag.js) -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XB8WJ1MR8D"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XB8WJ1MR8D');
+        </script>
+        <title>Política de Privacidad · Budsin Games</title>
+        <link rel="icon" type="image/jpeg" href="images.jpeg" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;700;800&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --bg: #edf1f5;
+                --bg-2: #dfe6ee;
+                --surface: rgba(255, 255, 255, 0.92);
+                --surface-strong: #ffffff;
+                --line: rgba(18, 24, 38, 0.1);
+                --text: #111827;
+                --muted: #5c6678;
+                --red: #ef3f45;
+                --blue: #2daeff;
+                --shadow: 0 24px 64px rgba(15, 23, 42, 0.12);
+                --shadow-soft: 0 16px 36px rgba(15, 23, 42, 0.08);
+            }
+            *, *::before, *::after { box-sizing: border-box; }
+            body {
+                margin: 0;
+                min-height: 100vh;
+                font-family: "Sora", sans-serif;
+                color: var(--text);
+                background: radial-gradient(circle at top center, rgba(255,216,74,0.28), transparent 30%), linear-gradient(180deg, #f7fafc 0%, var(--bg) 55%, var(--bg-2) 100%);
+                overflow-x: hidden;
+            }
+            body::before, body::after {
+                content: "";
+                position: fixed;
+                top: 24px; bottom: 24px;
+                width: clamp(14px,2.8vw,34px);
+                border-radius: 999px;
+                opacity: 0.95;
+                pointer-events: none;
+                z-index: 0;
+            }
+            body::before { left:14px; background: linear-gradient(180deg,#ff686e 0%,var(--red) 100%); box-shadow: inset 0 0 0 2px rgba(255,255,255,.35); }
+            body::after  { right:14px; background: linear-gradient(180deg,#63d4ff 0%,var(--blue) 100%); box-shadow: inset 0 0 0 2px rgba(255,255,255,.35); }
+            .shell {
+                position: relative;
+                z-index: 1;
+                width: min(960px, calc(100% - 80px));
+                margin: 0 auto;
+                padding: 28px 0 64px;
+            }
+            .top {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin-bottom: 22px;
+            }
+            .back-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                padding: 10px 18px;
+                border-radius: 999px;
+                border: 1px solid var(--line);
+                background: var(--surface-strong);
+                box-shadow: var(--shadow-soft);
+                color: var(--text);
+                text-decoration: none;
+                font-size: .88rem;
+                font-weight: 700;
+                transition: transform .2s, box-shadow .2s;
+            }
+            .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+            .page-header {
+                padding: 28px 32px;
+                border: 1px solid rgba(255,255,255,.8);
+                border-radius: 36px;
+                background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(246,249,252,.88)), linear-gradient(135deg, rgba(239,63,69,.07), rgba(45,174,255,.07));
+                box-shadow: var(--shadow);
+                margin-bottom: 24px;
+                position: relative;
+                overflow: hidden;
+            }
+            .page-header::after {
+                content: "";
+                position: absolute;
+                inset: 20px 20px auto auto;
+                width: 160px; height: 160px;
+                border-radius: 40px;
+                background: radial-gradient(circle at 30% 30%, rgba(239,63,69,0.18), transparent 52%), radial-gradient(circle at 70% 70%, rgba(45,174,255,0.16), transparent 46%);
+                transform: rotate(14deg);
+                opacity: 0.85;
+            }
+            .page-kicker {
+                display: inline-flex;
+                margin-bottom: 10px;
+                padding: 7px 12px;
+                border-radius: 999px;
+                background: rgba(239,63,69,0.1);
+                color: var(--red);
+                font-size: 0.78rem;
+                font-weight: 800;
+                letter-spacing: 0.08em;
+                text-transform: uppercase;
+            }
+            .page-header h1 {
+                margin: 0 0 8px;
+                font-family: "Bebas Neue", sans-serif;
+                font-size: clamp(3rem, 8vw, 5.5rem);
+                line-height: 0.92;
+                letter-spacing: 0.04em;
+                position: relative;
+                z-index: 1;
+            }
+            .page-header p {
+                margin: 0;
+                color: var(--muted);
+                line-height: 1.7;
+                font-size: 0.98rem;
+                max-width: 48rem;
+                position: relative;
+                z-index: 1;
+            }
+            .content-card {
+                padding: 28px 32px;
+                border: 1px solid rgba(255,255,255,.8);
+                border-radius: 28px;
+                background: var(--surface);
+                box-shadow: var(--shadow-soft);
+                line-height: 1.8;
+                font-size: 0.95rem;
+            }
+            .content-card h2 {
+                font-family: "Bebas Neue", sans-serif;
+                font-size: 1.8rem;
+                letter-spacing: 0.03em;
+                margin: 28px 0 12px;
+            }
+            .content-card h2:first-child { margin-top: 0; }
+            .content-card h3 {
+                font-size: 1.05rem;
+                font-weight: 800;
+                margin: 20px 0 8px;
+            }
+            .content-card p { margin: 0 0 14px; color: var(--muted); }
+            .content-card ul { margin: 0 0 14px; padding-left: 20px; color: var(--muted); }
+            .content-card li { margin-bottom: 6px; }
+            .content-card a { color: var(--blue); }
+            .content-card strong { color: var(--text); }
+            .last-updated {
+                display: inline-block;
+                margin-top: 20px;
+                padding: 8px 14px;
+                border-radius: 999px;
+                background: rgba(17,24,39,0.05);
+                font-size: 0.82rem;
+                color: var(--muted);
+            }
+            @media (max-width: 920px) {
+                body::before, body::after { display: none; }
+                .shell { width: min(100%, calc(100% - 28px)); }
+            }
+            @media (max-width: 680px) {
+                .shell { padding-top: 18px; }
+                .page-header { padding: 20px; border-radius: 28px; }
+                .content-card { padding: 20px; border-radius: 24px; }
+            }
+            html[data-site-theme="dark"] body { color: #e6edf8; }
+            html[data-site-theme="dark"] .back-link { background: rgba(9,15,28,.92); border-color: rgba(148,163,184,.28); color: #e2e8f0; }
+            html[data-site-theme="dark"] .page-header { background: linear-gradient(135deg, rgba(9,15,28,.96), rgba(15,23,42,.92)); border-color: rgba(148,163,184,.14); }
+            html[data-site-theme="dark"] .page-header h1 { color: #f1f5f9; }
+            html[data-site-theme="dark"] .page-header p { color: #94a3b8; }
+            html[data-site-theme="dark"] .page-kicker { background: rgba(255,104,110,.15); color: var(--red); }
+            html[data-site-theme="dark"] .content-card { background: rgba(9,15,28,.88); border-color: rgba(148,163,184,.14); }
+            html[data-site-theme="dark"] .content-card p, html[data-site-theme="dark"] .content-card ul { color: #94a3b8; }
+            html[data-site-theme="dark"] .content-card h2, html[data-site-theme="dark"] .content-card strong { color: #f1f5f9; }
+            html[data-site-theme="dark"] .last-updated { background: rgba(148,163,184,.1); color: #94a3b8; }
+        </style>
+    </head>
+    <body>
+        <main class="shell">
+            <div class="top">
+                <a class="back-link" href="index.html">← Volver al portal</a>
+            </div>
+            <div class="page-header">
+                <span class="page-kicker">Legal</span>
+                <h1>Política de Privacidad</h1>
+                <p>Información sobre cómo recopilamos, usamos y protegemos tus datos en Budsin Games.</p>
+            </div>
+            <div class="content-card">
+                <h2>1. Información que recopilamos</h2>
+                <p>Budsin Games recopila información mínima para el funcionamiento del sitio:</p>
+                <ul>
+                    <li><strong>Datos de navegación anónimos:</strong> Utilizamos Firebase Firestore para contar clics en los juegos de forma agregada y anónima. No almacenamos direcciones IP, ubicación precisa ni identificadores personales.</li>
+                    <li><strong>Almacenamiento local (localStorage):</strong> Guardamos tus preferencias (idioma, favoritos, tecla de acceso rápido, URLs de disfraz) exclusivamente en tu navegador. Estos datos no son enviados a nuestros servidores.</li>
+                    <li><strong>Cookies de terceros:</strong> Google AdSense puede utilizar cookies para mostrar anuncios personalizados. Consulta la sección 4 para más detalles.</li>
+                </ul>
+
+                <h2>2. Cómo usamos tu información</h2>
+                <p>Los datos recopilados se utilizan exclusivamente para:</p>
+                <ul>
+                    <li>Mostrar el ranking de juegos más populares (conteo anónimo de clics).</li>
+                    <li>Recordar tus preferencias de idioma, favoritos y configuración en tu navegador.</li>
+                    <li>Mostrar anuncios a través de Google AdSense.</li>
+                    <li>Mejorar la experiencia de usuario y el rendimiento del sitio.</li>
+                </ul>
+
+                <h2>3. Servicios de terceros</h2>
+                <p>Este sitio utiliza los siguientes servicios de terceros:</p>
+                <ul>
+                    <li><strong>Google AdSense:</strong> Para mostrar anuncios. Puede recopilar datos de navegación para personalizar anuncios. Más información en <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">Política de Privacidad de Google</a>.</li>
+                    <li><strong>Firebase (Google):</strong> Para el conteo anónimo de popularidad de juegos. No almacenamos datos personales en Firebase.</li>
+                    <li><strong>Cloudflare Pages:</strong> Como plataforma de alojamiento. Cloudflare puede recopilar datos de tráfico básicos con fines de seguridad y rendimiento.</li>
+                    <li><strong>Padlet:</strong> Para el tablero de comentarios y sugerencias. Consulta la <a href="https://padlet.com/about/privacy" target="_blank" rel="noreferrer">Política de Privacidad de Padlet</a>.</li>
+                </ul>
+
+                <h2>4. Cookies</h2>
+                <p>Este sitio utiliza cookies propias y de terceros para:</p>
+                <ul>
+                    <li>Recordar tus preferencias (idioma, favoritos) mediante localStorage.</li>
+                    <li>Mostrar anuncios relevantes a través de Google AdSense.</li>
+                    <li>Analizar el tráfico del sitio de forma anónima.</li>
+                </ul>
+                <p>Puedes gestionar o desactivar las cookies de terceros desde la configuración de tu navegador. Ten en cuenta que deshabilitar ciertas cookies puede afectar la visualización de anuncios.</p>
+
+                <h2>5. Menores de edad</h2>
+                <p>Budsin Games es un portal de juegos apto para todas las edades. Sin embargo, no recopilamos intencionadamente datos personales de menores de 13 años. Si eres padre o tutor y crees que tu hijo ha proporcionado datos personales, contáctanos para que los eliminemos.</p>
+
+                <h2>6. Tus derechos</h2>
+                <p>Según el RGPD y otras leyes de privacidad aplicables, tienes derecho a:</p>
+                <ul>
+                    <li>Acceder a los datos que tenemos sobre ti.</li>
+                    <li>Solicitar la eliminación de tus datos.</li>
+                    <li>Limitar u oponerte al procesamiento de tus datos.</li>
+                    <li>Solicitar la portabilidad de tus datos.</li>
+                </ul>
+                <p>Para ejercer estos derechos, contáctanos a través del <a href="contacto.html">formulario de contacto</a>.</p>
+
+                <h2>7. Cambios en esta política</h2>
+                <p>Podemos actualizar esta política de privacidad periódicamente. Te recomendamos revisar esta página para estar informado de cualquier cambio. La fecha de la última actualización se indica al final de esta página.</p>
+
+                <h2>8. Contacto</h2>
+                <p>Si tienes preguntas sobre esta política de privacidad, puedes contactarnos a través de nuestra <a href="contacto.html">página de contacto</a> o mediante el <a href="https://forms.gle/bUHTy8Lt6Kz1qkAx8" target="_blank" rel="noreferrer">formulario de sugerencias</a>.</p>
+
+                <div class="last-updated">Última actualización: 10 de mayo de 2026</div>
+                <nav class="page-links">
+                    <a href="about.html">ℹ️ Acerca de</a>
+                    <a href="terms.html">⚖️ Términos de Servicio</a>
+                    <a href="contacto.html">✉️ Contacto</a>
+                    <a href="comentarios.html">💬 Comentarios</a>
+                </nav>
+            </div>
+        </main>
+        <script src="site-theme.js"></script>
+        <script src="classroom-hotkey.js"></script>
+    </body>
+</html>
