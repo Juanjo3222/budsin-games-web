@@ -58,4 +58,4 @@ Estas funcionalidades fueron **aprobadas por el usuario** y deben implementarse 
 - [ ] **Badge "Nuevo"** (`data-new="true"`): Inyectar via JS un `<span class="new-badge">Nuevo</span>` en las tarjetas con `data-new="true"`. Estilo: píldora verde-azul, esquina inferior-izquierda de la portada. Sin Firebase.
 
 ---
-*Última actualización: 25 de abril de 2026*
+*Última actualización: 10 de mayo de 2026*

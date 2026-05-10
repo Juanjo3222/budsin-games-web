@@ -189,8 +189,8 @@ Firebase se usa únicamente para el conteo de popularidad.
 
 ## 📝 Changelog
 
-### v4.6
-* Se agregaron **Super Smash Bros 64**, **Crossy Road**, **Plague Inc** y **Odd Bot Out** al catálogo con portadas propias, acceso directo desde el index e integración al sistema de ranking/popularidad.
+### v4.7
+* Se agregaron **Super Smash Bros 64**, **Crossy Road**, **Plague Inc**, **Odd Bot Out** y **Brawl Stars** al catálogo con portadas propias, acceso directo desde el index e integración al sistema de ranking/popularidad.
 
 ---
 
