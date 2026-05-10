@@ -3577,6 +3577,13 @@
             const typeFilters = document.getElementById("typeFilters");
             const cards = Array.from(document.querySelectorAll(".game-card"));
 
+            // Precargar audio para la transición (Chrome necesita datos cargados para autoplay)
+            let preloadedAudioUrl = "bmusic.mp3";
+            fetch("bmusic.mp3")
+                .then(r => r.blob())
+                .then(blob => { preloadedAudioUrl = URL.createObjectURL(blob); })
+                .catch(() => {});
+
             // Inyectar badge "Nuevo" en tarjetas marcadas
             cards.forEach((card) => {
                 if (card.dataset.new === "true") {
@@ -4624,6 +4631,7 @@
                 video.play();
 
                 loadAudio = document.getElementById("loading-audio");
+                loadAudio.src = preloadedAudioUrl;
                 loadAudio.currentTime = 0;
                 loadAudio.volume = 1;
                 loadAudio.play().then(() => {
