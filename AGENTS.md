@@ -33,10 +33,27 @@ Este archivo centraliza la lógica de desarrollo de `budsin-games.pages.dev`. Es
 3. **Estructura Plana**: Todo juego vive en `public/[nombre-del-juego]`. No usar la carpeta `/games`.
 4. **Firebase Minimalista**: Solo para conteo de impactos. Prohibido crear sistemas de Login/Auth por defecto.
 
-5. **Assets obligatorios en páginas de juego**: Toda página de juego nueva o editada **debe incluir** en su `<head>`:
+5. **Assets obligatorios en TODA página HTML**: Cualquier `.html` dentro de `public/` **debe incluir** en su `<head>` (lo más alto posible, tras `<meta charset>`):
    - Favicon: `<link rel="icon" type="image/jpeg" href="https://budsin-games.pages.dev/images.jpeg">`
+   - Google Tag Manager: 
+     ```html
+     <!-- Google Tag Manager -->
+     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+     })(window,document,'script','dataLayer','GTM-5ZT26944');</script>
+     <!-- End Google Tag Manager -->
+     ```
+   - Inmediatamente después de `<body>`:
+     ```html
+     <!-- Google Tag Manager (noscript) -->
+     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZT26944"
+     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+     <!-- End Google Tag Manager (noscript) -->
+     ```
    - Script Classroom Hotkey: `<script src="https://budsin-games.pages.dev/classroom-hotkey.js"></script>` (justo antes de `</body>`)
-   - Sin excepción. Aplica a cualquier `.html` dentro de `public/` que sea una página de juego.
+   - Sin excepción. Aplica a **cualquier** `.html` dentro de `public/`.
 
 6. **Traducciones obligatorias al añadir un juego**: Cada vez que se añada una nueva tarjeta de juego al `index.html`, se deben completar **los 3 idiomas** sin excepción:
    - **HTML** (`<a class="game-card">`): atributos `data-desc-es="..."` y `data-desc-en="..."` en el `<p>` de descripción; `data-label-es="Disponible" data-label-en="Available"` en el `<span>` de estado; `data-es="..."` y `data-en="..."` en el `<span class="category-tag">`.
