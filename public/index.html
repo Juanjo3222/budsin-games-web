@@ -1472,6 +1472,7 @@
             <video id="loading-video" muted playsinline preload="auto">
                 <source src="Budsin%20Games.mp4" type="video/mp4">
             </video>
+            <audio id="loading-audio" preload="auto" src="bmusic.mp3"></audio>
             <div id="loading-bar-wrap">
                 <div id="loading-bar-fill"></div>
             </div>
@@ -4622,10 +4623,17 @@
                 video.currentTime = 0;
                 video.play();
 
-                loadAudio = new Audio("bmusic.mp3");
-                loadAudio.currentTime = 69;
+                loadAudio = document.getElementById("loading-audio");
+                loadAudio.currentTime = 0;
                 loadAudio.volume = 1;
-                loadAudio.play();
+                loadAudio.play().then(() => {
+                    loadAudio.currentTime = 69;
+                }).catch(() => {
+                    loadAudio.addEventListener("loadedmetadata", () => {
+                        loadAudio.currentTime = 69;
+                        loadAudio.play().catch(() => {});
+                    }, { once: true });
+                });
 
                 let start = performance.now();
                 const duration = 9000;
