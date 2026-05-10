@@ -810,7 +810,7 @@
                 z-index: 60;
                 display: grid;
                 place-items: center;
-                background: rgba(11, 18, 32, 0.8);
+                background: #000;
                 opacity: 0;
                 pointer-events: none;
                 transition: opacity 0.25s ease;
@@ -821,32 +821,75 @@
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                gap: 12px;
                 opacity: 1;
                 pointer-events: all;
             }
 
-            .loader-dot {
-                width: 64px;
-                height: 64px;
+            #loading-video {
+                position: absolute;
+                inset: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            #loading-bar-wrap {
+                position: absolute;
+                bottom: calc(50% - 8cm);
+                left: 50%;
+                transform: translateX(-50%);
+                width: min(320px, 75%);
+                height: 10px;
+                background: rgba(255,255,255,0.15);
                 border-radius: 999px;
-                border: 4px solid rgba(255, 255, 255, 0.24);
-                border-top-color: var(--surface-strong);
-                animation: spin 0.8s linear infinite;
+                overflow: visible;
+                z-index: 2;
+                box-shadow: 0 0 12px rgba(239,63,69,0.3);
             }
 
-            .app-transition-text {
-                margin: 0;
+            #loading-bar-fill {
+                width: 0%;
+                height: 100%;
+                background: linear-gradient(90deg, #ef3f45, #ff8c55, #ffb347);
+                border-radius: 999px;
+                transition: width 0.3s ease;
+                box-shadow: 0 0 8px rgba(239,63,69,0.6);
+            }
+
+            #loading-pct {
+                position: absolute;
+                bottom: calc(50% - 8cm - 22px);
+                left: 50%;
+                transform: translateX(-50%);
                 color: #fff;
+                font-size: 14px;
                 font-weight: 700;
-                letter-spacing: 0.03em;
-                text-align: center;
+                font-family: 'Inter', system-ui, sans-serif;
+                letter-spacing: 0.05em;
+                text-shadow: 0 0 10px rgba(0,0,0,0.8);
+                z-index: 2;
             }
 
-            @keyframes spin {
-                to {
-                    transform: rotate(360deg);
-                }
+            #skip-loading-btn {
+                position: absolute;
+                top: 20px;
+                right: 24px;
+                z-index: 3;
+                background: #000;
+                border: 1px solid rgba(255,255,255,0.25);
+                color: #fff;
+                font-size: 14px;
+                font-weight: 600;
+                padding: 8px 18px;
+                border-radius: 999px;
+                cursor: pointer;
+                transition: background 0.2s, border-color 0.2s;
+                font-family: 'Inter', system-ui, sans-serif;
+                letter-spacing: 0.03em;
+            }
+            #skip-loading-btn:hover {
+                background: #1a1a1a;
+                border-color: rgba(255,255,255,0.5);
             }
 
             html[data-site-theme="dark"] .search-wrap,
@@ -1426,14 +1469,14 @@
                 </div>
 
         <div id="appTransition" class="app-transition" aria-hidden="true">
-            <div
-                class="loader-dot"
-                aria-label="Cargando"
-                data-i18n-aria="loaderLabel"
-            ></div>
-            <p class="app-transition-text" data-i18n="loadingPage">
-                Cargando página...
-            </p>
+            <video id="loading-video" muted playsinline preload="auto">
+                <source src="Budsin%20Games.mp4" type="video/mp4">
+            </video>
+            <div id="loading-bar-wrap">
+                <div id="loading-bar-fill"></div>
+            </div>
+            <span id="loading-pct">0%</span>
+            <button id="skip-loading-btn" data-i18n="skipLoading" aria-label="Skip"></button>
         </div>
 
         <main class="shell">
@@ -3651,6 +3694,7 @@
                     suggestionsLink: "Envia tus sugerencias a Budsin",
                     loadingPage: "Cargando página...",
                     loaderLabel: "Cargando",
+                    skipLoading: "Saltar 🡥",
                     closeNotification: "Cerrar notificación",
                     changelogTitle: "Novedades de Budsin Games",
                     changelogDesc:
@@ -3727,6 +3771,7 @@
                     suggestionsLink: "Send your suggestions to Budsin",
                     loadingPage: "Loading page...",
                     loaderLabel: "Loading",
+                    skipLoading: "Skip 🡥",
                     closeNotification: "Close notification",
                     changelogTitle: "What's new in Budsin Games",
                     changelogDesc:
@@ -3803,6 +3848,7 @@
                     suggestionsLink: "Envie suas sugestões ao Budsin",
                     loadingPage: "Carregando página...",
                     loaderLabel: "Carregando",
+                    skipLoading: "Pular 🡥",
                     closeNotification: "Fechar notificação",
                     changelogTitle: "Novidades do Budsin Games",
                     changelogDesc:
@@ -3974,6 +4020,14 @@
 
             function resetAppTransition() {
                 if (!appTransition) return;
+                const video = document.getElementById("loading-video");
+                if (video) { video.pause(); video.currentTime = 0; }
+                if (loadAudio) { loadAudio.pause(); loadAudio = null; }
+                if (loadTimer) { cancelAnimationFrame(loadTimer); loadTimer = null; }
+                const bar = document.getElementById("loading-bar-fill");
+                if (bar) bar.style.width = "0%";
+                const pct = document.getElementById("loading-pct");
+                if (pct) pct.textContent = "0%";
                 appTransition.classList.remove("is-open");
                 appTransition.setAttribute("aria-hidden", "true");
             }
@@ -4557,18 +4611,93 @@
                 updateDynamicLabels();
             }
 
+            let loadTimer = null, loadAudio = null, navTimer = null, pendingNavUrl = null, pendingGameName = "", firebasePromise = null;
+
             function openAppTransition() {
                 appTransition.classList.add("is-open");
                 appTransition.setAttribute("aria-hidden", "false");
+
+                const video = document.getElementById("loading-video");
+                const bar = document.getElementById("loading-bar-fill");
+                video.currentTime = 0;
+                video.play();
+
+                loadAudio = new Audio("bmusic.mp3");
+                loadAudio.currentTime = 69;
+                loadAudio.volume = 1;
+                loadAudio.play();
+
+                let start = performance.now();
+                const duration = 9000;
+                const fadeStart = 5000;
+
+                if (loadTimer) cancelAnimationFrame(loadTimer);
+                function tick() {
+                    const elapsed = performance.now() - start;
+                    const pct = Math.min(100, (elapsed / duration) * 100);
+                    bar.style.width = pct + "%";
+                    document.getElementById("loading-pct").textContent = Math.round(pct) + "%";
+                    if (elapsed >= fadeStart && loadAudio) {
+                        const fadeElapsed = elapsed - fadeStart;
+                        const fadeDur = duration - fadeStart;
+                        loadAudio.volume = Math.max(0, 1 - fadeElapsed / fadeDur);
+                    }
+                    if (elapsed < duration) {
+                        loadTimer = requestAnimationFrame(tick);
+                    }
+                }
+                tick();
+            }
+
+            function closeAppTransition() {
+                const video = document.getElementById("loading-video");
+                video.pause();
+                video.currentTime = 0;
+                if (loadAudio) { loadAudio.pause(); loadAudio = null; }
+                if (loadTimer) { cancelAnimationFrame(loadTimer); loadTimer = null; }
+                const bar = document.getElementById("loading-bar-fill");
+                bar.style.width = "0%";
+                document.getElementById("loading-pct").textContent = "0%";
+                appTransition.classList.remove("is-open");
+                appTransition.setAttribute("aria-hidden", "true");
             }
 
             function navigateToGame(url) {
-                window.setTimeout(() => {
+                pendingNavUrl = url;
+                navTimer = setTimeout(() => {
+                    closeAppTransition();
                     const destination = new URL(url, window.location.href);
                     destination.searchParams.set("lang", currentLanguage);
                     window.location.href = `${destination.pathname}${destination.search}${destination.hash}`;
-                }, 260);
+                }, 9000);
             }
+
+            document.getElementById("skip-loading-btn").addEventListener("click", async () => {
+                if (navTimer) {
+                    clearTimeout(navTimer);
+                    navTimer = null;
+                }
+                if (loadTimer) {
+                    cancelAnimationFrame(loadTimer);
+                    loadTimer = null;
+                }
+                const video = document.getElementById("loading-video");
+                if (video) { video.pause(); video.currentTime = 0; }
+                if (loadAudio) { loadAudio.pause(); loadAudio = null; }
+                document.getElementById("loading-bar-fill").style.width = "0%";
+                document.getElementById("loading-pct").textContent = "0%";
+                if (firebasePromise) {
+                    const success = await firebasePromise;
+                    if (!success && pendingNavUrl) {
+                        queueRemoteIncrement(pendingNavUrl, pendingGameName, 1);
+                    }
+                }
+                if (pendingNavUrl) {
+                    const destination = new URL(pendingNavUrl, window.location.href);
+                    destination.searchParams.set("lang", currentLanguage);
+                    window.location.href = `${destination.pathname}${destination.search}${destination.hash}`;
+                }
+            });
 
             cards.forEach((card) => {
                 const favBtn = card.querySelector(".favorite-btn");
@@ -4591,6 +4720,9 @@
                     event.preventDefault();
                     const href = getCardHref(card);
                     const gameName = card.querySelector("strong").textContent;
+                    pendingNavUrl = href;
+                    pendingGameName = gameName;
+                    firebasePromise = incrementRemotePopularity(href, gameName, 1);
                     openAppTransition();
                     // Guardar en jugado recientemente
                     const recent = readJson(RECENTLY_PLAYED_KEY, []);
@@ -4604,11 +4736,7 @@
                         (Number(popularityState[href]) || 0) + 1;
                     saveLocalPopularity();
                     renderShelves();
-                    const success = await incrementRemotePopularity(
-                        href,
-                        gameName,
-                        1,
-                    );
+                    const success = await firebasePromise;
                     if (!success) {
                         queueRemoteIncrement(href, gameName, 1);
                     }
@@ -4771,5 +4899,6 @@
         </script>
         <script src="site-theme.js"></script>
         <script src="classroom-hotkey.js"></script>
+        <script src="lines-bg.js"></script>
     </body>
 </html>
