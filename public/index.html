@@ -1680,7 +1680,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <div id="recentlyPlayedList" class="recent-grid"></div>
                     </section>
                     <div id="banner-spot"></div>
-                    <script src="https://keepandroidopen.org/banner.js?lang=es&id=banner-spot&hidebutton=off"></script>
                 </div>
 
                 <div class="games-heading">
@@ -4535,6 +4534,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 renderShelves();
                 applyFilters();
                 updateDynamicLabels();
+                loadBanner(nextLanguage);
+            }
+
+            function loadBanner(lang) {
+                const spot = document.getElementById("banner-spot");
+                if (!spot) return;
+                spot.innerHTML = "";
+                const s = document.createElement("script");
+                s.src = `https://keepandroidopen.org/banner.js?lang=${lang}&id=banner-spot&hidebutton=off`;
+                spot.appendChild(s);
             }
 
             function loadLanguagePreference() {
