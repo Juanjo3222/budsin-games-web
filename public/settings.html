@@ -352,6 +352,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 accent-color: var(--blue);
                 cursor: pointer;
             }
+            input[type="range"]:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
             .slider-value {
                 min-width: 52px;
                 text-align: right;
@@ -721,6 +725,38 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
 
+            <!-- ── Card 5: Loading Screen ── -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon green">🎬</div>
+                    <div>
+                        <h2 data-i18n="cardLoadingTitle">Pantalla de carga</h2>
+                        <p data-i18n="cardLoadingSub">Personaliza la transición al abrir un juego.</p>
+                    </div>
+                </div>
+
+                <!-- Audio toggle -->
+                <div class="toggle-row">
+                    <div>
+                        <div class="toggle-label" data-i18n="toggleAudioLabel">Música de carga</div>
+                        <div class="toggle-sub" data-i18n="toggleAudioSub">Reproduce bmusic.mp3 durante la pantalla de carga de 9 segundos.</div>
+                    </div>
+                    <label class="toggle" aria-label="Música de carga">
+                        <input type="checkbox" id="toggleLoadingAudio" />
+                        <span class="toggle-track"></span>
+                    </label>
+                </div>
+
+                <!-- Duration slider -->
+                <div style="margin-top:6px">
+                    <label class="field-label" for="loadingDurationSlider" data-i18n="loadingDurationLabel">Duración de la carga (segundos)</label>
+                    <div class="slider-row">
+                        <input type="range" id="loadingDurationSlider" min="4" max="15" step="1" value="9" />
+                        <span class="slider-value" id="loadingDurationValue">9s</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Footer -->
             <footer class="site-footer">
                 <div class="footer-inner">
@@ -755,6 +791,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 HOTKEY:     "budsin_hotkey",
                 QUICK_TOGGLE: "budsin_quick_toggle_visible",
                 AUTO_DISGUISE: "budsin_auto_disguise_ms",
+                LOADING_AUDIO: "budsin_loading_audio",
+                LOADING_DURATION: "budsin_loading_duration",
             };
 
             var DEFAULT_URL = "https://docs.google.com/document/d/1gwlAb1OGRGyBkAvdOzILU-i9UquM4nauJ6X3uSnyUXE/edit?usp=sharing";
@@ -796,6 +834,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     activateLabel: "Activar",
                     activeLabel: "Activa ✓",
                     editLabel: "Editar",
+                    cardLoadingTitle: "Pantalla de carga",
+                    cardLoadingSub: "Personaliza la transición al abrir un juego.",
+                    toggleAudioLabel: "Música de carga",
+                    toggleAudioSub: "Reproduce bmusic.mp3 durante la pantalla de carga de 9 segundos.",
+                    loadingDurationLabel: "Duración de la carga (segundos)",
                     footerTagline: "Juegos gratis en el navegador",
                     footerAbout: "Acerca de",
                     footerPrivacy: "Privacidad",
@@ -839,6 +882,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     activateLabel: "Activate",
                     activeLabel: "Active ✓",
                     editLabel: "Edit",
+                    cardLoadingTitle: "Loading screen",
+                    cardLoadingSub: "Customize the transition when opening a game.",
+                    toggleAudioLabel: "Loading music",
+                    toggleAudioSub: "Play bmusic.mp3 during the 9-second loading screen.",
+                    loadingDurationLabel: "Loading duration (seconds)",
                     footerTagline: "Free browser games",
                     footerAbout: "About",
                     footerPrivacy: "Privacy",
@@ -882,6 +930,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     activateLabel: "Ativar",
                     activeLabel: "Ativo ✓",
                     editLabel: "Editar",
+                    cardLoadingTitle: "Tela de carregamento",
+                    cardLoadingSub: "Personalize a transição ao abrir um jogo.",
+                    toggleAudioLabel: "Música de carregamento",
+                    toggleAudioSub: "Reproduz bmusic.mp3 durante a tela de carregamento de 9 segundos.",
+                    loadingDurationLabel: "Duração do carregamento (segundos)",
                     footerTagline: "Jogos grátis no navegador",
                     footerAbout: "Sobre",
                     footerPrivacy: "Privacidade",
@@ -1183,6 +1236,42 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (toggleAutoEl.checked) {
                     store(KEYS.AUTO_DISGUISE, String(parseInt(this.value, 10) * 1000));
                 }
+            });
+
+            // ─── Loading screen ───
+            var toggleLoadingAudioEl = document.getElementById("toggleLoadingAudio");
+            var loadingDurationSliderEl = document.getElementById("loadingDurationSlider");
+            var loadingDurationValueEl = document.getElementById("loadingDurationValue");
+
+            function syncLoadingDuration() {
+                if (toggleLoadingAudioEl.checked) {
+                    loadingDurationSliderEl.value = "9";
+                    loadingDurationSliderEl.disabled = true;
+                    loadingDurationValueEl.textContent = "9s (fijo)";
+                    store(KEYS.LOADING_DURATION, "9000");
+                } else {
+                    loadingDurationSliderEl.disabled = false;
+                    var secs = parseInt(loadingDurationSliderEl.value, 10);
+                    loadingDurationValueEl.textContent = secs + "s";
+                }
+            }
+
+            toggleLoadingAudioEl.checked = load(KEYS.LOADING_AUDIO, "0") === "1";
+            var storedDuration = parseInt(load(KEYS.LOADING_DURATION, "9000"), 10) || 9000;
+            loadingDurationSliderEl.value = Math.round(storedDuration / 1000);
+            syncLoadingDuration();
+
+            toggleLoadingAudioEl.addEventListener("change", function() {
+                store(KEYS.LOADING_AUDIO, this.checked ? "1" : "0");
+                syncLoadingDuration();
+                showToast(I18N[getCurrentLanguage()].toastSaved);
+            });
+
+            loadingDurationSliderEl.addEventListener("input", function() {
+                if (toggleLoadingAudioEl.checked) return;
+                var secs = parseInt(this.value, 10);
+                loadingDurationValueEl.textContent = secs + "s";
+                store(KEYS.LOADING_DURATION, String(secs * 1000));
             });
 
             // ─── Language ───

@@ -3942,6 +3942,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             let currentLanguage = "es";
 
+            const LOADING_AUDIO_KEY = "budsin_loading_audio";
+            const LOADING_DURATION_KEY = "budsin_loading_duration";
+            function getLoadingAudioEnabled() {
+                return localStorage.getItem(LOADING_AUDIO_KEY) === "1";
+            }
+            function getLoadingDuration() {
+                const v = parseInt(localStorage.getItem(LOADING_DURATION_KEY), 10);
+                return (v && v >= 4000) ? v : 9000;
+            }
+
             let activeType = "all";
             let activeCategory = "";
             let popularityState = readJson(POPULARITY_KEY, {});
@@ -4690,22 +4700,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 video.currentTime = 0;
                 video.play();
 
-                loadAudio = document.getElementById("loading-audio");
-                loadAudio.src = preloadedAudioUrl;
-                loadAudio.currentTime = 0;
-                loadAudio.volume = 1;
-                loadAudio.play().then(() => {
-                    loadAudio.currentTime = 69;
-                }).catch(() => {
-                    loadAudio.addEventListener("loadedmetadata", () => {
+                if (getLoadingAudioEnabled()) {
+                    loadAudio = document.getElementById("loading-audio");
+                    loadAudio.src = preloadedAudioUrl;
+                    loadAudio.currentTime = 0;
+                    loadAudio.volume = 1;
+                    loadAudio.play().then(() => {
                         loadAudio.currentTime = 69;
-                        loadAudio.play().catch(() => {});
-                    }, { once: true });
-                });
+                    }).catch(() => {
+                        loadAudio.addEventListener("loadedmetadata", () => {
+                            loadAudio.currentTime = 69;
+                            loadAudio.play().catch(() => {});
+                        }, { once: true });
+                    });
+                }
 
                 let start = performance.now();
-                const duration = 9000;
-                const fadeStart = 5000;
+                const duration = getLoadingDuration();
+                const fadeStart = Math.min(5000, duration * 0.55);
 
                 if (loadTimer) cancelAnimationFrame(loadTimer);
                 function tick() {
@@ -4740,12 +4752,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             function navigateToGame(url) {
                 pendingNavUrl = url;
+                const duration = getLoadingDuration();
                 navTimer = setTimeout(() => {
                     closeAppTransition();
                     const destination = new URL(url, window.location.href);
                     destination.searchParams.set("lang", currentLanguage);
                     window.location.href = `${destination.pathname}${destination.search}${destination.hash}`;
-                }, 9000);
+                }, duration);
             }
 
             document.getElementById("skip-loading-btn").addEventListener("click", async () => {
