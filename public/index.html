@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
     <head>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -27,7 +27,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           gtag('js', new Date());
           gtag('config', 'G-XB8WJ1MR8D');
         </script>
-        <title>Budsin Games — Juegos gratis en el navegador</title>
+        <title>Budsin Games — Free browser games portal</title>
         <script type="application/ld+json">
         {
             "@context": "https://schema.org",
@@ -150,7 +150,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             }
 
             .title::before {
-                content: var(--home-label, "Inicio");
+                content: var(--home-label, "Home");
                 display: inline-flex;
                 margin-bottom: 14px;
                 padding: 8px 14px;
@@ -1505,10 +1505,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <span aria-hidden="true">🌐</span>
                         <select
                             id="languageSelect"
-                            aria-label="Seleccionar idioma"
+                            aria-label="Select language"
                         >
+                            <option value="en" selected>English</option>
                             <option value="es">Español</option>
-                            <option value="en">English</option>
                             <option value="pt">Português</option>
                         </select>
                     </label>
@@ -1592,7 +1592,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <input
                             id="gameSearch"
                             type="search"
-                            placeholder="Buscar juego por nombre..."
+                            placeholder="Search game by name..."
                             autocomplete="off"
                         />
                     </label>
@@ -3940,7 +3940,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 },
             };
 
-            let currentLanguage = "es";
+            let currentLanguage = "en";
 
             const LOADING_AUDIO_KEY = "budsin_loading_audio";
             const LOADING_DURATION_KEY = "budsin_loading_duration";
@@ -4314,7 +4314,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
 
             function getTranslations() {
-                return TRANSLATIONS[currentLanguage] || TRANSLATIONS.es;
+                return TRANSLATIONS[currentLanguage] || TRANSLATIONS.en;
             }
 
             const PT_DESCRIPTIONS = {
@@ -4559,9 +4559,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             function loadLanguagePreference() {
                 try {
                     const savedLanguage = localStorage.getItem(LANGUAGE_KEY);
-                    return TRANSLATIONS[savedLanguage] ? savedLanguage : "es";
+                    return TRANSLATIONS[savedLanguage] ? savedLanguage : "en";
                 } catch (error) {
-                    return "es";
+                    return "en";
                 }
             }
 

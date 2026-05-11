@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es">
+<html lang="en">
     <head>
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -599,9 +599,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <a id="backLink" class="back-link" href="index.html">← Volver al portal</a>
                 <label class="language-picker" for="languageSelect">
                     <span>🌐</span>
-                    <select id="languageSelect" aria-label="Seleccionar idioma">
-                        <option value="es">Español</option>
+                    <select id="languageSelect" aria-label="Select language">
                         <option value="en">English</option>
+                        <option value="es">Español</option>
                         <option value="pt">Português</option>
                     </select>
                 </label>
@@ -952,7 +952,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             function resolveLanguage(l) {
                 if (l === "en") return "en";
                 if (l === "pt") return "pt";
-                return "es";
+                return "en";
             }
 
             function getLanguageFromUrl() {
@@ -963,7 +963,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             function getCurrentLanguage() {
                 var fromUrl = getLanguageFromUrl();
                 if (fromUrl) { store(KEYS.LANGUAGE, fromUrl); return fromUrl; }
-                return resolveLanguage(load(KEYS.LANGUAGE, "es"));
+                return resolveLanguage(load(KEYS.LANGUAGE, "en"));
             }
 
             function isValidUrl(v) {
