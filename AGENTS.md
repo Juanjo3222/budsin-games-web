@@ -45,6 +45,10 @@ Este archivo centraliza la lógica de desarrollo de `budsin-games.pages.dev`. Es
      })(window,document,'script','dataLayer','GTM-5ZT26944');</script>
      <!-- End Google Tag Manager -->
      ```
+   - Google AdSense:
+     ```html
+     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+     ```
    - Inmediatamente después de `<body>`:
      ```html
      <!-- Google Tag Manager (noscript) -->
