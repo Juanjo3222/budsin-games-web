@@ -8,7 +8,7 @@ const STATIC = [
   "/icon-192.png",
   "/icon-512.png",
   "/favicon.png",
-  "/images.jpeg",
+  "/images.ico",
   "/site-theme.js",
   "/lines-bg.js",
   "/classroom-hotkey.js",
