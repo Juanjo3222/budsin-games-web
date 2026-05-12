@@ -429,6 +429,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             }
 
             .cover {
+                position: relative;
                 aspect-ratio: 16 / 10;
                 overflow: hidden;
                 border-radius: 24px;
@@ -613,8 +614,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
             .new-badge {
                 position: absolute;
-                top: 38px;
-                left: 14px;
+                bottom: 8px;
+                left: 8px;
                 z-index: 3;
                 padding: 3px 8px;
                 border-radius: 999px;
@@ -3642,8 +3643,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (card.dataset.new === "true") {
                     const badge = document.createElement("span");
                     badge.className = "new-badge";
-                    badge.textContent = "Nuevo";
-                    card.appendChild(badge);
+                    const cover = card.querySelector(".cover");
+                    if (cover) cover.appendChild(badge);
                 }
             });
 
@@ -3763,6 +3764,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     changelogItem1:
                         "Se agregaron Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars y Hollow Knight Silksong al catálogo con portadas propias y acceso directo desde el portal.",
                     settingsPageLink: "⚙️ Ajustes",
+                    newBadge: "Nuevo",
                     resultsCount: (count) => `${count} juegos`,
                     favoriteSaved: "Guardado",
                     playersLabel: "jugadores",
@@ -3840,6 +3842,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     changelogItem1:
                         "Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars and Hollow Knight Silksong were added to the catalog with their own covers and direct access from the portal.",
                     settingsPageLink: "⚙️ Settings",
+                    newBadge: "New",
                     resultsCount: (count) => `${count} games`,
                     favoriteSaved: "Saved",
                     playersLabel: "players",
@@ -3917,6 +3920,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     changelogItem1:
                         "Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars e Hollow Knight Silksong foram adicionados ao catálogo com capas próprias e acesso direto do portal.",
                     settingsPageLink: "⚙️ Configurações",
+                    newBadge: "Novo",
                     resultsCount: (count) => `${count} jogos`,
                     favoriteSaved: "Salvo",
                     playersLabel: "jogadores",
@@ -4546,6 +4550,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     languageSelect.value = nextLanguage;
                 }
 
+                document.querySelectorAll(".new-badge").forEach((b) => {
+                    b.textContent = t.newBadge;
+                });
                 renderShelves();
                 applyFilters();
                 updateDynamicLabels();
