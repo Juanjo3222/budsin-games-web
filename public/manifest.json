@@ -1,0 +1,27 @@
+{
+  "name": "Budsin Games",
+  "short_name": "Budsin Games",
+  "description": "Portal de juegos gratis en navegador con experiencia tipo consola. Juega Minecraft, Geometry Dash, Among Us y más de 39 juegos online sin descargar nada.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#edf1f5",
+  "theme_color": "#ef3f45",
+  "orientation": "any",
+  "categories": ["games", "entertainment"],
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

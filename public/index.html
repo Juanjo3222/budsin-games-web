@@ -40,6 +40,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         }
         </script>
         <link rel="icon" type="image/jpeg" href="images.jpeg" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Budsin Games" />
+        <link rel="apple-touch-icon" href="/icon-512.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
         <link
@@ -4989,5 +4994,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <script src="site-theme.js"></script>
         <script src="classroom-hotkey.js"></script>
         <script src="lines-bg.js"></script>
+        <script>
+            if ("serviceWorker" in navigator) {
+                navigator.serviceWorker.register("/sw.js", { scope: "/" });
+            }
+        </script>
     </body>
 </html>
