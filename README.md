@@ -61,6 +61,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 | Cookie Clicker Legacy Edition  | Idle        |
 | Bitcoin Clicker                | Idle        |
 | Geometry Dash                  | Acción      |
+| Monster Tracks                 | Acción      |
 | Hollow Knight                  | Acción      |
 | Hollow Knight Silksong         | Acción      |
 | Eggy Car                       | Acción      |
@@ -200,6 +201,9 @@ Firebase se usa únicamente para el conteo de popularidad.
 * Se agregó una sección de **artículos/consejos** en la página principal con guías de uso del portal.
 * Se implementó un **footer** consistente en todas las páginas con navegación a políticas y páginas legales.
 * Se mejoró la **página 404** con diseño propio, navegación y estilo acorde al portal.
+
+### v4.9
+* Se agregó **Monster Tracks** al catálogo con portada propia, acceso directo desde el index e integración al sistema de ranking/popularidad.
 
 ### v4.8
 * Se agregó **Hollow Knight Silksong** al catálogo con portada propia, acceso directo desde el index e integración al sistema de ranking/popularidad.
