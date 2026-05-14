@@ -237,7 +237,7 @@
       "html[data-site-theme='dark'] .library-meta { background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.9)) !important; color: rgba(226, 232, 240, 0.84) !important; }",
       "html[data-site-theme='ps5'] .library-meta { background: linear-gradient(135deg, rgba(8, 11, 24, 0.96), rgba(12, 18, 36, 0.9)) !important; color: rgba(220, 232, 248, 0.84) !important; }",
       "html[data-site-theme='dark'] .games .game-card { background: rgba(9, 15, 28, 0.92) !important; border-color: rgba(148, 163, 184, 0.22) !important; color: #eef6ff !important; }",
-      "html[data-site-theme='ps5'] .games .game-card { background: rgba(8, 11, 24, 0.92) !important; border-color: rgba(100, 150, 220, 0.16) !important; color: #eef2f8 !important; }",
+
       ".budsin-topbar-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }",
       ".budsin-fullscreen-button { display: inline-flex; align-items: center; justify-content: center; min-height: 50px; padding: 0 20px; border: 0; border-radius: 18px; font: 800 14px/1 'Sora', system-ui, sans-serif; cursor: pointer; text-decoration: none; transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 16px 36px rgba(15, 23, 42, 0.18); }",
       ".budsin-fullscreen-button:hover { transform: translateY(-2px); filter: brightness(1.02); }",

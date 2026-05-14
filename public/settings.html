@@ -590,9 +590,114 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             html[data-site-theme="dark"] .footer-copy { color: #94a3b8; }
 
             /* ────────────────────────────────────────
-               PS5 theme (inherits most dark styles, overrides body text)
+               PlayStation 5 Theme
             ──────────────────────────────────────── */
-            html[data-site-theme="ps5"] body { color: #eef2f8; }
+            html[data-site-theme="ps5"] body {
+                color: #eef2f8;
+                background: radial-gradient(circle at top left, rgba(0, 111, 205, 0.07), transparent 30%),
+                            radial-gradient(circle at bottom right, rgba(0, 55, 145, 0.05), transparent 30%),
+                            linear-gradient(180deg, #040810 0%, var(--bg) 48%, var(--bg-2) 100%);
+            }
+
+            html[data-site-theme="ps5"] body::before,
+            html[data-site-theme="ps5"] body::after { display: none; }
+
+            html[data-site-theme="ps5"] .page-header {
+                background: linear-gradient(135deg, rgba(10, 14, 28, 0.96), rgba(8, 11, 24, 0.92));
+                border-color: rgba(100, 150, 220, 0.12);
+                box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+            }
+            html[data-site-theme="ps5"] .page-header h1 { color: #eef2f8; }
+            html[data-site-theme="ps5"] .page-header p { color: #8b9fc0; }
+
+            html[data-site-theme="ps5"] .settings-card {
+                background: rgba(10, 14, 28, 0.88);
+                border-color: rgba(100, 150, 220, 0.12);
+            }
+            html[data-site-theme="ps5"] .card-header p { color: #8b9fc0; }
+
+            html[data-site-theme="ps5"] .back-link,
+            html[data-site-theme="ps5"] .language-picker {
+                background: rgba(10, 14, 28, 0.88);
+                border-color: rgba(100, 150, 220, 0.18);
+                color: #c8daf8;
+            }
+            html[data-site-theme="ps5"] .language-picker select { color: #c8daf8; }
+
+            html[data-site-theme="ps5"] input[type="text"],
+            html[data-site-theme="ps5"] input[type="url"],
+            html[data-site-theme="ps5"] input[type="number"],
+            html[data-site-theme="ps5"] select.field-select {
+                background: rgba(8, 11, 24, 0.92);
+                border-color: rgba(100, 150, 220, 0.18);
+                color: #eef2f8;
+            }
+            html[data-site-theme="ps5"] input:focus,
+            html[data-site-theme="ps5"] select.field-select:focus { border-color: #006FCD; }
+
+            html[data-site-theme="ps5"] .btn-secondary {
+                background: rgba(10, 14, 28, 0.88);
+                border-color: rgba(100, 150, 220, 0.18);
+                color: #c8daf8;
+            }
+            html[data-site-theme="ps5"] .btn-ghost {
+                color: #8b9fc0;
+                border-color: rgba(100, 150, 220, 0.18);
+            }
+
+            html[data-site-theme="ps5"] .btn-primary {
+                background: linear-gradient(135deg, #006FCD, #003791);
+                box-shadow: 0 8px 20px rgba(0, 55, 145, 0.3);
+                color: #fff;
+            }
+
+            html[data-site-theme="ps5"] .url-item {
+                background: rgba(10, 14, 28, 0.88);
+                border-color: rgba(100, 150, 220, 0.14);
+            }
+            html[data-site-theme="ps5"] .url-item.is-active { border-color: var(--green); }
+            html[data-site-theme="ps5"] .url-name { color: #eef2f8; }
+            html[data-site-theme="ps5"] .url-addr { color: #8b9fc0; }
+
+            html[data-site-theme="ps5"] .toggle-row { border-color: rgba(100, 150, 220, 0.12); }
+            html[data-site-theme="ps5"] .toggle-label { color: #eef2f8; }
+            html[data-site-theme="ps5"] .toggle-sub { color: #8b9fc0; }
+
+            html[data-site-theme="ps5"] .hotkey-badge {
+                background: rgba(8, 11, 24, 0.92);
+                border-color: rgba(100, 150, 220, 0.18);
+                color: #c8daf8;
+            }
+
+            html[data-site-theme="ps5"] .preview-bar {
+                background: rgba(10, 14, 28, 0.88);
+                border-color: rgba(100, 150, 220, 0.14);
+                color: #c8daf8;
+            }
+
+            html[data-site-theme="ps5"] .add-url-form {
+                border-color: rgba(100, 150, 220, 0.18);
+            }
+
+            html[data-site-theme="ps5"] .field-label { color: #8b9fc0; }
+
+            html[data-site-theme="ps5"] #toast {
+                background: rgba(200, 220, 248, 0.92);
+                color: #080a14;
+            }
+
+            html[data-site-theme="ps5"] .site-footer {
+                background: rgba(8, 11, 24, 0.82);
+                border-color: rgba(100, 150, 220, 0.12);
+            }
+            html[data-site-theme="ps5"] .footer-brand strong { color: #eef2f8; }
+            html[data-site-theme="ps5"] .footer-brand span { color: #8b9fc0; }
+            html[data-site-theme="ps5"] .footer-links a {
+                background: rgba(10, 14, 28, 0.88);
+                border-color: rgba(100, 150, 220, 0.18);
+                color: #c8daf8;
+            }
+            html[data-site-theme="ps5"] .footer-copy { color: #6a7fa0; }
         </style>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
     </head>
