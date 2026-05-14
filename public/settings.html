@@ -588,6 +588,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 color: #e2e8f0;
             }
             html[data-site-theme="dark"] .footer-copy { color: #94a3b8; }
+
+            /* ────────────────────────────────────────
+               PS5 theme (inherits most dark styles, overrides body text)
+            ──────────────────────────────────────── */
+            html[data-site-theme="ps5"] body { color: #eef2f8; }
         </style>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
     </head>
@@ -709,7 +714,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
 
-            <!-- ── Card 4: Preview ── -->
+            <!-- ── Card 4: Theme ── -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon blue">🎨</div>
+                    <div>
+                        <h2 data-i18n="cardThemeTitle">Tema visual</h2>
+                        <p data-i18n="cardThemeSub">Personaliza la apariencia del portal.</p>
+                    </div>
+                </div>
+                <div>
+                    <label class="field-label" for="themeSelect" data-i18n="themeLabel">Tema</label>
+                    <select id="themeSelect" class="field-select">
+                        <option value="light">Claro</option>
+                        <option value="dark">Oscuro</option>
+                        <option value="ps5">PlayStation 5</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- ── Card 5: Preview ── -->
             <div class="settings-card">
                 <div class="card-header">
                     <div class="card-icon blue">👁️</div>
@@ -730,7 +754,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </div>
 
-            <!-- ── Card 5: Loading Screen ── -->
+            <!-- ── Card 6: Loading Screen ── -->
             <div class="settings-card">
                 <div class="card-header">
                     <div class="card-icon green">🎬</div>
@@ -839,6 +863,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     activateLabel: "Activar",
                     activeLabel: "Activa ✓",
                     editLabel: "Editar",
+                    cardThemeTitle: "Tema visual",
+                    cardThemeSub: "Personaliza la apariencia del portal.",
+                    themeLabel: "Tema",
+                    themeLight: "Claro",
+                    themeDark: "Oscuro",
+                    themePS5: "PlayStation 5",
                     cardLoadingTitle: "Pantalla de carga",
                     cardLoadingSub: "Personaliza la transición al abrir un juego.",
                     toggleAudioLabel: "Música de carga",
@@ -887,6 +917,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     activateLabel: "Activate",
                     activeLabel: "Active ✓",
                     editLabel: "Edit",
+                    cardThemeTitle: "Theme",
+                    cardThemeSub: "Customize the portal appearance.",
+                    themeLabel: "Theme",
+                    themeLight: "Light",
+                    themeDark: "Dark",
+                    themePS5: "PlayStation 5",
                     cardLoadingTitle: "Loading screen",
                     cardLoadingSub: "Customize the transition when opening a game.",
                     toggleAudioLabel: "Loading music",
@@ -935,6 +971,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     activateLabel: "Ativar",
                     activeLabel: "Ativo ✓",
                     editLabel: "Editar",
+                    cardThemeTitle: "Tema visual",
+                    cardThemeSub: "Personalize a aparência do portal.",
+                    themeLabel: "Tema",
+                    themeLight: "Claro",
+                    themeDark: "Escuro",
+                    themePS5: "PlayStation 5",
                     cardLoadingTitle: "Tela de carregamento",
                     cardLoadingSub: "Personalize a transição ao abrir um jogo.",
                     toggleAudioLabel: "Música de carregamento",
@@ -1279,6 +1321,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 store(KEYS.LOADING_DURATION, String(secs * 1000));
             });
 
+            // ─── Theme ───
+            var themeSelect = document.getElementById("themeSelect");
+            var currentTheme = load("budsin_site_theme", "light") || "light";
+            themeSelect.value = currentTheme;
+
+            themeSelect.addEventListener("change", function () {
+                store("budsin_site_theme", this.value);
+                showToast(I18N[getCurrentLanguage()].toastSaved);
+                location.reload();
+            });
+
             // ─── Language ───
             var languageSelect = document.getElementById("languageSelect");
             var backLink       = document.getElementById("backLink");
@@ -1301,6 +1354,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 backLink.textContent = t.back;
                 backLink.href = "index.html?lang=" + lang;
                 languageSelect.value = lang;
+
+                // Translate theme options
+                var themeOpts = document.getElementById("themeSelect").querySelectorAll("option");
+                if (themeOpts[0]) themeOpts[0].textContent = t.themeLight;
+                if (themeOpts[1]) themeOpts[1].textContent = t.themeDark;
+                if (themeOpts[2]) themeOpts[2].textContent = t.themePS5;
+
                 renderUrlList(); // re-renders with new labels
             }
 

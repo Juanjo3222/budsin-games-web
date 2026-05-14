@@ -24,7 +24,8 @@
   function draw() {
     time += 0.004;
     ctx.clearRect(0, 0, W, H);
-    const dark = document.documentElement.getAttribute('data-site-theme') === 'dark';
+    const theme = document.documentElement.getAttribute('data-site-theme');
+    const dark = theme === 'dark' || theme === 'ps5';
     const col = dark ? '148,163,184' : '18,24,38';
 
     for (const p of pts) {
