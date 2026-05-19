@@ -114,24 +114,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     let loaded = 0
     let totalGuess = 332398592
+    let stallTimer = null
 
     function update() {
       const mb = (loaded / 1024 / 1024).toFixed(2)
       const total = (totalGuess / 1024 / 1024).toFixed(2)
       document.getElementById("text").textContent = mb + " MB / " + total + " MB"
       document.getElementById("fill").style.width = (loaded / totalGuess * 100) + "%"
+      clearTimeout(stallTimer)
+      stallTimer = setTimeout(hideLoader, 60000)
     }
 
-    async function fetchPart(url) {
-      try {
-        const res = await fetch(url)
-        if (!res.ok) return null
-        const buf = await res.arrayBuffer()
-        loaded += buf.byteLength
-        update()
-        return new Uint8Array(buf)
-      } catch {
-        return null
+    async function fetchPart(url, retries = 1) {
+      for (let attempt = 0; attempt <= retries; attempt++) {
+        try {
+          const ctrl = new AbortController()
+          const timer = setTimeout(() => ctrl.abort(), 30000)
+          const res = await fetch(url, { signal: ctrl.signal })
+          clearTimeout(timer)
+          if (!res.ok) continue
+          const buf = await res.arrayBuffer()
+          loaded += buf.byteLength
+          update()
+          return new Uint8Array(buf)
+        } catch {
+          if (attempt === retries) return null
+        }
       }
     }
 
@@ -177,6 +185,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     function hideLoader() {
       const loader = document.getElementById("loader")
       if (!loader || loader.style.display === "none") return
+      clearTimeout(stallTimer)
       loader.style.display = "none"
       const hotkey = document.createElement("script")
       hotkey.src = "https://budsin-games.pages.dev/classroom-hotkey.js"
@@ -214,7 +223,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }
     }
 
-    setTimeout(hideLoader, 60000)
     start()
   </script>
 
