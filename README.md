@@ -203,7 +203,7 @@ Firebase se usa únicamente para el conteo de popularidad.
 * Features Pro: sin anuncios, tema Gold exclusivo, badge "⭐ PRO", favoritos ilimitados, acceso anticipado a juegos, estadísticas de actividad.
 * Badge "Anticipado para Pro: próximamente gratis" en juegos marcados con `data-pro="true"`.
 * Popup informativo "Modificaciones importantes" con obligación de lectura.
-* **Bendy and the Ink Machine** — primer juego exclusivo Pro. Disponible para todos el 24 de mayo.
+* **Bendy and the Ink Machine** — primer juego exclusivo Pro. Disponible para todos el 22 de mayo.
 * Pro-Gating: los juegos con `data-pro="true"` muestran popup de suscripción para usuarios Free.
 
 ### v5.1

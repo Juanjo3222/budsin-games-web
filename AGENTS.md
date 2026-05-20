@@ -156,7 +156,7 @@ Cuando añadas un juego que será **exclusivo para usuarios Pro** (o anticipado)
 ### 1. Marcar la tarjeta en `index.html`
 - Añadir `data-pro="true"` al `<a class="game-card">`.
 - Añadir `data-pro-release="AAAA-MM-DD"` con la fecha en que estará disponible para todos.
-- Si el juego ya existe y lo haces Pro, cambiar `data-label-es`/`data-label-en` a "Pro" / "Available May 24".
+- Si el juego ya existe y lo haces Pro, cambiar `data-label-es`/`data-label-en` a "Pro" / "Available May 22".
 - El badge "Anticipado para Pro: próximamente gratis" se inyecta automáticamente vía JS para usuarios Free.
 
 ### 2. Gating al hacer clic (en `index.html`)
