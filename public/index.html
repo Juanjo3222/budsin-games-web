@@ -2070,6 +2070,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 data-i18n="randomGame"
                             >🎲 Juego al azar</button>
                         </div>
+                        <div id="proHeroMessage" style="display:none;margin-top:16px;padding:10px 18px;border-radius:14px;background:linear-gradient(135deg,rgba(255,215,0,0.1),rgba(255,140,0,0.06));border:1px solid rgba(255,215,0,0.25);font-size:.82rem;color:#ffd700;font-weight:600" data-i18n="proHeroMessage">¡Eres Pro! Muchas gracias por apoyarme 🫶</div>
                     </div>
                     <div class="hero-showcase">
                         <article class="showcase-panel primary">
@@ -4437,6 +4438,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (adContainer) adContainer.style.display = isPro ? "none" : "";
                 if (adScript) adScript.style.display = isPro ? "none" : "";
 
+                // Show/hide Pro hero message
+                const proHeroMsg = document.getElementById("proHeroMessage");
+                if (proHeroMsg) proHeroMsg.style.display = isPro ? "" : "none";
+
                 // Add/remove Pro badge in UI
                 const metaPortal = document.querySelector('[data-i18n="metaPortal"]');
                 if (metaPortal) {
@@ -4575,6 +4580,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     shelfRecent: "🕐 Jugado recientemente",
                     noRecent: "Aún no has jugado nada.",
                     favLimitReached: "Límite de favoritos alcanzado (20). Hazte Pro para ilimitados.",
+                    proHeroMessage: "¡Eres Pro! Muchas gracias por apoyarme 🫶",
                     proGatingTitle: "Juego exclusivo para Budsin Pro",
                     proGatingSub: "Este juego está disponible primero para usuarios Pro.",
                     proGatingBenefits: "⭐ Ventajas de ser Pro",
@@ -4668,6 +4674,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     shelfRecent: "🕐 Recently played",
                     noRecent: "You haven't played anything yet.",
                     favLimitReached: "Favorites limit reached (20). Go Pro for unlimited.",
+                    proHeroMessage: "You're Pro! Thank you so much for your support 🫶",
                     proGatingTitle: "Exclusive game for Budsin Pro",
                     proGatingSub: "This game is available first for Pro users.",
                     proGatingBenefits: "⭐ Benefits of going Pro",
@@ -4761,6 +4768,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     shelfRecent: "🕐 Jogado recentemente",
                     noRecent: "Você ainda não jogou nada.",
                     favLimitReached: "Limite de favoritos atingido (20). Torne-se Pro para ilimitados.",
+                    proHeroMessage: "Você é Pro! Muito obrigado pelo apoio 🫶",
                     proGatingTitle: "Jogo exclusivo para Budsin Pro",
                     proGatingSub: "Este jogo está disponível primeiro para usuários Pro.",
                     proGatingBenefits: "⭐ Vantagens de ser Pro",
