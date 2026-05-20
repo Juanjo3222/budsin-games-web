@@ -10,7 +10,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Juega Cookie Clicker Legacy Edition desde Budsin Games.">
+  <meta name="description" content="Juega Cookie Clicker Legacy online gratis. La edición clásica del adictivo juego de hacer galletas. Hornea, invierte y descubre todo el dulce contenido.">
   <title>Cookie Clicker Legacy Edition | Budsin Games</title>
   <link rel="icon" type="image/x-icon" href="images.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -396,9 +396,72 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
     }
 
-    #game-frame {
+    .game-info {
       display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
+    .game-info.is-open {
+      display: flex;
+    }
+    .game-info-inner {
+      background: #fff;
+      border-radius: 28px;
+      padding: 28px 32px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      line-height: 1.8;
+      font-size: 0.95rem;
+      position: relative;
+    }
+    .game-info-inner h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+      margin: 20px 0 10px;
+    }
+    .game-info-inner h2:first-child { margin-top: 0; }
+    .game-info-inner p { margin: 0 0 12px; color: #5c6678; }
+    .game-info-inner ul { margin: 0 0 12px; padding-left: 20px; color: #5c6678; }
+    .game-info-inner li { margin-bottom: 6px; }
+    .game-info-inner strong { color: #111827; }
+    .game-info-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(18,24,38,0.1);
+      background: #fff;
+      color: #111827;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      margin-bottom: 8px;
+    }
+    html[data-site-theme="dark"] .game-info-inner {
+      background: rgba(9,15,28,0.96);
+      color: #e2e8f0;
+    }
+    html[data-site-theme="dark"] .game-info-inner h2 { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-inner p,
+    html[data-site-theme="dark"] .game-info-inner ul { color: #94a3b8; }
+    html[data-site-theme="dark"] .game-info-inner strong { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-close { background: rgba(9,15,28,0.92); border-color: rgba(148,163,184,0.28); color: #e2e8f0; }
+    html[data-site-theme="dark"] .game-info { background: rgba(0,0,0,0.75); }
 
     @media (max-width: 920px) {
       body::before,
@@ -482,13 +545,42 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <strong>Cookie Clicker Legacy Edition</strong>
         <span>Esta edición ayuda a arreglar problemas con los saves, aunque es un poco más antigua y menos recomendada que la versión principal.</span>
       </div>
-      <a class="back" href="index.html">Volver al portal</a>
+      <div style="display:flex;gap:10px;align-items:stretch;">
+  <button type="button" class="back" onclick="document.getElementById('gameInfo').classList.toggle('is-open')" style="background:linear-gradient(135deg,#111827,#1f2937);border:0;font:inherit;font-weight:800;color:#fff;padding:0 20px;border-radius:18px;cursor:pointer;">ℹ️ Info</button>
+  <a class="back" href="index.html">Volver al portal</a>
+</div>
     </header>
 
     <p class="note">
       La versión principal sigue siendo la más recomendada. Si tienes problemas al guardar allí, prueba esta Legacy Edition como alternativa más compatible con saves.
     </p>
   </div>
+  <section class="game-info" id="gameInfo">
+  <div class="game-info-inner">
+    <button type="button" class="game-info-close" onclick="document.getElementById('gameInfo').classList.remove('is-open')">&times;</button>
+    <h2>About Cookie Clicker Legacy</h2>
+    <p>Cookie Clicker Legacy is the classic idle clicker game where your goal is to bake as many cookies as possible. Start by clicking the giant cookie, then use your cookies to purchase upgrades, buildings, and special abilities that automate cookie production. The legacy edition includes classic features and content from the original game.</p>
+
+    <h2>How to Play</h2>
+    <p>Click the giant cookie to earn cookies. Spend cookies on upgrades like cursors, grandmas, farms, and factories that automatically produce cookies over time. Unlock achievements, discover hidden features, and keep expanding your cookie empire. The game runs even when you're away, making it a true idle experience.</p>
+
+    <h2>Controls</h2>
+    <ul>
+      <li><strong>Mouse Click:</strong> Click the giant cookie to bake cookies manually</li>
+      <li><strong>Left Click:</strong> Purchase upgrades and buildings from the shop</li>
+      <li><strong>Golden Cookies:</strong> Click them when they appear for temporary bonuses</li>
+    </ul>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Buy upgrades early — they make a big difference in cookie production</li>
+      <li>Focus on the highest-producing buildings first</li>
+      <li>Click golden cookies for valuable time-limited bonuses</li>
+      <li>Prestige (ascend) after your first playthrough for permanent upgrades</li>
+      <li>Let the game run idle — production continues while you're away</li>
+    </ul>
+  </div>
+</section>
   <script src="site-theme.js"></script>
   <script src="classroom-hotkey.js"></script>
 </body>

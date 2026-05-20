@@ -10,6 +10,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-5ZT26944');</script>
 <!-- End Google Tag Manager -->
   <meta charset="utf-8">
+  <meta name="description" content="Juega Pac-Man online gratis. El clásico juego de arcade donde comes puntos y evitas fantasmas en el laberinto. Diversión retro sin límites.">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="icon" type="image/x-icon" href="images.ico">
   <!-- We only include this to explicitly loosen the CSP of various packager environments. It does not provide any security. -->
@@ -159,6 +160,31 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZT26944"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
+<div style="position:fixed;top:16px;right:16px;z-index:50;display:flex;gap:8px;"><button onclick="document.getElementById('gameInfo').style.display='flex'" style="background:#2563eb;color:#fff;border:none;padding:10px 18px;border-radius:40px;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(37,99,235,0.3);font-family:sans-serif;">ℹ️ Info</button></div>
+
+<div id="gameInfo" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:28px;padding:28px 32px;max-width:680px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.3);position:relative;">
+    <button type="button" onclick="this.parentElement.parentElement.style.display='none'" style="position:absolute;top:12px;right:16px;background:none;border:none;font-size:28px;cursor:pointer;color:#666;line-height:1;">&times;</button>
+    <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; margin: 0 0 8px; color: #111827;">Pac-Man</h1>
+    <p style="font-family: 'Sora', sans-serif; font-size: 0.95rem; line-height: 1.7; color: #5c6678; margin: 0 0 20px;">Pac-Man is the legendary arcade game that defined a generation. Navigate the maze, eat all the dots, and avoid the colorful ghosts — Blinky, Pinky, Inky, and Clyde. Eat Power Pellets to turn the tables and devour ghosts for bonus points. Simple to learn but endlessly addictive.</p>
+    <div style="margin-bottom: 20px; font-family: 'Sora', sans-serif;">
+      <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; margin: 16px 0 8px; color: #111827;">How to Play</h2>
+      <p style="font-size: 0.95rem; line-height: 1.7; color: #5c6678; margin: 0 0 12px;">Guide Pac-Man through the maze eating all the small dots while avoiding the four ghosts. Eat a Power Pellet to turn ghosts blue and vulnerable — then eat them for extra points. Collect bonus fruits for additional points. Clear all dots to advance to the next level.</p>
+      <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; margin: 16px 0 8px; color: #111827;">Controls</h2>
+      <ul style="font-size: 0.95rem; line-height: 1.7; color: #5c6678;">
+        <li><strong>Arrow Keys:</strong> Change direction of Pac-Man</li>
+        <li><strong>WASD:</strong> Alternative movement keys</li>
+      </ul>
+      <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; margin: 16px 0 8px; color: #111827;">Tips</h2>
+      <ul style="font-size: 0.95rem; line-height: 1.7; color: #5c6678;">
+        <li>Learn the ghost patterns to predict their movements</li>
+        <li>Prioritize Power Pellets when ghosts are close</li>
+        <li>Use the side tunnels to escape when cornered</li>
+        <li>Plan your route to clear dots efficiently</li>
+      </ul>
+    </div>
+  </div>
+</div>
   <div id="app"></div>
 
   <div id="launch" class="screen" hidden title="Click to start">

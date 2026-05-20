@@ -10,7 +10,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Juega Rocket Goal desde Budsin Games.">
+  <meta name="description" content="Juega Rocket Goal online gratis. Fútbol con coches impulsados por cohetes. Compite en partidos rápidos y marca goles espectaculares.">
   <title>Rocket Goal | Budsin Games</title>
   <link rel="icon" href="images.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -396,9 +396,72 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
     }
 
-    #game-frame {
+    .game-info {
       display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
+    .game-info.is-open {
+      display: flex;
+    }
+    .game-info-inner {
+      background: #fff;
+      border-radius: 28px;
+      padding: 28px 32px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      line-height: 1.8;
+      font-size: 0.95rem;
+      position: relative;
+    }
+    .game-info-inner h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+      margin: 20px 0 10px;
+    }
+    .game-info-inner h2:first-child { margin-top: 0; }
+    .game-info-inner p { margin: 0 0 12px; color: #5c6678; }
+    .game-info-inner ul { margin: 0 0 12px; padding-left: 20px; color: #5c6678; }
+    .game-info-inner li { margin-bottom: 6px; }
+    .game-info-inner strong { color: #111827; }
+    .game-info-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(18,24,38,0.1);
+      background: #fff;
+      color: #111827;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      margin-bottom: 8px;
+    }
+    html[data-site-theme="dark"] .game-info-inner {
+      background: rgba(9,15,28,0.96);
+      color: #e2e8f0;
+    }
+    html[data-site-theme="dark"] .game-info-inner h2 { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-inner p,
+    html[data-site-theme="dark"] .game-info-inner ul { color: #94a3b8; }
+    html[data-site-theme="dark"] .game-info-inner strong { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-close { background: rgba(9,15,28,0.92); border-color: rgba(148,163,184,0.28); color: #e2e8f0; }
+    html[data-site-theme="dark"] .game-info { background: rgba(0,0,0,0.75); }
 
     @media (max-width: 920px) {
       body::before,
@@ -493,7 +556,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <strong>Rocket Goal</strong>
       <span>Conduce, acelera y marca goles con coches impulsados por cohetes desde su propia página dedicada.</span>
     </div>
-    <a class="back" href="index.html">Volver al portal</a>
+    <div style="display:flex;gap:10px;align-items:stretch;">
+  <button type="button" class="back" onclick="document.getElementById('gameInfo').classList.toggle('is-open')" style="background:linear-gradient(135deg,#111827,#1f2937);border:0;font:inherit;font-weight:800;color:#fff;padding:0 20px;border-radius:18px;cursor:pointer;">ℹ️ Info</button>
+  <a class="back" href="index.html">Volver al portal</a>
+</div>
   </header>
 
   <script>
@@ -505,6 +571,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       launcher.style.display = "none";
     }
   </script>
+  <section class="game-info" id="gameInfo">
+  <div class="game-info-inner">
+    <button type="button" class="game-info-close" onclick="document.getElementById('gameInfo').classList.remove('is-open')">&times;</button>
+    <h2>About Rocket Goal</h2>
+    <p>Rocket Goal is an exciting rocket-powered car soccer game. Drive your rocket car across the field, hit the giant ball, and score goals against your opponent. With simple controls and fast-paced matches, it's easy to pick up but hard to master. Play against the AI or challenge a friend.</p>
+
+    <h2>How to Play</h2>
+    <p>Control your rocket-powered car on the field. Your goal is to hit the ball into the opponent's goal while defending your own. Use your rocket boost to gain speed and aerial control. Matches are timed — the player with the most goals at the end wins.</p>
+
+    <h2>Controls</h2>
+    <ul>
+      <li><strong>WASD / Arrow Keys:</strong> Drive your car around the field</li>
+      <li><strong>Space:</strong> Activate rocket boost for speed burst</li>
+      <li><strong>Shift:</strong> Jump / flip in the air</li>
+    </ul>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Use boost strategically — don't waste it all at once</li>
+      <li>Learn to aerial hit the ball for unpredictable angles</li>
+      <li>Defend your goal when the opponent has the ball</li>
+      <li>Use walls to bounce the ball into tricky positions</li>
+      <li>Practice ball control to set up scoring opportunities</li>
+    </ul>
+  </div>
+</section>
   <script src="site-theme.js"></script>
   <script src="classroom-hotkey.js"></script>
 </body>

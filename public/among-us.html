@@ -10,7 +10,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Juega Among Us desde Budsin Games.">
+  <meta name="description" content="Juega Among Us online gratis desde el navegador en Budsin Games. Descubre al impostor, completa tus tareas y sobrevive en esta nave espacial. Sin descargas, al instante.">
   <title>Among Us | Budsin Games</title>
   <link rel="icon" href="images.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -400,6 +400,73 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       display: none;
     }
 
+    .game-info {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .game-info.is-open {
+      display: flex;
+    }
+    .game-info-inner {
+      background: #fff;
+      border-radius: 28px;
+      padding: 28px 32px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      line-height: 1.8;
+      font-size: 0.95rem;
+      position: relative;
+    }
+    .game-info-inner h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+      margin: 20px 0 10px;
+    }
+    .game-info-inner h2:first-child { margin-top: 0; }
+    .game-info-inner p { margin: 0 0 12px; color: #5c6678; }
+    .game-info-inner ul { margin: 0 0 12px; padding-left: 20px; color: #5c6678; }
+    .game-info-inner li { margin-bottom: 6px; }
+    .game-info-inner strong { color: #111827; }
+    .game-info-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(18,24,38,0.1);
+      background: #fff;
+      color: #111827;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      margin-bottom: 8px;
+    }
+    html[data-site-theme="dark"] .game-info-inner {
+      background: rgba(9,15,28,0.96);
+      color: #e2e8f0;
+    }
+    html[data-site-theme="dark"] .game-info-inner h2 { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-inner p,
+    html[data-site-theme="dark"] .game-info-inner ul { color: #94a3b8; }
+    html[data-site-theme="dark"] .game-info-inner strong { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-close { background: rgba(9,15,28,0.92); border-color: rgba(148,163,184,0.28); color: #e2e8f0; }
+    html[data-site-theme="dark"] .game-info { background: rgba(0,0,0,0.75); }
+
     @media (max-width: 920px) {
       body::before,
       body::after {
@@ -481,8 +548,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <strong>Among Us</strong>
       <span>Descubre al impostor o sabotea a la tripulación desde su propia página dedicada.</span>
     </div>
-    <a class="back" href="index.html">Volver al portal</a>
+    <div style="display:flex;gap:10px;align-items:stretch;">
+  <button type="button" class="back" onclick="document.getElementById('gameInfo').classList.toggle('is-open')" style="background:linear-gradient(135deg,#111827,#1f2937);border:0;font:inherit;font-weight:800;color:#fff;padding:0 20px;border-radius:18px;cursor:pointer;">ℹ️ Info</button>
+  <a class="back" href="index.html">Volver al portal</a>
+</div>
   </header>
+  <section class="game-info" id="gameInfo">
+  <div class="game-info-inner">
+    <button type="button" class="game-info-close" onclick="document.getElementById('gameInfo').classList.remove('is-open')">&times;</button>
+    <h2>About Among Us</h2>
+    <p>Among Us is a multiplayer social deduction game where 4-15 players work together on a spaceship, but some crewmates are impostors trying to sabotage and kill everyone. The crew must complete tasks and vote out impostors, while impostors must eliminate the crew without being caught. This browser version lets you play directly without downloading anything.</p>
+
+    <h2>How to Play</h2>
+    <p>Play as a crewmate or impostor in a spaceship setting. As a crewmate, complete all your assigned tasks and report any suspicious activity. As an impostor, blend in with crewmates while sabotaging the ship and eliminating targets. Call emergency meetings to discuss who might be the impostor and vote to eject suspects.</p>
+
+    <h2>Controls</h2>
+    <ul>
+      <li><strong>Mouse:</strong> Click to interact with buttons, tasks, and vents</li>
+      <li><strong>WASD / Arrow Keys:</strong> Move your character around the map</li>
+      <li><strong>E or Space:</strong> Use/ interact with objects and tasks</li>
+      <li><strong>Q:</strong> Kill (impostor only)</li>
+      <li><strong>R:</strong> Report a dead body</li>
+      <li><strong>Tab:</strong> Open the map</li>
+    </ul>
+
+    <h2>Tips for Beginners</h2>
+    <ul>
+      <li>Stick with other crewmates — impostors are less likely to kill when others are watching</li>
+      <li>Learn the task locations so you can spot impostors faking tasks</li>
+      <li>As impostor, use vents to move quickly between rooms</li>
+      <li>Sabotage creates chaos — use it to separate crewmates from each other</li>
+      <li>Always have an alibi ready if someone accuses you</li>
+    </ul>
+  </div>
+</section>
   <script src="site-theme.js"></script>
   <script src="classroom-hotkey.js"></script>
 </body>

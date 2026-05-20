@@ -10,7 +10,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Juega Dumb Ways to Die desde Budsin Games.">
+  <meta name="description" content="Juega Dumb Ways to Die online gratis. El clásico juego de supervivencia con minijuegos locos. Evita morir de formas absurdas y divertidas.">
   <title>Dumb Ways to Die | Budsin Games</title>
   <link rel="icon" href="images.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -236,6 +236,73 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       line-height: 1.75;
     }
 
+    .game-info {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .game-info.is-open {
+      display: flex;
+    }
+    .game-info-inner {
+      background: #fff;
+      border-radius: 28px;
+      padding: 28px 32px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      line-height: 1.8;
+      font-size: 0.95rem;
+      position: relative;
+    }
+    .game-info-inner h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+      margin: 20px 0 10px;
+    }
+    .game-info-inner h2:first-child { margin-top: 0; }
+    .game-info-inner p { margin: 0 0 12px; color: #5c6678; }
+    .game-info-inner ul { margin: 0 0 12px; padding-left: 20px; color: #5c6678; }
+    .game-info-inner li { margin-bottom: 6px; }
+    .game-info-inner strong { color: #111827; }
+    .game-info-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(18,24,38,0.1);
+      background: #fff;
+      color: #111827;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      margin-bottom: 8px;
+    }
+    html[data-site-theme="dark"] .game-info-inner {
+      background: rgba(9,15,28,0.96);
+      color: #e2e8f0;
+    }
+    html[data-site-theme="dark"] .game-info-inner h2 { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-inner p,
+    html[data-site-theme="dark"] .game-info-inner ul { color: #94a3b8; }
+    html[data-site-theme="dark"] .game-info-inner strong { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-close { background: rgba(9,15,28,0.92); border-color: rgba(148,163,184,0.28); color: #e2e8f0; }
+    html[data-site-theme="dark"] .game-info { background: rgba(0,0,0,0.75); }
+
     @media (max-width: 920px) {
       body::before,
       body::after {
@@ -270,7 +337,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <strong>Dumb Ways to Die</strong>
         <span>Supera minijuegos rápidos, absurdos y letales antes de que todo salga terriblemente mal.</span>
       </div>
-      <a class="back" href="index.html">Volver al portal</a>
+      <div style="display:flex;gap:10px;align-items:stretch;">
+  <button type="button" class="back" onclick="document.getElementById('gameInfo').classList.toggle('is-open')" style="background:linear-gradient(135deg,#111827,#1f2937);border:0;font:inherit;font-weight:800;color:#fff;padding:0 20px;border-radius:18px;cursor:pointer;">ℹ️ Info</button>
+  <a class="back" href="index.html">Volver al portal</a>
+</div>
     </header>
 
     <main class="frame-shell">
@@ -299,6 +369,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }, 7000);
     })();
   </script>
+  <section class="game-info" id="gameInfo">
+  <div class="game-info-inner">
+    <button type="button" class="game-info-close" onclick="document.getElementById('gameInfo').classList.remove('is-open')">&times;</button>
+    <h2>About Dumb Ways to Die</h2>
+    <p>Dumb Ways to Die is a quirky and darkly humorous mini-game collection based on the viral safety campaign. Test your reflexes across dozens of absurd scenarios where one wrong move leads to a hilarious demise. Poke, prod, swipe, and tap your way through increasingly challenging levels.</p>
+
+    <h2>How to Play</h2>
+    <p>Each mini-game presents a different situation where you must avoid dying in a dumb way. Follow the on-screen instructions carefully — you might need to poke, swipe, tap, or drag objects. Complete all mini-games in a round to advance. The game gets faster and more challenging as you progress.</p>
+
+    <h2>Controls</h2>
+    <ul>
+      <li><strong>Mouse:</strong> Click, drag, and interact with objects on screen</li>
+      <li><strong>Follow on-screen prompts:</strong> Each mini-game has unique controls</li>
+    </ul>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Read the instructions carefully before each mini-game</li>
+      <li>React quickly — many challenges are timed</li>
+      <li>Practice each mini-game to memorize the pattern</li>
+      <li>Stay calm under pressure — panic leads to mistakes</li>
+      <li>Have fun with it — the humor is part of the experience</li>
+    </ul>
+  </div>
+</section>
   <script src="site-theme.js"></script>
   <script src="classroom-hotkey.js"></script>
 </body>

@@ -10,6 +10,7 @@
   <head>
     <base href="https://cdn.jsdelivr.net/gh/web-ports/hollow-knight-silksong@master/">
     <meta charset="utf-8">
+    <meta name="description" content="Juega Hollow Knight Silksong online gratis. Juega como Hornet en su propia aventura. Explora Pharloom y lucha contra nuevos enemigos.">
     <link rel="icon" type="image/x-icon" href="https://budsin-games.pages.dev/images.ico">
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -69,6 +70,35 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZT26944"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+<div style="position:fixed;top:16px;right:16px;z-index:50;display:flex;gap:8px;">
+  <button onclick="var el=document.getElementById('gameInfo');el.style.display='flex';" style="padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.6);color:#fff;font-weight:700;font-size:0.88rem;cursor:pointer;backdrop-filter:blur(8px);font-family:sans-serif;">ℹ️ Info</button>
+</div>
+<div id="gameInfo" style="display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px;">
+  <div style="background:#fff;border-radius:28px;padding:28px 32px;max-width:680px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.3);position:relative;">
+    <button type="button" onclick="document.getElementById('gameInfo').style.display='none'" style="position:sticky;top:0;float:right;width:36px;height:36px;border-radius:999px;border:1px solid rgba(18,24,38,0.1);background:#fff;color:#111827;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;margin-bottom:8px;">&times;</button>
+  <h1 style="font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; margin: 0 0 8px; color: #111827;">Hollow Knight: Silksong</h1>
+  <p style="font-family: 'Sora', sans-serif; font-size: 0.95rem; line-height: 1.7; color: #5c6678; margin: 0 0 20px;">Hollow Knight: Silksong is the highly anticipated sequel to Hollow Knight. Play as Hornet, the fierce princess-protector of Hallownest, as she explores the mysterious kingdom of Pharloom. With new abilities, enemies, and a vast interconnected world, Silksong expands on everything that made the original a masterpiece.</p>
+  <div style="margin-bottom: 20px; font-family: 'Sora', sans-serif;">
+    <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; margin: 16px 0 8px; color: #111827;">How to Play</h2>
+    <p style="font-size: 0.95rem; line-height: 1.7; color: #5c6678; margin: 0 0 12px;">Explore the kingdom of Pharloom as Hornet. Use your needle and thread to attack enemies and traverse the environment. Unlock new abilities that let you access previously unreachable areas. Defeat challenging bosses, collect items, and uncover the story of this mysterious new world.</p>
+    <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; margin: 16px 0 8px; color: #111827;">Controls</h2>
+    <ul style="font-size: 0.95rem; line-height: 1.7; color: #5c6678;">
+      <li><strong>WASD / Arrow Keys:</strong> Move Hornet</li>
+      <li><strong>Z / J:</strong> Attack with needle</li>
+      <li><strong>X / K:</strong> Use thread ability / heal</li>
+      <li><strong>C / L:</strong> Dash / dodge</li>
+      <li><strong>Up + Attack:</strong> Strike upward</li>
+    </ul>
+    <h2 style="font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; margin: 16px 0 8px; color: #111827;">Tips</h2>
+    <ul style="font-size: 0.95rem; line-height: 1.7; color: #5c6678;">
+      <li>Explore every path — Silksong rewards thorough exploration</li>
+      <li>Learn boss patterns to find openings for attack</li>
+      <li>Upgrade your needle and abilities when possible</li>
+      <li>Use thread abilities creatively for traversal and combat</li>
+    </ul>
+  </div>
+  </div>
+</div>
     <div id="loading-text" style="color: white; font-size: 48px; font-family: cursive; text-align: center; margin-top: 20px;"> LOADING...</div>
     <div id="unity-container">
       <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>

@@ -10,7 +10,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Juega Hollow Knight desde Budsin Games.">
+  <meta name="description" content="Juega Hollow Knight online gratis desde el navegador. Explora Hallownest, lucha contra jefes y descubre los secretos del reino de los insectos.">
   <title>Hollow Knight | Budsin Games</title>
   <link rel="icon" type="image/x-icon" href="images.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -396,9 +396,72 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
       box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
     }
 
-    #game-frame {
+    .game-info {
       display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
     }
+    .game-info.is-open {
+      display: flex;
+    }
+    .game-info-inner {
+      background: #fff;
+      border-radius: 28px;
+      padding: 28px 32px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.3);
+      line-height: 1.8;
+      font-size: 0.95rem;
+      position: relative;
+    }
+    .game-info-inner h2 {
+      font-family: "Bebas Neue", sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.03em;
+      margin: 20px 0 10px;
+    }
+    .game-info-inner h2:first-child { margin-top: 0; }
+    .game-info-inner p { margin: 0 0 12px; color: #5c6678; }
+    .game-info-inner ul { margin: 0 0 12px; padding-left: 20px; color: #5c6678; }
+    .game-info-inner li { margin-bottom: 6px; }
+    .game-info-inner strong { color: #111827; }
+    .game-info-close {
+      position: sticky;
+      top: 0;
+      float: right;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(18,24,38,0.1);
+      background: #fff;
+      color: #111827;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+      margin-bottom: 8px;
+    }
+    html[data-site-theme="dark"] .game-info-inner {
+      background: rgba(9,15,28,0.96);
+      color: #e2e8f0;
+    }
+    html[data-site-theme="dark"] .game-info-inner h2 { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-inner p,
+    html[data-site-theme="dark"] .game-info-inner ul { color: #94a3b8; }
+    html[data-site-theme="dark"] .game-info-inner strong { color: #f1f5f9; }
+    html[data-site-theme="dark"] .game-info-close { background: rgba(9,15,28,0.92); border-color: rgba(148,163,184,0.28); color: #e2e8f0; }
+    html[data-site-theme="dark"] .game-info { background: rgba(0,0,0,0.75); }
 
     @media (max-width: 920px) {
       body::before,
@@ -486,7 +549,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <strong>Hollow Knight</strong>
       <span>Explora Hallownest desde Budsin Games. La carga puede tardar porque el juego se reconstruye por partes. Cuando te salga la cutscene, skipealo varias veces, si aparece negro, vuelve a presiopnar una tecla varias veces.</span>
     </div>
-    <a class="back" href="index.html">Volver al portal</a>
+    <div style="display:flex;gap:10px;align-items:stretch;">
+  <button type="button" class="back" onclick="document.getElementById('gameInfo').classList.toggle('is-open')" style="background:linear-gradient(135deg,#111827,#1f2937);border:0;font:inherit;font-weight:800;color:#fff;padding:0 20px;border-radius:18px;cursor:pointer;">ℹ️ Info</button>
+  <a class="back" href="index.html">Volver al portal</a>
+</div>
   </header>
 
   <script>
@@ -591,6 +657,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       document.body.appendChild(script);
     })();
   </script>
+  <section class="game-info" id="gameInfo">
+  <div class="game-info-inner">
+    <button type="button" class="game-info-close" onclick="document.getElementById('gameInfo').classList.remove('is-open')">&times;</button>
+    <h2>About Hollow Knight</h2>
+    <p>Hollow Knight is a critically acclaimed action-adventure game set in the hauntingly beautiful world of Hallownest. As the Knight, you explore vast interconnected environments, battle challenging bosses, and uncover the secrets of a fallen insect kingdom. This browser version brings the atmospheric experience directly to your browser.</p>
+
+    <h2>How to Play</h2>
+    <p>Explore the interconnected world of Hallownest, fighting enemies and discovering new abilities that let you access previously unreachable areas. Defeat bosses to earn powerful upgrades. Talk to NPCs to learn about the lore and find hidden paths. Use your map and compass to navigate the vast world.</p>
+
+    <h2>Controls</h2>
+    <ul>
+      <li><strong>WASD / Arrow Keys:</strong> Move your character</li>
+      <li><strong>Z / J:</strong> Attack with your nail</li>
+      <li><strong>X / K:</strong> Focus SOUL to heal</li>
+      <li><strong>C / L:</strong> Dash</li>
+      <li><strong>Up + Attack:</strong> Strike upward</li>
+      <li><strong>Down + Attack:</strong> Strike downward (pogo on enemies)</li>
+    </ul>
+
+    <h2>Tips</h2>
+    <ul>
+      <li>Explore everywhere — many secrets are hidden off the main path</li>
+      <li>Heal safely during boss fights when there's a brief pause</li>
+      <li>Use your map and buy pins to track important locations</li>
+      <li>Upgrade your nail as soon as you can afford it</li>
+      <li>Learn boss attack patterns to find openings</li>
+    </ul>
+  </div>
+</section>
   <script src="site-theme.js"></script>
   <script src="classroom-hotkey.js"></script>
 </body>
