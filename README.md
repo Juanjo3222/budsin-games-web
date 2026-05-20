@@ -54,6 +54,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 
 | Juego                          | Categoría   |
 | ------------------------------ | ----------- |
+| Escape Road                    | Acción      |
 | Minecraft 1.12.2               | Acción      |
 | Minecraft 1.8                  | Multiplayer |
 | Minecraft 1.21.x               | Acción      |
@@ -194,6 +195,9 @@ Firebase se usa únicamente para el conteo de popularidad.
 ---
 
 ## 📝 Changelog
+
+### v5.1
+* Se agregó **Escape Road** al catálogo con portada propia, acceso directo desde el index e integración al sistema de ranking/popularidad.
 
 ### v5.0
 * Se añadieron páginas de **Acerca de**, **Contacto** y **Política de Privacidad** con contenido sustancial para cumplir con los requisitos de AdSense.
