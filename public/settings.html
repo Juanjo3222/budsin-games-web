@@ -891,7 +891,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <div class="card-header" style="margin-top:14px">
                     <div class="card-icon" style="background:linear-gradient(135deg,#ffd700,#ff8c00);box-shadow:0 4px 12px rgba(255,215,0,0.3)">⭐</div>
                     <div>
-                        <h2>Budsin Pro</h2>
+                        <h2 data-i18n="proCardTitle">Budsin Pro</h2>
                         <p data-i18n="cardProSub">Inicia sesión con Google para verificar tu suscripción Pro.</p>
                     </div>
                 </div>
@@ -901,14 +901,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div style="text-align:center;margin-bottom:12px;font-size:.82rem;color:var(--muted)">
                         <strong style="color:#ffd700;font-size:1.2rem">$2.99 USD</strong>
                         <span style="display:inline-block;margin:0 8px">/</span>
-                        <strong style="color:#ffd700;font-size:1.2rem">S/ 7 PEN por mes</strong>
-                        <br>Cuota mensual — acceso a funcionalidades Pro.
+                        <strong style="color:#ffd700;font-size:1.2rem">S/ 7 PEN</strong>
+                        <span data-i18n="proPriceMonth"> por mes</span>
+                        <br>
+                        <span data-i18n="proPriceSub">Cuota mensual — acceso a funcionalidades Pro.</span>
                     </div>
                     <button type="button" id="proGoogleBtn" class="btn btn-primary" style="background:#fff;color:#444;border:2px solid #ffd700;box-shadow:0 4px 16px rgba(255,215,0,0.2);width:100%;justify-content:center;transition:transform 0.2s,box-shadow 0.2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(255,215,0,0.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(255,215,0,0.2)'">
                         <svg style="width:22px;height:22px" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.84.93 7.45 2.56 10.78l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
                             <span data-i18n="proGoogle">Iniciar sesión con Google</span>
-                        </button>
-                        <p style="margin:6px 0 0;font-size:.72rem;color:var(--muted);text-align:center">Al iniciar sesión se verificará tu suscripción. Si eres nuevo, contacta al admin para activar Pro.</p>
+                    </button>
+                    <p style="margin:6px 0 0;font-size:.72rem;color:var(--muted);text-align:center" data-i18n="proLoginHint">Al iniciar sesión se verificará tu suscripción. Si eres nuevo, contacta al admin para activar Pro.</p>
                     <p id="proError" style="color:var(--red);font-size:.82rem;margin:8px 0 0;display:none"></p>
                 </div>
 
@@ -927,31 +929,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
                         <div style="background:rgba(255,215,0,0.08);border-radius:12px;padding:12px;text-align:center">
                             <div style="font-size:1.2rem;font-weight:800;color:#ffd700" id="proStatsGames">0</div>
-                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px">Juegos jugados</div>
+                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px" data-i18n="proStatsGames">Juegos jugados</div>
                         </div>
                         <div style="background:rgba(255,215,0,0.08);border-radius:12px;padding:12px;text-align:center">
                             <div style="font-size:1.2rem;font-weight:800;color:#ffd700" id="proStatsFavs">0</div>
-                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px">Favoritos</div>
+                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px" data-i18n="proStatsFavs">Favoritos</div>
                         </div>
                     </div>
 
                     <!-- Renewal date -->
                     <div id="proRenewalRow" style="display:none;margin-top:12px;padding:10px 12px;border-radius:12px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.15);font-size:.78rem;text-align:center">
-                        <span style="color:var(--muted)">🔄 Renovación:</span>
+                        <span data-i18n="proRenewalLabel" style="color:var(--muted)">🔄 Renovación:</span>
                         <strong id="proRenewalDate" style="color:#ffd700;margin-left:4px"></strong>
                         <span id="proRenewalWarning" style="display:none;margin-left:6px;color:#ef3f45;font-weight:700">⚠️</span>
                     </div>
 
                     <!-- Pro features list -->
                     <div style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.1)">
-                        <div style="font-size:.78rem;font-weight:700;color:#ffd700;margin-bottom:8px">Beneficios Pro</div>
+                        <div style="font-size:.78rem;font-weight:700;color:#ffd700;margin-bottom:8px" data-i18n="proBenefitsTitle">Beneficios Pro</div>
                         <ul style="margin:0;padding:0;list-style:none;font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;gap:6px">
-                            <li>✓ <strong>Sin anuncios</strong> en el portal</li>
-                            <li>✓ <strong>Tema Pro (Gold)</strong> exclusivo</li>
-                            <li>✓ <strong>Favoritos ilimitados</strong> (sin límite de 20)</li>
-                            <li>✓ <strong>Acceso anticipado</strong> a juegos nuevos</li>
-                            <li>✓ <strong>Estadísticas</strong> de tu actividad</li>
-                            <li>✓ <strong>Prioridad</strong> en nuevas features</li>
+                            <li>✓ <strong data-i18n="proBenefitNoAds">Sin anuncios</strong> <span data-i18n="proBenefitNoAdsSuffix">en el portal</span></li>
+                            <li data-i18n="proBenefitTheme">✓ Tema Pro (Gold) exclusivo</li>
+                            <li>✓ <strong data-i18n="proBenefitFavs">Favoritos ilimitados</strong> <span data-i18n="proBenefitFavsSuffix">(sin límite de 20)</span></li>
+                            <li>✓ <strong data-i18n="proBenefitEarly">Acceso anticipado</strong> <span data-i18n="proBenefitEarlySuffix">a juegos nuevos</span></li>
+                            <li>✓ <strong data-i18n="proBenefitStats">Estadísticas</strong> <span data-i18n="proBenefitStatsSuffix">de tu actividad</span></li>
+                            <li data-i18n="proBenefitPriority">✓ Prioridad en nuevas features</li>
                         </ul>
                     </div>
                 </div>
@@ -1159,6 +1161,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proLogout: "Cerrar sesión",
                     proBadgeFree: "Gratuito",
                     proRenewalDays: "días",
+                    proCardTitle: "Budsin Pro",
+                    proPriceMonth: "por mes",
+                    proPriceSub: "Cuota mensual — acceso a funcionalidades Pro.",
+                    proLoginHint: "Al iniciar sesión se verificará tu suscripción. Si eres nuevo, contacta al admin para activar Pro.",
+                    proStatsGames: "Juegos jugados",
+                    proStatsFavs: "Favoritos",
+                    proRenewalLabel: "🔄 Renovación:",
+                    proBenefitsTitle: "Beneficios Pro",
+                    proBenefitNoAds: "Sin anuncios",
+                    proBenefitNoAdsSuffix: "en el portal",
+                    proBenefitTheme: "✓ Tema Pro (Gold) exclusivo",
+                    proBenefitFavs: "Favoritos ilimitados",
+                    proBenefitFavsSuffix: "(sin límite de 20)",
+                    proBenefitEarly: "Acceso anticipado",
+                    proBenefitEarlySuffix: "a juegos nuevos",
+                    proBenefitStats: "Estadísticas",
+                    proBenefitStatsSuffix: "de tu actividad",
+                    proBenefitPriority: "✓ Prioridad en nuevas features",
                     cardLoadingSub: "Personaliza la transición al abrir un juego.",
                     toggleAudioLabel: "Música de carga",
                     toggleAudioSub: "Reproduce bmusic.mp3 durante la pantalla de carga de 9 segundos.",
@@ -1219,6 +1239,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proLogout: "Sign out",
                     proBadgeFree: "Free",
                     proRenewalDays: "days",
+                    proCardTitle: "Budsin Pro",
+                    proPriceMonth: "per month",
+                    proPriceSub: "Monthly fee — access to Pro features.",
+                    proLoginHint: "Signing in will verify your subscription. If you're new, contact the admin to activate Pro.",
+                    proStatsGames: "Games played",
+                    proStatsFavs: "Favorites",
+                    proRenewalLabel: "🔄 Renewal:",
+                    proBenefitsTitle: "Pro Benefits",
+                    proBenefitNoAds: "No ads",
+                    proBenefitNoAdsSuffix: "on the portal",
+                    proBenefitTheme: "✓ Exclusive Pro (Gold) theme",
+                    proBenefitFavs: "Unlimited favorites",
+                    proBenefitFavsSuffix: "(no 20 limit)",
+                    proBenefitEarly: "Early access",
+                    proBenefitEarlySuffix: "to new games",
+                    proBenefitStats: "Stats",
+                    proBenefitStatsSuffix: "of your activity",
+                    proBenefitPriority: "✓ Priority on new features",
                     cardLoadingSub: "Customize the transition when opening a game.",
                     toggleAudioLabel: "Loading music",
                     toggleAudioSub: "Play bmusic.mp3 during the 9-second loading screen.",
@@ -1279,6 +1317,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proLogout: "Sair",
                     proBadgeFree: "Grátis",
                     proRenewalDays: "dias",
+                    proCardTitle: "Budsin Pro",
+                    proPriceMonth: "por mês",
+                    proPriceSub: "Taxa mensal — acesso a funcionalidades Pro.",
+                    proLoginHint: "Fazer login verificará sua assinatura. Se você é novo, contate o admin para ativar o Pro.",
+                    proStatsGames: "Jogos jogados",
+                    proStatsFavs: "Favoritos",
+                    proRenewalLabel: "🔄 Renovação:",
+                    proBenefitsTitle: "Benefícios Pro",
+                    proBenefitNoAds: "Sem anúncios",
+                    proBenefitNoAdsSuffix: "no portal",
+                    proBenefitTheme: "✓ Tema Pro (Gold) exclusivo",
+                    proBenefitFavs: "Favoritos ilimitados",
+                    proBenefitFavsSuffix: "(sem limite de 20)",
+                    proBenefitEarly: "Acesso antecipado",
+                    proBenefitEarlySuffix: "a novos jogos",
+                    proBenefitStats: "Estatísticas",
+                    proBenefitStatsSuffix: "da sua atividade",
+                    proBenefitPriority: "✓ Prioridade em novas funcionalidades",
                     cardLoadingSub: "Personalize a transição ao abrir um jogo.",
                     toggleAudioLabel: "Música de carregamento",
                     toggleAudioSub: "Reproduz bmusic.mp3 durante a tela de carregamento de 9 segundos.",
