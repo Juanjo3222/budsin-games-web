@@ -1989,28 +1989,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div id="proGatingPopup" class="changelog-popup" aria-hidden="true" style="display:none">
             <div class="changelog-card" role="status" aria-live="polite" style="max-width:440px">
                 <div class="changelog-close-wrap">
-                    <button id="closeGatingPopup" class="changelog-close" type="button" aria-label="Cerrar" style="border-radius:50%;width:36px;height:36px;line-height:36px;font-size:1.2rem;padding:0">×</button>
+                    <button id="closeGatingPopup" class="changelog-close" type="button" data-i18n-aria="proGatingClose" aria-label="Cerrar" style="border-radius:50%;width:36px;height:36px;line-height:36px;font-size:1.2rem;padding:0">×</button>
                 </div>
                 <span style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-size:1.4rem;padding:8px 16px">🔒</span>
-                <h2 style="margin:8px 0 4px;font-size:1.1rem">Juego exclusivo para Budsin Pro</h2>
-                <p style="margin:0 0 12px;font-size:.82rem;color:var(--muted)">Este juego está disponible primero para usuarios Pro.</p>
+                <h2 style="margin:8px 0 4px;font-size:1.1rem" data-i18n="proGatingTitle">Juego exclusivo para Budsin Pro</h2>
+                <p style="margin:0 0 12px;font-size:.82rem;color:var(--muted)" data-i18n="proGatingSub">Este juego está disponible primero para usuarios Pro.</p>
                 <div style="background:rgba(255,215,0,0.06);border-radius:12px;padding:12px;margin-bottom:12px;font-size:.78rem">
-                    <div style="font-weight:700;color:#ffd700;margin-bottom:6px">⭐ Ventajas de ser Pro</div>
+                    <div style="font-weight:700;color:#ffd700;margin-bottom:6px" data-i18n="proGatingBenefits">⭐ Ventajas de ser Pro</div>
                     <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;color:var(--muted)">
-                        <li>✓ Sin anuncios en el portal</li>
-                        <li>✓ Tema Gold exclusivo</li>
-                        <li>✓ Favoritos ilimitados</li>
-                        <li>✓ Acceso anticipado a juegos nuevos</li>
-                        <li>✓ Estadísticas de tu actividad</li>
+                        <li data-i18n="proGatingNoAds">✓ Sin anuncios en el portal</li>
+                        <li data-i18n="proGatingGoldTheme">✓ Tema Gold exclusivo</li>
+                        <li data-i18n="proGatingUnlimitedFavs">✓ Favoritos ilimitados</li>
+                        <li data-i18n="proGatingEarlyAccess">✓ Acceso anticipado a juegos nuevos</li>
+                        <li data-i18n="proGatingStats">✓ Estadísticas de tu actividad</li>
                     </ul>
-                    <div style="margin-top:8px;text-align:center;color:#ffd700;font-weight:700">$2.99 USD / S/ 7 PEN por mes</div>
+                    <div style="margin-top:8px;text-align:center;color:#ffd700;font-weight:700" data-i18n="proGatingPrice">$2.99 USD / S/ 7 PEN por mes</div>
                 </div>
-                <div id="proGatingFreeDate" style="display:none;font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:8px;border-radius:8px;background:rgba(255,215,0,0.06)">
+                <div id="proGatingFreeDate" style="display:none;font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:8px;border-radius:8px;background:rgba(255,215,0,0.06)" data-i18n="proGatingFreeDate">
                     🎉 Este juego será <strong style="color:#ffd700">gratis para todos</strong> el <strong style="color:#ffd700">22 de mayo de 2026</strong>.
                 </div>
                 <div style="display:flex;flex-direction:column;gap:6px">
-                    <a href="settings.html#proCard" style="display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:0 16px;border-radius:14px;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-size:.9rem;font-weight:800;text-decoration:none;box-shadow:0 6px 20px rgba(255,215,0,0.3)">⭐ Quiero ser Pro</a>
-                    <button id="closeGatingBtn" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;font-size:.8rem;border-radius:50px">Cerrar</button>
+                    <a href="settings.html#proCard" style="display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:0 16px;border-radius:14px;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-size:.9rem;font-weight:800;text-decoration:none;box-shadow:0 6px 20px rgba(255,215,0,0.3)" data-i18n="proGatingCta">⭐ Quiero ser Pro</a>
+                    <button id="closeGatingBtn" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;font-size:.8rem;border-radius:50px" data-i18n="proGatingClose">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -4575,6 +4575,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     shelfRecent: "🕐 Jugado recientemente",
                     noRecent: "Aún no has jugado nada.",
                     favLimitReached: "Límite de favoritos alcanzado (20). Hazte Pro para ilimitados.",
+                    proGatingTitle: "Juego exclusivo para Budsin Pro",
+                    proGatingSub: "Este juego está disponible primero para usuarios Pro.",
+                    proGatingBenefits: "⭐ Ventajas de ser Pro",
+                    proGatingNoAds: "✓ Sin anuncios en el portal",
+                    proGatingGoldTheme: "✓ Tema Gold exclusivo",
+                    proGatingUnlimitedFavs: "✓ Favoritos ilimitados",
+                    proGatingEarlyAccess: "✓ Acceso anticipado a juegos nuevos",
+                    proGatingStats: "✓ Estadísticas de tu actividad",
+                    proGatingPrice: "$2.99 USD / S/ 7 PEN por mes",
+                    proGatingFreeDate: "🎉 Este juego será gratis para todos el 22 de mayo de 2026.",
+                    proGatingCta: "⭐ Quiero ser Pro",
+                    proGatingClose: "Cerrar",
                     categoriesLabel: "Categorías",
                     articlesKicker: "Consejos y guías",
                     articlesTitle: "Tips para sacarle más partido al portal",
@@ -4656,6 +4668,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     shelfRecent: "🕐 Recently played",
                     noRecent: "You haven't played anything yet.",
                     favLimitReached: "Favorites limit reached (20). Go Pro for unlimited.",
+                    proGatingTitle: "Exclusive game for Budsin Pro",
+                    proGatingSub: "This game is available first for Pro users.",
+                    proGatingBenefits: "⭐ Benefits of going Pro",
+                    proGatingNoAds: "✓ No ads on the portal",
+                    proGatingGoldTheme: "✓ Exclusive Gold theme",
+                    proGatingUnlimitedFavs: "✓ Unlimited favorites",
+                    proGatingEarlyAccess: "✓ Early access to new games",
+                    proGatingStats: "✓ Activity stats",
+                    proGatingPrice: "$2.99 USD / S/ 7 PEN per month",
+                    proGatingFreeDate: "🎉 This game will be free for everyone on May 22, 2026.",
+                    proGatingCta: "⭐ I want to be Pro",
+                    proGatingClose: "Close",
                     categoriesLabel: "Categories",
                     articlesKicker: "Tips & guides",
                     articlesTitle: "Tips to get the most out of the portal",
@@ -4737,6 +4761,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     shelfRecent: "🕐 Jogado recentemente",
                     noRecent: "Você ainda não jogou nada.",
                     favLimitReached: "Limite de favoritos atingido (20). Torne-se Pro para ilimitados.",
+                    proGatingTitle: "Jogo exclusivo para Budsin Pro",
+                    proGatingSub: "Este jogo está disponível primeiro para usuários Pro.",
+                    proGatingBenefits: "⭐ Vantagens de ser Pro",
+                    proGatingNoAds: "✓ Sem anúncios no portal",
+                    proGatingGoldTheme: "✓ Tema Gold exclusivo",
+                    proGatingUnlimitedFavs: "✓ Favoritos ilimitados",
+                    proGatingEarlyAccess: "✓ Acesso antecipado a novos jogos",
+                    proGatingStats: "✓ Estatísticas da sua atividade",
+                    proGatingPrice: "$2.99 USD / S/ 7 PEN por mês",
+                    proGatingFreeDate: "🎉 Este jogo será grátis para todos em 22 de maio de 2026.",
+                    proGatingCta: "⭐ Quero ser Pro",
+                    proGatingClose: "Fechar",
                     categoriesLabel: "Categorias",
                     articlesKicker: "Dicas e guias",
                     articlesTitle: "Dicas para aproveitar melhor o portal",

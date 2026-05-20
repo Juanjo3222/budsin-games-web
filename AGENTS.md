@@ -190,7 +190,7 @@ Cuando añadas un juego que será **exclusivo para usuarios Pro** (o anticipado)
 
 ### 5. Traducciones
 - Las tarjetas Pro siguen las mismas reglas de traducción (ES/EN/PT en HTML y JS).
-- El popup de gating no necesita traducción (usar español por ahora).
+- El popup de gating y el overlay del juego también se traducen (claves `proGating*` en el objeto `I18N` del `index.html`).
 
 ### 6. Assets obligatorios
 - La página del juego **debe** incluir todos los assets de la Regla de Oro #5 (favicon, GTM, AdSense, classroom-hotkey).
