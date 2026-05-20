@@ -1157,6 +1157,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     cardProSub: "Inicia sesión con Google para verificar tu suscripción Pro.",
                     proGoogle: "Iniciar sesión con Google",
                     proLogout: "Cerrar sesión",
+                    proBadgeFree: "Gratuito",
+                    proRenewalDays: "días",
                     cardLoadingSub: "Personaliza la transición al abrir un juego.",
                     toggleAudioLabel: "Música de carga",
                     toggleAudioSub: "Reproduce bmusic.mp3 durante la pantalla de carga de 9 segundos.",
@@ -1215,6 +1217,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     cardProSub: "Sign in with Google to verify your Pro subscription.",
                     proGoogle: "Sign in with Google",
                     proLogout: "Sign out",
+                    proBadgeFree: "Free",
+                    proRenewalDays: "days",
                     cardLoadingSub: "Customize the transition when opening a game.",
                     toggleAudioLabel: "Loading music",
                     toggleAudioSub: "Play bmusic.mp3 during the 9-second loading screen.",
@@ -1273,6 +1277,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     cardProSub: "Faça login com Google para verificar sua assinatura Pro.",
                     proGoogle: "Entrar com Google",
                     proLogout: "Sair",
+                    proBadgeFree: "Grátis",
+                    proRenewalDays: "dias",
                     cardLoadingSub: "Personalize a transição ao abrir um jogo.",
                     toggleAudioLabel: "Música de carregamento",
                     toggleAudioSub: "Reproduz bmusic.mp3 durante a tela de carregamento de 9 segundos.",
@@ -1662,6 +1668,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
 
                 renderUrlList(); // re-renders with new labels
+
+                // Re-translate Pro badge if user is Free
+                var proBadge = document.getElementById("proBadge");
+                var proTopBadge = document.getElementById("proTopBadge");
+                if (proBadge && proBadge.dataset.pro === "0") {
+                    proBadge.textContent = t.proBadgeFree;
+                    proTopBadge.textContent = t.proBadgeFree;
+                }
             }
 
             languageSelect.addEventListener("change", function() {
@@ -1729,6 +1743,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 var proBadge = document.getElementById("proBadge");
                 var proCard = document.getElementById("proCard");
                 var proTopBadge = document.getElementById("proTopBadge");
+                var t = I18N[getCurrentLanguage()];
 
                 function setProCardStyle(active) {
                     if (active) {
@@ -1743,7 +1758,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         proCard.style.border = "2px solid var(--border)";
                         proCard.style.boxShadow = "0 1px 3px rgba(0,0,0,0.06)";
                         proCard.style.background = "var(--surface)";
-                        proTopBadge.textContent = "Gratuito";
+                        proTopBadge.textContent = t.proBadgeFree;
                         proTopBadge.style.background = "rgba(17,24,39,0.06)";
                         proTopBadge.style.color = "var(--muted)";
                         proTopBadge.style.boxShadow = "none";
@@ -1801,6 +1816,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             } catch(_) {}
                         }
                         if (isPro) {
+                            proBadge.dataset.pro = "1";
+                            proTopBadge.dataset.pro = "1";
                             proBadge.textContent = "⭐ PRO";
                             proBadge.style.background = "linear-gradient(135deg,#ffd700,#ff8c00)";
                             proBadge.style.color = "#000";
@@ -1813,7 +1830,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             if (paidUntil) {
                                 var now = new Date();
                                 var diffDays = Math.ceil((paidUntil - now) / (1000 * 60 * 60 * 24));
-                                renewalEl.textContent = paidUntil.toLocaleDateString() + " (" + diffDays + " días)";
+                                renewalEl.textContent = paidUntil.toLocaleDateString() + " (" + diffDays + " " + t.proRenewalDays + ")";
                                 renewalRow.style.display = "block";
                                 if (diffDays <= 1 && diffDays >= -5) {
                                     warningEl.style.display = "inline";
@@ -1824,7 +1841,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 renewalRow.style.display = "none";
                             }
                         } else {
-                            proBadge.textContent = "Gratuito";
+                            proBadge.dataset.pro = "0";
+                            proTopBadge.dataset.pro = "0";
+                            proBadge.textContent = t.proBadgeFree;
                             proBadge.style.background = "rgba(17,24,39,0.06)";
                             proBadge.style.color = "var(--muted)";
                             setProCardStyle(false);
@@ -1832,7 +1851,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         }
                     }).catch(function() {
                         store("budsin_pro_active", "0");
-                        proBadge.textContent = "Gratuito";
+                        proBadge.textContent = t.proBadgeFree;
                         proBadge.style.background = "rgba(17,24,39,0.06)";
                         proBadge.style.color = "var(--muted)";
                         setProCardStyle(false);
