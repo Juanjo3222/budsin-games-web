@@ -76,7 +76,128 @@ Este archivo centraliza la lógica de desarrollo de `budsin-games.pages.dev`. Es
 Estas funcionalidades fueron **aprobadas por el usuario** y deben implementarse en orden de prioridad. Marcar como `[x]` cuando estén completas.
 
 ### 🔴 Alta prioridad
-- [ ] **Badge "Nuevo"** (`data-new="true"`): Inyectar via JS un `<span class="new-badge">Nuevo</span>` en las tarjetas con `data-new="true"`. Estilo: píldora verde-azul, esquina inferior-izquierda de la portada. Sin Firebase.
+- [x] **Badge "Nuevo"** (`data-new="true"`): Inyectar via JS un `<span class="new-badge">Nuevo</span>` en las tarjetas con `data-new="true"`. Estilo: píldora verde-azul, esquina inferior-izquierda de la portada. Sin Firebase.
+
+### 🟢 Implementado
+- [x] **Budsin Pro (Firebase Auth)**: Sistema de suscripción manual con Firebase Auth + Firestore. El admin gestiona usuarios Pro desde `/admin.html`. Los usuarios inician sesión en Settings. Features Pro: sin anuncios, badge "⭐ PRO" en el portal.
 
 ---
-*Última actualización: 10 de mayo de 2026*
+
+## ⭐ Budsin Pro VS Gratis — Lo que toda IA debe saber
+
+### 💰 Precio y suscripción
+- **$2.99 USD / S/ 7 PEN por mes** (cuota mensual).
+- El admin marca "Pagado este mes" desde `/admin.html` → extiende `paidUntil` 35 días.
+- Si el admin no marca pago en todo el mes, el Pro se auto-revoca a los 35 días.
+
+### 🔥 Diferencias Free vs Pro
+
+| Característica | Free | Pro |
+|---|---|---|
+| Anuncios | ✅ Se muestran | ❌ Ocultos |
+| Favoritos | Máximo 20 juegos | Ilimitados |
+| Tema Gold (Dark+Oro) | ❌ No disponible | ✅ Exclusivo |
+| Badge ⭐ PRO | ❌ No | ✅ Visible en portal |
+| Estadísticas (juegos jugados, favoritos) | ❌ No | ✅ En Settings |
+| Acceso anticipado a juegos nuevos | ❌ No | ✅ Prioridad |
+| Badge "Anticipado para Pro" | ✅ Se muestra en tarjetas marcadas | ❌ Oculto |
+
+### 📁 Archivos clave del sistema Pro
+
+- **`public/index.html`**: Contiene la lógica principal (Firebase Auth, `applyProFeatures()`, badges, tema, favoritos, polling cada 5 min, verificación al volver a la pestaña).
+- **`public/settings.html`**: Login con Google, muestra estado Pro, fecha de renovación, estadísticas, selector de tema Pro.
+- **`public/admin.html`**: Panel admin para gestionar usuarios. Botones "Hacer Pro", "✅ Pagar este mes", "Revocar Pro". Muestra columna "Pagado hasta" con fecha.
+- **`AGENTS.md`**: Este archivo.
+- **`README.md`**: Changelog duplicado.
+
+### 🔐 Firebase
+
+- **Auth**: Solo Google Sign-In (sin email/password para usuarios).
+- **Firestore collection `users`**: Cada documento tiene `uid → { email, pro, proSince, paidUntil, createdAt }`.
+- **Admin emails hardcodeados**: `juvaldiviam@gmail.com`, `juanjoseguravegamail@gmail.com`.
+- `paidUntil` es un `Timestamp` de Firestore. Si `paidUntil < now`, el Pro se auto-revoca.
+
+### 🧠 Lógica de verificación en cliente
+
+1. **Al cargar la página**: `localStorage` cachea `budsin_pro_active` (0/1) para respuesta inmediata.
+2. **Firebase Auth** se inicializa con `initializeApp()` en `index.html` y `settings.html`.
+3. **`onAuthStateChanged`** detecta sesión activa y consulta Firestore (`users/{uid}`).
+4. **Polling** cada 5 minutos re-consulta Firestore (`setInterval(300000)`).
+5. **`visibilitychange`** re-consulta al volver a la pestaña.
+6. **Auto-revocación**: Si `paidUntil` expiró, se setea `pro: false` en Firestore y se truncan favoritos a 20.
+
+### 🎨 Tema Pro (Gold + Dark)
+- CSS en `index.html` (línea ~1631) y `settings.html` (línea ~702).
+- Sobrescribe variables CSS (`--bg`, `--text`, `--muted`, `--surface`, etc.) en `html[data-site-theme="pro"]`.
+- Selector de tema en Settings, oculto para no-Pro.
+- Traducción: `themePro: "⭐ Pro (Gold)"` en ES/EN/PT.
+
+### 🏷️ Tarjetas de juego `data-pro="true"`
+- Cualquier `<a class="game-card">` con `data-pro="true"` muestra un badge "Anticipado para Pro" (solo visible para usuarios Free).
+- Si el usuario es Pro, el badge no se inyecta.
+- El badge tiene clase `.pro-badge` (píldora dorada, esquina inferior-derecha de la portada).
+
+### 🚫 Límite de favoritos
+- Free: máx 20. Al llegar al límite, toast rojo con mensaje traducido.
+- Pro: sin límite.
+- Al perder Pro, los favoritos se truncan a 20 automáticamente.
+- Los favoritos se muestran en grid visual con covers (como "Jugado recientemente").
+
+### 🗓️ Renovación y alertas
+- En Settings (logueado Pro): muestra "🔄 Renovación: [fecha] (X días)".
+- Si faltan ≤1 día o han pasado hasta 5 días: muestra ⚠️ roja.
+
+---
+
+## 🚪 Pro-Gating: Cómo añadir un juego exclusivo Pro
+
+Cuando añadas un juego que será **exclusivo para usuarios Pro** (o anticipado), sigue estas reglas:
+
+### 1. Marcar la tarjeta en `index.html`
+- Añadir `data-pro="true"` al `<a class="game-card">`.
+- Añadir `data-pro-release="AAAA-MM-DD"` con la fecha en que estará disponible para todos.
+- Si el juego ya existe y lo haces Pro, cambiar `data-label-es`/`data-label-en` a "Pro" / "Available May 24".
+- El badge "Anticipado para Pro: próximamente gratis" se inyecta automáticamente vía JS para usuarios Free.
+
+### 2. Gating al hacer clic (en `index.html`)
+- Si un usuario **Free** hace clic en una tarjeta `data-pro="true"`:
+  1. Se cuenta el clic en Firebase (`incrementRemotePopularity`) igual que siempre.
+  2. Se compara `data-pro-release` con la fecha actual. Si ya pasó esa fecha → el juego se libera y se navega normal (sin popup).
+  3. Si la fecha de liberación aún no llega → se muestra un **popup** (modal) con:
+     - "🔒 Juego exclusivo para Budsin Pro"
+     - Lista de ventajas Pro (sin anuncios, tema Gold, favoritos ilimitados, acceso anticipado, estadísticas).
+     - Precio: "$2.99 USD / S/ 7 PEN por mes".
+     - Botón "⭐ Quiero ser Pro" que enlaza a `settings.html#proCard`.
+     - Botón "Cerrar" (circular).
+     - Texto: "🎉 Será gratis para todos el [fecha]".
+- Si el usuario es **Pro** → navega normal al juego.
+
+### 3. Gating en la página del juego (`.html` dentro de `public/`)
+- El HTML del juego debe incluir al inicio del `<body>` un script que:
+  1. Lee `localStorage.getItem("budsin_pro_active")`.
+  2. Compara `data-pro-release` con la fecha actual: `new Date() >= new Date(releaseDate)`.
+  3. Si es Pro O la fecha de liberación ya pasó → muestra el juego normalmente (overlay oculto).
+  4. Si NO es Pro y la fecha aún no llega → muestra un overlay fullscreen con:
+     - Misma info que el popup del portal.
+     - El juego NO debe ser accesible (oculto tras overlay).
+     - Botón cerrar circular.
+     - Texto: "🎉 Será gratis para todos el [fecha]".
+- También debe contar el clic en Firebase al cargarse.
+
+### 4. Firebase en páginas de juego
+- Inicializar Firebase en la página del juego (misma config que `index.html`).
+- Llamar a `incrementRemotePopularity(href, gameName, 1)` para contar el acceso.
+
+### 5. Traducciones
+- Las tarjetas Pro siguen las mismas reglas de traducción (ES/EN/PT en HTML y JS).
+- El popup de gating no necesita traducción (usar español por ahora).
+
+### 6. Assets obligatorios
+- La página del juego **debe** incluir todos los assets de la Regla de Oro #5 (favicon, GTM, AdSense, classroom-hotkey).
+- La portada del juego debe estar en `public/portadas/[nombre].webp`.
+- **⚠️ URL absoluta para enlaces Pro**: Si la página tiene `<base>` tag (ej. CDN), los enlaces como `/settings.html#proCard` NO funcionan porque resuelven contra el origen del base. Usar URL absoluta: `https://budsin-games.pages.dev/settings.html#proCard`.
+- **⚠️ Font-family**: El overlay del gating debe incluir `font-family: system-ui, -apple-system, sans-serif` para que herede la tipografía del portal.
+
+---
+
+*Última actualización: 20 de mayo de 2026*

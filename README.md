@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/Games-40-blue" />
   <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange" />
-  <img src="https://img.shields.io/badge/Version-4.8-purple" />
+  <img src="https://img.shields.io/badge/Version-6.0-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -29,8 +29,9 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 
 ## ✨ Features
 
-* 🎮 **40 juegos jugables al instante**
+* 🎮 **40+ juegos jugables al instante**
 * ⚡ **Sin descargas ni instalación**
+* ⭐ **Budsin Pro**: suscripción manual con Firebase Auth (Google Sign-In). Sin anuncios, badge Pro y panel admin en `/admin.html`.
 * 🧩 **UI tipo consola (portadas interactivas)**
 * ⭐ **Sistema de favoritos (localStorage)**
 * 📊 **Ranking de popularidad con Firebase**
@@ -112,7 +113,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 * HTML5
 * CSS3
 * JavaScript (Vanilla)
-* Firebase (conteo de popularidad, sin Auth)
+* Firebase (conteo de popularidad, Auth para Budsin Pro)
 * Cloudflare Pages
 
 ---
@@ -195,6 +196,15 @@ Firebase se usa únicamente para el conteo de popularidad.
 ---
 
 ## 📝 Changelog
+
+### v6.0
+* **Budsin Pro** — Nuevo sistema de suscripción manual con Firebase Auth + Firestore.
+* Los usuarios inician sesión con Google desde **Settings**. El admin gestiona suscripciones desde `/admin.html`.
+* Features Pro: sin anuncios, tema Gold exclusivo, badge "⭐ PRO", favoritos ilimitados, acceso anticipado a juegos, estadísticas de actividad.
+* Badge "Anticipado para Pro: próximamente gratis" en juegos marcados con `data-pro="true"`.
+* Popup informativo "Modificaciones importantes" con obligación de lectura.
+* **Bendy and the Ink Machine** — primer juego exclusivo Pro. Disponible para todos el 24 de mayo.
+* Pro-Gating: los juegos con `data-pro="true"` muestran popup de suscripción para usuarios Free.
 
 ### v5.1
 * Se agregó **Escape Road** al catálogo con portada propia, acceso directo desde el index e integración al sistema de ranking/popularidad.

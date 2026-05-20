@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+    <head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5ZT26944');</script>
+<!-- End Google Tag Manager -->
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="robots" content="noindex, nofollow" />
+        <title>Budsin Admin · Pro Manager</title>
+        <link rel="icon" type="image/x-icon" href="images.ico" />
+        <style>
+            *, *::before, *::after { box-sizing: border-box; }
+            :root {
+                --bg: #edf1f5; --bg-2: #dfe6ee; --surface: rgba(255,255,255,0.92);
+                --surface-strong:#fff; --line: rgba(18,24,38,0.1);
+                --text: #111827; --muted: #5c6678; --red: #ef3f45; --blue: #2daeff; --green: #2fc98a;
+                --shadow: 0 24px 64px rgba(15,23,42,0.12); --shadow-soft: 0 16px 36px rgba(15,23,42,0.08);
+            }
+            body {
+                margin: 0; min-height: 100vh; font-family: "Sora", system-ui, sans-serif;
+                color: var(--text);
+                background: radial-gradient(circle at top center, rgba(255,216,74,0.28), transparent 30%), linear-gradient(180deg,#f7fafc 0%,var(--bg) 55%,var(--bg-2) 100%);
+            }
+            .shell { width: min(720px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 64px; }
+            .card {
+                padding: 24px; border: 1px solid rgba(255,255,255,.8); border-radius: 28px;
+                background: var(--surface); box-shadow: var(--shadow-soft);
+                margin-bottom: 16px;
+            }
+            h1 { margin: 0 0 6px; font-family: "Bebas Neue", sans-serif; font-size: clamp(2.8rem,7vw,4rem); letter-spacing: .04em; }
+            .back-link {
+                display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
+                border-radius: 999px; border: 1px solid var(--line);
+                background: var(--surface-strong); box-shadow: var(--shadow-soft);
+                color: var(--text); text-decoration: none; font-size: .88rem; font-weight: 700;
+                margin-bottom: 18px; transition: transform .2s;
+            }
+            .back-link:hover { transform: translateY(-2px); }
+            label { display: block; font-size: .82rem; font-weight: 700; color: var(--muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: .04em; }
+            input, select {
+                width: 100%; min-height: 46px; border-radius: 12px; border: 1px solid var(--line);
+                padding: 0 12px; font: inherit; font-size: .9rem; color: var(--text);
+                background: var(--surface-strong); outline: none; margin-bottom: 10px;
+            }
+            input:focus { border-color: var(--blue); }
+            .btn {
+                display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+                min-height: 46px; padding: 0 16px; border-radius: 12px; border: 0;
+                font: inherit; font-size: .88rem; font-weight: 800; cursor: pointer;
+                transition: transform .18s, box-shadow .18s;
+            }
+            .btn:hover { transform: translateY(-1px); }
+            .btn-primary { background: linear-gradient(135deg, var(--red), #ff8c55); color: #fff; box-shadow: 0 8px 20px rgba(239,63,69,.28); }
+            .btn-secondary { background: var(--surface-strong); color: var(--text); border: 1px solid var(--line); }
+            .btn-danger { background: rgba(239,63,69,.1); color: var(--red); border: 1px solid rgba(239,63,69,.2); min-height: 38px; font-size: .82rem; }
+            .btn-sm { min-height: 34px; padding: 0 12px; font-size: .8rem; }
+            .btn-green { background: linear-gradient(135deg, var(--green), #1fa8ff); color: #fff; box-shadow: 0 8px 20px rgba(47,201,138,.28); }
+            table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+            th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); }
+            th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 800; }
+            .badge-pro { display: inline-block; padding: 2px 8px; border-radius: 999px; background: linear-gradient(135deg,#ffd700,#ff8c00); color: #000; font-size: .7rem; font-weight: 800; }
+            .badge-free { display: inline-block; padding: 2px 8px; border-radius: 999px; background: rgba(17,24,39,0.06); color: var(--muted); font-size: .7rem; font-weight: 800; }
+            .error { color: var(--red); font-size: .82rem; margin: 6px 0 0; display: none; }
+            .success { color: var(--green); font-size: .82rem; margin: 6px 0 0; display: none; }
+            #authSection, #adminSection { display: none; }
+            #authSection.is-visible, #adminSection.is-visible { display: block; }
+            .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+            .admin-header .email { font-size: .82rem; color: var(--muted); }
+            .row { display: flex; gap: 10px; align-items: end; }
+            .row > *:first-child { flex: 1; }
+        </style>
+    </head>
+    <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZT26944"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+        <div class="shell">
+            <a class="back-link" href="index.html">← Volver al portal</a>
+
+            <div class="card">
+                <h1>Admin · Pro</h1>
+                <p style="color:var(--muted);margin:4px 0 0;font-size:.92rem">Gestiona los usuarios Pro de Budsin Games.</p>
+            </div>
+
+            <!-- Auth section -->
+            <div id="authSection" class="card">
+                <h2 style="margin:0 0 12px;font-size:1.1rem">Acceso administrador</h2>
+                <button type="button" id="adminGoogleBtn" class="btn btn-primary" style="background:#fff;color:#444;border:1px solid var(--line);box-shadow:var(--shadow-soft);width:100%;justify-content:center;margin-bottom:10px">
+                    <span style="display:inline-flex;align-items:center;gap:10px;font-size:.9rem">
+                        <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.87 7.35 2.56 10.56l7.98-5.97z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.97C6.51 42.62 14.62 48 24 48z"/></svg>
+                        <span>Iniciar sesión con Google</span>
+                    </span>
+                </button>
+                <div style="position:relative;text-align:center;margin:8px 0">
+                    <span style="background:var(--surface);padding:0 10px;font-size:.78rem;color:var(--muted);position:relative;z-index:1">o con email</span>
+                    <div style="border-top:1px solid var(--line);margin-top:-.6em"></div>
+                </div>
+                <div>
+                    <label>Email</label>
+                    <input type="email" id="adminEmail" placeholder="admin@email.com" />
+                </div>
+                <div>
+                    <label>Contraseña</label>
+                    <input type="password" id="adminPassword" placeholder="••••••••" />
+                </div>
+                <div style="display:flex;gap:8px">
+                    <button type="button" id="adminLoginBtn" class="btn btn-primary">Iniciar sesión</button>
+                </div>
+                <p id="adminError" class="error"></p>
+            </div>
+
+            <!-- Admin section -->
+            <div id="adminSection">
+                <div class="card">
+                    <div class="admin-header">
+                        <div>
+                            <h2 style="margin:0;font-size:1.1rem">Panel de control</h2>
+                            <span class="email" id="adminEmailDisplay"></span>
+                        </div>
+                        <button type="button" id="adminLogoutBtn" class="btn btn-secondary btn-sm">Cerrar sesión</button>
+                    </div>
+
+                    <div id="usersTableWrap">
+                        <p style="color:var(--muted);font-size:.88rem" id="usersLoading">Cargando usuarios...</p>
+                        <table id="usersTable" style="display:none">
+                            <thead>
+                                <tr><th>Email</th><th>Estado</th><th>Registrado</th><th>Pagado hasta</th><th>Acción</th></tr>
+                            </thead>
+                            <tbody id="usersBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+        <script>
+        (function() {
+            "use strict";
+
+            var ADMIN_EMAILS = ["juvaldiviam@gmail.com", "juanjoseguravegamail@gmail.com"];
+
+            var firebaseConfig = {
+                apiKey: "AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U",
+                authDomain: "juanjo-games.firebaseapp.com",
+                projectId: "juanjo-games",
+                storageBucket: "juanjo-games.firebasestorage.app",
+                messagingSenderId: "927529249414",
+                appId: "1:927529249414:web:410a686dc7f0da25ec3f07",
+            };
+
+            var app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(firebaseConfig);
+            var auth = app.auth();
+            var db = app.firestore();
+
+            function ensureUserDoc(user) {
+                return db.collection("users").doc(user.uid).get().then(function(doc) {
+                    if (!doc.exists) {
+                        return db.collection("users").doc(user.uid).set({
+                            email: user.email,
+                            displayName: user.displayName || "",
+                            pro: false,
+                            createdAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+                        });
+                    }
+                }).catch(function(e) { console.warn("[Budsin Admin] Error ensuring user doc:", e); });
+            }
+
+            var authSection = document.getElementById("authSection");
+            var adminSection = document.getElementById("adminSection");
+
+            function isAdmin(email) {
+                return ADMIN_EMAILS.some(function(e) { return e.toLowerCase() === (email || "").toLowerCase(); });
+            }
+
+            function showError(el, msg) {
+                el.textContent = msg;
+                el.style.display = "block";
+            }
+
+            function hideError(el) {
+                el.style.display = "none";
+            }
+
+            function renderAllUsers() {
+                var tbody = document.getElementById("usersBody");
+                var table = document.getElementById("usersTable");
+                var loading = document.getElementById("usersLoading");
+
+                db.collection("users").orderBy("createdAt", "desc").get().then(function(snapshot) {
+                    loading.style.display = "none";
+                    if (snapshot.empty) {
+                        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:20px">No hay usuarios registrados todavía.</td></tr>';
+                        table.style.display = "table";
+                        return;
+                    }
+                    table.style.display = "table";
+                    tbody.innerHTML = "";
+                    snapshot.forEach(function(doc) {
+                        var data = doc.data();
+                        var isPro = data.pro === true;
+                        var tr = document.createElement("tr");
+                        var registered = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString() : "—";
+                        var paidUntil = data.paidUntil && data.paidUntil.toDate ? data.paidUntil.toDate() : null;
+                        var paidUntilStr = paidUntil ? paidUntil.toLocaleDateString() + (paidUntil < new Date() ? " ⚠️" : "") : "—";
+                        var isExpired = paidUntil && paidUntil < new Date();
+                        tr.innerHTML =
+                            '<td>' + escHtml(data.email || doc.id) + '</td>' +
+                            '<td>' + (isPro ? (isExpired ? '<span class="badge-free">⚠️ Vencido</span>' : '<span class="badge-pro">⭐ PRO</span>') : '<span class="badge-free">Gratuito</span>') + '</td>' +
+                            '<td style="font-size:.8rem;color:var(--muted)">' + registered + '</td>' +
+                            '<td style="font-size:.8rem;color:var(--muted)">' + paidUntilStr + '</td>' +
+                            '<td>' +
+                                (isPro ? '<button type="button" class="btn btn-sm btn-green" data-pay="' + doc.id + '" style="margin-right:4px">✅ Pagar este mes</button>' : '') +
+                                '<button type="button" class="btn btn-sm ' + (isPro ? 'btn-danger' : 'btn-green') + '" data-uid="' + doc.id + '" data-email="' + escHtml(data.email || doc.id) + '" data-pro="' + isPro + '">' + (isPro ? 'Revocar Pro' : 'Hacer Pro') + '</button>' +
+                            '</td>';
+                        tbody.appendChild(tr);
+                    });
+
+                    tbody.querySelectorAll("button[data-pay]").forEach(function(btn) {
+                        btn.addEventListener("click", function() {
+                            var uid = this.dataset.pay;
+                            var expiry = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000);
+                            db.collection("users").doc(uid).update({
+                                paidUntil: window.firebase.firestore.Timestamp.fromDate(expiry),
+                            }).then(function() {
+                                renderAllUsers();
+                            }).catch(function(err) { alert("Error: " + err.message); });
+                        });
+                    });
+
+                    tbody.querySelectorAll("button[data-uid]").forEach(function(btn) {
+                        btn.addEventListener("click", function() {
+                            var uid = this.dataset.uid;
+                            var email = this.dataset.email;
+                            var wasPro = this.dataset.pro === "true";
+                            if (wasPro) {
+                                if (!confirm("¿Revocar Pro a " + email + "?")) return;
+                                db.collection("users").doc(uid).update({ pro: false, proSince: null, paidUntil: null }).then(function() {
+                                    renderAllUsers();
+                                }).catch(function(err) { alert("Error: " + err.message); });
+                            } else {
+                                var expiry = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000);
+                                db.collection("users").doc(uid).update({
+                                    pro: true,
+                                    proSince: window.firebase.firestore.FieldValue.serverTimestamp(),
+                                    paidUntil: window.firebase.firestore.Timestamp.fromDate(expiry),
+                                }).then(function() {
+                                    renderAllUsers();
+                                }).catch(function(err) { alert("Error: " + err.message); });
+                            }
+                        });
+                    });
+                }).catch(function(err) {
+                    loading.textContent = "Error al cargar: " + err.message;
+                });
+            }
+
+            function escHtml(str) {
+                return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+            }
+
+            // Auth state listener
+            auth.onAuthStateChanged(function(user) {
+                if (user && isAdmin(user.email)) {
+                    ensureUserDoc(user).then(function() {
+                        authSection.classList.remove("is-visible");
+                        adminSection.classList.add("is-visible");
+                        document.getElementById("adminEmailDisplay").textContent = user.email;
+                        renderAllUsers();
+                    });
+                } else if (user) {
+                    authSection.classList.add("is-visible");
+                    adminSection.classList.remove("is-visible");
+                    showError(document.getElementById("adminError"), "No tienes permisos de administrador.");
+                    auth.signOut();
+                } else {
+                    authSection.classList.add("is-visible");
+                    adminSection.classList.remove("is-visible");
+                }
+            });
+
+            // Google Sign-In
+            document.getElementById("adminGoogleBtn").addEventListener("click", function() {
+                var provider = new firebase.auth.GoogleAuthProvider();
+                auth.signInWithPopup(provider).catch(function(err) {
+                    showError(document.getElementById("adminError"), err.message);
+                });
+            });
+
+            // Login (email/password)
+            document.getElementById("adminLoginBtn").addEventListener("click", function() {
+                var email = document.getElementById("adminEmail").value.trim();
+                var password = document.getElementById("adminPassword").value;
+                var errorEl = document.getElementById("adminError");
+                hideError(errorEl);
+                if (!email || !password) { showError(errorEl, "Completa ambos campos."); return; }
+                auth.signInWithEmailAndPassword(email, password).catch(function(err) {
+                    showError(errorEl, err.message);
+                });
+            });
+
+            // Logout
+            document.getElementById("adminLogoutBtn").addEventListener("click", function() {
+                auth.signOut();
+            });
+        })();
+        </script>
+    </body>
+</html>

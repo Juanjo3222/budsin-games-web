@@ -698,8 +698,113 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 color: #c8daf8;
             }
             html[data-site-theme="ps5"] .footer-copy { color: #6a7fa0; }
+
+            /* ── Pro Theme (Gold + Dark) ── */
+            html[data-site-theme="pro"] {
+                --bg: #0d0b08;
+                --bg-2: #0a0805;
+                --surface: rgba(15,12,6,0.92);
+                --surface-strong: rgba(20,16,8,0.96);
+                --line: rgba(255,215,0,0.1);
+                --text: #e8e0d0;
+                --muted: #b8a87a;
+                --shadow: 0 24px 64px rgba(0,0,0,0.5);
+                --shadow-soft: 0 16px 36px rgba(0,0,0,0.4);
+            }
+            html[data-site-theme="pro"] body {
+                color: #e8e0d0;
+                background: radial-gradient(circle at top right, rgba(255,215,0,0.06), transparent 30%),
+                            radial-gradient(circle at bottom left, rgba(255,140,0,0.04), transparent 30%),
+                            linear-gradient(180deg, #0a0a0a 0%, #111 48%, #1a1500 100%);
+            }
+            html[data-site-theme="pro"] body::before,
+            html[data-site-theme="pro"] body::after { display: none; }
+            html[data-site-theme="pro"] .page-header {
+                background: linear-gradient(135deg, rgba(15,12,0,0.96), rgba(20,16,0,0.92));
+                border-color: rgba(255,215,0,0.12);
+                box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+            }
+            html[data-site-theme="pro"] .page-header h1 { color: #ffd700; }
+            html[data-site-theme="pro"] .page-header p { color: #b8a87a; }
+            html[data-site-theme="pro"] .settings-card {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.1);
+            }
+            html[data-site-theme="pro"] .card-header p { color: #b8a87a; }
+            html[data-site-theme="pro"] .back-link,
+            html[data-site-theme="pro"] .language-picker {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.14);
+                color: #e8d8a0;
+            }
+            html[data-site-theme="pro"] .language-picker select { color: #e8d8a0; }
+            html[data-site-theme="pro"] input[type="text"],
+            html[data-site-theme="pro"] input[type="url"],
+            html[data-site-theme="pro"] input[type="number"],
+            html[data-site-theme="pro"] select.field-select {
+                background: rgba(10,8,0,0.92);
+                border-color: rgba(255,215,0,0.14);
+                color: #e8d8a0;
+            }
+            html[data-site-theme="pro"] input:focus,
+            html[data-site-theme="pro"] select.field-select:focus { border-color: #ffd700; }
+            html[data-site-theme="pro"] .btn-secondary {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.14);
+                color: #e8d8a0;
+            }
+            html[data-site-theme="pro"] .btn-ghost {
+                color: #b8a87a;
+                border-color: rgba(255,215,0,0.14);
+            }
+            html[data-site-theme="pro"] .btn-primary {
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+                box-shadow: 0 8px 20px rgba(255,215,0,0.2);
+                color: #000;
+            }
+            html[data-site-theme="pro"] .url-item {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.1);
+            }
+            html[data-site-theme="pro"] .url-item.is-active { border-color: #ffd700; }
+            html[data-site-theme="pro"] .url-name { color: #e8e0d0; }
+            html[data-site-theme="pro"] .url-addr { color: #b8a87a; }
+            html[data-site-theme="pro"] .toggle-row { border-color: rgba(255,215,0,0.1); }
+            html[data-site-theme="pro"] .toggle-label { color: #e8e0d0; }
+            html[data-site-theme="pro"] .toggle-sub { color: #b8a87a; }
+            html[data-site-theme="pro"] .hotkey-badge {
+                background: rgba(10,8,0,0.92);
+                border-color: rgba(255,215,0,0.14);
+                color: #e8d8a0;
+            }
+            html[data-site-theme="pro"] .preview-bar {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.1);
+                color: #e8d8a0;
+            }
+            html[data-site-theme="pro"] .add-url-form { border-color: rgba(255,215,0,0.14); }
+            html[data-site-theme="pro"] .field-label { color: #b8a87a; }
+            html[data-site-theme="pro"] #toast {
+                background: rgba(200,190,160,0.92);
+                color: #0a0800;
+            }
+            html[data-site-theme="pro"] .site-footer {
+                background: rgba(10,8,0,0.82);
+                border-color: rgba(255,215,0,0.1);
+            }
+            html[data-site-theme="pro"] .footer-brand strong { color: #ffd700; }
+            html[data-site-theme="pro"] .footer-brand span { color: #b8a87a; }
+            html[data-site-theme="pro"] .footer-links a {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.14);
+                color: #e8d8a0;
+            }
+            html[data-site-theme="pro"] .footer-copy { color: #8a7a50; }
         </style>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
     </head>
 
     <body>
@@ -780,6 +885,78 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </p>
             </div>
 
+            <!-- ── Card: Budsin Pro ── -->
+            <div class="settings-card" id="proCard" style="border:2px solid #ffd700;box-shadow:0 0 0 4px rgba(255,215,0,0.1),0 24px 64px rgba(255,215,0,0.08);background:linear-gradient(135deg,rgba(255,215,0,0.04),rgba(255,140,0,0.04)),var(--surface);position:relative">
+                <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;padding:4px 16px;border-radius:0 0 12px 12px;font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 4px 12px rgba(255,215,0,0.3)">⭐ Pro</div>
+                <div class="card-header" style="margin-top:14px">
+                    <div class="card-icon" style="background:linear-gradient(135deg,#ffd700,#ff8c00);box-shadow:0 4px 12px rgba(255,215,0,0.3)">⭐</div>
+                    <div>
+                        <h2>Budsin Pro</h2>
+                        <p data-i18n="cardProSub">Inicia sesión con Google para verificar tu suscripción Pro.</p>
+                    </div>
+                </div>
+
+                <!-- Logged out state -->
+                <div id="proLoggedOut">
+                    <div style="text-align:center;margin-bottom:12px;font-size:.82rem;color:var(--muted)">
+                        <strong style="color:#ffd700;font-size:1.2rem">$2.99 USD</strong>
+                        <span style="display:inline-block;margin:0 8px">/</span>
+                        <strong style="color:#ffd700;font-size:1.2rem">S/ 7 PEN por mes</strong>
+                        <br>Cuota mensual — acceso a funcionalidades Pro.
+                    </div>
+                    <button type="button" id="proGoogleBtn" class="btn btn-primary" style="background:#fff;color:#444;border:2px solid #ffd700;box-shadow:0 4px 16px rgba(255,215,0,0.2);width:100%;justify-content:center;transition:transform 0.2s,box-shadow 0.2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(255,215,0,0.35)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 16px rgba(255,215,0,0.2)'">
+                        <svg style="width:22px;height:22px" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.54 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.76-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.84.93 7.45 2.56 10.78l7.98-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                            <span data-i18n="proGoogle">Iniciar sesión con Google</span>
+                        </button>
+                        <p style="margin:6px 0 0;font-size:.72rem;color:var(--muted);text-align:center">Al iniciar sesión se verificará tu suscripción. Si eres nuevo, contacta al admin para activar Pro.</p>
+                    <p id="proError" style="color:var(--red);font-size:.82rem;margin:8px 0 0;display:none"></p>
+                </div>
+
+                <!-- Logged in state -->
+                <div id="proLoggedIn" style="display:none;background:rgba(255,215,0,0.06);border-radius:16px;padding:16px;border:1px solid rgba(255,215,0,0.2)">
+                    <div style="display:flex;align-items:center;gap:12px">
+                        <span style="font-size:1.6rem">👤</span>
+                        <div style="flex:1">
+                            <strong id="proUserEmail" style="font-size:.95rem"></strong>
+                            <span id="proBadge" style="display:inline-block;margin-top:4px;padding:4px 12px;border-radius:999px;font-size:.75rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase"></span>
+                        </div>
+                        <button type="button" id="proLogoutBtn" class="btn btn-ghost btn-sm" data-i18n="proLogout" style="flex-shrink:0">Cerrar sesión</button>
+                    </div>
+
+                    <!-- Stats -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+                        <div style="background:rgba(255,215,0,0.08);border-radius:12px;padding:12px;text-align:center">
+                            <div style="font-size:1.2rem;font-weight:800;color:#ffd700" id="proStatsGames">0</div>
+                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px">Juegos jugados</div>
+                        </div>
+                        <div style="background:rgba(255,215,0,0.08);border-radius:12px;padding:12px;text-align:center">
+                            <div style="font-size:1.2rem;font-weight:800;color:#ffd700" id="proStatsFavs">0</div>
+                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px">Favoritos</div>
+                        </div>
+                    </div>
+
+                    <!-- Renewal date -->
+                    <div id="proRenewalRow" style="display:none;margin-top:12px;padding:10px 12px;border-radius:12px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.15);font-size:.78rem;text-align:center">
+                        <span style="color:var(--muted)">🔄 Renovación:</span>
+                        <strong id="proRenewalDate" style="color:#ffd700;margin-left:4px"></strong>
+                        <span id="proRenewalWarning" style="display:none;margin-left:6px;color:#ef3f45;font-weight:700">⚠️</span>
+                    </div>
+
+                    <!-- Pro features list -->
+                    <div style="margin-top:12px;padding:12px;border-radius:12px;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.1)">
+                        <div style="font-size:.78rem;font-weight:700;color:#ffd700;margin-bottom:8px">Beneficios Pro</div>
+                        <ul style="margin:0;padding:0;list-style:none;font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;gap:6px">
+                            <li>✓ <strong>Sin anuncios</strong> en el portal</li>
+                            <li>✓ <strong>Tema Pro (Gold)</strong> exclusivo</li>
+                            <li>✓ <strong>Favoritos ilimitados</strong> (sin límite de 20)</li>
+                            <li>✓ <strong>Acceso anticipado</strong> a juegos nuevos</li>
+                            <li>✓ <strong>Estadísticas</strong> de tu actividad</li>
+                            <li>✓ <strong>Prioridad</strong> en nuevas features</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- ── Card 3: Behavior ── -->
             <div class="settings-card">
                 <div class="card-header">
@@ -834,6 +1011,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <option value="light">Claro</option>
                         <option value="dark">Oscuro</option>
                         <option value="ps5">PlayStation 5</option>
+                        <option value="pro" id="proThemeOption" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-weight:800">⭐ Pro (Gold)</option>
                     </select>
                 </div>
             </div>
@@ -974,7 +1152,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     themeLight: "Claro",
                     themeDark: "Oscuro",
                     themePS5: "PlayStation 5",
+                    themePro: "⭐ Pro (Gold)",
                     cardLoadingTitle: "Pantalla de carga",
+                    cardProSub: "Inicia sesión con Google para verificar tu suscripción Pro.",
+                    proGoogle: "Iniciar sesión con Google",
+                    proLogout: "Cerrar sesión",
                     cardLoadingSub: "Personaliza la transición al abrir un juego.",
                     toggleAudioLabel: "Música de carga",
                     toggleAudioSub: "Reproduce bmusic.mp3 durante la pantalla de carga de 9 segundos.",
@@ -1028,7 +1210,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     themeLight: "Light",
                     themeDark: "Dark",
                     themePS5: "PlayStation 5",
+                    themePro: "⭐ Pro (Gold)",
                     cardLoadingTitle: "Loading screen",
+                    cardProSub: "Sign in with Google to verify your Pro subscription.",
+                    proGoogle: "Sign in with Google",
+                    proLogout: "Sign out",
                     cardLoadingSub: "Customize the transition when opening a game.",
                     toggleAudioLabel: "Loading music",
                     toggleAudioSub: "Play bmusic.mp3 during the 9-second loading screen.",
@@ -1082,7 +1268,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     themeLight: "Claro",
                     themeDark: "Escuro",
                     themePS5: "PlayStation 5",
+                    themePro: "⭐ Pro (Gold)",
                     cardLoadingTitle: "Tela de carregamento",
+                    cardProSub: "Faça login com Google para verificar sua assinatura Pro.",
+                    proGoogle: "Entrar com Google",
+                    proLogout: "Sair",
                     cardLoadingSub: "Personalize a transição ao abrir um jogo.",
                     toggleAudioLabel: "Música de carregamento",
                     toggleAudioSub: "Reproduz bmusic.mp3 durante a tela de carregamento de 9 segundos.",
@@ -1427,8 +1617,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             });
 
             // ─── Theme ───
-            var themeSelect = document.getElementById("themeSelect");
             var currentTheme = load("budsin_site_theme", "light") || "light";
+            document.documentElement.setAttribute("data-site-theme", currentTheme);
+            var themeSelect = document.getElementById("themeSelect");
             themeSelect.value = currentTheme;
 
             themeSelect.addEventListener("change", function () {
@@ -1465,6 +1656,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (themeOpts[0]) themeOpts[0].textContent = t.themeLight;
                 if (themeOpts[1]) themeOpts[1].textContent = t.themeDark;
                 if (themeOpts[2]) themeOpts[2].textContent = t.themePS5;
+                if (themeOpts[3]) {
+                    themeOpts[3].textContent = t.themePro || "⭐ Pro (Gold)";
+                    themeOpts[3].style.display = localStorage.getItem("budsin_pro_active") === "1" ? "" : "none";
+                }
 
                 renderUrlList(); // re-renders with new labels
             }
@@ -1474,6 +1669,185 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 store(KEYS.LANGUAGE, lang);
                 applyLanguage(lang);
             });
+
+            // ─── Firebase Auth + Pro (Google) ───
+            var BUDSIN_FIREBASE_CONFIG = {
+                apiKey: "AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U",
+                authDomain: "juanjo-games.firebaseapp.com",
+                projectId: "juanjo-games",
+                storageBucket: "juanjo-games.firebasestorage.app",
+                messagingSenderId: "927529249414",
+                appId: "1:927529249414:web:410a686dc7f0da25ec3f07",
+            };
+
+            var firebaseApp = null;
+            var firebaseAuth = null;
+            var firebaseDb = null;
+
+            function initFirebaseAuth() {
+                if (!window.firebase) return;
+                try {
+                    firebaseApp = window.firebase.apps.length
+                        ? window.firebase.app()
+                        : window.firebase.initializeApp(BUDSIN_FIREBASE_CONFIG);
+                    firebaseAuth = firebaseApp.auth();
+                    firebaseDb = firebaseApp.firestore();
+                } catch(e) { console.warn("[Budsin Pro] Firebase init error:", e); }
+            }
+
+            function getProRef(uid) {
+                return firebaseDb.collection("users").doc(uid);
+            }
+
+            function showProError(msg) {
+                var el = document.getElementById("proError");
+                el.textContent = msg;
+                el.style.display = "block";
+            }
+
+            function hideProError() {
+                document.getElementById("proError").style.display = "none";
+            }
+
+            function ensureUserDoc(user) {
+                return getProRef(user.uid).get().then(function(doc) {
+                    if (!doc.exists) {
+                        return getProRef(user.uid).set({
+                            email: user.email,
+                            displayName: user.displayName || "",
+                            pro: false,
+                            createdAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+                        });
+                    }
+                }).catch(function(e) { console.warn("[Budsin Pro] Error ensuring user doc:", e); });
+            }
+
+            function renderProState(user) {
+                var loggedOut = document.getElementById("proLoggedOut");
+                var loggedIn = document.getElementById("proLoggedIn");
+                var userEmail = document.getElementById("proUserEmail");
+                var proBadge = document.getElementById("proBadge");
+
+                if (!user) {
+                    loggedOut.style.display = "block";
+                    loggedIn.style.display = "none";
+                    store("budsin_pro_user", "");
+                    store("budsin_pro_active", "0");
+                    return;
+                }
+
+                loggedOut.style.display = "none";
+                loggedIn.style.display = "block";
+                userEmail.textContent = user.email;
+
+                // Update stats
+                try {
+                    var recent = JSON.parse(localStorage.getItem("budsin_recently_played") || "[]");
+                    document.getElementById("proStatsGames").textContent = recent.length;
+                } catch(_) { document.getElementById("proStatsGames").textContent = "0"; }
+                try {
+                    var favs = JSON.parse(localStorage.getItem("budsin_favorites") || "[]");
+                    document.getElementById("proStatsFavs").textContent = favs.length;
+                } catch(_) { document.getElementById("proStatsFavs").textContent = "0"; }
+
+                // Save to localStorage for index.html
+                store("budsin_pro_user", JSON.stringify({ uid: user.uid, email: user.email }));
+
+                // Ensure the Firestore doc exists (for Google Sign-In first time)
+                ensureUserDoc(user).then(function() {
+                    // Check Pro status
+                    getProRef(user.uid).get().then(function(doc) {
+                        var data = doc.exists ? doc.data() : {};
+                        var isPro = data.pro === true;
+                        // Check if paidUntil is expired
+                        var paidUntil = data.paidUntil && data.paidUntil.toDate ? data.paidUntil.toDate() : null;
+                        var isExpired = paidUntil && paidUntil < new Date();
+                        if (isPro && isExpired) {
+                            // Auto-revoke expired Pro
+                            getProRef(user.uid).update({ pro: false, paidUntil: null }).catch(function() {});
+                            isPro = false;
+                        }
+                        store("budsin_pro_active", isPro ? "1" : "0");
+                        // If no longer Pro, truncate favorites to 20
+                        if (!isPro) {
+                            try {
+                                var favs = JSON.parse(localStorage.getItem("budsin_favorites") || "[]");
+                                if (favs.length > 20) {
+                                    localStorage.setItem("budsin_favorites", JSON.stringify(favs.slice(0, 20)));
+                                }
+                            } catch(_) {}
+                        }
+                        if (isPro) {
+                            proBadge.textContent = "⭐ PRO";
+                            proBadge.style.background = "linear-gradient(135deg,#ffd700,#ff8c00)";
+                            proBadge.style.color = "#000";
+
+                            // Show renewal date
+                            var renewalRow = document.getElementById("proRenewalRow");
+                            var renewalEl = document.getElementById("proRenewalDate");
+                            var warningEl = document.getElementById("proRenewalWarning");
+                            if (paidUntil) {
+                                var now = new Date();
+                                var diffDays = Math.ceil((paidUntil - now) / (1000 * 60 * 60 * 24));
+                                renewalEl.textContent = paidUntil.toLocaleDateString() + " (" + diffDays + " días)";
+                                renewalRow.style.display = "block";
+                                if (diffDays <= 1 && diffDays >= -5) {
+                                    warningEl.style.display = "inline";
+                                } else {
+                                    warningEl.style.display = "none";
+                                }
+                            } else {
+                                renewalRow.style.display = "none";
+                            }
+                        } else {
+                            proBadge.textContent = "Gratuito";
+                            proBadge.style.background = "rgba(17,24,39,0.06)";
+                            proBadge.style.color = "var(--muted)";
+                            document.getElementById("proRenewalRow").style.display = "none";
+                        }
+                    }).catch(function() {
+                        store("budsin_pro_active", "0");
+                        proBadge.textContent = "Gratuito";
+                        proBadge.style.background = "rgba(17,24,39,0.06)";
+                        proBadge.style.color = "var(--muted)";
+                    });
+                });
+            }
+
+            function setupAuthListeners() {
+                if (!firebaseAuth) return;
+                var currentProUser = null;
+                firebaseAuth.onAuthStateChanged(function(user) {
+                    currentProUser = user;
+                    renderProState(user);
+                });
+                // Poll every 5 minutes
+                setInterval(function() {
+                    if (currentProUser) renderProState(currentProUser);
+                }, 300000);
+                // Re-check when tab becomes visible again
+                document.addEventListener("visibilitychange", function() {
+                    if (!document.hidden && currentProUser) renderProState(currentProUser);
+                });
+            }
+
+            // Google Sign-In
+            document.getElementById("proGoogleBtn").addEventListener("click", function() {
+                hideProError();
+                var provider = new firebase.auth.GoogleAuthProvider();
+                firebaseAuth.signInWithPopup(provider).catch(function(err) {
+                    showProError(err.message);
+                });
+            });
+
+            // Logout
+            document.getElementById("proLogoutBtn").addEventListener("click", function() {
+                firebaseAuth.signOut();
+            });
+
+            // ─── Init Firebase Auth ───
+            initFirebaseAuth();
+            if (firebaseAuth) setupAuthListeners();
 
             // ─── Init ───
             var preferredLanguage = getCurrentLanguage();
@@ -1488,6 +1862,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <script src="https://budsin-games.pages.dev/classroom-hotkey.js"></script>
         <script src="lines-bg.js"></script>
         <script>
+            // Auto-scroll to section if hash in URL
+            try {
+                var hash = window.location.hash;
+                if (hash) {
+                    var target = document.getElementById(hash.replace("#", ""));
+                    if (target) setTimeout(function() { target.scrollIntoView({ behavior: "smooth", block: "start" }); }, 300);
+                }
+            } catch(_) {}
+
             if ("serviceWorker" in navigator) {
                 navigator.serviceWorker.register("/sw.js", { scope: "/" });
             }

@@ -629,6 +629,26 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 pointer-events: none;
             }
 
+            .pro-badge {
+                position: absolute;
+                bottom: 8px;
+                right: 8px;
+                z-index: 3;
+                padding: 4px 10px;
+                border-radius: 999px;
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+                color: #000;
+                font-size: 0.55rem;
+                font-weight: 800;
+                letter-spacing: 0.06em;
+                text-transform: uppercase;
+                box-shadow: 0 2px 10px rgba(255, 215, 0, 0.45);
+                pointer-events: none;
+                text-align: center;
+                line-height: 1.3;
+                max-width: 120px;
+            }
+
             .game-card .meta-row {
                 display: flex;
                 align-items: center;
@@ -996,6 +1016,50 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
             .changelog-popup.is-visible {
                 display: block;
+            }
+
+            /* ── Gating Pro popup (fullscreen overlay) ── */
+            #proGatingPopup {
+                position: fixed;
+                inset: 0;
+                z-index: 100;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                background: rgba(0,0,0,0.7);
+                backdrop-filter: blur(4px);
+            }
+            #proGatingPopup .changelog-card {
+                pointer-events: auto;
+                max-width: 440px;
+                width: 92%;
+                margin: auto;
+            }
+
+            /* ── Pro popup (modal centrado) ── */
+            .pro-popup {
+                position: fixed;
+                inset: 0;
+                z-index: 99;
+                display: none;
+                place-items: center;
+                background: rgba(0,0,0,0.45);
+                backdrop-filter: blur(4px);
+                pointer-events: none;
+            }
+            .pro-popup.is-visible {
+                display: grid;
+                pointer-events: auto;
+            }
+            .pro-popup .changelog-card {
+                width: min(480px, calc(100vw - 32px));
+                max-height: 90vh;
+                overflow-y: auto;
+                animation: proFadeIn 0.3s ease;
+            }
+            @keyframes proFadeIn {
+                from { opacity: 0; transform: scale(0.92) translateY(12px); }
+                to   { opacity: 1; transform: scale(1) translateY(0); }
             }
 
             .changelog-card {
@@ -1578,6 +1642,193 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 color: #fff;
             }
 
+            /* ════════════════════════════════════════
+               Pro Theme — Gold + Dark
+               ════════════════════════════════════════ */
+
+            html[data-site-theme="pro"] {
+                --bg: #0d0b08;
+                --bg-2: #0a0805;
+                --surface: rgba(15,12,6,0.92);
+                --surface-strong: rgba(20,16,8,0.96);
+                --line: rgba(255,215,0,0.1);
+                --text: #e8e0d0;
+                --muted: #b8a87a;
+                --shadow: 0 24px 64px rgba(0,0,0,0.5);
+                --shadow-soft: 0 16px 36px rgba(0,0,0,0.4);
+            }
+            html[data-site-theme="pro"] body {
+                background: radial-gradient(circle at top right, rgba(255,215,0,0.06), transparent 30%),
+                            radial-gradient(circle at bottom left, rgba(255,140,0,0.04), transparent 30%),
+                            linear-gradient(180deg, #0a0a0a 0%, #111 48%, #1a1500 100%);
+            }
+            html[data-site-theme="pro"] body::before,
+            html[data-site-theme="pro"] body::after { display: none; }
+
+            html[data-site-theme="pro"] .title {
+                background: linear-gradient(135deg, rgba(15,12,0,0.96), rgba(20,16,0,0.92));
+                border-color: rgba(255,215,0,0.12);
+                box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+            }
+            html[data-site-theme="pro"] .title-copy h1 { color: #ffd700; }
+            html[data-site-theme="pro"] .title-copy p { color: #b8a87a; }
+            html[data-site-theme="pro"] .hero-badges span {
+                background: rgba(255,215,0,0.1);
+                border-color: rgba(255,215,0,0.15);
+                color: #e8d8a0;
+            }
+
+            html[data-site-theme="pro"] .game-card {
+                background: rgba(15,12,0,0.78) !important;
+                border-color: rgba(255,215,0,0.1) !important;
+                box-shadow: 0 8px 32px rgba(0,0,0,0.4) !important;
+            }
+            html[data-site-theme="pro"] .game-card::before {
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+                box-shadow: 0 0 0 6px rgba(255,215,0,0.1);
+            }
+            html[data-site-theme="pro"] .game-card:hover {
+                border-color: rgba(255,215,0,0.3);
+                box-shadow: 0 20px 48px rgba(0,0,0,0.5), 0 0 24px rgba(255,215,0,0.04);
+            }
+            html[data-site-theme="pro"] .content p { color: #b8a87a; }
+            html[data-site-theme="pro"] .content strong { color: #ffd700; }
+            html[data-site-theme="pro"] .content span {
+                background: rgba(255,215,0,0.1);
+                color: #ffd700;
+            }
+
+            html[data-site-theme="pro"] .search-wrap,
+            html[data-site-theme="pro"] .chip,
+            html[data-site-theme="pro"] .shelf {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.12);
+            }
+            html[data-site-theme="pro"] .chip.active {
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+                border-color: transparent;
+                color: #000;
+            }
+            html[data-site-theme="pro"] .category-tag {
+                background: rgba(255,215,0,0.12);
+                color: #ffd700;
+            }
+            html[data-site-theme="pro"] .favorite-btn {
+                background: rgba(10,8,0,0.88);
+                border-color: rgba(255,215,0,0.14);
+            }
+            html[data-site-theme="pro"] .random-btn {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.14);
+                color: #e8d8a0;
+            }
+
+            html[data-site-theme="pro"] .library {
+                background: rgba(10,8,0,0.82);
+                border-color: rgba(255,215,0,0.08);
+                box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+            }
+            html[data-site-theme="pro"] .library-head p { color: #b8a87a; }
+            html[data-site-theme="pro"] .library-kicker {
+                background: rgba(255,215,0,0.12);
+                color: #ffd700;
+            }
+            html[data-site-theme="pro"] .library-meta {
+                background: linear-gradient(135deg, rgba(10,8,0,0.96), rgba(15,12,0,0.9));
+                color: rgba(200,190,160,0.8);
+            }
+
+            html[data-site-theme="pro"] .changelog-card {
+                background: rgba(15,12,0,0.96);
+                border-color: rgba(255,215,0,0.1);
+                color: #e8e0d0;
+            }
+            html[data-site-theme="pro"] .changelog-card p { color: #b8a87a; }
+            html[data-site-theme="pro"] .changelog-card span {
+                background: rgba(255,215,0,0.14);
+                color: #ffd700;
+            }
+            html[data-site-theme="pro"] .changelog-close {
+                background: rgba(255,215,0,0.1);
+                color: #e8d8a0;
+            }
+            html[data-site-theme="pro"] .changelog-countdown {
+                background: rgba(10,8,0,0.8);
+                border-color: rgba(255,215,0,0.1);
+            }
+            html[data-site-theme="pro"] .suggestions-link {
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+                color: #000;
+                box-shadow: 0 18px 34px rgba(255,215,0,0.2);
+            }
+
+            html[data-site-theme="pro"] .no-results {
+                border-color: rgba(255,215,0,0.12);
+                color: #b8a87a;
+            }
+
+            html[data-site-theme="pro"] .language-picker,
+            html[data-site-theme="pro"] .settings-link {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.14);
+                color: #e8d8a0;
+            }
+
+            html[data-site-theme="pro"] .articles-section {
+                background: rgba(10,8,0,0.82);
+                border-color: rgba(255,215,0,0.1);
+            }
+            html[data-site-theme="pro"] .articles-head h2 { color: #ffd700; }
+            html[data-site-theme="pro"] .articles-kicker {
+                background: rgba(255,215,0,0.14);
+                color: #ffd700;
+            }
+            html[data-site-theme="pro"] .article-card {
+                background: rgba(15,12,0,0.92);
+                border-color: rgba(255,215,0,0.1);
+            }
+            html[data-site-theme="pro"] .article-card h3 { color: #e8e0d0; }
+            html[data-site-theme="pro"] .article-card p { color: #b8a87a; }
+            html[data-site-theme="pro"] .article-link {
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+                color: #000;
+            }
+
+            html[data-site-theme="pro"] .site-footer {
+                background: rgba(10,8,0,0.82);
+                border-color: rgba(255,215,0,0.1);
+            }
+            html[data-site-theme="pro"] .footer-brand strong { color: #ffd700; }
+            html[data-site-theme="pro"] .footer-brand span { color: #b8a87a; }
+            html[data-site-theme="pro"] .footer-links a {
+                background: rgba(15,12,0,0.88);
+                border-color: rgba(255,215,0,0.14);
+                color: #e8d8a0;
+            }
+            html[data-site-theme="pro"] .footer-copy { color: #8a7a50; }
+
+            html[data-site-theme="pro"] .card-tooltip {
+                background: rgba(10,8,0,0.95);
+            }
+            html[data-site-theme="pro"] .card-tooltip::after {
+                border-top-color: rgba(10,8,0,0.95);
+            }
+
+            html[data-site-theme="pro"] .app-transition {
+                background: rgba(5,4,0,0.88);
+            }
+
+            html[data-site-theme="pro"] .chip--tools {
+                border-color: rgba(255,215,0,0.18);
+                background: rgba(255,215,0,0.06);
+                color: #ffd700;
+            }
+            html[data-site-theme="pro"] .chip--tools.active {
+                background: linear-gradient(135deg, #ffd700, #ff8c00);
+                border-color: transparent;
+                color: #000;
+            }
+
             @media (max-width: 1180px) {
                 .games {
                     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1688,7 +1939,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         >5.000s</span
                     >
                 </div>
-                <span>Version 5.1</span>
+                <span>Version 6.0</span>
                 <h2 id="changelogTitle" data-i18n="changelogTitle">
                     Novedades de Budsin Games
                 </h2>
@@ -1698,15 +1949,71 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </p>
                 <ul class="changelog-list">
                     <li data-i18n="changelogItem1">
-                        Se agregó Escape Road al catálogo con portada propia y acceso directo desde el portal.
+                        Se agregaron Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars, Hollow Knight Silksong y Escape Road al catálogo con portadas propias.
                     </li>
                     <li data-i18n="changelogItem2">
-                        Se agregaron Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars y Hollow Knight Silksong al catálogo con portadas propias y acceso directo desde el portal.
+                        Mejoras generales de rendimiento y estabilidad en el portal.
                     </li>
                 </ul>
                     </div>
                     <div class="chips" id="categoryFilters" aria-label="Filtros por categoría"></div>
                 </div>
+
+        <!-- ─── Popup: Modificaciones importantes (Pro) ─── -->
+        <div id="proPopup" class="pro-popup" aria-hidden="true">
+            <div class="changelog-card" role="status" aria-live="polite">
+                <div class="changelog-close-wrap">
+                    <button id="closeProPopup" class="changelog-close" type="button" aria-label="Cerrar" disabled>×</button>
+                    <span id="proPopupCountdown" class="changelog-countdown">5.000s</span>
+                </div>
+                <span style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000">Importante</span>
+                <h2 style="margin:4px 0 8px">Modificaciones importantes</h2>
+                <ul class="changelog-list">
+                    <li>Se agregó <strong>Budsin Pro</strong>: sistema de suscripción manual.</li>
+                    <li>Inicia sesión con Google desde <strong>Settings</strong> para verificar tu estado.</li>
+                    <li><strong>Precio: $2.99 USD / S/ 7 PEN por mes</strong> — membresía mensual, sin anuncios, badge ⭐ PRO y más.</li>
+                    <li><strong>Bendy and the Ink Machine</strong> — primer juego exclusivo Pro. Disponible para todos el 24 de mayo.</li>
+                </ul>
+                <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">
+                    <a href="settings.html#proCard" style="display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 20px;border-radius:16px;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-size:.95rem;font-weight:800;text-decoration:none;box-shadow:0 8px 24px rgba(255,215,0,0.35);transition:transform 0.2s,box-shadow 0.2s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 32px rgba(255,215,0,0.45)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        ⭐ Suscribirme a Budsin Pro — $2.99 USD ⭐
+                    </a>
+                </div>
+                <p style="margin:8px 0 0;font-size:.78rem;color:var(--muted);text-align:center">
+                    Este aviso se muestra una sola vez.
+                </p>
+            </div>
+        </div>
+
+        <!-- ─── Popup: Gating Pro (juego exclusivo) ─── -->
+        <div id="proGatingPopup" class="changelog-popup" aria-hidden="true" style="display:none">
+            <div class="changelog-card" role="status" aria-live="polite" style="max-width:440px">
+                <div class="changelog-close-wrap">
+                    <button id="closeGatingPopup" class="changelog-close" type="button" aria-label="Cerrar" style="border-radius:50%;width:36px;height:36px;line-height:36px;font-size:1.2rem;padding:0">×</button>
+                </div>
+                <span style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-size:1.4rem;padding:8px 16px">🔒</span>
+                <h2 style="margin:8px 0 4px;font-size:1.1rem">Juego exclusivo para Budsin Pro</h2>
+                <p style="margin:0 0 12px;font-size:.82rem;color:var(--muted)">Este juego está disponible primero para usuarios Pro.</p>
+                <div style="background:rgba(255,215,0,0.06);border-radius:12px;padding:12px;margin-bottom:12px;font-size:.78rem">
+                    <div style="font-weight:700;color:#ffd700;margin-bottom:6px">⭐ Ventajas de ser Pro</div>
+                    <ul style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px;color:var(--muted)">
+                        <li>✓ Sin anuncios en el portal</li>
+                        <li>✓ Tema Gold exclusivo</li>
+                        <li>✓ Favoritos ilimitados</li>
+                        <li>✓ Acceso anticipado a juegos nuevos</li>
+                        <li>✓ Estadísticas de tu actividad</li>
+                    </ul>
+                    <div style="margin-top:8px;text-align:center;color:#ffd700;font-weight:700">$2.99 USD / S/ 7 PEN por mes</div>
+                </div>
+                <div id="proGatingFreeDate" style="display:none;font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:8px;border-radius:8px;background:rgba(255,215,0,0.06)">
+                    🎉 Este juego será <strong style="color:#ffd700">gratis para todos</strong> el <strong style="color:#ffd700">24 de mayo de 2026</strong>.
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                    <a href="settings.html#proCard" style="display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:0 16px;border-radius:14px;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-size:.9rem;font-weight:800;text-decoration:none;box-shadow:0 6px 20px rgba(255,215,0,0.3)">⭐ Quiero ser Pro</a>
+                    <button id="closeGatingBtn" class="btn btn-ghost btn-sm" style="width:100%;justify-content:center;font-size:.8rem;border-radius:50px">Cerrar</button>
+                </div>
+            </div>
+        </div>
 
         <div id="appTransition" class="app-transition" aria-hidden="true">
             <video id="loading-video" muted playsinline preload="auto">
@@ -1896,13 +2203,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </section>
                     <section class="shelf" id="favoritesShelf">
                         <h3 data-i18n="shelfFavorites">🎮 Tus juegos</h3>
-                        <ul id="favoritesList" class="shelf-list">
-                            <li>
-                                <span data-i18n="noFavorites"
-                                    >Aún no tienes favoritos.</span
-                                ><span>—</span>
-                            </li>
-                        </ul>
+                        <div id="favoritesList" class="recent-grid"></div>
                     </section>
                     <section class="shelf" id="recentlyPlayedShelf">
                         <h3 data-i18n="shelfRecent">🕐 Jugado recientemente</h3>
@@ -3818,6 +4119,55 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </div>
                         </div></a
                     >
+                    <a
+                        class="game-card"
+                        href="Bendy%20and%20the%20Ink%20Machine.html"
+                        data-name="bendy and the ink machine"
+                        data-type="port"
+                        data-category="Port"
+                        data-pro="true"
+                        data-pro-release="2026-05-24"
+                        data-new="true"
+                        ><button
+                            type="button"
+                            class="favorite-btn"
+                            aria-label="Agregar a favoritos"
+                        >
+                            ☆
+                        </button>
+                        <div class="cover">
+                            <img
+                                src="batim.webp"
+                                alt="Bendy and the Ink Machine"
+                                loading="lazy"
+                            />
+                        </div>
+                        <div class="content">
+                            <span
+                                data-label-es="Pro · Disponible 24 may"
+                                data-label-en="Pro · Available May 24"
+                                data-label-pt="Pro · Disponível 24 mai"
+                                >Pro · Disponible 24 may</span
+                            ><strong>Bendy and the Ink Machine</strong>
+                            <p
+                                data-desc-es="Sobrevive a los pasillos del taller de animación Joey Drew Studios en este escalofriante juego de terror."
+                                data-desc-en="Survive the halls of Joey Drew Studios in this chilling horror game."
+                                data-desc-pt="Sobreviva aos corredores do Joey Drew Studios neste jogo de terror arrepiante."
+                            >
+                                Sobrevive a los pasillos del taller de animación
+                                Joey Drew Studios en este escalofriante juego de terror.
+                            </p>
+                            <div class="meta-row">
+                                <span
+                                    class="category-tag"
+                                    data-es="Port"
+                                    data-en="Port"
+                                    data-pt="Port"
+                                    >Port</span
+                                ><span class="players" data-players>🔥 0</span>
+                            </div>
+                        </div></a
+                    >
                 </section>
                 <div id="noResults" class="no-results" data-i18n="noResults">
                     No encontramos juegos con ese filtro. Prueba otra búsqueda.
@@ -3919,6 +4269,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
         <script>
             window.BUDSIN_FIREBASE_CONFIG = window.BUDSIN_FIREBASE_CONFIG || {
                 apiKey: "AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U",
@@ -3930,7 +4281,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             };
         </script>
         <script>
-            const SITE_VERSION = "5.1";
+            const SITE_VERSION = "6.0";
             const STORAGE_KEY = "juanjos_games_seen_version";
             const ENABLE_CHANGELOG_POPUP = true;
             const FAVORITES_KEY = "budsin_favorites";
@@ -3947,6 +4298,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             let changelogCloseReady = true;
             let changelogUnlockTimer = null;
             let changelogCountdownFrame = null;
+
+            // Apply saved theme
+            var savedTheme = localStorage.getItem("budsin_site_theme") || "light";
+            document.documentElement.setAttribute("data-site-theme", savedTheme);
+
+            const PRO_STORAGE_KEY = "budsin_pro_popup_seen";
+            const proPopup = document.getElementById("proPopup");
+            const closeProBtn = document.getElementById("closeProPopup");
+            const proCountdownEl = document.getElementById("proPopupCountdown");
+            let proPopupCloseReady = true;
+            let proPopupUnlockTimer = null;
+            let proPopupCountdownFrame = null;
             const searchInput = document.getElementById("gameSearch");
             const typeFilters = document.getElementById("typeFilters");
             const cards = Array.from(document.querySelectorAll(".game-card"));
@@ -3968,6 +4331,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
             });
 
+            // Inyectar badge "Anticipado para Pro" en tarjetas marcadas
+            cards.forEach((card) => {
+                if (card.dataset.pro === "true") {
+                    const isPro = localStorage.getItem("budsin_pro_active") === "1";
+                    if (!isPro) {
+                        const badge = document.createElement("span");
+                        badge.className = "pro-badge";
+                        badge.textContent = "Anticipado para Pro\npróximamente gratis";
+                        const cover = card.querySelector(".cover");
+                        if (cover) cover.appendChild(badge);
+                    }
+                }
+            });
+
             // Tooltip en cada tarjeta
             cards.forEach((card) => {
                 const tooltip = document.createElement("span");
@@ -3980,6 +4357,109 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 tooltip.textContent = `${cat}${types ? " — " + types : ""}`;
                 card.appendChild(tooltip);
             });
+
+            // ─── Budsin Pro: init Firebase Auth + apply features ───
+            function initProAuth() {
+                if (!window.firebase) return;
+                try {
+                    const app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(window.BUDSIN_FIREBASE_CONFIG || {
+                        apiKey: "AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U",
+                        authDomain: "juanjo-games.firebaseapp.com",
+                        projectId: "juanjo-games",
+                        storageBucket: "juanjo-games.firebasestorage.app",
+                        messagingSenderId: "927529249414",
+                        appId: "1:927529249414:web:410a686dc7f0da25ec3f07",
+                    });
+                    if (!app) return;
+                    const auth = app.auth();
+                    const db = app.firestore();
+                    let currentUser = null;
+                    let proPollTimer = null;
+
+                    function checkProStatus(user) {
+                        if (!user) return;
+                        db.collection("users").doc(user.uid).get()
+                            .then((doc) => {
+                                const data = doc.exists ? doc.data() : {};
+                                let isPro = data.pro === true;
+                                const paidUntil = data.paidUntil && data.paidUntil.toDate ? data.paidUntil.toDate() : null;
+                                if (isPro && paidUntil && paidUntil < new Date()) {
+                                    db.collection("users").doc(user.uid).update({ pro: false, paidUntil: null }).catch(() => {});
+                                    isPro = false;
+                                }
+                                localStorage.setItem("budsin_pro_active", isPro ? "1" : "0");
+                                if (!isPro) {
+                                    try {
+                                        var favs = JSON.parse(localStorage.getItem("budsin_favorites") || "[]");
+                                        if (favs.length > 20) {
+                                            localStorage.setItem("budsin_favorites", JSON.stringify(favs.slice(0, 20)));
+                                        }
+                                    } catch(_) {}
+                                }
+                                applyProFeatures(isPro);
+                                renderShelves();
+                            })
+                            .catch(() => {
+                                localStorage.setItem("budsin_pro_active", "0");
+                                applyProFeatures(false);
+                            });
+                    }
+
+                    auth.onAuthStateChanged((user) => {
+                        currentUser = user;
+                        if (user) {
+                            localStorage.setItem("budsin_pro_user", JSON.stringify({ uid: user.uid, email: user.email }));
+                            checkProStatus(user);
+                            // Poll every 5 minutes
+                            if (proPollTimer) clearInterval(proPollTimer);
+                            proPollTimer = setInterval(function() {
+                                if (currentUser) checkProStatus(currentUser);
+                            }, 300000);
+                        } else {
+                            if (proPollTimer) { clearInterval(proPollTimer); proPollTimer = null; }
+                            localStorage.removeItem("budsin_pro_user");
+                            localStorage.setItem("budsin_pro_active", "0");
+                            applyProFeatures(false);
+                        }
+                    });
+
+                    // Re-check when tab becomes visible again
+                    document.addEventListener("visibilitychange", function() {
+                        if (!document.hidden && currentUser) checkProStatus(currentUser);
+                    });
+                } catch (e) { console.warn("[Budsin Pro] Auth init error:", e); }
+            }
+
+            function applyProFeatures(isPro) {
+                // Hide ads for Pro users
+                const adContainer = document.getElementById("container-3822757dc469f188bf377ea7050634be");
+                const adScript = document.querySelector('script[src*="profitablecpmratenetwork"]');
+                if (adContainer) adContainer.style.display = isPro ? "none" : "";
+                if (adScript) adScript.style.display = isPro ? "none" : "";
+
+                // Add/remove Pro badge in UI
+                const metaPortal = document.querySelector('[data-i18n="metaPortal"]');
+                if (metaPortal) {
+                    let badge = document.getElementById("proUIBadge");
+                    if (isPro) {
+                        if (!badge) {
+                            badge = document.createElement("span");
+                            badge.id = "proUIBadge";
+                            badge.style.cssText = "display:inline-block;margin-left:8px;padding:2px 8px;border-radius:999px;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-size:.6rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;vertical-align:middle";
+                            badge.textContent = "⭐ PRO";
+                            metaPortal.parentNode.insertBefore(badge, metaPortal.nextSibling);
+                        }
+                        badge.style.display = "";
+                    } else if (badge) {
+                        badge.style.display = "none";
+                    }
+                }
+            }
+
+            // Check localStorage first (set by settings.html), then init Firebase Auth for live updates
+            const localPro = localStorage.getItem("budsin_pro_active") === "1";
+            applyProFeatures(localPro);
+            initProAuth();
 
             // Contador de juegos en badgeGames
             const totalGames = cards.length;
@@ -4082,9 +4562,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     changelogDesc:
                         "Este popup solo aparece una vez por versión o la primera vez que entras al sitio.",
                     changelogItem1:
-                        "Se agregó Escape Road al catálogo con portada propia y acceso directo desde el portal.",
+                        "Se agregaron Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars, Hollow Knight Silksong y Escape Road al catálogo con portadas propias.",
                     changelogItem2:
-                        "Se agregaron Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars y Hollow Knight Silksong al catálogo con portadas propias y acceso directo desde el portal.",
+                        "Mejoras generales de rendimiento y estabilidad en el portal.",
                     settingsPageLink: "⚙️ Ajustes",
                     newBadge: "Nuevo",
                     resultsCount: (count) => `${count} juegos`,
@@ -4094,6 +4574,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     randomGame: "🎲 Juego al azar",
                     shelfRecent: "🕐 Jugado recientemente",
                     noRecent: "Aún no has jugado nada.",
+                    favLimitReached: "Límite de favoritos alcanzado (20). Hazte Pro para ilimitados.",
                     categoriesLabel: "Categorías",
                     articlesKicker: "Consejos y guías",
                     articlesTitle: "Tips para sacarle más partido al portal",
@@ -4162,9 +4643,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     changelogDesc:
                         "This popup appears only once per version or the first time you enter the site.",
                     changelogItem1:
-                        "Escape Road was added to the catalog with its own cover and direct access from the portal.",
+                        "Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars, Hollow Knight Silksong and Escape Road were added to the catalog with their own covers.",
                     changelogItem2:
-                        "Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars and Hollow Knight Silksong were added to the catalog with their own covers and direct access from the portal.",
+                        "General performance and stability improvements.",
                     settingsPageLink: "⚙️ Settings",
                     newBadge: "New",
                     resultsCount: (count) => `${count} games`,
@@ -4174,6 +4655,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     randomGame: "🎲 Random game",
                     shelfRecent: "🕐 Recently played",
                     noRecent: "You haven't played anything yet.",
+                    favLimitReached: "Favorites limit reached (20). Go Pro for unlimited.",
                     categoriesLabel: "Categories",
                     articlesKicker: "Tips & guides",
                     articlesTitle: "Tips to get the most out of the portal",
@@ -4242,9 +4724,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     changelogDesc:
                         "Este popup aparece apenas uma vez por versão ou na primeira vez que você entra no site.",
                     changelogItem1:
-                        "Escape Road foi adicionado ao catálogo com capa própria e acesso direto do portal.",
+                        "Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars, Hollow Knight Silksong e Escape Road foram adicionados ao catálogo com capas próprias.",
                     changelogItem2:
-                        "Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars e Hollow Knight Silksong foram adicionados ao catálogo com capas próprias e acesso direto do portal.",
+                        "Melhorias gerais de desempenho e estabilidade.",
                     settingsPageLink: "⚙️ Configurações",
                     newBadge: "Novo",
                     resultsCount: (count) => `${count} jogos`,
@@ -4254,6 +4736,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     randomGame: "🎲 Jogo aleatório",
                     shelfRecent: "🕐 Jogado recentemente",
                     noRecent: "Você ainda não jogou nada.",
+                    favLimitReached: "Limite de favoritos atingido (20). Torne-se Pro para ilimitados.",
                     categoriesLabel: "Categorias",
                     articlesKicker: "Dicas e guias",
                     articlesTitle: "Dicas para aproveitar melhor o portal",
@@ -4609,6 +5092,65 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }, CHANGELOG_CLOSE_DELAY_MS);
             }
 
+            function setProPopupCountdown(valueMs) {
+                if (!proCountdownEl) return;
+                const safeMs = Math.max(0, Number(valueMs) || 0);
+                proCountdownEl.textContent = (safeMs / 1000).toFixed(3) + "s";
+            }
+
+            function showProPopup() {
+                if (!proPopup) return;
+                proPopup.classList.add("is-visible");
+                proPopup.setAttribute("aria-hidden", "false");
+                proPopupCloseReady = false;
+                if (closeProBtn) closeProBtn.disabled = true;
+                const unlockAt = performance.now() + CHANGELOG_CLOSE_DELAY_MS;
+                setProPopupCountdown(CHANGELOG_CLOSE_DELAY_MS);
+                if (proPopupCountdownFrame) window.cancelAnimationFrame(proPopupCountdownFrame);
+                const tick = () => {
+                    const remaining = unlockAt - performance.now();
+                    setProPopupCountdown(remaining);
+                    if (remaining > 0) { proPopupCountdownFrame = window.requestAnimationFrame(tick); return; }
+                    proPopupCloseReady = true;
+                    if (closeProBtn) closeProBtn.disabled = false;
+                    if (proCountdownEl) proCountdownEl.classList.add("is-done");
+                    proPopupCountdownFrame = null;
+                };
+                proPopupCountdownFrame = window.requestAnimationFrame(tick);
+                if (proPopupUnlockTimer) window.clearTimeout(proPopupUnlockTimer);
+                proPopupUnlockTimer = window.setTimeout(() => {
+                    proPopupCloseReady = true;
+                    if (closeProBtn) closeProBtn.disabled = false;
+                    if (proCountdownEl) proCountdownEl.classList.add("is-done");
+                    setProPopupCountdown(0);
+                }, CHANGELOG_CLOSE_DELAY_MS);
+            }
+
+            function closeProPopup() {
+                if (!proPopupCloseReady) return;
+                try { localStorage.setItem(PRO_STORAGE_KEY, "1"); } catch(_) {}
+                if (proPopupUnlockTimer) { window.clearTimeout(proPopupUnlockTimer); proPopupUnlockTimer = null; }
+                if (proPopupCountdownFrame) { window.cancelAnimationFrame(proPopupCountdownFrame); proPopupCountdownFrame = null; }
+                setProPopupCountdown(0);
+                proPopup.classList.remove("is-visible");
+                proPopup.setAttribute("aria-hidden", "true");
+            }
+
+            // ─── Gating Pro: popup para juegos exclusivos ───
+            function showProGatingPopup() {
+                var popup = document.getElementById("proGatingPopup");
+                if (!popup) return;
+                popup.style.display = "flex";
+                popup.setAttribute("aria-hidden", "false");
+            }
+
+            function closeProGatingPopup() {
+                var popup = document.getElementById("proGatingPopup");
+                if (!popup) return;
+                popup.style.display = "none";
+                popup.setAttribute("aria-hidden", "true");
+            }
+
             function closeChangelog() {
                 if (!changelogCloseReady) {
                     return;
@@ -4742,6 +5284,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     "Simulador 3D de Brawl Stars com batalhas e personagens no seu navegador.",
                 "comentarios":
                     "Deixe sua opiniao e sugestoes para o portal atraves do quadro do Padlet.",
+                "bendy and the ink machine":
+                    "Sobreviva aos corredores do Joey Drew Studios neste jogo de terror arrepiante.",
             };
 
             const PT_CATEGORIES = {
@@ -4750,12 +5294,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 Idle: "Idle",
                 Clásicos: "Clássicos",
                 Herramientas: "Ferramentas",
+                Port: "Port",
             };
 
             const PT_LABELS = {
                 Disponible: "Disponível",
                 Alternativa: "Alternativa",
                 Herramienta: "Ferramenta",
+                "Pro · Disponible 24 may": "Pro · Disponível 24 mai",
             };
 
             function applyLanguage(language) {
@@ -4919,18 +5465,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 const favorites = readJson(FAVORITES_KEY, []);
                 const popularity = popularityState;
 
-                const favoriteNames = cards
-                    .filter((card) => favorites.includes(getCardHref(card)))
-                    .map((card) => card.querySelector("strong").textContent);
-
-                favoritesList.innerHTML = favoriteNames.length
-                    ? favoriteNames
-                          .map(
-                              (name) =>
-                                  `<li><span>${name}</span><span>${getTranslations().favoriteSaved}</span></li>`,
-                          )
-                          .join("")
-                    : `<li><span>${getTranslations().noFavorites}</span><span>—</span></li>`;
+                // Shelf de favoritos (visual grid con covers)
+                if (favoritesList) {
+                    if (favorites.length) {
+                        favoritesList.innerHTML = favorites
+                            .map((href) => {
+                                const card = cards.find(
+                                    (c) => getCardHref(c) === href,
+                                );
+                                if (!card) return "";
+                                const name = card.querySelector("strong").textContent;
+                                const img = card.querySelector(".cover img");
+                                const src = img ? img.getAttribute("src") : "";
+                                return `<div class="recent-mini" data-fav-href="${href}">${src ? `<img src="${src}" alt="${name}">` : ""}<span class="recent-mini-name">${name}</span></div>`;
+                            })
+                            .join("");
+                        favoritesList.querySelectorAll(".recent-mini").forEach((mini) => {
+                            mini.addEventListener("click", () => {
+                                const href = mini.dataset.favHref;
+                                const card = cards.find((c) => getCardHref(c) === href);
+                                if (card) card.click();
+                            });
+                        });
+                    } else {
+                        favoritesList.innerHTML = `<span class="recent-empty">${getTranslations().noFavorites}</span>`;
+                    }
+                }
 
                 const ranking = cards
                     .map((card) => {
@@ -5130,6 +5690,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
             });
 
+            const FAVORITES_LIMIT_FREE = 20;
+
             cards.forEach((card) => {
                 const favBtn = card.querySelector(".favorite-btn");
                 favBtn.addEventListener("click", (event) => {
@@ -5141,6 +5703,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     if (index >= 0) {
                         favorites.splice(index, 1);
                     } else {
+                        const isPro = localStorage.getItem("budsin_pro_active") === "1";
+                        if (!isPro && favorites.length >= FAVORITES_LIMIT_FREE) {
+                            const msg = getTranslations().favLimitReached || "Límite de favoritos alcanzado (20). Hazte Pro para ilimitados.";
+                            const toast = document.getElementById("toast") || (() => { const t = document.createElement("div"); t.id = "toast"; t.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(239,63,69,.92);color:#fff;padding:12px 22px;border-radius:999px;font-size:.88rem;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.28);opacity:0;transition:opacity .25s"; document.body.appendChild(t); return t; })();
+                            toast.textContent = msg;
+                            toast.style.opacity = "1";
+                            setTimeout(() => { toast.style.opacity = "0"; }, 3000);
+                            return;
+                        }
                         favorites.push(href);
                     }
                     writeJson(FAVORITES_KEY, favorites);
@@ -5151,6 +5722,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     event.preventDefault();
                     const href = getCardHref(card);
                     const gameName = card.querySelector("strong").textContent;
+
+                    // Gating for Pro-only games
+                    if (card.dataset.pro === "true" && localStorage.getItem("budsin_pro_active") !== "1") {
+                        var releaseDate = card.dataset.proRelease;
+                        var isReleased = releaseDate && new Date(releaseDate + "T00:00:00") <= new Date();
+                        if (isReleased) {
+                            // Game is now free for everyone
+                        } else {
+                            firebasePromise = incrementRemotePopularity(href, gameName, 1);
+                            const success = await firebasePromise;
+                            if (!success) queueRemoteIncrement(href, gameName, 1);
+                            // Show the free date if available
+                            if (releaseDate) {
+                                var freeDateEl = document.getElementById("proGatingFreeDate");
+                                if (freeDateEl) freeDateEl.style.display = "block";
+                            }
+                            showProGatingPopup();
+                            return;
+                        }
+                    }
+
                     pendingNavUrl = href;
                     pendingGameName = gameName;
                     firebasePromise = incrementRemotePopularity(href, gameName, 1);
@@ -5186,6 +5778,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 }
             }
 
+            // Pro popup init
+            try {
+                if (localStorage.getItem(PRO_STORAGE_KEY) !== "1") {
+                    showProPopup();
+                }
+            } catch (_) { showProPopup(); }
+
+            if (closeProBtn) closeProBtn.addEventListener("click", closeProPopup);
+
+            // Gating popup close
+            document.getElementById("closeGatingPopup")?.addEventListener("click", closeProGatingPopup);
+            document.getElementById("closeGatingBtn")?.addEventListener("click", closeProGatingPopup);
+            var gatingPopup = document.getElementById("proGatingPopup");
+            if (gatingPopup) {
+                gatingPopup.addEventListener("click", function (e) {
+                    if (e.target === gatingPopup) closeProGatingPopup();
+                });
+            }
+
+            if (proPopup) {
+                proPopup.addEventListener("click", function (e) {
+                    if (e.target === proPopup) closeProPopup();
+                });
+            }
+
             if (closeButton) {
                 closeButton.addEventListener("click", closeChangelog);
             }
@@ -5199,12 +5816,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
 
             window.addEventListener("keydown", function (event) {
-                if (
-                    event.key === "Escape" &&
-                    popup &&
-                    popup.classList.contains("is-visible")
-                ) {
-                    closeChangelog();
+                if (event.key === "Escape") {
+                    if (popup && popup.classList.contains("is-visible")) closeChangelog();
+                    if (proPopup && proPopup.classList.contains("is-visible")) closeProPopup();
                 }
             });
 
