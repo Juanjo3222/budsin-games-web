@@ -2351,6 +2351,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             </li>
                         </ul>
                     </section>
+                    <!-- Free trial CTA card -->
+                    <section class="shelf" id="trialCtaCard" style="background:linear-gradient(135deg,rgba(0,201,255,0.06),rgba(146,253,157,0.06));border:1px solid rgba(0,201,255,0.2);cursor:pointer;transition:transform .2s,box-shadow .2s" onclick="handleTrialClick()" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,201,255,0.12)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+                        <div style="display:flex;align-items:center;gap:14px;padding:6px 0">
+                            <span style="font-size:2rem">🎁</span>
+                            <div style="flex:1">
+                                <strong style="font-size:.95rem;color:#00c9ff" data-i18n="trialCtaTitle">🎁 Prueba Budsin Pro gratis 7 días</strong>
+                                <p style="margin:4px 0 0;font-size:.82rem;color:var(--muted)" data-i18n="trialCtaDesc">Sin anuncios, tema Gold, favoritos ilimitados y acceso anticipado. Sin compromiso.</p>
+                            </div>
+                            <span style="font-size:1.4rem;color:var(--muted);opacity:.5">→</span>
+                        </div>
+                    </section>
                     <section class="shelf" id="favoritesShelf">
                         <h3 data-i18n="shelfFavorites">🎮 Tus juegos</h3>
                         <div id="favoritesList" class="recent-grid"></div>
@@ -4634,11 +4645,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 const data = doc.exists ? doc.data() : {};
                                 let isPro = data.pro === true;
                                 const paidUntil = data.paidUntil && data.paidUntil.toDate ? data.paidUntil.toDate() : null;
+                                const trialUsed = data.trialUsed === true;
                                 if (isPro && paidUntil && paidUntil < new Date()) {
-                                    db.collection("users").doc(user.uid).update({ pro: false, trial: false, paidUntil: null }).catch(() => {});
+                                    db.collection("users").doc(user.uid).update({ pro: false, trial: false, trialUsed: true, paidUntil: null }).catch(() => {});
                                     isPro = false;
                                 }
                                 localStorage.setItem("budsin_pro_active", isPro ? "1" : "0");
+                                localStorage.setItem("budsin_trial_used", trialUsed ? "1" : "0");
                                 if (!isPro) {
                                     try {
                                         var favs = JSON.parse(localStorage.getItem("budsin_favorites") || "[]");
@@ -4647,6 +4660,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                         }
                                     } catch(_) {}
                                 }
+                                updateTrialCard();
                                 applyProFeatures(isPro);
                                 renderShelves();
                             })
@@ -4655,6 +4669,54 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 applyProFeatures(false);
                             });
                     }
+
+                    function updateTrialCard() {
+                        const card = document.getElementById("trialCtaCard");
+                        if (!card) return;
+                        const isPro = localStorage.getItem("budsin_pro_active") === "1";
+                        const trialUsed = localStorage.getItem("budsin_trial_used") === "1";
+                        if (!isPro && !trialUsed) {
+                            card.style.display = "block";
+                        } else {
+                            card.style.display = "none";
+                        }
+                    }
+                    updateTrialCard();
+
+                    window.handleTrialClick = function() {
+                        const user = auth.currentUser;
+                        if (!user) {
+                            // Not logged in → redirect to settings
+                            const lang = currentLanguage || "en";
+                            window.location.href = "settings.html?lang=" + lang + "#proCard";
+                            return;
+                        }
+                        // Logged in → check if trial already used
+                        const trialUsed = localStorage.getItem("budsin_trial_used") === "1";
+                        if (trialUsed) {
+                            document.getElementById("trialCtaCard").style.display = "none";
+                            return;
+                        }
+                        // Activate trial
+                        const expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+                        db.collection("users").doc(user.uid).update({
+                            pro: true,
+                            trial: true,
+                            trialUsed: true,
+                            proSince: window.firebase.firestore.FieldValue.serverTimestamp(),
+                            paidUntil: window.firebase.firestore.Timestamp.fromDate(expiry),
+                        }).then(() => {
+                            localStorage.setItem("budsin_pro_active", "1");
+                            localStorage.setItem("budsin_trial_used", "1");
+                            document.getElementById("trialCtaCard").style.display = "none";
+                            applyProFeatures(true);
+                            renderShelves();
+                            const t = getTranslations();
+                            showToast("🎁 " + (t.trialCtaTitle || "Free trial activated! 7 days"), false);
+                        }).catch((err) => {
+                            console.warn("[Budsin] Trial activation error:", err);
+                        });
+                    };
 
                     auth.onAuthStateChanged((user) => {
                         currentUser = user;
@@ -4670,7 +4732,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             if (proPollTimer) { clearInterval(proPollTimer); proPollTimer = null; }
                             localStorage.removeItem("budsin_pro_user");
                             localStorage.setItem("budsin_pro_active", "0");
+                            localStorage.setItem("budsin_trial_used", "0");
                             applyProFeatures(false);
+                            updateTrialCard();
                         }
                     });
 
@@ -4856,6 +4920,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     sortPopular: "Más jugados",
                     sortAlphabetical: "A-Z",
                     sortNewest: "Más nuevos",
+                    trialCtaTitle: "🎁 Prueba Budsin Pro gratis 7 días",
+                    trialCtaDesc: "Sin anuncios, tema Gold, favoritos ilimitados y acceso anticipado. Sin compromiso.",
                     searchHistoryTitle: "Búsquedas recientes",
                     shelfCollections: "📁 Mis colecciones",
                     collectionsCreate: "Nueva colección",
@@ -4982,6 +5048,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     sortPopular: "Most played",
                     sortAlphabetical: "A-Z",
                     sortNewest: "Newest",
+                    trialCtaTitle: "🎁 Try Budsin Pro free for 7 days",
+                    trialCtaDesc: "No ads, Gold theme, unlimited favorites, and early access. No commitment.",
                     searchHistoryTitle: "Recent searches",
                     shelfCollections: "📁 My collections",
                     collectionsCreate: "New collection",
@@ -5108,6 +5176,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     sortPopular: "Mais jogados",
                     sortAlphabetical: "A-Z",
                     sortNewest: "Mais novos",
+                    trialCtaTitle: "🎁 Experimente Budsin Pro grátis 7 dias",
+                    trialCtaDesc: "Sem anúncios, tema Gold, favoritos ilimitados e acesso antecipado. Sem compromisso.",
                     searchHistoryTitle: "Pesquisas recentes",
                     shelfCollections: "📁 Minhas coleções",
                     collectionsCreate: "Nova coleção",
