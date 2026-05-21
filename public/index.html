@@ -4659,6 +4659,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                             localStorage.setItem("budsin_favorites", JSON.stringify(favs.slice(0, 20)));
                                         }
                                     } catch(_) {}
+                                    try {
+                                        var cols = JSON.parse(localStorage.getItem(COLLECTIONS_KEY) || "[]");
+                                        if (cols.length > COLLECTIONS_LIMIT_FREE) {
+                                            localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(cols.slice(0, COLLECTIONS_LIMIT_FREE)));
+                                        }
+                                    } catch(_) {}
                                 }
                                 updateTrialCard();
                                 applyProFeatures(isPro);
@@ -4735,6 +4741,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             localStorage.setItem("budsin_trial_used", "0");
                             applyProFeatures(false);
                             updateTrialCard();
+                            try {
+                                var cols = JSON.parse(localStorage.getItem(COLLECTIONS_KEY) || "[]");
+                                if (cols.length > COLLECTIONS_LIMIT_FREE) {
+                                    localStorage.setItem(COLLECTIONS_KEY, JSON.stringify(cols.slice(0, COLLECTIONS_LIMIT_FREE)));
+                                }
+                            } catch(_) {}
                         }
                     });
 
