@@ -244,6 +244,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             db.collection("users").doc(uid).update({
                                 pro: true,
                                 trial: false,
+                                trialUsed: true,
                                 paidUntil: window.firebase.firestore.Timestamp.fromDate(expiry),
                             }).then(function() {
                                 renderAllUsers();
@@ -258,7 +259,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             var wasPro = this.dataset.pro === "true";
                             if (wasPro) {
                                 if (!confirm("¿Revocar Pro a " + email + "?")) return;
-                                db.collection("users").doc(uid).update({ pro: false, trial: false, proSince: null, paidUntil: null }).then(function() {
+                                db.collection("users").doc(uid).update({ pro: false, trial: false, trialUsed: true, proSince: null, paidUntil: null }).then(function() {
                                     renderAllUsers();
                                 }).catch(function(err) { alert("Error: " + err.message); });
                             } else {
@@ -266,6 +267,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 db.collection("users").doc(uid).update({
                                     pro: true,
                                     trial: false,
+                                    trialUsed: true,
                                     proSince: window.firebase.firestore.FieldValue.serverTimestamp(),
                                     paidUntil: window.firebase.firestore.Timestamp.fromDate(expiry),
                                 }).then(function() {
