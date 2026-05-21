@@ -3,10 +3,11 @@
 
     var SAVE_COLLECTION = "gamesaves";
     var FREE_LIMIT = 5;
-    var AUTO_SAVE_INTERVAL = 300000; // 5 min
+    var AUTO_SAVE_INTERVAL = 300000;
 
     var db = null;
     var auth = null;
+    var storage = null;
     var currentUser = null;
     var autoSaveTimers = {};
     var saveCountCache = null;
@@ -49,9 +50,10 @@
                 });
             db = app.firestore();
             auth = app.auth();
+            storage = app.storage();
             auth.onAuthStateChanged(function (u) {
                 currentUser = u;
-                saveCountCache = null; // invalidate on auth change
+                saveCountCache = null;
             });
             return true;
         } catch (e) {
@@ -64,7 +66,10 @@
         return db.collection(SAVE_COLLECTION).doc(docId(userId, gameName));
     }
 
-    // Count unique games this user has saves for (cached)
+    function getStoragePath(uid, gameName) {
+        return "gamesaves/" + docId(uid, gameName) + "/idb-snapshot.json";
+    }
+
     function countUserSaves(userId) {
         if (saveCountCache !== null) return Promise.resolve(saveCountCache);
         return db.collection(SAVE_COLLECTION)
@@ -77,17 +82,157 @@
             .catch(function () { return 0; });
     }
 
+    // ─── IDB helpers (no Firebase dependency) ───
+
+    function enumerateIDB() {
+        if (!window.indexedDB || !window.indexedDB.databases) {
+            return Promise.resolve([]);
+        }
+        return window.indexedDB.databases().then(function (dbs) {
+            return dbs.map(function (d) { return d.name; }).filter(Boolean);
+        }).catch(function () { return []; });
+    }
+
+    function snapshotIDB(dbNames) {
+        var results = {};
+        var chain = Promise.resolve();
+
+        dbNames.forEach(function (name) {
+            chain = chain.then(function () {
+                return new Promise(function (resolve) {
+                    var req;
+                    try { req = indexedDB.open(name); } catch (e) { resolve(); return; }
+                    req.onupgradeneeded = function () {};
+                    req.onsuccess = function () {
+                        var db = req.result;
+                        if (!db) { resolve(); return; }
+                        var dbData = { version: db.version, stores: {} };
+                        var storeNames = [];
+                        for (var i = 0; i < db.objectStoreNames.length; i++) {
+                            storeNames.push(db.objectStoreNames[i]);
+                        }
+                        if (storeNames.length === 0) {
+                            db.close();
+                            results[name] = dbData;
+                            resolve();
+                            return;
+                        }
+                        var storeChain = Promise.resolve();
+                        storeNames.forEach(function (sn) {
+                            storeChain = storeChain.then(function () {
+                                return new Promise(function (res2) {
+                                    try {
+                                        var tx = db.transaction(sn, "readonly");
+                                        var store = tx.objectStore(sn);
+                                        var records = [];
+                                        var cursorReq = store.openCursor();
+                                        cursorReq.onsuccess = function (e) {
+                                            var cursor = e.target.result;
+                                            if (cursor) {
+                                                records.push({ key: cursor.key, value: cursor.value });
+                                                cursor.continue();
+                                            } else {
+                                                dbData.stores[sn] = records;
+                                                res2();
+                                            }
+                                        };
+                                        cursorReq.onerror = function () { res2(); };
+                                    } catch (e) { res2(); }
+                                });
+                            });
+                        });
+                        storeChain.then(function () {
+                            db.close();
+                            results[name] = dbData;
+                            resolve();
+                        });
+                    };
+                    req.onerror = function () { resolve(); };
+                    req.onblocked = function () { resolve(); };
+                });
+            });
+        });
+
+        return chain.then(function () { return results; });
+    }
+
+    function restoreIDB(snapshot) {
+        var names = Object.keys(snapshot);
+        var chain = Promise.resolve();
+
+        names.forEach(function (name) {
+            chain = chain.then(function () {
+                return new Promise(function (resolve) {
+                    var delReq = indexedDB.deleteDatabase(name);
+                    delReq.onsuccess = function () { resolve(); };
+                    delReq.onerror = function () { resolve(); };
+                    delReq.onblocked = function () { resolve(); };
+                    setTimeout(resolve, 3000);
+                });
+            }).then(function () {
+                return new Promise(function (resolve) {
+                    var dbData = snapshot[name];
+                    if (!dbData) { resolve(); return; }
+                    var openReq;
+                    try { openReq = indexedDB.open(name, dbData.version || 1); } catch (e) { resolve(); return; }
+                    openReq.onupgradeneeded = function (e) {
+                        var d = e.target.result;
+                        var stores = dbData.stores || {};
+                        Object.keys(stores).forEach(function (sn) {
+                            if (!d.objectStoreNames.contains(sn)) {
+                                d.createObjectStore(sn, { autoIncrement: true });
+                            }
+                        });
+                    };
+                    openReq.onsuccess = function () {
+                        var d = openReq.result;
+                        var stores = dbData.stores || {};
+                        var storeNames = Object.keys(stores);
+                        if (storeNames.length === 0) { d.close(); resolve(); return; }
+                        var storeChain = Promise.resolve();
+                        storeNames.forEach(function (sn) {
+                            storeChain = storeChain.then(function () {
+                                return new Promise(function (res2) {
+                                    try {
+                                        var tx = d.transaction(sn, "readwrite");
+                                        var store = tx.objectStore(sn);
+                                        var records = stores[sn] || [];
+                                        records.forEach(function (rec) {
+                                            try { store.put(rec.value, rec.key); } catch (e) {}
+                                        });
+                                        tx.oncomplete = function () { res2(); };
+                                        tx.onerror = function () { res2(); };
+                                    } catch (e) { res2(); }
+                                });
+                            });
+                        });
+                        storeChain.then(function () { d.close(); resolve(); });
+                    };
+                    openReq.onerror = function () { resolve(); };
+                    openReq.onblocked = function () { resolve(); };
+                });
+            });
+        });
+
+        return chain;
+    }
+
+    // ─── Helpers exposed for game-save.js ───
+    window.__BudsinIDB = {
+        enumerate: enumerateIDB,
+        snapshot: snapshotIDB,
+        restore: restoreIDB,
+    };
+
     // ─── Public API ───
 
     window.BudsinSave = {
 
-        /** Init the save system for a game. Returns a promise. */
         init: function () {
             if (!initFirebase()) return Promise.resolve(false);
             return Promise.resolve(true);
         },
 
-        /** Save game data immediately. Overwrites if exists. Returns a promise. */
         saveNow: function (gameName, data) {
             if (!gameName || data === undefined || data === null) {
                 return Promise.reject("Invalid arguments");
@@ -101,13 +246,10 @@
 
             return new Promise(function (resolve, reject) {
                 if (!isPro) {
-                    // Check if this game already has a save → doesn't count toward limit
                     getSaveRef(uid, gameName).get().then(function (doc) {
                         if (doc.exists) {
-                            // Already saved this game before → just overwrite
                             doSave(uid, gameName, data).then(resolve).catch(reject);
                         } else {
-                            // New game → check limit
                             countUserSaves(uid).then(function (count) {
                                 if (count >= FREE_LIMIT) {
                                     reject("LIMIT_REACHED");
@@ -117,7 +259,6 @@
                             }).catch(reject);
                         }
                     }).catch(function () {
-                        // If read fails, try to save anyway
                         doSave(uid, gameName, data).then(resolve).catch(reject);
                     });
                 } else {
@@ -126,7 +267,6 @@
             });
         },
 
-        /** Load saved data for a game. Returns a promise with the data or null. */
         load: function (gameName) {
             if (!gameName) return Promise.resolve(null);
             if (!initFirebase()) return Promise.resolve(null);
@@ -137,6 +277,7 @@
             return getSaveRef(uid, gameName).get().then(function (doc) {
                 if (doc.exists) {
                     var d = doc.data();
+                    if (d.storagePath) return null; // IDB game, not localStorage
                     try {
                         return JSON.parse(d.data);
                     } catch (_) {
@@ -147,7 +288,6 @@
             }).catch(function () { return null; });
         },
 
-        /** Get save metadata. Returns a promise with { exists, updatedAt } or null. */
         getInfo: function (gameName) {
             if (!gameName) return Promise.resolve(null);
             if (!initFirebase()) return Promise.resolve(null);
@@ -162,13 +302,13 @@
                         exists: true,
                         updatedAt: d.updatedAt ? d.updatedAt.toDate() : null,
                         gameName: d.gameName,
+                        gameType: d.gameType || "localstorage",
                     };
                 }
                 return { exists: false, updatedAt: null, gameName: gameName };
             }).catch(function () { return null; });
         },
 
-        /** Delete saved data for a game. Returns a promise. */
         remove: function (gameName) {
             if (!gameName) return Promise.resolve();
             if (!initFirebase()) return Promise.resolve();
@@ -176,16 +316,23 @@
             var uid = getUserId();
             if (!uid) return Promise.resolve();
 
-            return getSaveRef(uid, gameName).delete().then(function () {
-                saveCountCache = null;
+            return getSaveRef(uid, gameName).get().then(function (doc) {
+                var d = doc.data();
+                var chain = Promise.resolve();
+                if (d && d.storagePath && storage) {
+                    chain = storage.ref(d.storagePath).delete().catch(function () {});
+                }
+                return chain.then(function () {
+                    return getSaveRef(uid, gameName).delete();
+                }).then(function () {
+                    saveCountCache = null;
+                });
             }).catch(function () {});
         },
 
-        /** Start auto-saving every 5 minutes. getDataFn should return the game state. */
         autoSave: function (gameName, getDataFn) {
             if (!gameName || typeof getDataFn !== "function") return;
 
-            // Save immediately on start
             var doAutoSave = function () {
                 try {
                     var data = getDataFn();
@@ -205,7 +352,6 @@
             autoSaveTimers[gameName] = setInterval(doAutoSave, AUTO_SAVE_INTERVAL);
         },
 
-        /** Stop auto-saving for a game. */
         stopAutoSave: function (gameName) {
             if (autoSaveTimers[gameName]) {
                 clearInterval(autoSaveTimers[gameName]);
@@ -213,7 +359,6 @@
             }
         },
 
-        /** Check if the user can save a new game (for UI). Returns a promise. */
         canSaveNewGame: function () {
             if (getPro()) return Promise.resolve({ allowed: true, count: 0, limit: Infinity });
             var uid = getUserId();
@@ -221,6 +366,128 @@
             return countUserSaves(uid).then(function (count) {
                 return { allowed: count < FREE_LIMIT, count: count, limit: FREE_LIMIT };
             });
+        },
+
+        // ─── IDB / Unity game save/load ───
+
+        saveIDB: function (gameName, snapshot) {
+            if (!gameName || !snapshot) return Promise.reject("Invalid arguments");
+            if (!initFirebase()) return Promise.reject("Firebase not available");
+
+            var uid = getUserId();
+            if (!uid) return Promise.reject("User not logged in");
+
+            var isPro = getPro();
+
+            return new Promise(function (resolve, reject) {
+                function doUpload() {
+                    var json = JSON.stringify(snapshot);
+                    var blob = new Blob([json], { type: "application/json" });
+                    var path = getStoragePath(uid, gameName);
+                    var storageRef = storage.ref(path);
+
+                    if (blob.size <= 900000) {
+                        doSave(uid, gameName, { idbSnapshot: snapshot, gameType: "unity" }).then(resolve).catch(reject);
+                    } else {
+                        storageRef.put(blob, { contentType: "application/json" }).then(function () {
+                            return getSaveRef(uid, gameName).set({
+                                userId: uid,
+                                gameName: gameName,
+                                storagePath: path,
+                                updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+                                gameType: "unity",
+                            });
+                        }).then(function () {
+                            saveCountCache = null;
+                            resolve();
+                        }).catch(reject);
+                    }
+                }
+
+                if (!isPro) {
+                    getSaveRef(uid, gameName).get().then(function (doc) {
+                        if (doc.exists) {
+                            doUpload();
+                        } else {
+                            countUserSaves(uid).then(function (count) {
+                                if (count >= FREE_LIMIT) {
+                                    reject("LIMIT_REACHED");
+                                } else {
+                                    doUpload();
+                                }
+                            }).catch(reject);
+                        }
+                    }).catch(function () { doUpload(); });
+                } else {
+                    doUpload();
+                }
+            });
+        },
+
+        loadIDB: function (gameName) {
+            if (!gameName) return Promise.resolve(null);
+            if (!initFirebase()) return Promise.resolve(null);
+
+            var uid = getUserId();
+            if (!uid) return Promise.resolve(null);
+
+            return getSaveRef(uid, gameName).get().then(function (doc) {
+                if (!doc.exists) return null;
+                var d = doc.data();
+
+                if (d.storagePath) {
+                    if (!storage) return null;
+                    return storage.ref(d.storagePath).getDownloadURL().then(function (url) {
+                        return fetch(url).then(function (res) {
+                            if (!res.ok) throw new Error("fetch failed");
+                            return res.json();
+                        });
+                    }).catch(function () { return null; });
+                }
+
+                if (d.data) {
+                    try {
+                        var parsed = JSON.parse(d.data);
+                        return parsed.idbSnapshot || parsed;
+                    } catch (e) {
+                        return null;
+                    }
+                }
+                return null;
+            }).catch(function () { return null; });
+        },
+
+        autoSaveIDB: function (gameName, getSnapshotFn) {
+            if (!gameName || typeof getSnapshotFn !== "function") return;
+
+            var doAutoSave = function () {
+                try {
+                    var snapshot = getSnapshotFn();
+                    // Handle both Promise and synchronous returns
+                    if (snapshot && typeof snapshot.then === "function") {
+                        snapshot.then(function (snap) {
+                            if (snap) {
+                                window.BudsinSave.saveIDB(gameName, snap).catch(function (err) {
+                                    if (err === "LIMIT_REACHED") {
+                                        window.BudsinSave.stopAutoSave(gameName);
+                                    }
+                                });
+                            }
+                        }).catch(function (_) {});
+                    } else if (snapshot) {
+                        window.BudsinSave.saveIDB(gameName, snapshot).catch(function (err) {
+                            if (err === "LIMIT_REACHED") {
+                                window.BudsinSave.stopAutoSave(gameName);
+                            }
+                        });
+                    }
+                } catch (_) {}
+            };
+
+            doAutoSave();
+
+            if (autoSaveTimers[gameName]) clearInterval(autoSaveTimers[gameName]);
+            autoSaveTimers[gameName] = setInterval(doAutoSave, AUTO_SAVE_INTERVAL);
         },
     };
 

@@ -235,7 +235,7 @@ Guardado automático en Firestore del progreso de los juegos. Cada 5 minutos se 
 - Campos: `userId`, `gameName`, `data` (string JSON), `updatedAt` (Timestamp).
 - La seguridad se maneja con reglas que verifican `request.auth.uid` y que el doc ID contenga el UID.
 
-### 📝 Cómo integrar en un juego HTML
+### 📝 Cómo integrar en un juego HTML (opción 1: BudsinSave bajo nivel)
 1. Incluir `save-system.js` antes de `</body>` (después de classroom-hotkey).
 2. En el script del juego:
    ```javascript
@@ -253,11 +253,167 @@ Guardado automático en Firestore del progreso de los juegos. Cada 5 minutos se 
    });
    ```
 
+### 📁 Archivos clave para GameSave
+- **`public/game-save.js`**: Wrapper de alto nivel con clases `GameSave` e `IDBGameSave`.
+
+### 🎮 GameSave (para juegos HTML/localStorage)
+**Uso para juegos tradicionales (HTML + JavaScript con estado en memoria)**
+
+```javascript
+// Inicializar y cargar estado guardado
+var gameSave = new GameSave("mi-juego");
+gameSave.init().then(function() {
+    var state = gameSave.getState();  // Devuelve una copia
+    console.log("Estado cargado:", state);
+});
+
+// Actualizar estado
+gameSave.setState({ score: 100, level: 5 });
+gameSave.mergeState({ lives: 3 });  // Fusionar parcialmente
+
+// Guardar ahora
+gameSave.saveNow().then(function() {
+    console.log("Guardado!");
+}).catch(function(err) {
+    console.log("Error:", err);  // "LIMIT_REACHED" si Free con 5 juegos
+});
+
+// Auto-guardar cada 5 minutos (recomendado)
+gameSave.startAutoSave();  // Luego en cada evento del juego, actualizar state
+gameSave.stopAutoSave();   // Detener cuando salga del juego
+
+// Obtener metadatos
+gameSave.getInfo().then(function(info) {
+    console.log("Existe:", info.exists, "Actualizado:", info.updatedAt);
+});
+
+// Eliminar guardado
+gameSave.delete();
+```
+
+**Fallback**: Si Firebase no está disponible, `GameSave` guarda en `localStorage` (clave: `game_mi-juego`).
+
+### 🕹️ IDBGameSave (para juegos Unity / IndexedDB)
+**Uso para juegos complejos con múltiples stores IndexedDB**
+
+**⚠️ CRITICAL: Restore BEFORE Unity boots!**
+
+```javascript
+// HTML: Include Firebase first
+// <script src="https://www.gstatic.com/firebasejs/9/firebase-app.js"></script>
+// <script src="https://www.gstatic.com/firebasejs/9/firebase-auth.js"></script>
+// <script src="https://www.gstatic.com/firebasejs/9/firebase-firestore.js"></script>
+// <script src="https://www.gstatic.com/firebasejs/9/firebase-storage.js"></script>
+// <script src="https://budsin-games.pages.dev/save-system.js"></script>
+// <script src="https://budsin-games.pages.dev/game-save.js"></script>
+
+// ANTES de createUnityInstance(): Initialize save and restore IDB
+var gameSave = new GameSave("nombre-del-juego-unity");
+gameSave.init().then(function(snapshot) {
+    console.log("✅ IDB restaurada desde cloud:", snapshot);
+    
+    // Ahora es seguro crear la instancia Unity
+    // IDB ya contiene los datos guardados
+    createUnityInstance(container, config, onProgress).then(function(unityInstance) {
+        console.log("✅ Unity iniciado con IDB restaurada");
+        
+        // Inicia auto-guardado cada 5 minutos
+        gameSave.startAutoSave();
+    }).catch(function(err) {
+        console.error("❌ Error iniciando Unity:", err);
+    });
+}).catch(function(err) {
+    console.warn("⚠️ No se pudo restaurar IDB, iniciando Unity con datos locales:", err);
+    
+    // Fallback: Inicia Unity de todas formas
+    createUnityInstance(container, config, onProgress).then(function(unityInstance) {
+        gameSave.startAutoSave();  // Guardará desde aquí en adelante
+    });
+});
+```
+
+**Auto-detección**: GameSave detecta automáticamente si el juego usa Unity/IDB escaneando `indexedDB.databases()`. Si encuentra una BD con el nombre del juego (normalizado), activa el modo IDB.
+
+**Métodos en modo Unity**:
+
+```javascript
+// Obtener snapshot actual de todas las stores
+var snap = gameSave.getSnapshot();  // Devuelve { "dbName": { version, stores: {...} } }
+
+// Guardar manualmente snapshot actual
+gameSave.saveNow().then(function() {
+    console.log("✅ IDB guardada a Firestore/Storage");
+}).catch(function(err) {
+    console.log("❌ Error:", err);  // "LIMIT_REACHED" si Free con 5 juegos
+});
+
+// Auto-guardar cada 5 minutos (recomendado)
+gameSave.startAutoSave();
+gameSave.stopAutoSave();
+
+// Metadatos
+gameSave.getInfo().then(function(info) {
+    console.log("Game type:", info.gameType);  // "unity" o "localstorage"
+    console.log("Last updated:", info.updatedAt);
+});
+
+// Eliminar guardado
+gameSave.delete();
+```
+
+**Estructura del snapshot IDB**: 
+```
+{
+  "dbName1": {
+    "version": 1,
+    "stores": {
+      "storeName1": [
+        { "key": "key1", "value": {...} },
+        { "key": "key2", "value": {...} }
+      ]
+    }
+  }
+}
+```
+
+### 🔄 Auto-detección de tipo de juego
+`GameSave` detecta automáticamente si un juego es localStorage o Unity/IDB:
+
+1. Al llamar `gameSave.init()`, escanea `indexedDB.databases()`.
+2. Si encuentra una BD cuyo nombre contiene el nombre del juego (normalizado, sin caracteres especiales), activa modo IDB.
+3. Si no encuentra coincidencias, usa modo localStorage.
+4. El tipo se almacena en `gameSave.gameType` ("localstorage" o "unity").
+
+### 💾 Almacenamiento en Firebase Storage (para grandes snapshots)
+Los snapshots grandes (>900KB) se guardan en **Firebase Storage** en lugar de Firestore (que tiene límite de 1MB):
+
+- **Pequeños** (<900KB): Se guardan directamente en Firestore documento `gamesaves/{uid}_{gameName}`.
+- **Grandes** (≥900KB): Se cargan a Storage en `gamesaves/{uid}_{gameName}/idb-snapshot.json`. Firestore solo almacena la referencia (`storagePath`).
+- Al descargar, `loadIDB()` detecta automáticamente si está en Storage o Firestore y recupera desde el origen correcto.
+
+**Requisito**: Firebase Storage debe estar habilitado en el proyecto Firebase (`juanjo-games`).
+
 ### 🚫 Límite Free: 5 juegos
 - Se cuentan documentos en `gamesaves` donde `userId == uid`.
-- Al intentar guardar un juego NUEVO (sin save previo) siendo Free con 5 juegos → `saveNow()` rechaza con `"LIMIT_REACHED"`.
+- Al intentar guardar un juego NUEVO (sin save previo) siendo Free con 5 juegos → `saveNow()` / `saveIDB()` rechaza con `"LIMIT_REACHED"`.
 - El auto-save se detiene automáticamente al recibir este error.
 - Pro: sin límite.
+
+### 🔥 Métodos adicionales de `window.BudsinSave` para Unity
+| Método | Descripción |
+|---|---|
+| `saveIDB(gameName, snapshot)` | Guarda snapshot IDB. Almacena en Storage si > 900KB. |
+| `loadIDB(gameName)` | Carga y restaura snapshot IDB desde Firestore / Storage. |
+| `autoSaveIDB(gameName, getSnapshotFn)` | Auto-guardar snapshot cada 5 min. |
+
+### 👁️ Helpers IDB (en `window.__BudsinIDB`)
+Accesibles para operaciones manuales de snapshot/restore sin Firebase:
+
+| Método | Descripción |
+|---|---|
+| `enumerate()` | Lista nombres de todas las IndexedDB. Retorna Promise. |
+| `snapshot(dbNames)` | Snapshots los stores. Retorna Promise con estructura. |
+| `restore(snapshot)` | Restaura IndexedDB desde snapshot. Retorna Promise. |
 
 ---
 
