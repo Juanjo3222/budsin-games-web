@@ -298,7 +298,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     authSection.classList.add("is-visible");
                     adminSection.classList.remove("is-visible");
                     showError(document.getElementById("adminError"), "No tienes permisos de administrador.");
-                    auth.signOut();
+                    // Redirect away instead of signing out globally (which would kill other tabs)
+                    window.location.href = "https://budsin-games.pages.dev/index.html";
                 } else {
                     authSection.classList.add("is-visible");
                     adminSection.classList.remove("is-visible");
