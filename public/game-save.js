@@ -183,7 +183,7 @@
                     btn.style.transform = "scale(1)";
                     btn.style.background = "rgba(0,0,0,0.45)";
                 });
-                btn.addEventListener("click", function () {
+                function doSave(showFeedback) {
                     var now = Date.now();
                     var elapsed = now - startTime;
                     BudsinSave.saveNow(gameName, {
@@ -192,6 +192,7 @@
                         lastPlayed: new Date().toISOString(),
                         browserData: captureLocalStorage(),
                     }).then(function () {
+                        if (!showFeedback) return;
                         btn.textContent = "\u2713";
                         btn.style.background = "rgba(46,204,113,0.7)";
                         setTimeout(function () {
@@ -199,6 +200,7 @@
                             btn.style.background = "rgba(0,0,0,0.45)";
                         }, 1200);
                     }).catch(function (err) {
+                        if (!showFeedback) return;
                         btn.textContent = "\u2717";
                         btn.style.background = "rgba(231,76,60,0.7)";
                         if (err === "LIMIT_REACHED") {
@@ -209,6 +211,93 @@
                             btn.style.background = "rgba(0,0,0,0.45)";
                         }, 3000);
                     });
+                }
+
+                function doLoad() {
+                    BudsinSave.load(gameName).then(function (data) {
+                        if (data && data.browserData) {
+                            restoreLocalStorage(data.browserData);
+                            btn.textContent = "\u{1F504}";
+                            btn.style.background = "rgba(52,152,219,0.7)";
+                            setTimeout(function () {
+                                btn.textContent = "\u{1F4BE}";
+                                btn.style.background = "rgba(0,0,0,0.45)";
+                            }, 1500);
+                            setTimeout(function () { location.reload(); }, 800);
+                        } else {
+                            btn.textContent = "!";
+                            btn.style.background = "rgba(243,156,18,0.7)";
+                            setTimeout(function () {
+                                btn.textContent = "\u{1F4BE}";
+                                btn.style.background = "rgba(0,0,0,0.45)";
+                            }, 1500);
+                        }
+                    }).catch(function () {});
+                }
+
+                btn.addEventListener("click", function () {
+                    var existing = document.getElementById("budsin-save-menu");
+                    if (existing) { existing.remove(); return; }
+
+                    var menu = document.createElement("div");
+                    menu.id = "budsin-save-menu";
+                    Object.assign(menu.style, {
+                        position: "fixed",
+                        top: "52px",
+                        left: "10px",
+                        zIndex: "2147483647",
+                        background: "rgba(20,20,30,0.92)",
+                        backdropFilter: "blur(8px)",
+                        borderRadius: "12px",
+                        border: "1px solid rgba(255,255,255,0.15)",
+                        padding: "6px",
+                        boxShadow: "0 8px 32px rgba(0,0,0,0.4)",
+                        fontFamily: "system-ui, -apple-system, sans-serif",
+                        fontSize: "13px",
+                        color: "#fff",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "4px",
+                        minWidth: "130px",
+                    });
+
+                    function makeOption(text, icon, fn) {
+                        var opt = document.createElement("button");
+                        opt.textContent = icon + " " + text;
+                        Object.assign(opt.style, {
+                            background: "transparent",
+                            border: "none",
+                            color: "#fff",
+                            padding: "8px 12px",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontSize: "13px",
+                            textAlign: "left",
+                            fontFamily: "inherit",
+                            transition: "background .15s",
+                        });
+                        opt.addEventListener("mouseenter", function () { opt.style.background = "rgba(255,255,255,0.1)"; });
+                        opt.addEventListener("mouseleave", function () { opt.style.background = "transparent"; });
+                        opt.addEventListener("click", function (e) {
+                            e.stopPropagation();
+                            fn();
+                            menu.remove();
+                        });
+                        return opt;
+                    }
+
+                    menu.appendChild(makeOption("Save", "\u{1F4BE}", function () { doSave(true); }));
+                    menu.appendChild(makeOption("Load", "\u{1F4C2}", doLoad));
+
+                    document.body.appendChild(menu);
+                    setTimeout(function () {
+                        document.addEventListener("click", function closeOnOutside(e) {
+                            if (!menu.contains(e.target) && e.target !== btn) {
+                                menu.remove();
+                                document.removeEventListener("click", closeOnOutside);
+                            }
+                        });
+                    }, 0);
                 });
                 document.body.appendChild(btn);
             }).catch(function () {});
