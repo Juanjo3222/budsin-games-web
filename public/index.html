@@ -516,6 +516,133 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 background: transparent;
             }
 
+            .search-history {
+                position: absolute;
+                top: calc(100% + 4px);
+                left: 0;
+                right: 0;
+                background: var(--surface-strong);
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                box-shadow: var(--shadow);
+                z-index: 100;
+                display: none;
+                overflow: hidden;
+            }
+            .search-history.is-visible { display: block; }
+            .search-history-item {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 10px 14px;
+                cursor: pointer;
+                font-size: .85rem;
+                color: var(--text);
+                transition: background .15s;
+            }
+            .search-history-item:hover { background: var(--bg-2); }
+            .search-history-item .remove-search {
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: var(--muted);
+                font-size: .9rem;
+                padding: 2px 6px;
+                border-radius: 6px;
+            }
+            .search-history-item .remove-search:hover { background: var(--bg); color: var(--red); }
+            .search-history-empty {
+                padding: 12px 14px;
+                font-size: .82rem;
+                color: var(--muted);
+                text-align: center;
+            }
+            .search-wrap { position: relative; }
+
+            .library-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+            .sort-wrap { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+
+            /* ── Collections ── */
+            .collection-btn {
+                position: absolute;
+                top: 8px;
+                right: 42px;
+                width: 30px;
+                height: 30px;
+                border: none;
+                border-radius: 50%;
+                background: rgba(0,0,0,.45);
+                color: #fff;
+                font-size: .85rem;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background .2s, transform .2s;
+                z-index: 5;
+                backdrop-filter: blur(4px);
+                line-height: 1;
+            }
+            .collection-btn:hover { background: rgba(0,0,0,.7); transform: scale(1.1); }
+            .collections-container { display: flex; flex-direction: column; gap: 16px; }
+            .collection-shelf { border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: var(--surface); }
+            .collection-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+            .collection-name { font-size: .9rem; color: var(--text); }
+            .collection-actions { display: flex; gap: 4px; }
+            .collection-actions button {
+                background: none; border: none; cursor: pointer; font-size: .85rem;
+                padding: 2px 6px; border-radius: 6px; transition: background .15s;
+            }
+            .collection-actions button:hover { background: var(--bg-2); }
+            .collections-popup {
+                position: fixed;
+                z-index: 9999;
+                background: var(--surface-strong);
+                border: 1px solid var(--line);
+                border-radius: 14px;
+                box-shadow: var(--shadow);
+                min-width: 180px;
+                max-width: 260px;
+                display: none;
+                overflow: hidden;
+                font-size: .85rem;
+            }
+            .collections-popup.is-visible { display: block; }
+            .collections-popup-head {
+                padding: 10px 14px;
+                font-weight: 700;
+                font-size: .78rem;
+                color: var(--muted);
+                border-bottom: 1px solid var(--line);
+                text-transform: uppercase;
+                letter-spacing: .04em;
+            }
+            .collections-popup-item {
+                display: block;
+                width: 100%;
+                padding: 10px 14px;
+                border: none;
+                background: none;
+                text-align: left;
+                font: inherit;
+                font-size: .85rem;
+                color: var(--text);
+                cursor: pointer;
+                transition: background .15s;
+            }
+            .collections-popup-item:hover { background: var(--bg-2); }
+            .collections-popup-item.in-collection { color: var(--blue); font-weight: 600; }
+            .collections-popup-empty { padding: 10px 14px; color: var(--muted); font-size: .82rem; text-align: center; }
+            .collections-popup-new { border-top: 1px solid var(--line); color: var(--blue); font-weight: 600; }
+
+            .game-card.keyboard-focus {
+                outline: 3px solid var(--blue);
+                outline-offset: 2px;
+                border-radius: 24px;
+            }
+            html[data-site-theme="dark"] .game-card.keyboard-focus { outline-color: #5b9eff; }
+            html[data-site-theme="pro"] .game-card.keyboard-focus { outline-color: #ffd700; }
+
             .chips {
                 display: flex;
                 flex-wrap: wrap;
@@ -1939,7 +2066,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         >5.000s</span
                     >
                 </div>
-                <span>Version 6.0</span>
+                <span>Version 6.1</span>
                 <h2 id="changelogTitle" data-i18n="changelogTitle">
                     Novedades de Budsin Games
                 </h2>
@@ -1953,6 +2080,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </li>
                     <li data-i18n="changelogItem2">
                         Mejoras generales de rendimiento y estabilidad en el portal.
+                    </li>
+                    <li data-i18n="changelogItem3">
+                        📁 Colecciones personalizadas: crea listas de juegos, renómbralas y adminístralas. Free: hasta 2, Pro: ilimitadas.
+                    </li>
+                    <li data-i18n="changelogItem4">
+                        🔍 Historial de búsqueda: las últimas 5 búsquedas se guardan y puedes reutilizarlas.
+                    </li>
+                    <li data-i18n="changelogItem5">
+                        📊 Ordenamiento mejorado: ordena juegos por Más jugados, A-Z o Más nuevos.
+                    </li>
+                    <li data-i18n="changelogItem6">
+                        ⌨️ Navegación con teclado: flechas ← → para moverte entre juegos, Enter para abrir, Escape para cerrar.
                     </li>
                 </ul>
                     </div>
@@ -2132,6 +2271,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             placeholder="Search game by name..."
                             autocomplete="off"
                         />
+                        <div id="searchHistory" class="search-history" aria-hidden="true"></div>
                     </label>
                     <div class="chips" id="typeFilters">
                         <button
@@ -2191,6 +2331,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             🛠️ Herramientas
                         </button>
                     </div>
+                    <div class="sort-wrap">
+                        <span data-i18n="sortLabel" style="font-size:.8rem;color:var(--muted);font-weight:600;white-space:nowrap">Ordenar:</span>
+                        <select id="sortSelect" aria-label="Sort games" style="padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-strong);font:inherit;font-size:.82rem;color:var(--text);cursor:pointer;outline:none">
+                            <option value="popular" data-i18n="sortPopular">Más jugados</option>
+                            <option value="alphabetical" data-i18n="sortAlphabetical">A-Z</option>
+                            <option value="newest" data-i18n="sortNewest">Más nuevos</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="shelves">
@@ -2209,6 +2357,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <section class="shelf" id="recentlyPlayedShelf">
                         <h3 data-i18n="shelfRecent">🕐 Jugado recientemente</h3>
                         <div id="recentlyPlayedList" class="recent-grid"></div>
+                    </section>
+                    <section class="shelf" id="collectionsShelf">
+                        <h3 data-i18n="shelfCollections">📁 Mis colecciones</h3>
+                        <div id="collectionsContainer" class="collections-container"></div>
+                        <button id="createCollectionBtn" type="button" class="btn btn-ghost btn-sm" style="margin-top:10px;font-size:.82rem" data-i18n="collectionsCreate">➕ Nueva colección</button>
                     </section>
                     <div id="banner-spot"></div>
                 </div>
@@ -4282,15 +4435,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             };
         </script>
         <script>
-            const SITE_VERSION = "6.0";
+            const SITE_VERSION = "6.1";
             const STORAGE_KEY = "juanjos_games_seen_version";
             const ENABLE_CHANGELOG_POPUP = true;
             const FAVORITES_KEY = "budsin_favorites";
+
+            function showToast(msg, isProCta) {
+                const el = document.getElementById("toast") || (() => {
+                    const t = document.createElement("div"); t.id = "toast";
+                    t.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(239,63,69,.92);color:#fff;padding:12px 22px;border-radius:999px;font-size:.88rem;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.28);opacity:0;transition:opacity .25s;display:flex;align-items:center;gap:10px;white-space:nowrap";
+                    document.body.appendChild(t); return t;
+                })();
+                if (isProCta) {
+                    const t = getTranslations();
+                    el.innerHTML = `${msg} <a href="settings.html#proCard" style="color:#ffd700;text-decoration:underline;font-weight:800;white-space:nowrap">⭐ ${t.proGatingCta || "Quiero ser Pro"}</a>`;
+                } else {
+                    el.textContent = msg;
+                }
+                el.style.opacity = "1";
+                clearTimeout(el._hideTimer);
+                el._hideTimer = setTimeout(() => { el.style.opacity = "0"; }, 4000);
+            }
             const POPULARITY_KEY = "budsin_popularity";
             const PENDING_POPULARITY_KEY = "budsin_popularity_pending";
             const FIREBASE_COLLECTION = "game_popularity";
             const RECENTLY_PLAYED_KEY = "budsin_recently_played";
             const RECENTLY_PLAYED_MAX = 5;
+            const SEARCH_HISTORY_KEY = "budsin_search_history";
+            const SEARCH_HISTORY_MAX = 5;
+            const COLLECTIONS_KEY = "budsin_collections";
+            const COLLECTIONS_LIMIT_FREE = 2;
             const popup = document.getElementById("changelogPopup");
             const closeButton = document.getElementById("closeChangelog");
             const countdownLabel =
@@ -4300,8 +4474,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             let changelogUnlockTimer = null;
             let changelogCountdownFrame = null;
 
-            // Apply saved theme
-            var savedTheme = localStorage.getItem("budsin_site_theme") || "light";
+            // Apply saved theme (auto-detect dark mode if no preference saved)
+            var savedTheme = localStorage.getItem("budsin_site_theme");
+            if (!savedTheme) {
+                savedTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
             document.documentElement.setAttribute("data-site-theme", savedTheme);
 
             const PRO_STORAGE_KEY = "budsin_pro_popup_seen";
@@ -4339,6 +4516,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     if (!isPro) {
                         const badge = document.createElement("span");
                         badge.className = "pro-badge";
+                        badge.classList.add("i18n-pro-badge");
                         badge.textContent = "Anticipado para Pro\npróximamente gratis";
                         const cover = card.querySelector(".cover");
                         if (cover) cover.appendChild(badge);
@@ -4357,6 +4535,77 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     .join(" · ");
                 tooltip.textContent = `${cat}${types ? " — " + types : ""}`;
                 card.appendChild(tooltip);
+            });
+
+            // Inyectar botón de colecciones en cada tarjeta
+            cards.forEach((card) => {
+                const colBtn = document.createElement("button");
+                colBtn.type = "button";
+                colBtn.className = "collection-btn";
+                colBtn.textContent = "📁";
+                colBtn.setAttribute("aria-label", "Add to collection");
+                const content = card.querySelector(".content");
+                if (content) {
+                    content.appendChild(colBtn);
+                    colBtn.addEventListener("click", (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        let popup = document.getElementById("collectionsPopup");
+                        if (!popup) {
+                            popup = document.createElement("div");
+                            popup.id = "collectionsPopup";
+                            popup.className = "collections-popup";
+                            document.body.appendChild(popup);
+                        }
+                        const href = getCardHref(card);
+                        const cols = getCollections();
+                        const t = getTranslations();
+                        const rect = colBtn.getBoundingClientRect();
+                        let html = `<div class="collections-popup-head">${t.collectionsAddTo || "Añadir a colección"}</div>`;
+                        if (cols.length) {
+                            html += cols.map(c => {
+                                const inCol = c.items.includes(href);
+                                return `<button type="button" class="collections-popup-item ${inCol ? 'in-collection' : ''}" data-col-name="${c.name}" data-href="${href}">${inCol ? '✓' : '+'} ${escHtml(c.name)}</button>`;
+                            }).join("");
+                        } else {
+                            html += `<div class="collections-popup-empty">${t.collectionsCreateFirst || "Crea una colección primero"}</div>`;
+                        }
+                        html += `<button type="button" class="collections-popup-item collections-popup-new" data-href="${href}">➕ ${t.collectionsCreate || "Nueva colección..."}</button>`;
+                        popup.innerHTML = html;
+                        popup.style.position = "fixed";
+                        popup.style.top = Math.min(rect.bottom + 4, window.innerHeight - 200) + "px";
+                        popup.style.left = Math.max(8, rect.left - 40) + "px";
+                        popup.classList.add("is-visible");
+
+                        popup.querySelectorAll(".collections-popup-item").forEach((item) => {
+                            item.addEventListener("click", (ev) => {
+                                ev.stopPropagation();
+                                if (item.classList.contains("collections-popup-new")) {
+                                    const name = prompt(t.collectionsCreatePrompt || "Nombre de la nueva colección:");
+                                    if (name && name.trim()) {
+                                        addCollection(name.trim());
+                                        // Re-append to the new collection
+                                        const newCols = getCollections();
+                                        const newCol = newCols.find(c => c.name === name.trim());
+                                        if (newCol) addToCollection(name.trim(), href);
+                                    }
+                                } else {
+                                    const colName = item.dataset.colName;
+                                    toggleCollectionItem(colName, href);
+                                }
+                                popup.classList.remove("is-visible");
+                            });
+                        });
+
+                        const closePopup = (ev) => {
+                            if (!popup.contains(ev.target) && ev.target !== colBtn) {
+                                popup.classList.remove("is-visible");
+                                document.removeEventListener("click", closePopup);
+                            }
+                        };
+                        setTimeout(() => document.addEventListener("click", closePopup), 10);
+                    });
+                }
             });
 
             // ─── Budsin Pro: init Firebase Auth + apply features ───
@@ -4570,6 +4819,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         "Se agregaron Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars, Hollow Knight Silksong y Escape Road al catálogo con portadas propias.",
                     changelogItem2:
                         "Mejoras generales de rendimiento y estabilidad en el portal.",
+                    changelogItem3:
+                        "📁 Colecciones personalizadas: crea listas de juegos, renómbralas y adminístralas. Free: hasta 2, Pro: ilimitadas.",
+                    changelogItem4:
+                        "🔍 Historial de búsqueda: las últimas 5 búsquedas se guardan y puedes reutilizarlas.",
+                    changelogItem5:
+                        "📊 Ordenamiento mejorado: ordena juegos por Más jugados, A-Z o Más nuevos.",
+                    changelogItem6:
+                        "⌨️ Navegación con teclado: flechas ← → para moverte entre juegos, Enter para abrir, Escape para cerrar.",
                     settingsPageLink: "⚙️ Ajustes",
                     newBadge: "Nuevo",
                     resultsCount: (count) => `${count} juegos`,
@@ -4593,6 +4850,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proGatingFreeDate: "🎉 Este juego será gratis para todos el 22 de mayo de 2026.",
                     proGatingCta: "⭐ Quiero ser Pro",
                     proGatingClose: "Cerrar",
+                    proBadge: "Anticipado para Pro\npróximamente gratis",
+                    sortLabel: "Ordenar:",
+                    sortPopular: "Más jugados",
+                    sortAlphabetical: "A-Z",
+                    sortNewest: "Más nuevos",
+                    searchHistoryTitle: "Búsquedas recientes",
+                    shelfCollections: "📁 Mis colecciones",
+                    collectionsCreate: "Nueva colección",
+                    collectionsCreatePrompt: "Nombre de la nueva colección:",
+                    collectionsRename: "Renombrar",
+                    collectionsRenamePrompt: "Nuevo nombre para la colección:",
+                    collectionsDelete: "Eliminar",
+                    collectionsDeleteConfirm: "¿Eliminar colección",
+                    collectionsEmpty: "Tus colecciones aparecerán aquí. Crea una y añade juegos desde cada tarjeta.",
+                    collectionsAddTo: "Añadir a colección",
+                    collectionsCreateFirst: "Crea una colección primero",
+                    collectionsLimitReached: "Límite de colecciones alcanzado (2). Hazte Pro para ilimitadas.",
                     categoriesLabel: "Categorías",
                     articlesKicker: "Consejos y guías",
                     articlesTitle: "Tips para sacarle más partido al portal",
@@ -4605,6 +4879,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     article3Desc: "Usa el buscador en tiempo real para encontrar juegos por nombre. También puedes filtrar por categoría: Acción, Idle, Multiplayer, Clásicos o herramientas. El contador de resultados te muestra cuántos juegos coinciden.",
                     article4Title: "Cambia de idioma",
                     article4Desc: "El portal está disponible en español, inglés y portugués. Usa el selector de idioma en la esquina superior derecha para cambiar al instante. Tu preferencia quedará guardada para la próxima visita.",
+                    article5Title: "Explora los más jugados",
+                    article5Desc: "La sección 'Más jugados' muestra los juegos más populares del portal según el conteo de clics. El ranking se actualiza en tiempo real y te ayuda a descubrir qué están jugando otros usuarios.",
+                    article6Title: "Juego al azar",
+                    article6Desc: "Usa el botón 'Juego al azar' para descubrir un juego aleatorio del catálogo. Es perfecto cuando no sabes qué jugar y quieres explorar títulos nuevos.",
+                    article7Title: "Ranking de popularidad",
+                    article7Desc: "Cada juego muestra su contador de jugadores en tiempo real. Los números se actualizan con cada clic y determinan qué juegos aparecen en el ranking de populares.",
                     footerTagline: "Juegos gratis en el navegador",
                     footerAbout: "Acerca de",
                     footerPrivacy: "Privacidad",
@@ -4664,6 +4944,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         "Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars, Hollow Knight Silksong and Escape Road were added to the catalog with their own covers.",
                     changelogItem2:
                         "General performance and stability improvements.",
+                    changelogItem3:
+                        "📁 Custom collections: create game lists, rename and manage them. Free: up to 2, Pro: unlimited.",
+                    changelogItem4:
+                        "🔍 Search history: last 5 searches are saved and reusable.",
+                    changelogItem5:
+                        "📊 Improved sorting: sort games by Most played, A-Z, or Newest.",
+                    changelogItem6:
+                        "⌨️ Keyboard navigation: ← → arrows to browse games, Enter to open, Escape to close.",
                     settingsPageLink: "⚙️ Settings",
                     newBadge: "New",
                     resultsCount: (count) => `${count} games`,
@@ -4687,6 +4975,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proGatingFreeDate: "🎉 This game will be free for everyone on May 22, 2026.",
                     proGatingCta: "⭐ I want to be Pro",
                     proGatingClose: "Close",
+                    proBadge: "Early access for Pro\nfree soon",
+                    sortLabel: "Sort:",
+                    sortPopular: "Most played",
+                    sortAlphabetical: "A-Z",
+                    sortNewest: "Newest",
+                    searchHistoryTitle: "Recent searches",
+                    shelfCollections: "📁 My collections",
+                    collectionsCreate: "New collection",
+                    collectionsCreatePrompt: "Name for the new collection:",
+                    collectionsRename: "Rename",
+                    collectionsRenamePrompt: "New name for the collection:",
+                    collectionsDelete: "Delete",
+                    collectionsDeleteConfirm: "Delete collection",
+                    collectionsEmpty: "Your collections will appear here. Create one and add games from each card.",
+                    collectionsAddTo: "Add to collection",
+                    collectionsCreateFirst: "Create a collection first",
+                    collectionsLimitReached: "Collections limit reached (2). Go Pro for unlimited.",
                     categoriesLabel: "Categories",
                     articlesKicker: "Tips & guides",
                     articlesTitle: "Tips to get the most out of the portal",
@@ -4699,6 +5004,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     article3Desc: "Use the real-time search to find games by name. You can also filter by category: Action, Idle, Multiplayer, Classics, or Tools. The result counter shows matching games.",
                     article4Title: "Change language",
                     article4Desc: "The portal is available in Spanish, English, and Portuguese. Use the language picker in the top-right corner to switch instantly. Your preference is saved for your next visit.",
+                    article5Title: "Explore the most played",
+                    article5Desc: "The 'Most played' section shows the most popular games on the portal based on click count. The ranking updates in real-time and helps you discover what others are playing.",
+                    article6Title: "Random game",
+                    article6Desc: "Use the 'Random game' button to discover a random game from the catalog. Perfect when you don't know what to play and want to explore new titles.",
+                    article7Title: "Popularity ranking",
+                    article7Desc: "Each game shows its real-time player count. Numbers update with every click and determine which games appear in the popular ranking.",
                     footerTagline: "Free browser games",
                     footerAbout: "About",
                     footerPrivacy: "Privacy",
@@ -4758,6 +5069,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         "Monster Tracks, Super Smash Bros 64, Crossy Road, Plague Inc, Odd Bot Out, Brawl Stars, Hollow Knight Silksong e Escape Road foram adicionados ao catálogo com capas próprias.",
                     changelogItem2:
                         "Melhorias gerais de desempenho e estabilidade.",
+                    changelogItem3:
+                        "📁 Coleções personalizadas: crie listas de jogos, renomeie e gerencie. Free: até 2, Pro: ilimitadas.",
+                    changelogItem4:
+                        "🔍 Histórico de pesquisa: as últimas 5 pesquisas são salvas e reutilizáveis.",
+                    changelogItem5:
+                        "📊 Ordenação melhorada: ordene jogos por Mais jogados, A-Z ou Mais novos.",
+                    changelogItem6:
+                        "⌨️ Navegação por teclado: setas ← → para navegar, Enter para abrir, Escape para fechar.",
                     settingsPageLink: "⚙️ Configurações",
                     newBadge: "Novo",
                     resultsCount: (count) => `${count} jogos`,
@@ -4781,6 +5100,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proGatingFreeDate: "🎉 Este jogo será grátis para todos em 22 de maio de 2026.",
                     proGatingCta: "⭐ Quero ser Pro",
                     proGatingClose: "Fechar",
+                    proBadge: "Antecipado para Pro\nem breve grátis",
+                    sortLabel: "Ordenar:",
+                    sortPopular: "Mais jogados",
+                    sortAlphabetical: "A-Z",
+                    sortNewest: "Mais novos",
+                    searchHistoryTitle: "Pesquisas recentes",
+                    shelfCollections: "📁 Minhas coleções",
+                    collectionsCreate: "Nova coleção",
+                    collectionsCreatePrompt: "Nome da nova coleção:",
+                    collectionsRename: "Renomear",
+                    collectionsRenamePrompt: "Novo nome para a coleção:",
+                    collectionsDelete: "Excluir",
+                    collectionsDeleteConfirm: "Excluir coleção",
+                    collectionsEmpty: "Suas coleções aparecerão aqui. Crie uma e adicione jogos de cada card.",
+                    collectionsAddTo: "Adicionar à coleção",
+                    collectionsCreateFirst: "Crie uma coleção primeiro",
+                    collectionsLimitReached: "Limite de coleções atingido (2). Torne-se Pro para ilimitadas.",
                     categoriesLabel: "Categorias",
                     articlesKicker: "Dicas e guias",
                     articlesTitle: "Dicas para aproveitar melhor o portal",
@@ -4793,6 +5129,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     article3Desc: "Use a busca em tempo real para encontrar jogos pelo nome. Você também pode filtrar por categoria: Ação, Idle, Multiplayer, Clássicos ou Ferramentas. O contador mostra quantos jogos correspondem.",
                     article4Title: "Mude o idioma",
                     article4Desc: "O portal está disponível em espanhol, inglês e português. Use o seletor de idioma no canto superior direito para alternar instantaneamente. Sua preferência será salva para a próxima visita.",
+                    article5Title: "Explore os mais jogados",
+                    article5Desc: "A seção 'Mais jogados' mostra os jogos mais populares do portal baseado na contagem de cliques. O ranking atualiza em tempo real e ajuda você a descobrir o que outros estão jogando.",
+                    article6Title: "Jogo aleatório",
+                    article6Desc: "Use o botão 'Jogo aleatório' para descobrir um jogo aleatório do catálogo. Perfeito quando você não sabe o que jogar e quer explorar novos títulos.",
+                    article7Title: "Ranking de popularidade",
+                    article7Desc: "Cada jogo mostra seu contador de jogadores em tempo real. Os números atualizam a cada clique e determinam quais jogos aparecem no ranking de populares.",
                     footerTagline: "Jogos grátis no navegador",
                     footerAbout: "Sobre",
                     footerPrivacy: "Privacidade",
@@ -4816,6 +5158,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             let activeType = "all";
             let activeCategory = "";
+            let activeSort = "popular";
+            let keyboardIndex = -1;
             let popularityState = readJson(POPULARITY_KEY, {});
             let firebaseDb = null;
             let firebaseEnabled = false;
@@ -4827,6 +5171,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const defaultCardOrder = new Map(
                 cards.map((card, index) => [getCardHref(card), index]),
             );
+
+            function escHtml(str) {
+                const div = document.createElement("div");
+                div.textContent = str;
+                return div.innerHTML;
+            }
 
             function logFirebase(message, error) {
                 if (error) {
@@ -4999,11 +5349,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (!gamesGrid) return;
 
                 const previousRects = withAnimation ? captureCardRects() : null;
+                const mode = activeSort || "popular";
                 const sortedCards = cards.slice().sort((cardA, cardB) => {
                     const hrefA = getCardHref(cardA);
                     const hrefB = getCardHref(cardB);
 
-                    if (!rankingReady) {
+                    if (mode === "alphabetical") {
+                        const nameA = (cardA.dataset.name || "").toLowerCase();
+                        const nameB = (cardB.dataset.name || "").toLowerCase();
+                        if (nameA < nameB) return -1;
+                        if (nameA > nameB) return 1;
+                        return 0;
+                    }
+
+                    if (mode === "newest") {
+                        const newA = cardA.dataset.new === "true" ? 1 : 0;
+                        const newB = cardB.dataset.new === "true" ? 1 : 0;
+                        if (newA !== newB) return newB - newA;
+                    }
+
+                    if (!rankingReady && mode !== "newest") {
                         return (
                             (defaultCardOrder.get(hrefA) || 0) -
                             (defaultCardOrder.get(hrefB) || 0)
@@ -5473,6 +5838,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 document.querySelectorAll(".new-badge").forEach((b) => {
                     b.textContent = t.newBadge;
                 });
+                document.querySelectorAll(".i18n-pro-badge").forEach((b) => {
+                    b.textContent = t.proBadge || "Anticipado para Pro\npróximamente gratis";
+                });
                 renderShelves();
                 applyFilters();
                 updateDynamicLabels();
@@ -5503,6 +5871,120 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 } catch (error) {
                     // ignore storage errors
                 }
+            }
+
+            function getSearchHistory() {
+                return readJson(SEARCH_HISTORY_KEY, []);
+            }
+            function saveSearchHistory(history) {
+                writeJson(SEARCH_HISTORY_KEY, history.slice(0, SEARCH_HISTORY_MAX));
+            }
+            function addSearchTerm(term) {
+                if (!term) return;
+                const history = getSearchHistory();
+                const idx = history.indexOf(term);
+                if (idx > -1) history.splice(idx, 1);
+                history.unshift(term);
+                saveSearchHistory(history);
+            }
+            function renderSearchHistory() {
+                const el = document.getElementById("searchHistory");
+                if (!el) return;
+                const history = getSearchHistory();
+                const t = getTranslations();
+                if (!history.length) {
+                    el.style.display = "none";
+                    return;
+                }
+                el.innerHTML = `<div class="search-history-empty">${t.searchHistoryTitle || "Recent searches"}</div>` +
+                    history.map((term) =>
+                        `<div class="search-history-item" data-term="${term.replace(/"/g, "&quot;")}">
+                            <span>🔍 ${term}</span>
+                            <button class="remove-search" data-term="${term.replace(/"/g, "&quot;")}" type="button" aria-label="Remove">✕</button>
+                        </div>`
+                    ).join("");
+                el.querySelectorAll(".search-history-item").forEach((item) => {
+                    item.addEventListener("click", (e) => {
+                        if (e.target.closest(".remove-search")) return;
+                        const term = item.dataset.term;
+                        searchInput.value = term;
+                        el.classList.remove("is-visible");
+                        el.style.display = "none";
+                        applyFilters();
+                    });
+                });
+                el.querySelectorAll(".remove-search").forEach((btn) => {
+                    btn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        const term = btn.dataset.term;
+                        const history = getSearchHistory();
+                        const idx = history.indexOf(term);
+                        if (idx > -1) history.splice(idx, 1);
+                        saveSearchHistory(history);
+                        renderSearchHistory();
+                    });
+                });
+                el.classList.add("is-visible");
+                el.style.display = "block";
+            }
+
+            // ─── Collections management ───
+            function getCollections() { return readJson(COLLECTIONS_KEY, []); }
+            function saveCollections(cols) { writeJson(COLLECTIONS_KEY, cols); }
+            function getCollectionLimit() {
+                return localStorage.getItem("budsin_pro_active") === "1" ? Infinity : COLLECTIONS_LIMIT_FREE;
+            }
+            function addCollection(name) {
+                const cols = getCollections();
+                const limit = getCollectionLimit();
+                if (cols.length >= limit) {
+                    const t = getTranslations();
+                    showToast(t.collectionsLimitReached || "Límite de colecciones alcanzado. Hazte Pro para más.", true);
+                    return false;
+                }
+                if (cols.find(c => c.name === name)) return false;
+                cols.push({ name, items: [] });
+                saveCollections(cols);
+                renderShelves();
+                return true;
+            }
+            function renameCollection(oldName, newName) {
+                const cols = getCollections();
+                const col = cols.find(c => c.name === oldName);
+                if (!col || cols.find(c => c.name === newName)) return false;
+                col.name = newName;
+                saveCollections(cols);
+                renderShelves();
+                return true;
+            }
+            function deleteCollection(name) {
+                const cols = getCollections().filter(c => c.name !== name);
+                saveCollections(cols);
+                renderShelves();
+            }
+            function addToCollection(collectionName, href) {
+                const cols = getCollections();
+                const col = cols.find(c => c.name === collectionName);
+                if (!col) return;
+                if (col.items.includes(href)) return;
+                col.items.push(href);
+                saveCollections(cols);
+                renderShelves();
+            }
+            function removeFromCollection(collectionName, href) {
+                const cols = getCollections();
+                const col = cols.find(c => c.name === collectionName);
+                if (!col) return;
+                col.items = col.items.filter(h => h !== href);
+                saveCollections(cols);
+                renderShelves();
+            }
+            function toggleCollectionItem(collectionName, href) {
+                const cols = getCollections();
+                const col = cols.find(c => c.name === collectionName);
+                if (!col) { addCollection(collectionName); return toggleCollectionItem(collectionName, href); }
+                if (col.items.includes(href)) { removeFromCollection(collectionName, href); }
+                else { addToCollection(collectionName, href); }
             }
 
             function renderShelves() {
@@ -5588,6 +6070,66 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         });
                     } else {
                         recentlyPlayedList.innerHTML = `<span class="recent-empty">${getTranslations().noRecent}</span>`;
+                    }
+                }
+
+                // Shelf de colecciones
+                const collectionsContainer = document.getElementById("collectionsContainer");
+                if (collectionsContainer) {
+                    const cols = getCollections();
+                    const t = getTranslations();
+                    if (cols.length) {
+                        collectionsContainer.innerHTML = cols.map((col, ci) => {
+                            const items = col.items.map((href) => {
+                                const card = cards.find((c) => getCardHref(c) === href);
+                                if (!card) return "";
+                                const name = card.querySelector("strong").textContent;
+                                const img = card.querySelector(".cover img");
+                                const src = img ? img.getAttribute("src") : "";
+                                return `<div class="recent-mini" data-col-href="${href}" data-col-name="${col.name}">${src ? `<img src="${src}" alt="${name}">` : ""}<span class="recent-mini-name">${name}</span></div>`;
+                            }).join("") || `<span class="recent-empty">${t.collectionsEmpty || "Colección vacía. Añade juegos desde cada tarjeta."}</span>`;
+                            const limit = getCollectionLimit();
+                            return `<div class="collection-shelf">
+                                <div class="collection-head">
+                                    <strong class="collection-name">📁 ${escHtml(col.name)}</strong>
+                                    <div class="collection-actions">
+                                        <button class="collection-rename-btn" data-col-name="${col.name}" type="button" title="${t.collectionsRename || "Renombrar"}">✏️</button>
+                                        <button class="collection-delete-btn" data-col-name="${col.name}" type="button" title="${t.collectionsDelete || "Eliminar"}">🗑️</button>
+                                    </div>
+                                </div>
+                                <div class="recent-grid" data-collection-grid="${ci}">${items}</div>
+                            </div>`;
+                        }).join("");
+
+                        collectionsContainer.querySelectorAll(".recent-mini").forEach((mini) => {
+                            mini.addEventListener("click", (e) => {
+                                if (e.target.closest(".collection-actions")) return;
+                                const href = mini.dataset.colHref;
+                                const card = cards.find((c) => getCardHref(c) === href);
+                                if (card) card.click();
+                            });
+                        });
+                        collectionsContainer.querySelectorAll(".collection-rename-btn").forEach((btn) => {
+                            btn.addEventListener("click", () => {
+                                const oldName = btn.dataset.colName;
+                                const t = getTranslations();
+                                const newName = prompt(t.collectionsRenamePrompt || "Nuevo nombre para la colección:", oldName);
+                                if (newName && newName.trim() && newName !== oldName) {
+                                    renameCollection(oldName, newName.trim());
+                                }
+                            });
+                        });
+                        collectionsContainer.querySelectorAll(".collection-delete-btn").forEach((btn) => {
+                            btn.addEventListener("click", () => {
+                                const name = btn.dataset.colName;
+                                const t = getTranslations();
+                                if (confirm((t.collectionsDeleteConfirm || "¿Eliminar colección") + ` "${name}"?`)) {
+                                    deleteCollection(name);
+                                }
+                            });
+                        });
+                    } else {
+                        collectionsContainer.innerHTML = `<span class="recent-empty">${t.collectionsEmpty || "Colección vacía. Añade juegos desde cada tarjeta."}</span>`;
                     }
                 }
             }
@@ -5750,10 +6292,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         const isPro = localStorage.getItem("budsin_pro_active") === "1";
                         if (!isPro && favorites.length >= FAVORITES_LIMIT_FREE) {
                             const msg = getTranslations().favLimitReached || "Límite de favoritos alcanzado (20). Hazte Pro para ilimitados.";
-                            const toast = document.getElementById("toast") || (() => { const t = document.createElement("div"); t.id = "toast"; t.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(239,63,69,.92);color:#fff;padding:12px 22px;border-radius:999px;font-size:.88rem;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.28);opacity:0;transition:opacity .25s"; document.body.appendChild(t); return t; })();
-                            toast.textContent = msg;
-                            toast.style.opacity = "1";
-                            setTimeout(() => { toast.style.opacity = "0"; }, 3000);
+                            showToast(msg, true);
                             return;
                         }
                         favorites.push(href);
@@ -5764,6 +6303,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
                 card.addEventListener("click", async (event) => {
                     event.preventDefault();
+                    cards.forEach((c) => c.classList.remove("keyboard-focus"));
                     const href = getCardHref(card);
                     const gameName = card.querySelector("strong").textContent;
 
@@ -5863,17 +6403,73 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (event.key === "Escape") {
                     if (popup && popup.classList.contains("is-visible")) closeChangelog();
                     if (proPopup && proPopup.classList.contains("is-visible")) closeProPopup();
+                    const searchHistoryEl = document.getElementById("searchHistory");
+                    if (searchHistoryEl && searchHistoryEl.classList.contains("is-visible")) {
+                        searchHistoryEl.classList.remove("is-visible");
+                        searchHistoryEl.style.display = "none";
+                    }
+                    if (document.activeElement === searchInput) {
+                        searchInput.blur();
+                    }
+                }
+
+                // Arrow key navigation between game cards (only when not typing in search)
+                if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+                    if (document.activeElement === searchInput) return;
+                    event.preventDefault();
+                    const visibleCards = cards.filter((c) => !c.classList.contains("hidden-card"));
+                    if (!visibleCards.length) return;
+                    if (keyboardIndex === -1) {
+                        keyboardIndex = 0;
+                    } else {
+                        keyboardIndex += event.key === "ArrowRight" ? 1 : -1;
+                        if (keyboardIndex < 0) keyboardIndex = visibleCards.length - 1;
+                        if (keyboardIndex >= visibleCards.length) keyboardIndex = 0;
+                    }
+                    cards.forEach((c) => c.classList.remove("keyboard-focus"));
+                    const target = visibleCards[keyboardIndex];
+                    target.classList.add("keyboard-focus");
+                    target.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                }
+
+                if (event.key === "Enter") {
+                    if (document.activeElement === searchInput) return;
+                    const focused = document.querySelector(".game-card.keyboard-focus");
+                    if (focused) focused.click();
                 }
             });
 
             window.addEventListener("pageshow", resetAppTransition);
 
-            searchInput.addEventListener("input", applyFilters);
+            searchInput.addEventListener("input", () => {
+                cards.forEach((c) => c.classList.remove("keyboard-focus"));
+                keyboardIndex = -1;
+                applyFilters();
+            });
+            searchInput.addEventListener("focus", () => {
+                if (getSearchHistory().length) renderSearchHistory();
+            });
+            searchInput.addEventListener("blur", () => {
+                setTimeout(() => {
+                    const el = document.getElementById("searchHistory");
+                    if (el) { el.classList.remove("is-visible"); el.style.display = "none"; }
+                }, 200);
+            });
+            searchInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    const term = searchInput.value.trim();
+                    if (term) addSearchTerm(term);
+                    const el = document.getElementById("searchHistory");
+                    if (el) { el.classList.remove("is-visible"); el.style.display = "none"; }
+                }
+            });
             typeFilters.addEventListener("click", (event) => {
                 const button = event.target.closest(".chip");
                 if (!button) return;
                 activeType = button.dataset.type;
                 activeCategory = "";
+                keyboardIndex = -1;
+                cards.forEach((c) => c.classList.remove("keyboard-focus"));
                 typeFilters
                     .querySelectorAll(".chip")
                     .forEach((chip) => chip.classList.remove("active"));
@@ -5906,6 +6502,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         .forEach((chip) => chip.classList.remove("active"));
                     typeFilters.querySelector('[data-type="all"]').classList.add("active");
                     applyFilters();
+                });
+            }
+
+            // Create collection button
+            const createColBtn = document.getElementById("createCollectionBtn");
+            if (createColBtn) {
+                createColBtn.addEventListener("click", () => {
+                    const t = getTranslations();
+                    const name = prompt(t.collectionsCreatePrompt || "Nombre de la nueva colección:");
+                    if (name && name.trim()) {
+                        addCollection(name.trim());
+                    }
+                });
+            }
+
+            // Sort dropdown
+            const sortSelect = document.getElementById("sortSelect");
+            if (sortSelect) {
+                sortSelect.addEventListener("change", () => {
+                    activeSort = sortSelect.value;
+                    sortGamesByRanking(true);
                 });
             }
 
