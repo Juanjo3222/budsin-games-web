@@ -935,6 +935,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             <div style="font-size:1.2rem;font-weight:800;color:#ffd700" id="proStatsFavs">0</div>
                             <div style="font-size:.72rem;color:var(--muted);margin-top:2px" data-i18n="proStatsFavs">Favoritos</div>
                         </div>
+                        <div style="background:rgba(0,201,255,0.08);border-radius:12px;padding:12px;text-align:center">
+                            <div style="font-size:1.2rem;font-weight:800;color:#00c9ff" id="proStatsSaves">0</div>
+                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px" data-i18n="proStatsSaves">Guardados</div>
+                        </div>
                     </div>
 
                     <!-- Trial CTA (only for Free users who haven't used trial) -->
@@ -1183,6 +1187,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proLoginHint: "Inicia sesión para verificar tu estado. Activa tu prueba gratis de 7 días desde tu perfil. Para ser Pro, escribe a budsinjys@gmail.com.",
                     proStatsGames: "Juegos jugados",
                     proStatsFavs: "Favoritos",
+                    proStatsSaves: "Guardados",
                     proRenewalLabel: "🔄 Renovación:",
                     proBenefitsTitle: "Beneficios Pro",
                     proBenefitNoAds: "Sin anuncios",
@@ -1266,6 +1271,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proLoginHint: "Sign in to verify your status. Activate your 7-day free trial from your profile. To become Pro, email budsinjys@gmail.com.",
                     proStatsGames: "Games played",
                     proStatsFavs: "Favorites",
+                    proStatsSaves: "Saved",
                     proRenewalLabel: "🔄 Renewal:",
                     proBenefitsTitle: "Pro Benefits",
                     proBenefitNoAds: "No ads",
@@ -1349,6 +1355,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proLoginHint: "Faça login para verificar seu status. Ative seu teste grátis de 7 dias no seu perfil. Para ser Pro, escreva para budsinjys@gmail.com.",
                     proStatsGames: "Jogos jogados",
                     proStatsFavs: "Favoritos",
+                    proStatsSaves: "Salvos",
                     proRenewalLabel: "🔄 Renovação:",
                     proBenefitsTitle: "Benefícios Pro",
                     proBenefitNoAds: "Sem anúncios",
@@ -1871,6 +1878,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     var favs = JSON.parse(localStorage.getItem("budsin_favorites") || "[]");
                     document.getElementById("proStatsFavs").textContent = favs.length;
                 } catch(_) { document.getElementById("proStatsFavs").textContent = "0"; }
+                // Save count from Firestore
+                if (window.BudsinSave && window.BudsinSave.canSaveNewGame) {
+                    window.BudsinSave.canSaveNewGame().then(function(info) {
+                        document.getElementById("proStatsSaves").textContent = info.count;
+                    }).catch(function() {
+                        document.getElementById("proStatsSaves").textContent = "0";
+                    });
+                } else {
+                    document.getElementById("proStatsSaves").textContent = "0";
+                }
 
                 // Save to localStorage for index.html
                 store("budsin_pro_user", JSON.stringify({ uid: user.uid, email: user.email }));
@@ -2030,6 +2047,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
         <script src="https://budsin-games.pages.dev/site-theme.js"></script>
         <script src="https://budsin-games.pages.dev/classroom-hotkey.js"></script>
+        <script src="https://budsin-games.pages.dev/save-system.js"></script>
         <script src="lines-bg.js"></script>
         <script>
             // Auto-scroll to section if hash in URL

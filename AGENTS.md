@@ -56,8 +56,9 @@ Este archivo centraliza la lógica de desarrollo de `budsin-games.pages.dev`. Es
      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      <!-- End Google Tag Manager (noscript) -->
      ```
-   - Script Classroom Hotkey: `<script src="https://budsin-games.pages.dev/classroom-hotkey.js"></script>` (justo antes de `</body>`)
-   - Sin excepción. Aplica a **cualquier** `.html` dentro de `public/`.
+    - Script Classroom Hotkey: `<script src="https://budsin-games.pages.dev/classroom-hotkey.js"></script>` (justo antes de `</body>`)
+    - Script Save System (solo si el juego soporta guardado auto): `<script src="https://budsin-games.pages.dev/save-system.js"></script>` (justo antes de `</body>`, después de classroom-hotkey)
+    - Sin excepción. Aplica a **cualquier** `.html` dentro de `public/`.
 
 6. **Traducciones obligatorias al añadir un juego**: Cada vez que se añada una nueva tarjeta de juego al `index.html`, se deben completar **los 3 idiomas** sin excepción:
    - **HTML** (`<a class="game-card">`): atributos `data-desc-es="..."` y `data-desc-en="..."` en el `<p>` de descripción; `data-label-es="Disponible" data-label-en="Available"` en el `<span>` de estado; `data-es="..."` y `data-en="..."` en el `<span class="category-tag">`.
@@ -200,4 +201,64 @@ Cuando añadas un juego que será **exclusivo para usuarios Pro** (o anticipado)
 
 ---
 
-*Última actualización: 20 de mayo de 2026*
+## 💾 Guardado Auto en la Nube (Save System)
+
+### 🎯 Propósito
+Guardado automático en Firestore del progreso de los juegos. Cada 5 minutos se guarda el estado del juego. Disponible para usuarios logueados con Google.
+
+### 🔥 Diferencias Free vs Pro
+
+| Característica | Free | Pro |
+|---|---|---|
+| Juegos con save | Máximo 5 juegos | Ilimitados |
+| Frecuencia auto-save | Cada 5 min | Cada 5 min |
+| Almacenamiento | Firestore (nube) | Firestore (nube) |
+
+### 📁 Archivo clave
+- **`public/save-system.js`**: Script compartido que provee la API `window.BudsinSave`.
+
+### 🧠 API de `window.BudsinSave`
+
+| Método | Descripción |
+|---|---|
+| `init()` | Inicializa Firebase y el sistema de guardado. Retorna Promise. |
+| `saveNow(gameName, data)` | Guarda datos del juego. Retorna Promise. Rechaza con `"LIMIT_REACHED"` si Free y ya tiene 5. |
+| `load(gameName)` | Carga datos guardados. Retorna Promise con los datos o `null`. |
+| `getInfo(gameName)` | Obtiene metadatos: `{ exists, updatedAt, gameName }`. |
+| `remove(gameName)` | Elimina el save de un juego. |
+| `autoSave(gameName, getDataFn)` | Inicia auto-guardado cada 5 min. `getDataFn` debe retornar el estado del juego. |
+| `stopAutoSave(gameName)` | Detiene auto-guardado para un juego. |
+| `canSaveNewGame()` | Retorna Promise con `{ allowed, count, limit, reason? }`. |
+
+### 🔥 Firestore collection `gamesaves`
+- Documento: `{userId}_{gameName}` (ej. `abc123_pacman`).
+- Campos: `userId`, `gameName`, `data` (string JSON), `updatedAt` (Timestamp).
+- La seguridad se maneja con reglas que verifican `request.auth.uid` y que el doc ID contenga el UID.
+
+### 📝 Cómo integrar en un juego HTML
+1. Incluir `save-system.js` antes de `</body>` (después de classroom-hotkey).
+2. En el script del juego:
+   ```javascript
+   // Inicializar
+   BudsinSave.init();
+
+   // Cargar datos al iniciar
+   BudsinSave.load("nombre-del-juego").then(function(data) {
+       if (data) restaurarEstado(data);
+   });
+
+   // Auto-guardar cada 5 minutos
+   BudsinSave.autoSave("nombre-del-juego", function() {
+       return obtenerEstadoActual();
+   });
+   ```
+
+### 🚫 Límite Free: 5 juegos
+- Se cuentan documentos en `gamesaves` donde `userId == uid`.
+- Al intentar guardar un juego NUEVO (sin save previo) siendo Free con 5 juegos → `saveNow()` rechaza con `"LIMIT_REACHED"`.
+- El auto-save se detiene automáticamente al recibir este error.
+- Pro: sin límite.
+
+---
+
+*Última actualización: 21 de mayo de 2026*
