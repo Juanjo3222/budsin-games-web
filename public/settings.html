@@ -937,6 +937,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                     </div>
 
+                    <!-- Trial CTA (only for Free users who haven't used trial) -->
+                    <div id="proTrialCta" style="display:none;margin-top:12px;padding:16px;border-radius:16px;background:linear-gradient(135deg,rgba(0,201,255,0.08),rgba(146,253,157,0.08));border:1px solid rgba(0,201,255,0.2);text-align:center">
+                        <div style="font-size:1rem;font-weight:800;color:#00c9ff;margin-bottom:6px" data-i18n="proTrialTitle">🎁 Prueba gratis 7 días</div>
+                        <p style="font-size:.78rem;color:var(--muted);margin:0 0 12px" data-i18n="proTrialDesc">Accede a todas las funciones Pro sin costo durante 7 días. Solo una vez.</p>
+                        <button type="button" id="proTrialBtn" class="btn btn-primary" style="background:linear-gradient(135deg,#00c9ff,#92fe9d);color:#000;box-shadow:0 6px 20px rgba(0,201,255,0.3);font-size:.85rem;padding:0 24px;min-height:44px">🎁 Activar prueba gratis</button>
+                    </div>
+                    <!-- Trial used message -->
+                    <div id="proTrialUsed" style="display:none;margin-top:12px;padding:10px 12px;border-radius:12px;background:rgba(239,63,69,0.06);border:1px solid rgba(239,63,69,0.15);font-size:.78rem;text-align:center;color:var(--muted)" data-i18n="proTrialUsed">Ya usaste tu prueba gratis. Para ser Pro, contacta a budsinjys@gmail.com.</div>
+
                     <!-- Renewal date -->
                     <div id="proRenewalRow" style="display:none;margin-top:12px;padding:10px 12px;border-radius:12px;background:rgba(255,215,0,0.08);border:1px solid rgba(255,215,0,0.15);font-size:.78rem;text-align:center">
                         <span data-i18n="proRenewalLabel" style="color:var(--muted)">🔄 Renovación:</span>
@@ -1164,11 +1173,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proLogout: "Cerrar sesión",
                     proBadgeFree: "Gratuito",
                     proBadgeTrial: "Free Trial",
+                    proTrialTitle: "🎁 Prueba gratis 7 días",
+                    proTrialDesc: "Accede a todas las funciones Pro sin costo durante 7 días. Solo una vez.",
+                    proTrialUsed: "Ya usaste tu prueba gratis. Para ser Pro, contacta a budsinjys@gmail.com.",
                     proRenewalDays: "días",
                     proCardTitle: "Budsin Pro",
                     proPriceMonth: "por mes",
                     proPriceSub: "Cuota mensual — acceso a funcionalidades Pro.",
-                    proLoginHint: "Al iniciar sesión obtendrás 7 días de prueba gratis. Para ser Pro, escribe a budsinjys@gmail.com.",
+                    proLoginHint: "Inicia sesión para verificar tu estado. Activa tu prueba gratis de 7 días desde tu perfil. Para ser Pro, escribe a budsinjys@gmail.com.",
                     proStatsGames: "Juegos jugados",
                     proStatsFavs: "Favoritos",
                     proRenewalLabel: "🔄 Renovación:",
@@ -1244,11 +1256,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proLogout: "Sign out",
                     proBadgeFree: "Free",
                     proBadgeTrial: "Free Trial",
+                    proTrialTitle: "🎁 7-day free trial",
+                    proTrialDesc: "Access all Pro features free for 7 days. One time only.",
+                    proTrialUsed: "You already used your free trial. To become Pro, email budsinjys@gmail.com.",
                     proRenewalDays: "days",
                     proCardTitle: "Budsin Pro",
                     proPriceMonth: "per month",
                     proPriceSub: "Monthly fee — access to Pro features.",
-                    proLoginHint: "Signing in gives you 7 days free trial. To become Pro, email budsinjys@gmail.com.",
+                    proLoginHint: "Sign in to verify your status. Activate your 7-day free trial from your profile. To become Pro, email budsinjys@gmail.com.",
                     proStatsGames: "Games played",
                     proStatsFavs: "Favorites",
                     proRenewalLabel: "🔄 Renewal:",
@@ -1324,11 +1339,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proLogout: "Sair",
                     proBadgeFree: "Grátis",
                     proBadgeTrial: "Free Trial",
+                    proTrialTitle: "🎁 Teste grátis 7 dias",
+                    proTrialDesc: "Acesse todas as funções Pro gratuitamente por 7 dias. Apenas uma vez.",
+                    proTrialUsed: "Você já usou seu teste grátis. Para ser Pro, escreva para budsinjys@gmail.com.",
                     proRenewalDays: "dias",
                     proCardTitle: "Budsin Pro",
                     proPriceMonth: "por mês",
                     proPriceSub: "Taxa mensal — acesso a funcionalidades Pro.",
-                    proLoginHint: "Fazer login dá 7 dias de teste grátis. Para ser Pro, escreva para budsinjys@gmail.com.",
+                    proLoginHint: "Faça login para verificar seu status. Ative seu teste grátis de 7 dias no seu perfil. Para ser Pro, escreva para budsinjys@gmail.com.",
                     proStatsGames: "Jogos jogados",
                     proStatsFavs: "Favoritos",
                     proRenewalLabel: "🔄 Renovação:",
@@ -1791,14 +1809,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             function ensureUserDoc(user) {
                 return getProRef(user.uid).get().then(function(doc) {
                     if (!doc.exists) {
-                        var trialExpiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
                         return getProRef(user.uid).set({
                             email: user.email,
                             displayName: user.displayName || "",
-                            pro: true,
-                            trial: true,
-                            proSince: window.firebase.firestore.FieldValue.serverTimestamp(),
-                            paidUntil: window.firebase.firestore.Timestamp.fromDate(trialExpiry),
+                            pro: false,
+                            trial: false,
                             createdAt: window.firebase.firestore.FieldValue.serverTimestamp(),
                         });
                     }
@@ -1886,6 +1901,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 }
                             } catch(_) {}
                         }
+                        var trialCta = document.getElementById("proTrialCta");
+                        var trialUsed = document.getElementById("proTrialUsed");
                         if (isPro) {
                             proBadge.dataset.pro = "1";
                             proTopBadge.dataset.pro = "1";
@@ -1898,6 +1915,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             proBadge.style.background = "linear-gradient(135deg,#ffd700,#ff8c00)";
                             proBadge.style.color = "#000";
                             setProCardStyle(true);
+                            if (trialCta) trialCta.style.display = "none";
+                            if (trialUsed) trialUsed.style.display = "none";
 
                             // Show renewal date
                             var renewalRow = document.getElementById("proRenewalRow");
@@ -1924,6 +1943,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             proBadge.style.color = "var(--muted)";
                             setProCardStyle(false);
                             document.getElementById("proRenewalRow").style.display = "none";
+                            // Show trial CTA if user hasn't used it yet
+                            var hasUsedTrial = data.trialUsed === true;
+                            if (trialCta) trialCta.style.display = hasUsedTrial ? "none" : "block";
+                            if (trialUsed) trialUsed.style.display = hasUsedTrial ? "block" : "none";
                         }
                     }).catch(function() {
                         store("budsin_pro_active", "0");
@@ -1964,6 +1987,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             // Logout
             document.getElementById("proLogoutBtn").addEventListener("click", function() {
                 firebaseAuth.signOut();
+            });
+
+            // Free trial activation
+            document.getElementById("proTrialBtn").addEventListener("click", function() {
+                hideProError();
+                var user = firebaseAuth.currentUser;
+                if (!user) { showProError("Debes iniciar sesión primero."); return; }
+                getProRef(user.uid).get().then(function(doc) {
+                    var data = doc.exists ? doc.data() : {};
+                    if (data.trialUsed === true) {
+                        showProError("Ya usaste tu prueba gratis.");
+                        return;
+                    }
+                    var expiry = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+                    return getProRef(user.uid).update({
+                        pro: true,
+                        trial: true,
+                        trialUsed: true,
+                        proSince: window.firebase.firestore.FieldValue.serverTimestamp(),
+                        paidUntil: window.firebase.firestore.Timestamp.fromDate(expiry),
+                    }).then(function() {
+                        renderProState(user);
+                    });
+                }).catch(function(err) {
+                    showProError("Error: " + err.message);
+                });
             });
 
             // ─── Init Firebase Auth ───
