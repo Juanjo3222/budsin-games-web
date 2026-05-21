@@ -117,6 +117,39 @@
                     }).catch(function () {});
                 }, 2000);
 
+                // ─── Toast for limit reached ───
+                function showLimitToast() {
+                    var toast = document.createElement("div");
+                    toast.textContent = "L\u00edmite de 5 juegos alcanzado. Hazte Pro para ilimitados.";
+                    Object.assign(toast.style, {
+                        position: "fixed",
+                        top: "56px",
+                        left: "10px",
+                        zIndex: "2147483647",
+                        padding: "10px 16px",
+                        borderRadius: "12px",
+                        background: "rgba(231,76,60,0.9)",
+                        color: "#fff",
+                        fontSize: "13px",
+                        fontFamily: "system-ui, -apple-system, sans-serif",
+                        fontWeight: "600",
+                        maxWidth: "300px",
+                        boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+                        backdropFilter: "blur(4px)",
+                        pointerEvents: "none",
+                        opacity: "0",
+                        transition: "opacity .3s",
+                    });
+                    document.body.appendChild(toast);
+                    requestAnimationFrame(function () {
+                        toast.style.opacity = "1";
+                    });
+                    setTimeout(function () {
+                        toast.style.opacity = "0";
+                        setTimeout(function () { toast.remove(); }, 400);
+                    }, 4000);
+                }
+
                 // ─── Save button (top-left corner) ───
                 var btn = document.createElement("button");
                 btn.id = "budsin-save-btn";
@@ -165,13 +198,16 @@
                             btn.textContent = "\u{1F4BE}";
                             btn.style.background = "rgba(0,0,0,0.45)";
                         }, 1200);
-                    }).catch(function () {
+                    }).catch(function (err) {
                         btn.textContent = "\u2717";
                         btn.style.background = "rgba(231,76,60,0.7)";
+                        if (err === "LIMIT_REACHED") {
+                            showLimitToast();
+                        }
                         setTimeout(function () {
                             btn.textContent = "\u{1F4BE}";
                             btn.style.background = "rgba(0,0,0,0.45)";
-                        }, 1200);
+                        }, 3000);
                     });
                 });
                 document.body.appendChild(btn);
