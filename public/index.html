@@ -6417,7 +6417,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
                     if (document.activeElement === searchInput) return;
                     event.preventDefault();
-                    const visibleCards = cards.filter((c) => !c.classList.contains("hidden-card"));
+                    // Re-query DOM each time to match visual order (sort may reorder nodes)
+                    const visibleCards = Array.from(document.querySelectorAll(".game-card:not(.hidden-card)"));
                     if (!visibleCards.length) return;
                     if (keyboardIndex === -1) {
                         keyboardIndex = 0;
@@ -6426,7 +6427,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         if (keyboardIndex < 0) keyboardIndex = visibleCards.length - 1;
                         if (keyboardIndex >= visibleCards.length) keyboardIndex = 0;
                     }
-                    cards.forEach((c) => c.classList.remove("keyboard-focus"));
+                    document.querySelectorAll(".game-card").forEach((c) => c.classList.remove("keyboard-focus"));
                     const target = visibleCards[keyboardIndex];
                     target.classList.add("keyboard-focus");
                     target.scrollIntoView({ behavior: "smooth", block: "nearest" });
