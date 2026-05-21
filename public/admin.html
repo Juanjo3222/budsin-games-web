@@ -65,6 +65,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 800; }
             .badge-pro { display: inline-block; padding: 2px 8px; border-radius: 999px; background: linear-gradient(135deg,#ffd700,#ff8c00); color: #000; font-size: .7rem; font-weight: 800; }
             .badge-free { display: inline-block; padding: 2px 8px; border-radius: 999px; background: rgba(17,24,39,0.06); color: var(--muted); font-size: .7rem; font-weight: 800; }
+            .badge-trial { display: inline-block; padding: 2px 8px; border-radius: 999px; background: linear-gradient(135deg,#00c9ff,#92fe9d); color: #000; font-size: .7rem; font-weight: 800; }
             .error { color: var(--red); font-size: .82rem; margin: 6px 0 0; display: none; }
             .success { color: var(--green); font-size: .82rem; margin: 6px 0 0; display: none; }
             #authSection, #adminSection { display: none; }
@@ -207,14 +208,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     snapshot.forEach(function(doc) {
                         var data = doc.data();
                         var isPro = data.pro === true;
+                        var isTrial = data.trial === true;
                         var tr = document.createElement("tr");
                         var registered = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString() : "—";
                         var paidUntil = data.paidUntil && data.paidUntil.toDate ? data.paidUntil.toDate() : null;
                         var paidUntilStr = paidUntil ? paidUntil.toLocaleDateString() + (paidUntil < new Date() ? " ⚠️" : "") : "—";
                         var isExpired = paidUntil && paidUntil < new Date();
+                        var statusHtml = "";
+                        if (isPro && isExpired) {
+                            statusHtml = '<span class="badge-free">⚠️ ' + (isTrial ? 'Trial vencido' : 'Vencido') + '</span>';
+                        } else if (isPro && isTrial) {
+                            var diffDays = paidUntil ? Math.ceil((paidUntil - new Date()) / (1000 * 60 * 60 * 24)) : "?";
+                            statusHtml = '<span class="badge-trial">📅 Trial (' + diffDays + ' d)</span>';
+                        } else if (isPro) {
+                            statusHtml = '<span class="badge-pro">⭐ PRO</span>';
+                        } else {
+                            statusHtml = '<span class="badge-free">Gratuito</span>';
+                        }
                         tr.innerHTML =
                             '<td>' + escHtml(data.email || doc.id) + '</td>' +
-                            '<td>' + (isPro ? (isExpired ? '<span class="badge-free">⚠️ Vencido</span>' : '<span class="badge-pro">⭐ PRO</span>') : '<span class="badge-free">Gratuito</span>') + '</td>' +
+                            '<td>' + statusHtml + '</td>' +
                             '<td style="font-size:.8rem;color:var(--muted)">' + registered + '</td>' +
                             '<td style="font-size:.8rem;color:var(--muted)">' + paidUntilStr + '</td>' +
                             '<td>' +
@@ -229,6 +242,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             var uid = this.dataset.pay;
                             var expiry = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000);
                             db.collection("users").doc(uid).update({
+                                pro: true,
+                                trial: false,
                                 paidUntil: window.firebase.firestore.Timestamp.fromDate(expiry),
                             }).then(function() {
                                 renderAllUsers();
@@ -243,13 +258,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             var wasPro = this.dataset.pro === "true";
                             if (wasPro) {
                                 if (!confirm("¿Revocar Pro a " + email + "?")) return;
-                                db.collection("users").doc(uid).update({ pro: false, proSince: null, paidUntil: null }).then(function() {
+                                db.collection("users").doc(uid).update({ pro: false, trial: false, proSince: null, paidUntil: null }).then(function() {
                                     renderAllUsers();
                                 }).catch(function(err) { alert("Error: " + err.message); });
                             } else {
                                 var expiry = new Date(Date.now() + 35 * 24 * 60 * 60 * 1000);
                                 db.collection("users").doc(uid).update({
                                     pro: true,
+                                    trial: false,
                                     proSince: window.firebase.firestore.FieldValue.serverTimestamp(),
                                     paidUntil: window.firebase.firestore.Timestamp.fromDate(expiry),
                                 }).then(function() {

@@ -4635,7 +4635,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 let isPro = data.pro === true;
                                 const paidUntil = data.paidUntil && data.paidUntil.toDate ? data.paidUntil.toDate() : null;
                                 if (isPro && paidUntil && paidUntil < new Date()) {
-                                    db.collection("users").doc(user.uid).update({ pro: false, paidUntil: null }).catch(() => {});
+                                    db.collection("users").doc(user.uid).update({ pro: false, trial: false, paidUntil: null }).catch(() => {});
                                     isPro = false;
                                 }
                                 localStorage.setItem("budsin_pro_active", isPro ? "1" : "0");
