@@ -585,7 +585,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             }
             .collection-btn:hover { background: rgba(0,0,0,.7); transform: scale(1.1); }
             .collections-container { display: flex; flex-direction: column; gap: 16px; }
-            .collections-container .recent-empty { display: block; padding: 24px 16px; text-align: center; line-height: 1.5; }
+
             .collection-shelf { border: 1px solid var(--line); border-radius: 16px; padding: 14px; background: var(--surface); }
             .collection-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
             .collection-name { font-size: .9rem; color: var(--text); }
@@ -6088,7 +6088,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 const img = card.querySelector(".cover img");
                                 const src = img ? img.getAttribute("src") : "";
                                 return `<div class="recent-mini" data-col-href="${href}" data-col-name="${col.name}">${src ? `<img src="${src}" alt="${name}">` : ""}<span class="recent-mini-name">${name}</span></div>`;
-                            }).join("") || `<span class="recent-empty">${t.collectionsEmpty || "Colección vacía. Añade juegos desde cada tarjeta."}</span>`;
+                            }).join("") || `<div style="grid-column:1/-1;padding:20px;text-align:center;color:var(--muted);font-size:.9rem;line-height:1.5">${t.collectionsEmpty || "Colección vacía. Añade juegos desde cada tarjeta."}</div>`;
                             const limit = getCollectionLimit();
                             return `<div class="collection-shelf">
                                 <div class="collection-head">
@@ -6130,7 +6130,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             });
                         });
                     } else {
-                        collectionsContainer.innerHTML = `<span class="recent-empty">${t.collectionsEmpty || "Colección vacía. Añade juegos desde cada tarjeta."}</span>`;
+                        collectionsContainer.innerHTML = `<div style="padding:24px 16px;text-align:center;color:var(--muted);font-size:.9rem;line-height:1.5;width:100%">${t.collectionsEmpty || "Tus colecciones aparecerán aquí. Crea una y añade juegos desde cada tarjeta."}</div>`;
                     }
                 }
             }
