@@ -35,14 +35,14 @@
     /**
      * Auto-detect game type by checking for IDB databases matching game name.
      */
-    function isUnityGame() {
+    window.__isUnityGame = function isUnityGame() {
         return typeof window.createUnityInstance === 'function' ||
             typeof window.UnityLoader === 'object' ||
             (typeof window.unityInstance !== 'undefined' && window.unityInstance !== null);
-    }
+    };
 
     function autoDetectGameType(gameName) {
-        if (isUnityGame()) return Promise.resolve("unity");
+        if (window.__isUnityGame()) return Promise.resolve("unity");
         return Promise.resolve("localstorage");
     }
 
@@ -502,7 +502,7 @@
             }
 
             function doSave() {
-                if (window.__BudsinIDB && isUnityGame()) {
+                if (window.__BudsinIDB && window.__isUnityGame()) {
                     return window.__BudsinIDB.enumerate().then(function (dbNames) {
                         if (dbNames.length === 0) return saveLocalStorage();
                         return window.__BudsinIDB.snapshot(dbNames).then(function (snap) {
@@ -559,7 +559,7 @@
 
             function doLoad() {
                 return BudsinSave.loadIDB(gameName).then(function (idbSnapshot) {
-                    if (idbSnapshot && window.__BudsinIDB && isUnityGame()) {
+                    if (idbSnapshot && window.__BudsinIDB && window.__isUnityGame()) {
                         return window.__BudsinIDB.restore(idbSnapshot).then(function () {
                             btn.textContent = "\u2713";
                             btn.style.background = "rgba(52,152,219,0.7)";
