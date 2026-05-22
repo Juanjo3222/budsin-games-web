@@ -50,7 +50,7 @@
                 });
             db = app.firestore();
             auth = app.auth();
-            storage = app.storage();
+            try { storage = app.storage(); } catch (_) { storage = null; }
             auth.onAuthStateChanged(function (u) {
                 currentUser = u;
                 saveCountCache = null;
@@ -383,25 +383,25 @@
                 function doUpload() {
                     var json = JSON.stringify(snapshot);
                     var blob = new Blob([json], { type: "application/json" });
-                    var path = getStoragePath(uid, gameName);
-                    var storageRef = storage.ref(path);
 
-                    if (blob.size <= 900000) {
+                    if (!storage || blob.size <= 900000) {
                         doSave(uid, gameName, { idbSnapshot: snapshot, gameType: "unity" }).then(resolve).catch(reject);
-                    } else {
-                        storageRef.put(blob, { contentType: "application/json" }).then(function () {
-                            return getSaveRef(uid, gameName).set({
-                                userId: uid,
-                                gameName: gameName,
-                                storagePath: path,
-                                updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
-                                gameType: "unity",
-                            });
-                        }).then(function () {
-                            saveCountCache = null;
-                            resolve();
-                        }).catch(reject);
+                        return;
                     }
+
+                    var path = getStoragePath(uid, gameName);
+                    storage.ref(path).put(blob, { contentType: "application/json" }).then(function () {
+                        return getSaveRef(uid, gameName).set({
+                            userId: uid,
+                            gameName: gameName,
+                            storagePath: path,
+                            updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+                            gameType: "unity",
+                        });
+                    }).then(function () {
+                        saveCountCache = null;
+                        resolve();
+                    }).catch(reject);
                 }
 
                 if (!isPro) {
