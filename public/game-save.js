@@ -551,6 +551,48 @@
                 });
             });
 
+            function doLoad() {
+                return BudsinSave.loadIDB(gameName).then(function (idbSnapshot) {
+                    if (idbSnapshot && window.__BudsinIDB) {
+                        return window.__BudsinIDB.restore(idbSnapshot).then(function () {
+                            btn.textContent = "\u2713";
+                            btn.style.background = "rgba(52,152,219,0.7)";
+                            showToast("Progreso Unity restaurado desde la nube", false);
+                            setTimeout(function () {
+                                btn.textContent = "\u{1F4BE}";
+                                btn.style.background = "rgba(0,0,0,0.45)";
+                            }, 2000);
+                        });
+                    }
+                    return BudsinSave.load(gameName).then(function (data) {
+                        if (!data) {
+                            showToast("No hay datos guardados en la nube", true);
+                            btn.textContent = "\u{1F4BE}";
+                            return;
+                        }
+                        var restored = 0;
+                        try {
+                            var savedData = typeof data === "string" ? JSON.parse(data) : data;
+                            if (savedData && typeof savedData === "object") {
+                                for (var key in savedData) {
+                                    if (savedData.hasOwnProperty(key) && typeof savedData[key] === "string") {
+                                        localStorage.setItem(key, savedData[key]);
+                                        restored++;
+                                    }
+                                }
+                            }
+                        } catch (_) {}
+                        btn.textContent = "\u2713";
+                        btn.style.background = "rgba(52,152,219,0.7)";
+                        showToast(restored > 0 ? "Datos restaurados (" + restored + " claves)" : "No se encontraron datos locales para restaurar", false);
+                        setTimeout(function () {
+                            btn.textContent = "\u{1F4BE}";
+                            btn.style.background = "rgba(0,0,0,0.45)";
+                        }, 2000);
+                    });
+                });
+            }
+
             var loadOpt = createMenuOption("\u{1F4C2} Load", function () {
                 hideMenu();
                 btn.textContent = "\u23F3";
@@ -566,30 +608,7 @@
                             btn.textContent = "\u{1F4BE}";
                             return;
                         }
-                        return BudsinSave.load(gameName).then(function (data) {
-                            if (!data) {
-                                showToast("No hay datos guardados en la nube", true);
-                                btn.textContent = "\u{1F4BE}";
-                                return;
-                            }
-                            var restored = 0;
-                            try {
-                                var savedData = typeof data === "string" ? JSON.parse(data) : data;
-                                for (var key in savedData) {
-                                    if (savedData.hasOwnProperty(key) && typeof savedData[key] === "string") {
-                                        localStorage.setItem(key, savedData[key]);
-                                        restored++;
-                                    }
-                                }
-                            } catch (_) {}
-                            btn.textContent = "\u2713";
-                            btn.style.background = "rgba(52,152,219,0.7)";
-                            showToast("Datos restaurados (" + restored + " claves)", false);
-                            setTimeout(function () {
-                                btn.textContent = "\u{1F4BE}";
-                                btn.style.background = "rgba(0,0,0,0.45)";
-                            }, 2000);
-                        });
+                        return doLoad();
                     });
                 }).catch(function () {
                     showToast("Error al conectar con Firebase", true);
