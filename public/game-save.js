@@ -520,6 +520,11 @@
         } catch (_) {}
     }
 
-    try { createButton(); } catch (_) {}
+    // Defer to avoid interfering with game initialization (esp. WebGL canvases)
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", function () { setTimeout(createButton, 100); });
+    } else {
+        setTimeout(createButton, 100);
+    }
 })();
 
