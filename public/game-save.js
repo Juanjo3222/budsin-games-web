@@ -212,7 +212,7 @@
         /**
          * Delete saved game.
          */
-        delete: function () {
+        'delete': function () {
             var self = this;
 
             if (self.gameType === "unity" && self._idbInstance) {
@@ -383,7 +383,7 @@
         /**
          * Delete saved game.
          */
-        delete: function () {
+        'delete': function () {
             if (!window.BudsinSave) return Promise.resolve();
             return window.BudsinSave.remove(this.gameName);
         },
@@ -398,3 +398,128 @@
     };
 
 })();
+
+// ─── Auto-init: Save button (top-left corner) ───
+(function () {
+    var gameName = "";
+    try {
+        var path = window.location.pathname.split("/").pop();
+        gameName = decodeURIComponent(path).replace(/\.html$/i, "").toLowerCase();
+        if (!gameName || gameName === "" || gameName === "index") return;
+    } catch (_) { return; }
+
+    function showToast(msg, isError) {
+        var toast = document.createElement("div");
+        toast.textContent = msg;
+        Object.assign(toast.style, {
+            position: "fixed",
+            top: "56px",
+            left: "10px",
+            zIndex: "2147483647",
+            padding: "10px 16px",
+            borderRadius: "12px",
+            background: isError ? "rgba(231,76,60,0.9)" : "rgba(46,204,113,0.9)",
+            color: "#fff",
+            fontSize: "13px",
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            fontWeight: "600",
+            maxWidth: "300px",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+            backdropFilter: "blur(4px)",
+            pointerEvents: "none",
+            opacity: "0",
+            transition: "opacity .3s",
+        });
+        document.body.appendChild(toast);
+        requestAnimationFrame(function () { toast.style.opacity = "1"; });
+        setTimeout(function () {
+            toast.style.opacity = "0";
+            setTimeout(function () { toast.remove(); }, 400);
+        }, 4000);
+    }
+
+    function createButton() {
+        var btn = document.createElement("button");
+        btn.id = "budsin-save-btn";
+        btn.textContent = "\u{1F4BE}";
+        btn.title = "Save progress";
+        Object.assign(btn.style, {
+            position: "fixed",
+            top: "10px",
+            left: "10px",
+            zIndex: "2147483647",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            border: "1px solid rgba(255,255,255,0.3)",
+            background: "rgba(0,0,0,0.45)",
+            color: "#fff",
+            fontSize: "16px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backdropFilter: "blur(4px)",
+            transition: "transform .15s, background .2s",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+        });
+        btn.addEventListener("mouseenter", function () {
+            btn.style.transform = "scale(1.1)";
+            btn.style.background = "rgba(0,0,0,0.65)";
+        });
+        btn.addEventListener("mouseleave", function () {
+            btn.style.transform = "scale(1)";
+            btn.style.background = "rgba(0,0,0,0.45)";
+        });
+        btn.addEventListener("click", function () {
+            if (!window.BudsinSave) {
+                showToast("Inicia sesi\u00f3n con Google para guardar en la nube", true);
+                return;
+            }
+            BudsinSave.init().then(function (ok) {
+                if (!ok) {
+                    showToast("Inicia sesi\u00f3n con Google para guardar en la nube", true);
+                    return;
+                }
+                // Capture localStorage game data
+                var gameData = {};
+                try {
+                    for (var i = 0; i < localStorage.length; i++) {
+                        var key = localStorage.key(i);
+                        if (!key) continue;
+                        if (key.indexOf("budsin_") === 0) continue;
+                        if (key.indexOf("firebase:") === 0) continue;
+                        gameData[key] = localStorage.getItem(key);
+                    }
+                } catch (_) {}
+                BudsinSave.saveNow(gameName, gameData).then(function () {
+                    btn.textContent = "\u2713";
+                    btn.style.background = "rgba(46,204,113,0.7)";
+                    showToast("Guardado en la nube \u2705", false);
+                    setTimeout(function () {
+                        btn.textContent = "\u{1F4BE}";
+                        btn.style.background = "rgba(0,0,0,0.45)";
+                    }, 1200);
+                }).catch(function (err) {
+                    btn.textContent = "\u2717";
+                    btn.style.background = "rgba(231,76,60,0.7)";
+                    if (err === "LIMIT_REACHED") {
+                        showToast("L\u00edmite de 5 juegos alcanzado. Hazte Pro para ilimitados.", true);
+                    } else {
+                        showToast("Error al guardar: " + err, true);
+                    }
+                    setTimeout(function () {
+                        btn.textContent = "\u{1F4BE}";
+                        btn.style.background = "rgba(0,0,0,0.45)";
+                    }, 3000);
+                });
+            }).catch(function () {
+                showToast("Error al conectar con Firebase", true);
+            });
+        });
+        document.body.appendChild(btn);
+    }
+
+    createButton();
+})();
+
