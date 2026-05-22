@@ -5,9 +5,10 @@
     var FREE_LIMIT = 5;
     var AUTO_SAVE_INTERVAL = 300000;
 
+    var CHUNK_SIZE = 400000;
+
     var db = null;
     var auth = null;
-    var storage = null;
     var currentUser = null;
     var autoSaveTimers = {};
     var saveCountCache = null;
@@ -50,7 +51,6 @@
                 });
             db = app.firestore();
             auth = app.auth();
-            try { storage = app.storage(); } catch (_) { storage = null; }
             auth.onAuthStateChanged(function (u) {
                 currentUser = u;
                 saveCountCache = null;
@@ -62,29 +62,12 @@
         }
     }
 
-    function ensureStorage() {
-        if (storage) return Promise.resolve();
-        if (!window.firebase || !window.firebase.app) return Promise.reject("Firebase not ready");
-        return new Promise(function (resolve, reject) {
-            var s = document.createElement("script");
-            s.src = "https://www.gstatic.com/firebasejs/9/firebase-storage.js";
-            s.onload = function () {
-                try {
-                    storage = window.firebase.app().storage();
-                    resolve();
-                } catch (e) { reject(e); }
-            };
-            s.onerror = function () { reject("Failed to load Firebase Storage SDK"); };
-            document.head.appendChild(s);
-        });
-    }
-
     function getSaveRef(userId, gameName) {
         return db.collection(SAVE_COLLECTION).doc(docId(userId, gameName));
     }
 
-    function getStoragePath(uid, gameName) {
-        return "gamesaves/" + docId(uid, gameName) + "/idb-snapshot.json";
+    function getChunksRef(userId, gameName) {
+        return getSaveRef(userId, gameName).collection("chunks");
     }
 
     function countUserSaves(userId) {
@@ -336,9 +319,15 @@
             return getSaveRef(uid, gameName).get().then(function (doc) {
                 var d = doc.data();
                 var chain = Promise.resolve();
-                if (d && d.storagePath && storage) {
-                    chain = storage.ref(d.storagePath).delete().catch(function () {});
+
+                if (d && d.chunkCount) {
+                    chain = getChunksRef(uid, gameName).get().then(function (snap) {
+                        var batch = db.batch();
+                        snap.forEach(function (c) { batch.delete(c.ref); });
+                        return batch.commit();
+                    }).catch(function () {});
                 }
+
                 return chain.then(function () {
                     return getSaveRef(uid, gameName).delete();
                 }).then(function () {
@@ -397,50 +386,55 @@
             var isPro = getPro();
 
             return new Promise(function (resolve, reject) {
-                function doUpload() {
+                function doSaveChunked() {
                     var json = JSON.stringify(snapshot);
-                    var blob = new Blob([json], { type: "application/json" });
 
-                    if (blob.size <= 900000) {
+                    if (json.length <= CHUNK_SIZE) {
                         doSave(uid, gameName, { idbSnapshot: snapshot, gameType: "unity" }).then(resolve).catch(reject);
                         return;
                     }
 
-                    ensureStorage().then(function () {
-                        var path = getStoragePath(uid, gameName);
-                        storage.ref(path).put(blob, { contentType: "application/json" }).then(function () {
-                            return getSaveRef(uid, gameName).set({
-                                userId: uid,
-                                gameName: gameName,
-                                storagePath: path,
-                                updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
-                                gameType: "unity",
-                            });
-                        }).then(function () {
-                            saveCountCache = null;
-                            resolve();
-                        }).catch(reject);
-                    }).catch(function () {
-                        doSave(uid, gameName, { idbSnapshot: snapshot, gameType: "unity" }).then(resolve).catch(reject);
-                    });
+                    var chunks = [];
+                    for (var i = 0; i < json.length; i += CHUNK_SIZE) {
+                        chunks.push(json.substring(i, i + CHUNK_SIZE));
+                    }
+
+                    var batch = db.batch();
+                    batch.set(getSaveRef(uid, gameName), {
+                        userId: uid,
+                        gameName: gameName,
+                        chunkCount: chunks.length,
+                        updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+                        gameType: "unity",
+                    }, { merge: true });
+
+                    for (var j = 0; j < chunks.length; j++) {
+                        var chunkRef = getChunksRef(uid, gameName).doc(String(j));
+                        batch.set(chunkRef, { data: chunks[j], index: j });
+                    }
+
+                    return batch.commit().then(function () {
+                        saveCountCache = null;
+                        resolve();
+                    }).catch(reject);
                 }
 
                 if (!isPro) {
                     getSaveRef(uid, gameName).get().then(function (doc) {
                         if (doc.exists) {
-                            doUpload();
+                            doSaveChunked();
                         } else {
                             countUserSaves(uid).then(function (count) {
                                 if (count >= FREE_LIMIT) {
                                     reject("LIMIT_REACHED");
                                 } else {
-                                    doUpload();
+                                    doSaveChunked();
                                 }
                             }).catch(reject);
                         }
-                    }).catch(function () { doUpload(); });
+                    }).catch(function () { doSaveChunked(); });
                 } else {
-                    doUpload();
+                    doSaveChunked();
                 }
             });
         },
@@ -456,17 +450,16 @@
                 if (!doc.exists) return null;
                 var d = doc.data();
 
-                if (d.storagePath) {
-                    function fromStorage() {
-                        return storage.ref(d.storagePath).getDownloadURL().then(function (url) {
-                            return fetch(url).then(function (res) {
-                                if (!res.ok) throw new Error("fetch failed");
-                                return res.json();
-                            });
-                        }).catch(function () { return null; });
-                    }
-                    if (storage) return fromStorage();
-                    return ensureStorage().then(fromStorage).catch(function () { return null; });
+                if (d.storagePath) return null;
+
+                if (d.chunkCount) {
+                    return getChunksRef(uid, gameName).orderBy("index").get().then(function (snap) {
+                        var parts = [];
+                        snap.forEach(function (c) { parts.push(c.data().data); });
+                        try {
+                            return JSON.parse(parts.join(""));
+                        } catch (_) { return null; }
+                    }).catch(function () { return null; });
                 }
 
                 if (d.data) {
