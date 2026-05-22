@@ -35,26 +35,15 @@
     /**
      * Auto-detect game type by checking for IDB databases matching game name.
      */
+    function isUnityGame() {
+        return typeof window.createUnityInstance === 'function' ||
+            typeof window.UnityLoader === 'object' ||
+            (typeof window.unityInstance !== 'undefined' && window.unityInstance !== null);
+    }
+
     function autoDetectGameType(gameName) {
-        if (!window.indexedDB || !window.indexedDB.databases) {
-            return Promise.resolve("localstorage");
-        }
-        return window.indexedDB.databases()
-            .then(function (dbs) {
-                var dbNames = dbs.map(function (d) { return d.name; });
-                // Check if any IDB database contains the game name (normalized)
-                var gameNameLower = gameName.toLowerCase().replace(/[^a-z0-9]/g, "");
-                for (var i = 0; i < dbNames.length; i++) {
-                    var dbLower = dbNames[i].toLowerCase().replace(/[^a-z0-9]/g, "");
-                    if (dbLower.includes(gameNameLower) || gameNameLower.includes(dbLower)) {
-                        return "unity";
-                    }
-                }
-                return "localstorage";
-            })
-            .catch(function () {
-                return "localstorage";
-            });
+        if (isUnityGame()) return Promise.resolve("unity");
+        return Promise.resolve("localstorage");
     }
 
     window.GameSave = function (gameName) {
@@ -512,33 +501,21 @@
                 });
             }
 
-            function isGameIDB(dbNames) {
-                var gameKey = gameName.replace(/[^a-z0-9]/g, "");
-                var excludePrefixes = ["firebase", "google", "ytgame", "__yt", "chrome-", "default", "keyval", "idb"];
-                return dbNames.some(function (n) {
-                    var name = n.toLowerCase().replace(/[^a-z0-9]/g, "");
-                    if (excludePrefixes.some(function (p) { return name.indexOf(p) === 0; })) return false;
-                    return name === gameKey;
-                });
-            }
-
             function doSave() {
-                if (window.__BudsinIDB) {
+                if (window.__BudsinIDB && isUnityGame()) {
                     return window.__BudsinIDB.enumerate().then(function (dbNames) {
-                        if (isGameIDB(dbNames) && dbNames.length > 0) {
-                            return window.__BudsinIDB.snapshot(dbNames).then(function (snap) {
-                                return BudsinSave.saveIDB(gameName, snap);
-                            }).then(function () {
-                                btn.textContent = "\u2713";
-                                btn.style.background = "rgba(46,204,113,0.7)";
-                                showToast("Progreso Unity guardado en la nube \u2705", false);
-                                setTimeout(function () {
-                                    btn.textContent = "\u{1F4BE}";
-                                    btn.style.background = "rgba(0,0,0,0.45)";
-                                }, 1200);
-                            });
-                        }
-                        return saveLocalStorage();
+                        if (dbNames.length === 0) return saveLocalStorage();
+                        return window.__BudsinIDB.snapshot(dbNames).then(function (snap) {
+                            return BudsinSave.saveIDB(gameName, snap);
+                        }).then(function () {
+                            btn.textContent = "\u2713";
+                            btn.style.background = "rgba(46,204,113,0.7)";
+                            showToast("Progreso Unity guardado en la nube \u2705", false);
+                            setTimeout(function () {
+                                btn.textContent = "\u{1F4BE}";
+                                btn.style.background = "rgba(0,0,0,0.45)";
+                            }, 1200);
+                        });
                     });
                 }
                 return saveLocalStorage();
@@ -582,7 +559,7 @@
 
             function doLoad() {
                 return BudsinSave.loadIDB(gameName).then(function (idbSnapshot) {
-                    if (idbSnapshot && window.__BudsinIDB) {
+                    if (idbSnapshot && window.__BudsinIDB && isUnityGame()) {
                         return window.__BudsinIDB.restore(idbSnapshot).then(function () {
                             btn.textContent = "\u2713";
                             btn.style.background = "rgba(52,152,219,0.7)";
