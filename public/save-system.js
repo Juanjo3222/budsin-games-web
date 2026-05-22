@@ -408,8 +408,9 @@
                         gameType: "unity",
                     }, { merge: true });
 
+                    var pad = String(chunks.length).length;
                     for (var j = 0; j < chunks.length; j++) {
-                        var chunkRef = getChunksRef(uid, gameName).doc(String(j));
+                        var chunkRef = getChunksRef(uid, gameName).doc(String(j).padStart(pad, "0"));
                         batch.set(chunkRef, { data: chunks[j], index: j });
                     }
 
@@ -453,13 +454,13 @@
                 if (d.storagePath) return null;
 
                 if (d.chunkCount) {
-                    return getChunksRef(uid, gameName).orderBy("index").get().then(function (snap) {
-                        var parts = [];
-                        snap.forEach(function (c) { parts.push(c.data().data); });
-                        try {
-                            return JSON.parse(parts.join(""));
-                        } catch (_) { return null; }
-                    }).catch(function () { return null; });
+                    return getChunksRef(uid, gameName).get().then(function (snap) {
+                        var chunks = [];
+                        snap.forEach(function (c) { chunks.push(c.data()); });
+                        chunks.sort(function (a, b) { return a.index - b.index; });
+                        var json = chunks.map(function (c) { return c.data; }).join("");
+                        return JSON.parse(json);
+                    }).catch(function (e) { console.warn("[BudsinSave] loadIDB error:", e); return null; });
                 }
 
                 if (d.data) {
