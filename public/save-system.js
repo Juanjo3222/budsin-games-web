@@ -1,5 +1,6 @@
 (function () {
     "use strict";
+    console.log("[BudsinSave] save-system.js loaded");
 
     var SAVE_COLLECTION = "gamesaves";
     var FREE_LIMIT = 5;
@@ -555,4 +556,5 @@
         });
     }
 
+    console.log("[BudsinSave] save-system.js initialized");
 })();

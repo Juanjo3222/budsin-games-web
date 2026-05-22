@@ -1,5 +1,6 @@
 (function () {
     "use strict";
+    console.log("[BudsinSave] game-save.js loaded");
 
     /**
      * GameSave: High-level wrapper for game save/load with auto-restore.
@@ -486,16 +487,28 @@
             });
 
             function initAndRun(cb) {
+                var timedOut = false;
+                var timer = setTimeout(function () {
+                    timedOut = true;
+                    console.error("[BudsinSave] initAndRun timed out after 15s");
+                    showToast("Error: tiempo de espera agotado. Revisa la consola.", true);
+                    btn.textContent = "\u{1F4BE}";
+                }, 15000);
                 loadFirebase().then(loadSaveSystem).then(function () {
+                    if (timedOut) return;
+                    clearTimeout(timer);
                     if (!window.BudsinSave) {
                         showToast("Error al cargar sistema de guardado", true);
                         btn.textContent = "\u{1F4BE}";
                         return;
                     }
                     BudsinSave.init().then(function () {
-                        cb();
+                        if (!timedOut) cb();
                     });
-                }).catch(function () {
+                }).catch(function (e) {
+                    if (timedOut) return;
+                    clearTimeout(timer);
+                    console.error("[BudsinSave] initAndRun error:", e);
                     showToast("Error al conectar con Firebase", true);
                     btn.textContent = "\u{1F4BE}";
                 });
