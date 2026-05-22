@@ -168,12 +168,13 @@
                 return new Promise(function (resolve) {
                     try {
                         var delReq = indexedDB.deleteDatabase(name);
-                        var resolved = false;
-                        function done() { if (!resolved) { resolved = true; resolve(); } }
-                        delReq.onsuccess = function () { console.log("[BudsinSave] Deleted DB:", name); done(); };
-                        delReq.onerror = function () { console.warn("[BudsinSave] Delete error:", name); done(); };
-                        delReq.onblocked = function () { console.warn("[BudsinSave] Delete blocked:", name); done(); };
-                        setTimeout(done, 5000);
+                        var fallback = setTimeout(function () {
+                            console.warn("[BudsinSave] Delete DB timed out after 15s:", name);
+                            resolve();
+                        }, 15000);
+                        delReq.onsuccess = function () { clearTimeout(fallback); console.log("[BudsinSave] Deleted DB:", name); resolve(); };
+                        delReq.onerror = function () { clearTimeout(fallback); console.warn("[BudsinSave] Delete error:", name); resolve(); };
+                        delReq.onblocked = function () { console.warn("[BudsinSave] Delete blocked:", name); };
                     } catch (e) { console.warn("[BudsinSave] Delete exception:", name, e); resolve(); }
                 });
             }).then(function () {
@@ -183,6 +184,10 @@
                     console.log("[BudsinSave] Opening DB:", name, "v" + (dbData.version || 1));
                     var openReq;
                     try { openReq = indexedDB.open(name, dbData.version || 1); } catch (e) { console.warn("[BudsinSave] Open exception:", name, e); resolve(); return; }
+                    var fallback = setTimeout(function () {
+                        console.warn("[BudsinSave] Open DB timed out after 15s:", name);
+                        resolve();
+                    }, 15000);
                     openReq.onupgradeneeded = function (e) {
                         var d = e.target.result;
                         var stores = dbData.stores || {};
@@ -194,6 +199,7 @@
                         });
                     };
                     openReq.onsuccess = function () {
+                        clearTimeout(fallback);
                         var d = openReq.result;
                         var stores = dbData.stores || {};
                         var storeNames = Object.keys(stores);
@@ -206,20 +212,24 @@
                                         var tx = d.transaction(sn, "readwrite");
                                         var store = tx.objectStore(sn);
                                         var records = stores[sn] || [];
-                                        console.log("[BudsinSave] Restoring", records.length, "records to", sn);
+                                        console.log("[BudsinSave] Writing", records.length, "records to", sn);
                                         records.forEach(function (rec) {
-                                            try { store.put(rec.value, rec.key); } catch (e) { console.warn("[BudsinSave] put error:", e); }
+                                            try { store.put(rec.value, rec.key); } catch (e) {}
                                         });
-                                        tx.oncomplete = function () { res2(); };
-                                        tx.onerror = function () { res2(); };
+                                        var txFallback = setTimeout(function () {
+                                            console.warn("[BudsinSave] Transaction timed out for", sn);
+                                            res2();
+                                        }, 15000);
+                                        tx.oncomplete = function () { clearTimeout(txFallback); res2(); };
+                                        tx.onerror = function () { clearTimeout(txFallback); console.warn("[BudsinSave] Transaction error:", sn); res2(); };
                                     } catch (e) { res2(); }
                                 });
                             });
                         });
                         storeChain.then(function () { d.close(); resolve(); });
                     };
-                    openReq.onerror = function () { console.warn("[BudsinSave] Open error:", name); resolve(); };
-                    openReq.onblocked = function () { console.warn("[BudsinSave] Open blocked:", name); resolve(); };
+                    openReq.onerror = function () { clearTimeout(fallback); console.warn("[BudsinSave] Open error:", name); resolve(); };
+                    openReq.onblocked = function () { console.warn("[BudsinSave] Open blocked:", name); };
                 });
             });
         });

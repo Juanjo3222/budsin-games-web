@@ -576,7 +576,7 @@
                         console.log("[BudsinSave] Restoring Unity save...");
                         var restorePromise = window.__BudsinIDB.restore(idbSnapshot);
                         var timeoutPromise = new Promise(function (_, reject) {
-                            setTimeout(function () { reject(new Error("Restore timeout after 30s")); }, 30000);
+                            setTimeout(function () { reject(new Error("Restore timeout after 120s")); }, 120000);
                         });
                         return Promise.race([restorePromise, timeoutPromise]).then(function () {
                             btn.textContent = "\u2713";
