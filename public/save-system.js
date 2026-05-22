@@ -62,6 +62,23 @@
         }
     }
 
+    function ensureStorage() {
+        if (storage) return Promise.resolve();
+        if (!window.firebase || !window.firebase.app) return Promise.reject("Firebase not ready");
+        return new Promise(function (resolve, reject) {
+            var s = document.createElement("script");
+            s.src = "https://www.gstatic.com/firebasejs/9/firebase-storage.js";
+            s.onload = function () {
+                try {
+                    storage = window.firebase.app().storage();
+                    resolve();
+                } catch (e) { reject(e); }
+            };
+            s.onerror = function () { reject("Failed to load Firebase Storage SDK"); };
+            document.head.appendChild(s);
+        });
+    }
+
     function getSaveRef(userId, gameName) {
         return db.collection(SAVE_COLLECTION).doc(docId(userId, gameName));
     }
@@ -384,24 +401,28 @@
                     var json = JSON.stringify(snapshot);
                     var blob = new Blob([json], { type: "application/json" });
 
-                    if (!storage || blob.size <= 900000) {
+                    if (blob.size <= 900000) {
                         doSave(uid, gameName, { idbSnapshot: snapshot, gameType: "unity" }).then(resolve).catch(reject);
                         return;
                     }
 
-                    var path = getStoragePath(uid, gameName);
-                    storage.ref(path).put(blob, { contentType: "application/json" }).then(function () {
-                        return getSaveRef(uid, gameName).set({
-                            userId: uid,
-                            gameName: gameName,
-                            storagePath: path,
-                            updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
-                            gameType: "unity",
-                        });
-                    }).then(function () {
-                        saveCountCache = null;
-                        resolve();
-                    }).catch(reject);
+                    ensureStorage().then(function () {
+                        var path = getStoragePath(uid, gameName);
+                        storage.ref(path).put(blob, { contentType: "application/json" }).then(function () {
+                            return getSaveRef(uid, gameName).set({
+                                userId: uid,
+                                gameName: gameName,
+                                storagePath: path,
+                                updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+                                gameType: "unity",
+                            });
+                        }).then(function () {
+                            saveCountCache = null;
+                            resolve();
+                        }).catch(reject);
+                    }).catch(function () {
+                        doSave(uid, gameName, { idbSnapshot: snapshot, gameType: "unity" }).then(resolve).catch(reject);
+                    });
                 }
 
                 if (!isPro) {
@@ -436,13 +457,16 @@
                 var d = doc.data();
 
                 if (d.storagePath) {
-                    if (!storage) return null;
-                    return storage.ref(d.storagePath).getDownloadURL().then(function (url) {
-                        return fetch(url).then(function (res) {
-                            if (!res.ok) throw new Error("fetch failed");
-                            return res.json();
-                        });
-                    }).catch(function () { return null; });
+                    function fromStorage() {
+                        return storage.ref(d.storagePath).getDownloadURL().then(function (url) {
+                            return fetch(url).then(function (res) {
+                                if (!res.ok) throw new Error("fetch failed");
+                                return res.json();
+                            });
+                        }).catch(function () { return null; });
+                    }
+                    if (storage) return fromStorage();
+                    return ensureStorage().then(fromStorage).catch(function () { return null; });
                 }
 
                 if (d.data) {
