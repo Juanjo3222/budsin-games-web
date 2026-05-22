@@ -473,35 +473,31 @@
             var btn = document.createElement("button");
             btn.id = "budsin-save-btn";
             btn.textContent = "\u{1F4BE}";
-            btn.title = "Save progress";
-            Object.assign(btn.style, {
+            btn.title = "Save / Load";
+            Object.assign(btn.style, menuBtnStyle());
+
+            var menu = document.createElement("div");
+            menu.id = "budsin-save-menu";
+            Object.assign(menu.style, {
                 position: "fixed",
-                top: "10px",
+                top: "52px",
                 left: "10px",
                 zIndex: "2147483647",
-                width: "36px",
-                height: "36px",
-                borderRadius: "50%",
-                border: "1px solid rgba(255,255,255,0.3)",
-                background: "rgba(0,0,0,0.45)",
-                color: "#fff",
-                fontSize: "16px",
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                transition: "transform .15s, background .2s",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                display: "none",
+                flexDirection: "column",
+                gap: "4px",
+                padding: "6px",
+                borderRadius: "12px",
+                background: "rgba(20,20,30,0.92)",
+                backdropFilter: "blur(8px)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.4)",
+                minWidth: "120px",
+                fontFamily: "system-ui, -apple-system, sans-serif",
             });
-            btn.addEventListener("mouseenter", function () {
-                btn.style.transform = "scale(1.1)";
-                btn.style.background = "rgba(0,0,0,0.65)";
-            });
-            btn.addEventListener("mouseleave", function () {
-                btn.style.transform = "scale(1)";
-                btn.style.background = "rgba(0,0,0,0.45)";
-            });
-            btn.addEventListener("click", function () {
+
+            var saveOpt = createMenuOption("\u{1F4BE} Save", function () {
+                hideMenu();
                 btn.textContent = "\u23F3";
                 loadFirebase().then(loadSaveSystem).then(function () {
                     if (!window.BudsinSave) {
@@ -554,8 +550,126 @@
                     btn.textContent = "\u{1F4BE}";
                 });
             });
+
+            var loadOpt = createMenuOption("\u{1F4C2} Load", function () {
+                hideMenu();
+                btn.textContent = "\u23F3";
+                loadFirebase().then(loadSaveSystem).then(function () {
+                    if (!window.BudsinSave) {
+                        showToast("Error al cargar sistema de guardado", true);
+                        btn.textContent = "\u{1F4BE}";
+                        return;
+                    }
+                    return BudsinSave.init().then(function (ok) {
+                        if (!ok) {
+                            showToast("Inicia sesi\u00f3n con Google para restaurar datos", true);
+                            btn.textContent = "\u{1F4BE}";
+                            return;
+                        }
+                        return BudsinSave.load(gameName).then(function (data) {
+                            if (!data) {
+                                showToast("No hay datos guardados en la nube", true);
+                                btn.textContent = "\u{1F4BE}";
+                                return;
+                            }
+                            var restored = 0;
+                            try {
+                                var savedData = typeof data === "string" ? JSON.parse(data) : data;
+                                for (var key in savedData) {
+                                    if (savedData.hasOwnProperty(key) && typeof savedData[key] === "string") {
+                                        localStorage.setItem(key, savedData[key]);
+                                        restored++;
+                                    }
+                                }
+                            } catch (_) {}
+                            btn.textContent = "\u2713";
+                            btn.style.background = "rgba(52,152,219,0.7)";
+                            showToast("Datos restaurados (" + restored + " claves)", false);
+                            setTimeout(function () {
+                                btn.textContent = "\u{1F4BE}";
+                                btn.style.background = "rgba(0,0,0,0.45)";
+                            }, 2000);
+                        });
+                    });
+                }).catch(function () {
+                    showToast("Error al conectar con Firebase", true);
+                    btn.textContent = "\u{1F4BE}";
+                });
+            });
+
+            menu.appendChild(saveOpt);
+            menu.appendChild(loadOpt);
+            document.body.appendChild(menu);
+
+            btn.addEventListener("mouseenter", function () {
+                btn.style.transform = "scale(1.1)";
+                btn.style.background = "rgba(0,0,0,0.65)";
+            });
+            btn.addEventListener("mouseleave", function () {
+                btn.style.transform = "scale(1)";
+                btn.style.background = "rgba(0,0,0,0.45)";
+            });
+            btn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+            });
+
+            document.addEventListener("click", function (e) {
+                if (!menu.contains(e.target) && e.target !== btn) {
+                    menu.style.display = "none";
+                }
+            });
+
             document.body.appendChild(btn);
         } catch (_) {}
+    }
+
+    function menuBtnStyle() {
+        return {
+            position: "fixed",
+            top: "10px",
+            left: "10px",
+            zIndex: "2147483647",
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            border: "1px solid rgba(255,255,255,0.3)",
+            background: "rgba(0,0,0,0.45)",
+            color: "#fff",
+            fontSize: "16px",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "transform .15s, background .2s",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+        };
+    }
+
+    function createMenuOption(text, onClick) {
+        var opt = document.createElement("button");
+        opt.textContent = text;
+        Object.assign(opt.style, {
+            background: "transparent",
+            color: "#eee",
+            border: "none",
+            borderRadius: "8px",
+            padding: "8px 12px",
+            cursor: "pointer",
+            fontSize: "13px",
+            fontFamily: "system-ui, -apple-system, sans-serif",
+            textAlign: "left",
+            transition: "background .15s",
+        });
+        opt.addEventListener("mouseenter", function () { opt.style.background = "rgba(255,255,255,0.1)"; });
+        opt.addEventListener("mouseleave", function () { opt.style.background = "transparent"; });
+        opt.addEventListener("click", function (e) { e.stopPropagation(); onClick(); });
+        return opt;
+    }
+
+    function hideMenu() {
+        var m = document.getElementById("budsin-save-menu");
+        if (m) m.style.display = "none";
     }
 
     // Defer to avoid interfering with game initialization (esp. WebGL canvases)
