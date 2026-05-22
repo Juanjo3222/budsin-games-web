@@ -496,38 +496,20 @@
                 fontFamily: "system-ui, -apple-system, sans-serif",
             });
 
-            function initAndAuth(cb) {
+            function initAndRun(cb) {
                 loadFirebase().then(loadSaveSystem).then(function () {
                     if (!window.BudsinSave) {
                         showToast("Error al cargar sistema de guardado", true);
                         btn.textContent = "\u{1F4BE}";
                         return;
                     }
-                    BudsinSave.init().then(function (ok) {
-                        if (!ok) {
-                            showToast("Inicia sesi\u00f3n con Google para guardar en la nube", true);
-                            btn.textContent = "\u{1F4BE}";
-                            return;
-                        }
-                        waitForAuth(0, cb);
+                    BudsinSave.init().then(function () {
+                        cb();
                     });
                 }).catch(function () {
                     showToast("Error al conectar con Firebase", true);
                     btn.textContent = "\u{1F4BE}";
                 });
-            }
-
-            function waitForAuth(retries, cb) {
-                if (retries > 20) {
-                    showToast("Inicia sesi\u00f3n con Google para guardar en la nube", true);
-                    btn.textContent = "\u{1F4BE}";
-                    return;
-                }
-                try {
-                    var user = window.firebase && window.firebase.auth() && window.firebase.auth().currentUser;
-                    if (user) { cb(user); return; }
-                } catch (_) {}
-                setTimeout(function () { waitForAuth(retries + 1, cb); }, 200);
             }
 
             function isGameIDB(dbNames) {
@@ -540,7 +522,7 @@
                 });
             }
 
-            function doSave(user) {
+            function doSave() {
                 if (window.__BudsinIDB) {
                     return window.__BudsinIDB.enumerate().then(function (dbNames) {
                         if (isGameIDB(dbNames) && dbNames.length > 0) {
@@ -556,13 +538,13 @@
                                 }, 1200);
                             });
                         }
-                        return saveLocalStorage(user);
+                        return saveLocalStorage();
                     });
                 }
-                return saveLocalStorage(user);
+                return saveLocalStorage();
             }
 
-            function saveLocalStorage(user) {
+            function saveLocalStorage() {
                 var gameData = {};
                 try {
                     for (var i = 0; i < localStorage.length; i++) {
@@ -598,7 +580,7 @@
                 });
             }
 
-            function doLoad(user) {
+            function doLoad() {
                 return BudsinSave.loadIDB(gameName).then(function (idbSnapshot) {
                     if (idbSnapshot && window.__BudsinIDB) {
                         return window.__BudsinIDB.restore(idbSnapshot).then(function () {
@@ -645,13 +627,13 @@
             var saveOpt = createMenuOption("\u{1F4BE} Save", function () {
                 hideMenu();
                 btn.textContent = "\u23F3";
-                initAndAuth(doSave);
+                initAndRun(doSave);
             });
 
             var loadOpt = createMenuOption("\u{1F4C2} Load", function () {
                 hideMenu();
                 btn.textContent = "\u23F3";
-                initAndAuth(doLoad);
+                initAndRun(doLoad);
             });
 
             var loadOpt = createMenuOption("\u{1F4C2} Load", function () {
