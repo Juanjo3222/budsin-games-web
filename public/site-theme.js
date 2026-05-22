@@ -67,7 +67,9 @@
   };
 
   function resolveLanguage(language) {
-    return language === "en" ? "en" : "es";
+    if (language === "en") return "en";
+    if (language === "pt") return "pt";
+    return "es";
   }
 
   function getLanguageFromUrl() {
@@ -132,6 +134,7 @@
   }
 
   function resolveTheme(theme) {
+    if (theme === "custom") return "custom";
     if (theme === "ps5") return "ps5";
     return theme === "dark" ? "dark" : "light";
   }
@@ -268,6 +271,18 @@
 
   function setThemeVariables(theme) {
     var root = document.documentElement;
+    if (theme === "custom") {
+      // Load custom theme from localStorage, don't override user's custom colors
+      var ct = {};
+      try { ct = JSON.parse(window.localStorage.getItem("budsin_custom_theme") || "{}"); } catch(e) {}
+      if (ct.primary) root.style.setProperty("--custom-primary", ct.primary);
+      if (ct.secondary) root.style.setProperty("--custom-secondary", ct.secondary);
+      if (ct.accent) root.style.setProperty("--custom-accent", ct.accent);
+      if (ct.bg) root.style.setProperty("--custom-bg", ct.bg);
+      root.dataset.siteTheme = "custom";
+      root.style.colorScheme = "light";
+      return;
+    }
     var palette = THEMES[theme] || THEMES[DEFAULT_THEME];
     Object.keys(palette).forEach(function (key) {
       root.style.setProperty(key, palette[key]);

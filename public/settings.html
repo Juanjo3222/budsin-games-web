@@ -885,6 +885,32 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </p>
             </div>
 
+            <!-- ── Perfil (Pro only) ── -->
+            <div class="settings-card" id="profileCard" style="display:none">
+                <div class="card-header">
+                    <div class="card-icon" style="background:linear-gradient(135deg,#ffd700,#ff8c00);box-shadow:0 4px 12px rgba(255,215,0,0.3)">👤</div>
+                    <div>
+                        <h2 data-i18n="profileTitle">Perfil</h2>
+                        <p data-i18n="profileSub">Personaliza tu perfil público.</p>
+                    </div>
+                </div>
+                <div id="profileLoggedOut" style="padding:12px;border-radius:12px;background:rgba(255,215,0,0.05);text-align:center;color:var(--muted);font-size:.88rem" data-i18n="profileProOnly">Inicia sesión como Pro para personalizar tu perfil.</div>
+                <div id="profileLoggedIn" style="display:none">
+                    <div style="display:flex;gap:10px;align-items:end;margin-bottom:10px">
+                        <div style="flex:1">
+                            <label class="field-label" data-i18n="profileAvatarLabel">URL del avatar</label>
+                            <input type="url" id="profileAvatar" class="field-input" placeholder="https://ejemplo.com/avatar.jpg" />
+                        </div>
+                        <div id="profileAvatarPreview" style="width:56px;height:56px;border-radius:50%;flex-shrink:0;background:var(--bg-2);background-size:cover;background-position:center;border:2px solid var(--line)"></div>
+                    </div>
+                    <label class="field-label" data-i18n="profileDisplayNameLabel">Nombre público</label>
+                    <input type="text" id="profileDisplayName" class="field-input" placeholder="Tu nombre visible" maxlength="30" style="margin-bottom:10px" />
+                    <label class="field-label" data-i18n="profileBioLabel">Biografía</label>
+                    <input type="text" id="profileBio" class="field-input" placeholder="Cuéntanos sobre ti..." maxlength="160" style="margin-bottom:10px" />
+                    <button type="button" id="profileSaveBtn" class="btn btn-primary" style="margin-top:4px" data-i18n="profileSaveBtn">💾 Guardar perfil</button>
+                </div>
+            </div>
+
             <!-- ── Card: Budsin Pro ── -->
             <div class="settings-card" id="proCard" style="border:2px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,0.06);background:var(--surface);position:relative">
                 <div id="proTopBadge" style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:rgba(17,24,39,0.06);color:var(--muted);padding:4px 16px;border-radius:0 0 12px 12px;font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase">Pro</div>
@@ -1031,6 +1057,129 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <option value="ps5">PlayStation 5</option>
                         <option value="pro" id="proThemeOption" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-weight:800">⭐ Pro (Gold)</option>
                     </select>
+                </div>
+            </div>
+
+            <!-- Estadísticas avanzadas -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon blue">📊</div>
+                    <div>
+                        <h2 data-i18n="statsAdvancedTitle">Estadísticas avanzadas</h2>
+                        <p data-i18n="statsAdvancedSub">Sesiones, juegos y rachas.</p>
+                    </div>
+                </div>
+                <div id="statsContent">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+                        <div style="background:rgba(45,174,255,0.08);border-radius:12px;padding:12px;text-align:center">
+                            <div style="font-size:1.2rem;font-weight:800;color:var(--blue)" id="statsTotalSessions">0</div>
+                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px" data-i18n="statsTotalSessions">Sesiones</div>
+                        </div>
+                        <div style="background:rgba(47,201,138,0.08);border-radius:12px;padding:12px;text-align:center">
+                            <div style="font-size:1.2rem;font-weight:800;color:var(--green)" id="statsTodaySessions">0</div>
+                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px" data-i18n="statsTodaySessions">Hoy</div>
+                        </div>
+                        <div style="background:rgba(255,216,74,0.08);border-radius:12px;padding:12px;text-align:center">
+                            <div style="font-size:1.2rem;font-weight:800;color:#ffd700" id="statsTotalGames">0</div>
+                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px" data-i18n="statsTotalGamesPlayed">Juegos</div>
+                        </div>
+                        <div style="background:rgba(239,63,69,0.08);border-radius:12px;padding:12px;text-align:center">
+                            <div style="font-size:1.2rem;font-weight:800;color:var(--red)" id="statsStreak">0</div>
+                            <div style="font-size:.72rem;color:var(--muted);margin-top:2px" data-i18n="statsStreak">Racha</div>
+                        </div>
+                    </div>
+                    <div id="statsCalendar" style="display:flex;gap:3px;flex-wrap:wrap;margin-top:8px"></div>
+                    <div id="statsNoData" style="display:none;padding:20px;text-align:center;color:var(--muted);font-size:.88rem" data-i18n="statsNoData">Aún no hay datos.</div>
+                </div>
+            </div>
+
+            <!-- Solicitar juego -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon gold">🎮</div>
+                    <div>
+                        <h2 data-i18n="gameRequestTitle">Solicitar juego</h2>
+                        <p data-i18n="gameRequestSub">¿Quieres que añadamos un juego?</p>
+                    </div>
+                </div>
+                <div id="gameRequestForm">
+                    <label class="field-label" data-i18n="gameRequestNameLabel">Nombre del juego</label>
+                    <input type="text" id="grName" class="field-input" placeholder="Ej: Minecraft 1.20" />
+                    <label class="field-label" data-i18n="gameRequestUrlLabel">URL del juego (opcional)</label>
+                    <input type="url" id="grUrl" class="field-input" placeholder="https://ejemplo.com/juego" />
+                    <label class="field-label" data-i18n="gameRequestDescLabel">Descripción (opcional)</label>
+                    <input type="text" id="grDesc" class="field-input" placeholder="¿Por qué deberíamos añadirlo?" maxlength="200" />
+                    <button type="button" id="grSubmitBtn" class="btn btn-primary" style="margin-top:8px" data-i18n="gameRequestSubmitBtn">📨 Enviar solicitud</button>
+                </div>
+            </div>
+
+            <!-- Mis guardados -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon blue">💾</div>
+                    <div>
+                        <h2 data-i18n="mySavesTitle">Mis guardados</h2>
+                        <p data-i18n="mySavesSub">Partidas en la nube.</p>
+                    </div>
+                </div>
+                <div id="mySavesList" style="padding:12px;text-align:center;color:var(--muted);font-size:.88rem" data-i18n="mySavesListEmpty">No tienes juegos guardados.</div>
+                <div id="mySavesContent" style="display:none"></div>
+            </div>
+
+            <!-- Exportar datos -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon gold">📥</div>
+                    <div>
+                        <h2 data-i18n="exportTitle">Exportar mis datos</h2>
+                        <p data-i18n="exportSub">Descarga tus datos del portal.</p>
+                    </div>
+                </div>
+                <button type="button" id="exportDataBtn" class="btn btn-primary" style="background:linear-gradient(135deg,var(--green),#1fa8ff)" data-i18n="exportBtn">📦 Descargar JSON</button>
+            </div>
+
+            <!-- Logros -->
+            <div class="settings-card">
+                <div class="card-header">
+                    <div class="card-icon gold">🏅</div>
+                    <div>
+                        <h2 data-i18n="achievementsTitle">Logros</h2>
+                        <p data-i18n="achievementsSub">Desbloquea logros jugando.</p>
+                    </div>
+                </div>
+                <div id="achievementsGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>
+            </div>
+
+            <!-- Tema personalizado (Pro only) -->
+            <div class="settings-card" id="customThemeCard" style="display:none">
+                <div class="card-header">
+                    <div class="card-icon gold">🎨</div>
+                    <div>
+                        <h2 data-i18n="customThemeTitle">Tema personalizado</h2>
+                        <p data-i18n="customThemeSub">Colores personalizados para Pro.</p>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <div>
+                        <label class="field-label" data-i18n="customThemePrimaryLabel">Primario</label>
+                        <input type="color" id="ctPrimary" class="field-input" style="min-height:46px;padding:4px" value="#111827" />
+                    </div>
+                    <div>
+                        <label class="field-label" data-i18n="customThemeSecondaryLabel">Secundario</label>
+                        <input type="color" id="ctSecondary" class="field-input" style="min-height:46px;padding:4px" value="#5c6678" />
+                    </div>
+                    <div>
+                        <label class="field-label" data-i18n="customThemeAccentLabel">Acento</label>
+                        <input type="color" id="ctAccent" class="field-input" style="min-height:46px;padding:4px" value="#2daeff" />
+                    </div>
+                    <div>
+                        <label class="field-label" data-i18n="customThemeBgLabel">Fondo</label>
+                        <input type="color" id="ctBg" class="field-input" style="min-height:46px;padding:4px" value="#edf1f5" />
+                    </div>
+                </div>
+                <div style="display:flex;gap:8px;margin-top:8px">
+                    <button type="button" id="ctApplyBtn" class="btn btn-primary" style="flex:1" data-i18n="customThemeApplyBtn">Aplicar tema</button>
+                    <button type="button" id="ctResetBtn" class="btn btn-secondary" data-i18n="customThemeResetBtn">Restablecer</button>
                 </div>
             </div>
 
@@ -1183,6 +1332,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proTrialUsed: "Ya usaste tu prueba gratis. Para ser Pro, contacta a budsinjys@gmail.com.",
                     proRenewalDays: "días",
                     proCardTitle: "Budsin Pro",
+                    tutProDesc: "Aquí puedes ver tu estado Pro, activar prueba gratis y gestionar tu suscripción.",
                     proPriceMonth: "por mes",
                     proPriceSub: "Cuota mensual — acceso a funcionalidades Pro.",
                     proLoginHint: "Inicia sesión para verificar tu estado. Activa tu prueba gratis de 7 días desde tu perfil. Para ser Pro, escribe a budsinjys@gmail.com.",
@@ -1213,6 +1363,96 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     footerContact: "Contacto",
                     footerFeedback: "Comentarios",
                     footerCopy: "© 2026 Budsin Games. Todos los juegos pertenecen a sus respectivos creadores.",
+                    // New v6.2 features
+                    profileTitle: "Perfil",
+                    profileSub: "Personaliza tu perfil público visible en el portal.",
+                    profileAvatarLabel: "URL del avatar",
+                    profileAvatarPlaceholder: "https://ejemplo.com/avatar.jpg",
+                    profileDisplayNameLabel: "Nombre público",
+                    profileDisplayNamePlaceholder: "Tu nombre visible",
+                    profileBioLabel: "Biografía",
+                    profileBioPlaceholder: "Cuéntanos sobre ti...",
+                    profileSaveBtn: "💾 Guardar perfil",
+                    profileSaved: "Perfil guardado correctamente",
+                    profileProOnly: "Solo usuarios Pro pueden tener perfil personalizado",
+                    statsAdvancedTitle: "📊 Estadísticas avanzadas",
+                    statsAdvancedSub: "Sesiones, tiempo de juego y rachas. Solo visible para ti.",
+                    statsTotalSessions: "Sesiones totales",
+                    statsTodaySessions: "Hoy",
+                    statsTotalGamesPlayed: "Juegos diferentes",
+                    statsStreak: "Racha actual",
+                    statsStreakDays: "días seguidos",
+                    statsPlayDates: "Calendario de actividad",
+                    statsNoData: "Aún no hay datos de juego. Juega algunos juegos para ver tus estadísticas.",
+                    statsHours: "h",
+                    statsMinutes: "min",
+                    gameRequestTitle: "🎮 Solicitar juego",
+                    gameRequestSub: "¿Quieres que añadamos un juego? Los Pro tienen prioridad.",
+                    gameRequestNameLabel: "Nombre del juego",
+                    gameRequestNamePlaceholder: "Ej: Minecraft 1.20",
+                    gameRequestUrlLabel: "URL del juego (opcional)",
+                    gameRequestUrlPlaceholder: "https://ejemplo.com/juego",
+                    gameRequestDescLabel: "Descripción (opcional)",
+                    gameRequestDescPlaceholder: "¿Por qué deberíamos añadirlo?",
+                    gameRequestSubmitBtn: "📨 Enviar solicitud",
+                    gameRequestSuccess: "Solicitud enviada! Los admins la revisarán pronto.",
+                    gameRequestProOnly: "Solo usuarios Pro pueden solicitar juegos.",
+                    gameRequestPending: "Solicitudes pendientes:",
+                    mySavesTitle: "💾 Mis guardados en la nube",
+                    mySavesSub: "Tus partidas guardadas automaticamente en la nube.",
+                    mySavesListEmpty: "No tienes juegos guardados en la nube.",
+                    mySavesDeleteBtn: "🗑️ Eliminar",
+                    mySavesRestoreBtn: "🔄 Restaurar",
+                    mySavesLastSave: "Último guardado:",
+                    mySavesDeleteConfirm: "¿Eliminar este guardado?",
+                    mySavesDeleted: "Guardado eliminado",
+                    mySavesRestored: "Datos restaurados desde la nube",
+                    mySavesProOnly: "Inicia sesión para guardar en la nube.",
+                    exportTitle: "📥 Exportar mis datos",
+                    exportSub: "Descarga un archivo JSON con tus favoritos, colecciones, logros y ajustes.",
+                    exportBtn: "📦 Descargar JSON",
+                    exportSuccess: "Datos exportados correctamente",
+                    achievementsTitle: "🏅 Logros",
+                    achievementsSub: "Desbloquea logros jugando en el portal.",
+                    achievementsProgress: "Progreso: {current}/{total}",
+                    achievementsLocked: "🔒 Bloqueado",
+                    achievementsUnlocked: "✅ Desbloqueado",
+                    achievementFirstGame: "Primer juego",
+                    achievementFirstGameDesc: "Juega tu primer juego en el portal",
+                    achievementTenGames: "Veterano",
+                    achievementTenGamesDesc: "Juega 10 juegos diferentes",
+                    achievementAllCategories: "Explorador",
+                    achievementAllCategoriesDesc: "Prueba juegos de todas las categorías",
+                    achievementProMember: "Pro Player",
+                    achievementProMemberDesc: "Activa Budsin Pro",
+                    achievementFavFive: "Fanático",
+                    achievementFavFiveDesc: "Añade 5 juegos a favoritos",
+                    achievementCollection: "Coleccionista",
+                    achievementCollectionDesc: "Crea tu primera colección",
+                    achievementStreak: "Racha",
+                    achievementStreakDesc: "Juega 7 días seguidos",
+                    achievementSocial: "Social",
+                    achievementSocialDesc: "Comparte una colección",
+                    customThemeTitle: "🎨 Tema personalizado",
+                    customThemeSub: "Elige tus propios colores. Solo para Pro.",
+                    customThemePrimaryLabel: "Color primario",
+                    customThemeSecondaryLabel: "Color secundario",
+                    customThemeAccentLabel: "Color de acento",
+                    customThemeBgLabel: "Color de fondo",
+                    customThemeApplyBtn: "Aplicar tema",
+                    customThemeResetBtn: "Restablecer tema",
+                    customThemeSaved: "Tema personalizado aplicado",
+                    customThemeResetConfirm: "¿Restablecer al tema por defecto?",
+                    shareCollectionTitle: "Compartir colección",
+                    shareCollectionCopied: "Link de colección copiado!",
+                    shareCollectionProOnly: "Solo Pro puede compartir colecciones",
+                    focusModeTitle: "Focus Mode",
+                    focusModeShortcut: "Atajo:",
+                    leaderboardTitle: "Leaderboard",
+                    leaderboardNoData: "Sin datos aún",
+                    onlineStatusOnline: "🟢 Conectado",
+                    onlineStatusOffline: "🔴 Sin conexión",
+                    onlineModeOffline: "Modo offline Pro activo",
                 },
                 en: {
                     htmlLang: "en",
@@ -1267,6 +1507,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proTrialUsed: "You already used your free trial. To become Pro, email budsinjys@gmail.com.",
                     proRenewalDays: "days",
                     proCardTitle: "Budsin Pro",
+                    tutProDesc: "Here you can see your Pro status, activate a free trial and manage your subscription.",
                     proPriceMonth: "per month",
                     proPriceSub: "Monthly fee — access to Pro features.",
                     proLoginHint: "Sign in to verify your status. Activate your 7-day free trial from your profile. To become Pro, email budsinjys@gmail.com.",
@@ -1297,6 +1538,96 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     footerContact: "Contact",
                     footerFeedback: "Feedback",
                     footerCopy: "© 2026 Budsin Games. All games belong to their respective creators.",
+                    // New v6.2 features
+                    profileTitle: "Profile",
+                    profileSub: "Customize your public profile visible on the portal.",
+                    profileAvatarLabel: "Avatar URL",
+                    profileAvatarPlaceholder: "https://example.com/avatar.jpg",
+                    profileDisplayNameLabel: "Display name",
+                    profileDisplayNamePlaceholder: "Your visible name",
+                    profileBioLabel: "Bio",
+                    profileBioPlaceholder: "Tell us about yourself...",
+                    profileSaveBtn: "💾 Save profile",
+                    profileSaved: "Profile saved successfully",
+                    profileProOnly: "Only Pro users can have a custom profile",
+                    statsAdvancedTitle: "📊 Advanced stats",
+                    statsAdvancedSub: "Sessions, playtime and streaks. Only visible to you.",
+                    statsTotalSessions: "Total sessions",
+                    statsTodaySessions: "Today",
+                    statsTotalGamesPlayed: "Different games",
+                    statsStreak: "Current streak",
+                    statsStreakDays: "days in a row",
+                    statsPlayDates: "Activity calendar",
+                    statsNoData: "No play data yet. Play some games to see your stats.",
+                    statsHours: "h",
+                    statsMinutes: "min",
+                    gameRequestTitle: "🎮 Request game",
+                    gameRequestSub: "Want us to add a game? Pro users get priority.",
+                    gameRequestNameLabel: "Game name",
+                    gameRequestNamePlaceholder: "E.g. Minecraft 1.20",
+                    gameRequestUrlLabel: "Game URL (optional)",
+                    gameRequestUrlPlaceholder: "https://example.com/game",
+                    gameRequestDescLabel: "Description (optional)",
+                    gameRequestDescPlaceholder: "Why should we add it?",
+                    gameRequestSubmitBtn: "📨 Submit request",
+                    gameRequestSuccess: "Request sent! Admins will review it soon.",
+                    gameRequestProOnly: "Only Pro users can request games.",
+                    gameRequestPending: "Pending requests:",
+                    mySavesTitle: "💾 My cloud saves",
+                    mySavesSub: "Your game saves automatically in the cloud.",
+                    mySavesListEmpty: "You have no cloud saves.",
+                    mySavesDeleteBtn: "🗑️ Delete",
+                    mySavesRestoreBtn: "🔄 Restore",
+                    mySavesLastSave: "Last saved:",
+                    mySavesDeleteConfirm: "Delete this save?",
+                    mySavesDeleted: "Save deleted",
+                    mySavesRestored: "Data restored from cloud",
+                    mySavesProOnly: "Sign in to save to the cloud.",
+                    exportTitle: "📥 Export my data",
+                    exportSub: "Download a JSON file with your favorites, collections, achievements and settings.",
+                    exportBtn: "📦 Download JSON",
+                    exportSuccess: "Data exported successfully",
+                    achievementsTitle: "🏅 Achievements",
+                    achievementsSub: "Unlock achievements by playing on the portal.",
+                    achievementsProgress: "Progress: {current}/{total}",
+                    achievementsLocked: "🔒 Locked",
+                    achievementsUnlocked: "✅ Unlocked",
+                    achievementFirstGame: "First game",
+                    achievementFirstGameDesc: "Play your first game on the portal",
+                    achievementTenGames: "Veteran",
+                    achievementTenGamesDesc: "Play 10 different games",
+                    achievementAllCategories: "Explorer",
+                    achievementAllCategoriesDesc: "Try games from all categories",
+                    achievementProMember: "Pro Player",
+                    achievementProMemberDesc: "Activate Budsin Pro",
+                    achievementFavFive: "Fan",
+                    achievementFavFiveDesc: "Add 5 games to favorites",
+                    achievementCollection: "Collector",
+                    achievementCollectionDesc: "Create your first collection",
+                    achievementStreak: "Streak",
+                    achievementStreakDesc: "Play 7 days in a row",
+                    achievementSocial: "Social",
+                    achievementSocialDesc: "Share a collection",
+                    customThemeTitle: "🎨 Custom theme",
+                    customThemeSub: "Choose your own colors. Pro only.",
+                    customThemePrimaryLabel: "Primary color",
+                    customThemeSecondaryLabel: "Secondary color",
+                    customThemeAccentLabel: "Accent color",
+                    customThemeBgLabel: "Background color",
+                    customThemeApplyBtn: "Apply theme",
+                    customThemeResetBtn: "Reset theme",
+                    customThemeSaved: "Custom theme applied",
+                    customThemeResetConfirm: "Reset to default theme?",
+                    shareCollectionTitle: "Share collection",
+                    shareCollectionCopied: "Collection link copied!",
+                    shareCollectionProOnly: "Only Pro can share collections",
+                    focusModeTitle: "Focus Mode",
+                    focusModeShortcut: "Shortcut:",
+                    leaderboardTitle: "Leaderboard",
+                    leaderboardNoData: "No data yet",
+                    onlineStatusOnline: "🟢 Online",
+                    onlineStatusOffline: "🔴 Offline",
+                    onlineModeOffline: "Pro offline mode active",
                 },
                 pt: {
                     htmlLang: "pt",
@@ -1351,6 +1682,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proTrialUsed: "Você já usou seu teste grátis. Para ser Pro, escreva para budsinjys@gmail.com.",
                     proRenewalDays: "dias",
                     proCardTitle: "Budsin Pro",
+                    tutProDesc: "Aqui você pode ver seu status Pro, ativar teste grátis e gerenciar sua assinatura.",
                     proPriceMonth: "por mês",
                     proPriceSub: "Taxa mensal — acesso a funcionalidades Pro.",
                     proLoginHint: "Faça login para verificar seu status. Ative seu teste grátis de 7 dias no seu perfil. Para ser Pro, escreva para budsinjys@gmail.com.",
@@ -1381,8 +1713,99 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     footerContact: "Contato",
                     footerFeedback: "Comentários",
                     footerCopy: "© 2026 Budsin Games. Todos os jogos pertencem a seus respectivos criadores.",
+                    // New v6.2 features
+                    profileTitle: "Perfil",
+                    profileSub: "Personalize seu perfil público visível no portal.",
+                    profileAvatarLabel: "URL do avatar",
+                    profileAvatarPlaceholder: "https://exemplo.com/avatar.jpg",
+                    profileDisplayNameLabel: "Nome público",
+                    profileDisplayNamePlaceholder: "Seu nome visível",
+                    profileBioLabel: "Biografia",
+                    profileBioPlaceholder: "Conte-nos sobre você...",
+                    profileSaveBtn: "💾 Salvar perfil",
+                    profileSaved: "Perfil salvo com sucesso",
+                    profileProOnly: "Apenas usuários Pro podem ter perfil personalizado",
+                    statsAdvancedTitle: "📊 Estatísticas avançadas",
+                    statsAdvancedSub: "Sessões, tempo de jogo e sequências. Visível apenas para você.",
+                    statsTotalSessions: "Total de sessões",
+                    statsTodaySessions: "Hoje",
+                    statsTotalGamesPlayed: "Jogos diferentes",
+                    statsStreak: "Sequência atual",
+                    statsStreakDays: "dias seguidos",
+                    statsPlayDates: "Calendário de atividade",
+                    statsNoData: "Ainda não há dados de jogo. Jogue alguns jogos para ver suas estatísticas.",
+                    statsHours: "h",
+                    statsMinutes: "min",
+                    gameRequestTitle: "🎮 Solicitar jogo",
+                    gameRequestSub: "Quer que adicionemos um jogo? Os Pro têm prioridade.",
+                    gameRequestNameLabel: "Nome do jogo",
+                    gameRequestNamePlaceholder: "Ex: Minecraft 1.20",
+                    gameRequestUrlLabel: "URL do jogo (opcional)",
+                    gameRequestUrlPlaceholder: "https://exemplo.com/jogo",
+                    gameRequestDescLabel: "Descrição (opcional)",
+                    gameRequestDescPlaceholder: "Por que deveríamos adicioná-lo?",
+                    gameRequestSubmitBtn: "📨 Enviar solicitação",
+                    gameRequestSuccess: "Solicitação enviada! Os admins revisarão em breve.",
+                    gameRequestProOnly: "Apenas usuários Pro podem solicitar jogos.",
+                    gameRequestPending: "Solicitações pendentes:",
+                    mySavesTitle: "💾 Meus salvos na nuvem",
+                    mySavesSub: "Suas partidas salvas automaticamente na nuvem.",
+                    mySavesListEmpty: "Você não tem jogos salvos na nuvem.",
+                    mySavesDeleteBtn: "🗑️ Excluir",
+                    mySavesRestoreBtn: "🔄 Restaurar",
+                    mySavesLastSave: "Último salvo:",
+                    mySavesDeleteConfirm: "Excluir este salvo?",
+                    mySavesDeleted: "Salvo excluído",
+                    mySavesRestored: "Dados restaurados da nuvem",
+                    mySavesProOnly: "Faça login para salvar na nuvem.",
+                    exportTitle: "📥 Exportar meus dados",
+                    exportSub: "Baixe um arquivo JSON com seus favoritos, coleções, conquistas e configurações.",
+                    exportBtn: "📦 Baixar JSON",
+                    exportSuccess: "Dados exportados com sucesso",
+                    achievementsTitle: "🏅 Conquistas",
+                    achievementsSub: "Desbloqueie conquistas jogando no portal.",
+                    achievementsProgress: "Progresso: {current}/{total}",
+                    achievementsLocked: "🔒 Bloqueado",
+                    achievementsUnlocked: "✅ Desbloqueado",
+                    achievementFirstGame: "Primeiro jogo",
+                    achievementFirstGameDesc: "Jogue seu primeiro jogo no portal",
+                    achievementTenGames: "Veterano",
+                    achievementTenGamesDesc: "Jogue 10 jogos diferentes",
+                    achievementAllCategories: "Explorador",
+                    achievementAllCategoriesDesc: "Experimente jogos de todas as categorias",
+                    achievementProMember: "Pro Player",
+                    achievementProMemberDesc: "Ative Budsin Pro",
+                    achievementFavFive: "Fã",
+                    achievementFavFiveDesc: "Adicione 5 jogos aos favoritos",
+                    achievementCollection: "Colecionador",
+                    achievementCollectionDesc: "Crie sua primeira coleção",
+                    achievementStreak: "Sequência",
+                    achievementStreakDesc: "Jogue 7 dias seguidos",
+                    achievementSocial: "Social",
+                    achievementSocialDesc: "Compartilhe uma coleção",
+                    customThemeTitle: "🎨 Tema personalizado",
+                    customThemeSub: "Escolha suas próprias cores. Apenas para Pro.",
+                    customThemePrimaryLabel: "Cor primária",
+                    customThemeSecondaryLabel: "Cor secundária",
+                    customThemeAccentLabel: "Cor de destaque",
+                    customThemeBgLabel: "Cor de fundo",
+                    customThemeApplyBtn: "Aplicar tema",
+                    customThemeResetBtn: "Restaurar tema",
+                    customThemeSaved: "Tema personalizado aplicado",
+                    customThemeResetConfirm: "Restaurar ao tema padrão?",
+                    shareCollectionTitle: "Compartilhar coleção",
+                    shareCollectionCopied: "Link da coleção copiado!",
+                    shareCollectionProOnly: "Apenas Pro pode compartilhar coleções",
+                    focusModeTitle: "Focus Mode",
+                    focusModeShortcut: "Atalho:",
+                    leaderboardTitle: "Leaderboard",
+                    leaderboardNoData: "Sem dados ainda",
+                    onlineStatusOnline: "🟢 Online",
+                    onlineStatusOffline: "🔴 Offline",
+                    onlineModeOffline: "Modo offline Pro ativo",
                 },
             };
+            window.I18N = I18N;
 
             // ─── Helpers ───
             function store(key, val) { try { localStorage.setItem(key, val); } catch(_) {} }
@@ -1391,19 +1814,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             function resolveLanguage(l) {
                 if (l === "en") return "en";
                 if (l === "pt") return "pt";
-                return "en";
+                return "es";
             }
 
             function getLanguageFromUrl() {
-                try { return resolveLanguage(new URL(location.href).searchParams.get("lang") || ""); }
-                catch(_) { return null; }
+                try {
+                    var lang = new URL(location.href).searchParams.get("lang");
+                    return lang ? resolveLanguage(lang) : null;
+                } catch(_) { return null; }
             }
 
             function getCurrentLanguage() {
                 var fromUrl = getLanguageFromUrl();
-                if (fromUrl) { store(KEYS.LANGUAGE, fromUrl); return fromUrl; }
-                return resolveLanguage(load(KEYS.LANGUAGE, "en"));
+                if (fromUrl) return fromUrl;
+                var stored = load(KEYS.LANGUAGE, "");
+                if (stored) return resolveLanguage(stored);
+                return "en";
             }
+            window.SettingsGetLang = getCurrentLanguage;
 
             function isValidUrl(v) {
                 try { var p = new URL(v); return p.protocol === "http:" || p.protocol === "https:"; }
@@ -2043,6 +2471,286 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             updateHotkeyBadge();
             renderUrlList();
 
+            // ─── Profile ───
+            function loadProfile() {
+                var user = firebaseAuth ? firebaseAuth.currentUser : null;
+                var profileCard = document.getElementById("profileCard");
+                var loggedOut = document.getElementById("profileLoggedOut");
+                var loggedIn = document.getElementById("profileLoggedIn");
+                if (!profileCard) return;
+                var isPro = localStorage.getItem("budsin_pro_active") === "1";
+                profileCard.style.display = isPro ? "block" : "none";
+                if (!user || !isPro) {
+                    if (loggedOut) loggedOut.style.display = "block";
+                    if (loggedIn) loggedIn.style.display = "none";
+                    return;
+                }
+                if (loggedOut) loggedOut.style.display = "none";
+                if (loggedIn) loggedIn.style.display = "block";
+                getProRef(user.uid).get().then(function(doc) {
+                    var data = doc.exists ? doc.data() : {};
+                    var profile = data.profile || {};
+                    document.getElementById("profileAvatar").value = profile.avatar || "";
+                    document.getElementById("profileDisplayName").value = profile.displayName || "";
+                    document.getElementById("profileBio").value = profile.bio || "";
+                    var preview = document.getElementById("profileAvatarPreview");
+                    if (preview && profile.avatar) preview.style.backgroundImage = "url(" + profile.avatar + ")";
+                }).catch(function() {});
+            }
+            
+            document.getElementById("profileAvatar")?.addEventListener("input", function() {
+                var preview = document.getElementById("profileAvatarPreview");
+                if (preview) preview.style.backgroundImage = "url(" + this.value + ")";
+            });
+            
+            document.getElementById("profileSaveBtn")?.addEventListener("click", function() {
+                var user = firebaseAuth.currentUser;
+                if (!user) return;
+                var avatar = document.getElementById("profileAvatar").value;
+                var displayName = document.getElementById("profileDisplayName").value;
+                var bio = document.getElementById("profileBio").value;
+                getProRef(user.uid).update({
+                    profile: { avatar: avatar, displayName: displayName, bio: bio }
+                }).then(function() {
+                    var t = I18N[getCurrentLanguage()];
+                    showToast(t.profileSaved || "Profile saved!");
+                }).catch(function(err) {
+                    showToast("Error: " + err.message);
+                });
+            });
+            
+            // ─── Advanced Stats ───
+            function renderAdvancedStats() {
+                try {
+                    var raw = localStorage.getItem("budsin_play_stats");
+                    if (!raw) {
+                        document.getElementById("statsNoData").style.display = "block";
+                        return;
+                    }
+                    document.getElementById("statsNoData").style.display = "none";
+                    var stats = JSON.parse(raw);
+                    var t = I18N[getCurrentLanguage()];
+                    document.getElementById("statsTotalSessions").textContent = stats.totalSessions || 0;
+                    var today = new Date().toISOString().slice(0, 10);
+                    var todayData = stats.playDates && stats.playDates[today];
+                    document.getElementById("statsTodaySessions").textContent = todayData ? todayData.count : 0;
+                    document.getElementById("statsTotalGames").textContent = stats.gamesPlayed ? Object.keys(stats.gamesPlayed).length : 0;
+                    // Calculate streak
+                    var dates = Object.keys(stats.playDates || {}).sort().reverse();
+                    var streak = 0;
+                    if (dates.length) {
+                        streak = 1;
+                        for (var i = 0; i < dates.length - 1; i++) {
+                            var d1 = new Date(dates[i]);
+                            var d2 = new Date(dates[i+1]);
+                            var diff = (d1 - d2) / 86400000;
+                            if (Math.round(diff) === 1) streak++;
+                            else break;
+                        }
+                    }
+                    document.getElementById("statsStreak").textContent = streak + "d";
+                    // Calendar mini-view (last 14 days)
+                    var cal = document.getElementById("statsCalendar");
+                    if (cal) {
+                        cal.innerHTML = "";
+                        for (var i = 13; i >= 0; i--) {
+                            var d = new Date();
+                            d.setDate(d.getDate() - i);
+                            var key = d.toISOString().slice(0, 10);
+                            var active = stats.playDates && stats.playDates[key];
+                            var div = document.createElement("div");
+                            div.style.cssText = "width:16px;height:16px;border-radius:4px;background:" + (active ? "var(--green)" : "var(--bg-2)") + ";border:1px solid var(--line);position:relative";
+                            div.title = key + ": " + (active ? active.count + " sesiones" : "0");
+                            cal.appendChild(div);
+                        }
+                    }
+                } catch(e) { console.warn("[Stats] Error:", e); }
+            }
+            
+            // ─── Game Requests ───
+            document.getElementById("grSubmitBtn")?.addEventListener("click", function() {
+                var isPro = localStorage.getItem("budsin_pro_active") === "1";
+                if (!isPro) {
+                    var t = I18N[getCurrentLanguage()];
+                    showToast(t.gameRequestProOnly || "Pro only");
+                    return;
+                }
+                var name = document.getElementById("grName").value.trim();
+                var url = document.getElementById("grUrl").value.trim();
+                var desc = document.getElementById("grDesc").value.trim();
+                if (!name) { showToast("Game name is required"); return; }
+                if (window.BudsinGameRequest) {
+                    window.BudsinGameRequest(name, url, desc);
+                }
+            });
+            
+            window.BudsinGameRequest = function(name, url, desc) {
+                var firebaseDb = null;
+                try {
+                    var app = firebase.apps.length ? firebase.app() : firebase.initializeApp(BUDSIN_FIREBASE_CONFIG);
+                    firebaseDb = app.firestore();
+                } catch(e) { showToast("Firebase error"); return; }
+                var user = firebase.auth().currentUser;
+                firebaseDb.collection("game_requests").add({
+                    gameName: name,
+                    gameUrl: url || "",
+                    description: desc || "",
+                    uid: user ? user.uid : "anonymous",
+                    email: user ? user.email : "anonymous",
+                    status: "pending",
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                }).then(function() {
+                    var t = I18N[getCurrentLanguage()];
+                    showToast(t.gameRequestSuccess || "Request sent!");
+                }).catch(function(err) {
+                    showToast("Error: " + err.message);
+                });
+            };
+            
+            // ─── My Saves ───
+            function renderMySaves() {
+                var list = document.getElementById("mySavesList");
+                var content = document.getElementById("mySavesContent");
+                if (!list) return;
+                var isLoggedIn = !!(firebaseAuth && firebaseAuth.currentUser);
+                if (!isLoggedIn) {
+                    list.style.display = "block";
+                    if (content) content.style.display = "none";
+                    return;
+                }
+                list.style.display = "none";
+                if (!window.BudsinSave) {
+                    if (content) content.innerHTML = "<div style='padding:20px;text-align:center;color:var(--muted)'>Save system not loaded</div>";
+                    return;
+                }
+                window.BudsinSave.canSaveNewGame().then(function(info) {
+                    if (!content) return;
+                    content.style.display = "block";
+                    content.innerHTML = "<div style='margin-bottom:8px;font-size:.82rem;color:var(--muted)'>" + (info.count || 0) + " juegos guardados" + (info.limit ? " / " + info.limit : "") + "</div>";
+                }).catch(function() {
+                    if (content) content.innerHTML = "<div style='padding:20px;text-align:center;color:var(--muted)'>Error loading saves</div>";
+                });
+            }
+            
+            // ─── Export Data ───
+            document.getElementById("exportDataBtn")?.addEventListener("click", function() {
+                var data = {
+                    exportDate: new Date().toISOString(),
+                    favorites: JSON.parse(localStorage.getItem("budsin_favorites") || "[]"),
+                    collections: JSON.parse(localStorage.getItem("budsin_collections") || "[]"),
+                    recentlyPlayed: JSON.parse(localStorage.getItem("budsin_recently_played") || "[]"),
+                    searchHistory: JSON.parse(localStorage.getItem("budsin_search_history") || "[]"),
+                    settings: {
+                        theme: localStorage.getItem("budsin_site_theme") || "light",
+                        language: localStorage.getItem("budsin_language") || "en",
+                        loadingAudio: localStorage.getItem("budsin_loading_audio") || "0",
+                        loadingDuration: localStorage.getItem("budsin_loading_duration") || "9000",
+                    },
+                    achievements: JSON.parse(localStorage.getItem("budsin_achievements") || "{}"),
+                    playStats: JSON.parse(localStorage.getItem("budsin_play_stats") || "{}"),
+                };
+                var blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement("a");
+                a.href = url;
+                a.download = "budsin-games-data-" + new Date().toISOString().slice(0, 10) + ".json";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                var t = I18N[getCurrentLanguage()];
+                showToast(t.exportSuccess || "Data exported!");
+            });
+            
+            // ─── Achievements ───
+            function renderAchievements() {
+                var grid = document.getElementById("achievementsGrid");
+                if (!grid) return;
+                var t = I18N[getCurrentLanguage()];
+                var ach = {};
+                try { ach = JSON.parse(localStorage.getItem("budsin_achievements") || "{}"); } catch(e) {}
+                var achievements = [
+                    { id: "first_game", icon: "🎮", cat: "achievementFirstGame", desc: "achievementFirstGameDesc" },
+                    { id: "ten_games", icon: "🏆", cat: "achievementTenGames", desc: "achievementTenGamesDesc" },
+                    { id: "all_categories", icon: "🌐", cat: "achievementAllCategories", desc: "achievementAllCategoriesDesc" },
+                    { id: "pro_member", icon: "⭐", cat: "achievementProMember", desc: "achievementProMemberDesc" },
+                    { id: "fav_five", icon: "❤️", cat: "achievementFavFive", desc: "achievementFavFiveDesc" },
+                    { id: "collection", icon: "📁", cat: "achievementCollection", desc: "achievementCollectionDesc" },
+                    { id: "streak", icon: "🔥", cat: "achievementStreak", desc: "achievementStreakDesc" },
+                    { id: "social", icon: "🤝", cat: "achievementSocial", desc: "achievementSocialDesc" },
+                ];
+                grid.innerHTML = achievements.map(function(a) {
+                    var unlocked = ach[a.id];
+                    var name = t[a.cat] || a.id;
+                    var desc = t[a.desc] || "";
+                    return '<div style="padding:10px;border-radius:12px;background:' + (unlocked ? 'rgba(47,201,138,0.08)' : 'var(--bg-2)') + ';border:1px solid ' + (unlocked ? 'rgba(47,201,138,0.2)' : 'var(--line)') + ';text-align:center;opacity:' + (unlocked ? '1' : '.5') + '">' +
+                        '<div style="font-size:1.6rem;margin-bottom:4px">' + a.icon + '</div>' +
+                        '<div style="font-weight:700;font-size:.78rem;color:var(--text)">' + name + '</div>' +
+                        '<div style="font-size:.68rem;color:var(--muted);margin-top:2px">' + desc + '</div>' +
+                        '<div style="font-size:.65rem;margin-top:4px;font-weight:600;color:' + (unlocked ? 'var(--green)' : 'var(--muted)') + '">' + (unlocked ? t.achievementsUnlocked : t.achievementsLocked) + '</div>' +
+                    '</div>';
+                }).join("");
+            }
+            
+            // ─── Custom Theme ───
+            function initCustomTheme() {
+                var card = document.getElementById("customThemeCard");
+                if (!card) return;
+                var isPro = localStorage.getItem("budsin_pro_active") === "1";
+                card.style.display = isPro ? "block" : "none";
+                
+                // Load saved custom theme
+                var ct = {};
+                try { ct = JSON.parse(localStorage.getItem("budsin_custom_theme") || "{}"); } catch(e) {}
+                if (ct.primary) document.getElementById("ctPrimary").value = ct.primary;
+                if (ct.secondary) document.getElementById("ctSecondary").value = ct.secondary;
+                if (ct.accent) document.getElementById("ctAccent").value = ct.accent;
+                if (ct.bg) document.getElementById("ctBg").value = ct.bg;
+            }
+            
+            document.getElementById("ctApplyBtn")?.addEventListener("click", function() {
+                var ct = {
+                    primary: document.getElementById("ctPrimary").value,
+                    secondary: document.getElementById("ctSecondary").value,
+                    accent: document.getElementById("ctAccent").value,
+                    bg: document.getElementById("ctBg").value,
+                };
+                localStorage.setItem("budsin_custom_theme", JSON.stringify(ct));
+                // Apply via CSS custom properties
+                document.documentElement.style.setProperty("--custom-primary", ct.primary);
+                document.documentElement.style.setProperty("--custom-secondary", ct.secondary);
+                document.documentElement.style.setProperty("--custom-accent", ct.accent);
+                document.documentElement.style.setProperty("--custom-bg", ct.bg);
+                document.documentElement.setAttribute("data-site-theme", "custom");
+                showToast("Custom theme applied!");
+            });
+            
+            document.getElementById("ctResetBtn")?.addEventListener("click", function() {
+                localStorage.removeItem("budsin_custom_theme");
+                document.documentElement.removeAttribute("data-site-theme");
+                var saved = localStorage.getItem("budsin_site_theme") || "light";
+                document.documentElement.setAttribute("data-site-theme", saved);
+                showToast("Theme reset");
+            });
+            
+            // ─── Init all new features ───
+            loadProfile();
+            renderAdvancedStats();
+            renderMySaves();
+            renderAchievements();
+            initCustomTheme();
+            
+            // Re-init on auth state change
+            var _origRenderPro = renderProState;
+            renderProState = function(user) {
+                _origRenderPro(user);
+                setTimeout(function() {
+                    loadProfile();
+                    initCustomTheme();
+                    renderMySaves();
+                }, 100);
+            };
+
         })();
         </script>
 
@@ -2060,8 +2768,52 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             } catch(_) {}
 
             if ("serviceWorker" in navigator) {
-                navigator.serviceWorker.register("/sw.js", { scope: "/" });
+                navigator.serviceWorker.register("/sw.js", { scope: "/" }).then(function(reg) {
+                    if (reg.active) {
+                        reg.active.postMessage({ type: "PRO_STATUS", isPro: localStorage.getItem("budsin_pro_active") === "1" });
+                    }
+                });
             }
+
+            // ─── Tutorial desde index.html ───
+            try {
+                if (new URLSearchParams(window.location.search).get("tutorial") === "1") {
+                    var tutCard = document.getElementById("proCard");
+                    if (tutCard) {
+                        // Inject CSS with !important that survives JS overrides
+                        var style = document.createElement("style");
+                        style.textContent = '#proCard[tut-highlight] { box-shadow: 0 0 0 4px #ffd700, 0 0 0 9999px rgba(0,0,0,0.45) !important; position: relative !important; z-index: 99999 !important; border-color: #ffd700 !important; }';
+                        document.head.appendChild(style);
+                        // Apply after a delay to survive init overrides
+                        setTimeout(function() {
+                            tutCard.setAttribute("tut-highlight", "true");
+                            tutCard.scrollIntoView({ block: "center" });
+                        }, 800);
+                    }
+                    setTimeout(function() {
+                        var tutOverlay = document.createElement("div");
+                        tutOverlay.id = "settingsTutorial";
+                        tutOverlay.style.cssText = "position:fixed;bottom:30px;left:50%;transform:translateX(-50%);z-index:999999;background:var(--surface-strong);border:1px solid var(--line);border-radius:20px;padding:20px 24px;box-shadow:0 24px 64px rgba(0,0,0,0.3);max-width:400px;text-align:center;animation:tutorialIn .35s cubic-bezier(.22,1,.36,1)";
+                        var t = {};
+                        try { t = (window.I18N || {})[window.SettingsGetLang ? window.SettingsGetLang() : "es"] || window.I18N?.es || {}; } catch(e) {}
+                        tutOverlay.innerHTML = '<div style="font-size:2rem;margin-bottom:8px">⭐</div>' +
+                            '<div style="font-weight:800;font-size:.95rem;margin-bottom:4px">' + (t.cardProTitle || 'Budsin Pro') + '</div>' +
+                            '<div style="font-size:.82rem;color:var(--muted);line-height:1.5;margin-bottom:14px">' + (t.tutProDesc || 'Aquí puedes ver tu estado Pro, activar prueba gratis y gestionar tu suscripción.') + '</div>' +
+                            '<button type="button" id="tutBackBtn" style="padding:10px 24px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--red),#ff8c55);color:#fff;font-weight:700;font-size:.88rem;cursor:pointer;font-family:inherit">← ' + (t.back || 'Volver al tutorial') + '</button>';
+                        document.body.appendChild(tutOverlay);
+                        document.getElementById("tutBackBtn")?.addEventListener("click", function() {
+                            if (tutCard) tutCard.removeAttribute("tut-highlight");
+                            window.location.href = "index.html?tutorial_continue=1";
+                        });
+                    }, 800);
+                }
+            } catch(_) {}
         </script>
+        <style>
+            @keyframes tutorialIn {
+                from { opacity: 0; transform: translateX(-50%) translateY(12px) scale(.96); }
+                to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+            }
+        </style>
     </body>
 </html>

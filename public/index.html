@@ -1146,6 +1146,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 display: block;
             }
 
+            /* ── Onboarding Tutorial ── */
+            .tutorial-overlay { font-family: "Sora", system-ui, sans-serif; }
+            .tutorial-overlay .tutorial-card { animation: tutorialIn .35s cubic-bezier(.22,1,.36,1); }
+            @keyframes tutorialIn {
+                from { opacity: 0; transform: translateY(12px) scale(.96); }
+                to { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            .tutorial-target-highlight {
+                position: relative !important;
+                z-index: 99999 !important;
+            }
+
             /* ── Gating Pro popup (fullscreen overlay) ── */
             #proGatingPopup {
                 position: fixed;
@@ -2155,6 +2167,77 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
 
+            <!-- Onboarding Tutorial -->
+            <div id="tutorialOverlay" class="tutorial-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99998;pointer-events:none">
+                <div id="tutorialBackdrop" style="position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);pointer-events:auto"></div>
+                <div id="tutorialHighlight" style="position:absolute;pointer-events:none;border-radius:14px;box-shadow:0 0 0 4px #ffd700,0 0 0 9999px rgba(0,0,0,0.55);transition:all .35s cubic-bezier(.22,1,.36,1);z-index:1"></div>
+                <div id="tutorialCard" class="tutorial-card" style="position:fixed;pointer-events:auto;z-index:99999;background:var(--surface-strong);border:1px solid var(--line);border-radius:20px;padding:20px 24px;box-shadow:0 24px 64px rgba(0,0,0,0.3);max-width:360px;display:none">
+                    <div style="display:flex;align-items:start;gap:12px">
+                        <span id="tutorialStepIcon" style="font-size:1.6rem;flex-shrink:0;margin-top:2px">👋</span>
+                        <div style="flex:1;min-width:0">
+                            <div id="tutorialStepTitle" style="font-weight:800;font-size:.95rem;margin-bottom:4px"></div>
+                            <div id="tutorialStepDesc" style="font-size:.82rem;color:var(--muted);line-height:1.5"></div>
+                            <img id="tutorialStepImg" src="tecla.png" style="display:none;margin-top:10px;width:100%;max-width:260px;border-radius:10px;border:1px solid var(--line);align-self:center" />
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--line)">
+                        <span id="tutorialProgress" style="font-size:.78rem;color:var(--muted);font-weight:600"></span>
+                        <div style="display:flex;gap:8px">
+                            <button type="button" id="tutorialPrevBtn" class="btn btn-secondary btn-sm" style="display:none;padding:8px 16px;border-radius:12px;border:1px solid var(--line);background:var(--surface-strong);color:var(--text);font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit">←</button>
+                            <button type="button" id="tutorialNextBtn" class="btn btn-primary btn-sm" style="padding:8px 20px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--red),#ff8c55);color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit" data-i18n="tutorialNext">Siguiente</button>
+                            <button type="button" id="tutorialDoneBtn" class="btn btn-primary btn-sm" style="display:none;padding:8px 20px;border-radius:12px;border:0;background:linear-gradient(135deg,var(--green),#1fa8ff);color:#fff;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit" data-i18n="tutorialDone">✓ Listo</button>
+                        </div>
+                    </div>
+                    <button type="button" id="tutorialSkipBtn" style="position:absolute;top:8px;right:10px;background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--muted);padding:4px;line-height:1">×</button>
+                </div>
+            </div>
+
+            <!-- Leaderboard Popup -->
+            <div id="leaderboardPopup" class="changelog-popup" aria-hidden="true" style="display:none">
+                <div class="changelog-card" role="status" style="max-width:480px;max-height:80vh;overflow-y:auto">
+                    <button type="button" id="closeLeaderboardPopup" style="position:absolute;top:12px;right:14px;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:1.2rem;display:flex;align-items:center;justify-content:center;color:var(--muted);z-index:2">×</button>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                        <span style="font-size:2rem">🏆</span>
+                        <div>
+                            <h2 style="margin:0;font-size:1.2rem" id="leaderboardTitle" data-i18n="leaderboardTitle">🏆 Leaderboards</h2>
+                            <p style="margin:2px 0 0;font-size:.82rem;color:var(--muted)" id="leaderboardGameName"></p>
+                        </div>
+                    </div>
+                    <div id="leaderboardScores" style="margin-bottom:12px">
+                        <div style="text-align:center;padding:20px;color:var(--muted)" data-i18n="leaderboardNoData">Sé el primero en jugar!</div>
+                    </div>
+                    <div id="leaderboardSubmitSection" style="display:none;padding:12px;border-radius:12px;background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.1)">
+                        <div style="font-size:.82rem;font-weight:600;margin-bottom:6px" data-i18n="leaderboardSubmitHint">Envía tu puntuación:</div>
+                        <div style="display:flex;gap:8px">
+                            <input type="number" id="leaderboardScoreInput" placeholder="Puntuación..." style="flex:1;min-height:40px;border-radius:10px;border:1px solid var(--line);padding:0 12px;font:inherit;font-size:.88rem;background:var(--surface-strong);color:var(--text);outline:none" />
+                            <button type="button" id="leaderboardSubmitBtn" class="btn btn-primary btn-sm" data-i18n="leaderboardSubmit">Enviar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modo sin distracciones (Focus) -->
+            <div id="focusOverlay" class="focus-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:var(--surface);cursor:default">
+                <style>
+                    .focus-overlay .focus-bar { position:fixed;top:0;left:0;right:0;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;background:var(--surface);border-bottom:1px solid var(--line);z-index:10;transition:opacity .3s;opacity:0;pointer-events:none }
+                    .focus-overlay:hover .focus-bar { opacity:1;pointer-events:auto }
+                    .focus-overlay .focus-bar button { background:var(--surface-strong);border:1px solid var(--line);border-radius:999px;padding:8px 16px;cursor:pointer;font-weight:600;color:var(--text);font-size:.85rem }
+                    .focus-overlay .focus-hint { position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;padding:8px 16px;border-radius:999px;font-size:.8rem;opacity:0;transition:opacity .3s;pointer-events:none }
+                    .focus-overlay:hover .focus-hint { opacity:1 }
+                </style>
+                <div class="focus-bar">
+                    <span style="font-weight:700;font-size:.9rem" data-i18n="focusModeTitle">🧘 Modo sin distracciones</span>
+                    <button id="focusExitBtn" data-i18n="focusModeExit">✕ Salir (ESC)</button>
+                </div>
+                <div id="focusContent" style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:20px">
+                    <div style="text-align:center;color:var(--muted);font-size:1.2rem;line-height:2">
+                        <div style="font-size:4rem;margin-bottom:20px">🎮</div>
+                        <div data-i18n="focusModeDesc">Juega a pantalla completa sin distracciones.</div>
+                        <div style="margin-top:30px;font-size:.9rem;color:var(--muted);opacity:.6" data-i18n="focusModeExit">Haz clic en un juego para comenzar o presiona ESC para salir.</div>
+                    </div>
+                </div>
+            </div>
+
         <div id="appTransition" class="app-transition" aria-hidden="true">
             <video id="loading-video" muted playsinline preload="auto">
                 <source src="Budsin%20Games.mp4" type="video/mp4">
@@ -2177,6 +2260,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         data-i18n="settingsPageLink"
                         >⚙️ Ajustes</a
                     >
+                    <span id="onlineStatus" class="settings-link" style="font-size:.75rem;padding:4px 10px;border-radius:999px;border:1px solid var(--line);display:none;font-weight:600" data-i18n="onlineStatusOnline">🟢 Online</span>
+                    <button type="button" id="focusModeBtn" class="settings-link" style="background:none;border:none;cursor:pointer;font-size:.9rem;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface-strong);color:var(--text);font-weight:600" title="Modo sin distracciones (Pro)" data-i18n="focusModeBtn">🧘 Focus</button>
                     <label class="language-picker" for="languageSelect">
                         <span aria-hidden="true">🌐</span>
                         <select
@@ -4447,7 +4532,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             };
         </script>
         <script>
-            const SITE_VERSION = "6.1";
+            const SITE_VERSION = "6.2";
             const STORAGE_KEY = "juanjos_games_seen_version";
             const ENABLE_CHANGELOG_POPUP = true;
             const FAVORITES_KEY = "budsin_favorites";
@@ -4455,7 +4540,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             function showToast(msg, isProCta) {
                 const el = document.getElementById("toast") || (() => {
                     const t = document.createElement("div"); t.id = "toast";
-                    t.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(239,63,69,.92);color:#fff;padding:12px 22px;border-radius:999px;font-size:.88rem;font-weight:700;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.28);opacity:0;transition:opacity .25s;display:flex;align-items:center;gap:10px;white-space:nowrap";
+                    t.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(239,63,69,.92);color:#fff;padding:12px 22px;border-radius:999px;font-size:.88rem;font-weight:700;z-index:999999;box-shadow:0 8px 24px rgba(0,0,0,.28);opacity:0;transition:opacity .25s;display:flex;align-items:center;gap:10px;white-space:nowrap";
                     document.body.appendChild(t); return t;
                 })();
                 if (isProCta) {
@@ -4616,6 +4701,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             }
                         };
                         setTimeout(() => document.addEventListener("click", closePopup), 10);
+                    });
+                }
+            });
+
+            // Inyectar botón de leaderboard en cada tarjeta
+            cards.forEach((card) => {
+                var lbBtn = document.createElement("button");
+                lbBtn.type = "button";
+                lbBtn.className = "collection-btn";
+                lbBtn.textContent = "🏆";
+                lbBtn.setAttribute("aria-label", "Leaderboard");
+                var content = card.querySelector(".content");
+                if (content) {
+                    content.appendChild(lbBtn);
+                    lbBtn.addEventListener("click", function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        var gameName = card.querySelector("strong").textContent;
+                        showLeaderboardPopup(gameName);
                     });
                 }
             });
@@ -4786,6 +4890,589 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     }
                 }
             }
+
+            // ─── Focus / Distraction-Free Mode ───
+            var isFocusModeActive = function() {
+                var el = document.getElementById("focusOverlay");
+                return el && el.style.display === "block";
+            };
+            
+            function initFocusMode() {
+                var focusBtn = document.getElementById("focusModeBtn");
+                var focusOverlay = document.getElementById("focusOverlay");
+                var focusExitBtn = document.getElementById("focusExitBtn");
+                if (!focusBtn || !focusOverlay || !focusExitBtn) return;
+                
+                // Show focus button only for Pro
+                var isPro = localStorage.getItem("budsin_pro_active") === "1";
+                focusBtn.style.display = isPro ? "" : "none";
+                
+                focusBtn.addEventListener("click", function() {
+                    focusOverlay.style.display = "block";
+                    document.body.style.overflow = "hidden";
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen().catch(function(){});
+                    }
+                });
+                
+                window.exitFocusMode = function() {
+                    focusOverlay.style.display = "none";
+                    document.body.style.overflow = "";
+                    if (document.fullscreenElement && document.exitFullscreen) {
+                        document.exitFullscreen().catch(function(){});
+                    }
+                    // Reset focus content for next use
+                    var focusContent = document.getElementById("focusContent");
+                    if (focusContent) {
+                        var t = getTranslations();
+                        focusContent.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:1.2rem;line-height:2"><div style="font-size:4rem;margin-bottom:20px">🎮</div><div>' + (t.focusModeDesc || 'Juega a pantalla completa sin distracciones.') + '</div><div style="margin-top:30px;font-size:.9rem;color:var(--muted);opacity:.6">' + (t.focusModeExit || 'Haz clic en un juego para comenzar o presiona ESC para salir.') + '</div></div>';
+                    }
+                };
+                
+                function exitFocus() { window.exitFocusMode(); }
+                
+                focusExitBtn.addEventListener("click", exitFocus);
+                document.addEventListener("keydown", function(e) {
+                    if (e.key === "Escape" && focusOverlay.style.display === "block") {
+                        exitFocus();
+                    }
+                });
+                
+                focusOverlay.addEventListener("click", function(e) {
+                    if (e.target === focusOverlay || e.target.closest(".focus-hint")) {
+                        exitFocus();
+                    }
+                });
+            }
+            
+            // Intercept navigation: if focus mode is active, load game in overlay instead
+            function loadGameInFocus(url) {
+                var focusContent = document.getElementById("focusContent");
+                if (!focusContent) return false;
+                focusContent.innerHTML = '<div style="position:absolute;top:0;left:0;width:100%;height:100%"><iframe src="' + url + '" style="width:100%;height:100%;border:none" allowfullscreen></iframe></div>';
+                return true;
+            }
+            
+            // Update Pro UI elements when Pro status changes
+            var _origApplyPro = applyProFeatures;
+            applyProFeatures = function(isPro) {
+                _origApplyPro(isPro);
+                var focusBtn = document.getElementById("focusModeBtn");
+                if (focusBtn) focusBtn.style.display = isPro ? "" : "none";
+                var statusEl = document.getElementById("onlineStatus");
+                if (statusEl) {
+                    if (isPro) {
+                        statusEl.style.display = "";
+                        statusEl.textContent = navigator.onLine ? "🟢 Online" : "🔴 Offline — Pro offline active";
+                        statusEl.style.background = navigator.onLine ? "rgba(47,201,138,0.12)" : "rgba(239,63,69,0.12)";
+                        statusEl.style.color = navigator.onLine ? "var(--green)" : "var(--red)";
+                        statusEl.style.borderColor = navigator.onLine ? "rgba(47,201,138,0.3)" : "rgba(239,63,69,0.3)";
+                    } else {
+                        statusEl.style.display = "none";
+                    }
+                }
+            };
+            
+            // ─── Achievements System ───
+            var ACHIEVEMENTS_KEY = "budsin_achievements";
+            var PLAY_STATS_KEY = "budsin_play_stats";
+            
+            var ACHIEVEMENTS = [
+                { id: "first_game", icon: "🎮", category: "firstGame", categoryDesc: "firstGameDesc" },
+                { id: "ten_games", icon: "🏆", category: "tenGames", categoryDesc: "tenGamesDesc" },
+                { id: "all_categories", icon: "🌐", category: "allCategories", categoryDesc: "allCategoriesDesc" },
+                { id: "pro_member", icon: "⭐", category: "proMember", categoryDesc: "proMemberDesc" },
+                { id: "fav_five", icon: "❤️", category: "favFive", categoryDesc: "favFiveDesc" },
+                { id: "collection", icon: "📁", category: "collection", categoryDesc: "collectionDesc" },
+                { id: "streak", icon: "🔥", category: "streak", categoryDesc: "streakDesc" },
+                { id: "social", icon: "🤝", category: "social", categoryDesc: "socialDesc" },
+            ];
+            
+            function getAchievements() { return readJson(ACHIEVEMENTS_KEY, {}); }
+            function saveAchievements(a) { writeJson(ACHIEVEMENTS_KEY, a); }
+            
+            function unlockAchievement(id) {
+                var ach = getAchievements();
+                if (ach[id]) return false;
+                ach[id] = { unlocked: true, date: new Date().toISOString() };
+                saveAchievements(ach);
+                var t = getTranslations();
+                var def = ACHIEVEMENTS.find(function(a) { return a.id === id; });
+                var name = def ? (t[def.category] || id) : id;
+                showToast("🏅 " + (t.achievementsUnlocked || "Logro desbloqueado") + ": " + name, false);
+                return true;
+            }
+            
+            function checkAchievements(gameName, category) {
+                var t = getTranslations();
+                // First game
+                var recent = readJson(RECENTLY_PLAYED_KEY, []);
+                if (recent.length >= 1) unlockAchievement("first_game");
+                if (recent.length >= 10) unlockAchievement("ten_games");
+                
+                // All categories
+                var cats = new Set(recent.map(function(h) {
+                    var card = cards.find(function(c) { return getCardHref(c) === h; });
+                    return card ? (card.dataset.category || "") : "";
+                }).filter(Boolean));
+                var allCats = new Set(cards.map(function(c) { return c.dataset.category || ""; }).filter(Boolean));
+                var covered = true;
+                allCats.forEach(function(c) { if (!cats.has(c)) covered = false; });
+                if (covered && allCats.size >= 2) unlockAchievement("all_categories");
+                
+                // Pro member
+                if (localStorage.getItem("budsin_pro_active") === "1") unlockAchievement("pro_member");
+                
+                // Fav five
+                var favs = readJson(FAVORITES_KEY, []);
+                if (favs.length >= 5) unlockAchievement("fav_five");
+                
+                // Collection
+                var cols = getCollections();
+                if (cols.length >= 1) unlockAchievement("collection");
+                
+                // Play streak
+                var stats = readJson(PLAY_STATS_KEY, {});
+                var dates = Object.keys(stats.playDates || {}).sort().reverse();
+                if (dates.length >= 7) {
+                    var streak = 1;
+                    var today = new Date();
+                    for (var i = 0; i < dates.length - 1; i++) {
+                        var d1 = new Date(dates[i]);
+                        var d2 = new Date(dates[i+1]);
+                        var diff = (d1 - d2) / 86400000;
+                        if (Math.round(diff) === 1) streak++;
+                        else break;
+                    }
+                    if (streak >= 7) unlockAchievement("streak");
+                }
+            }
+            
+            function trackPlaySession(gameName) {
+                var stats = readJson(PLAY_STATS_KEY, {});
+                var today = new Date().toISOString().slice(0, 10);
+                if (!stats.playDates) stats.playDates = {};
+                if (!stats.playDates[today]) stats.playDates[today] = { count: 0, games: [] };
+                stats.playDates[today].count++;
+                if (stats.playDates[today].games.indexOf(gameName) === -1) stats.playDates[today].games.push(gameName);
+                if (!stats.totalSessions) stats.totalSessions = 0;
+                stats.totalSessions++;
+                if (!stats.gamesPlayed) stats.gamesPlayed = {};
+                stats.gamesPlayed[gameName] = (stats.gamesPlayed[gameName] || 0) + 1;
+                writeJson(PLAY_STATS_KEY, stats);
+                checkAchievements(gameName);
+            }
+
+            // ─── Leaderboards ───
+            var LEADERBOARD_COLLECTION = "game_leaderboards";
+            
+            function submitLeaderboardScore(gameName, score, playerName) {
+                if (localStorage.getItem("budsin_pro_active") !== "1") {
+                    showToast(getTranslations().leaderboardProOnly || "Solo Pro puede enviar puntuaciones", true);
+                    return Promise.reject("PRO_REQUIRED");
+                }
+                if (!firebaseEnabled || !firebaseDb) {
+                    showToast("Firebase no disponible", false);
+                    return Promise.reject("FIREBASE_UNAVAILABLE");
+                }
+                var key = encodeURIComponent(gameName.toLowerCase().replace(/\s+/g, "-"));
+                var docRef = firebaseDb.collection(LEADERBOARD_COLLECTION).doc(key);
+                return docRef.set({
+                    gameName: gameName,
+                    lastScore: score,
+                    lastPlayer: playerName || "Anonymous",
+                    updatedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+                }, { merge: true }).then(function() {
+                    // Also add to scores subcollection
+                    return docRef.collection("scores").add({
+                        playerName: playerName || "Anonymous",
+                        score: Number(score),
+                        timestamp: window.firebase.firestore.FieldValue.serverTimestamp(),
+                    });
+                }).then(function() {
+                    showToast(getTranslations().leaderboardSubmitted || "Puntuación enviada!", false);
+                    return true;
+                }).catch(function(err) {
+                    console.warn("[Budsin] Leaderboard error:", err);
+                    showToast("Error al enviar puntuación", false);
+                    return false;
+                });
+            }
+            
+            function getLeaderboardScores(gameName) {
+                if (!firebaseEnabled || !firebaseDb) return Promise.resolve([]);
+                var key = encodeURIComponent(gameName.toLowerCase().replace(/\s+/g, "-"));
+                return firebaseDb.collection(LEADERBOARD_COLLECTION).doc(key)
+                    .collection("scores")
+                    .orderBy("score", "desc")
+                    .limit(10)
+                    .get()
+                    .then(function(snap) {
+                        var scores = [];
+                        snap.forEach(function(doc) {
+                            scores.push(doc.data());
+                        });
+                        return scores;
+                    }).catch(function() { return []; });
+            }
+            
+            // ─── Leaderboard Popup ───
+            var _leaderboardCurrentGame = "";
+            
+            function showLeaderboardPopup(gameName) {
+                var popup = document.getElementById("leaderboardPopup");
+                var titleEl = document.getElementById("leaderboardGameName");
+                var scoresEl = document.getElementById("leaderboardScores");
+                var submitEl = document.getElementById("leaderboardSubmitSection");
+                if (!popup) return;
+                _leaderboardCurrentGame = gameName;
+                if (titleEl) titleEl.textContent = gameName;
+                if (scoresEl) scoresEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Cargando...</div>';
+                popup.style.display = "flex";
+                popup.setAttribute("aria-hidden", "false");
+                
+                // Check if Pro for submission
+                var isPro = localStorage.getItem("budsin_pro_active") === "1";
+                if (submitEl) submitEl.style.display = isPro ? "block" : "none";
+                
+                // Load scores
+                getLeaderboardScores(gameName).then(function(scores) {
+                    if (!scoresEl) return;
+                    var t = getTranslations();
+                    if (!scores.length) {
+                        scoresEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)" data-i18n="leaderboardNoData">' + (t.leaderboardNoData || "Sé el primero en jugar!") + '</div>';
+                        return;
+                    }
+                    scoresEl.innerHTML = '<div style="display:flex;flex-direction:column;gap:6px">' +
+                        scores.slice(0, 10).map(function(s, i) {
+                            var medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : "#" + (i + 1);
+                            return '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:10px;background:' + (i < 3 ? 'rgba(255,215,0,0.06)' : 'var(--bg-2)') + '">' +
+                                '<span style="font-weight:600;font-size:.88rem">' + medal + ' ' + escHtml(s.playerName || "Anonymous") + '</span>' +
+                                '<span style="font-weight:800;color:var(--text)">' + Number(s.score || 0).toLocaleString() + '</span>' +
+                            '</div>';
+                        }).join('') + '</div>';
+                }).catch(function() {
+                    if (scoresEl) scoresEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--red)">Error loading scores</div>';
+                });
+            }
+            
+            function closeLeaderboardPopup() {
+                var popup = document.getElementById("leaderboardPopup");
+                if (!popup) return;
+                popup.style.display = "none";
+                popup.setAttribute("aria-hidden", "true");
+            }
+            
+            // ─── Game Requests ───
+            var GAME_REQUESTS_COLLECTION = "game_requests";
+            
+            function submitGameRequest(name, url, description) {
+                if (localStorage.getItem("budsin_pro_active") !== "1") {
+                    showToast(getTranslations().gameRequestProOnly || "Solo Pro puede solicitar juegos", true);
+                    return Promise.reject("PRO_REQUIRED");
+                }
+                if (!firebaseEnabled || !firebaseDb) {
+                    showToast("Firebase no disponible", false);
+                    return Promise.reject("FIREBASE_UNAVAILABLE");
+                }
+                var user = null;
+                try {
+                    var raw = localStorage.getItem("budsin_pro_user");
+                    if (raw) user = JSON.parse(raw);
+                } catch(_) {}
+                return firebaseDb.collection(GAME_REQUESTS_COLLECTION).add({
+                    gameName: name,
+                    gameUrl: url,
+                    description: description || "",
+                    uid: user ? user.uid : "anonymous",
+                    email: user ? user.email : "anonymous",
+                    status: "pending",
+                    createdAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+                }).then(function() {
+                    showToast(getTranslations().gameRequestSuccess || "Solicitud enviada!", false);
+                    return true;
+                }).catch(function(err) {
+                    console.warn("[Budsin] Game request error:", err);
+                    showToast("Error al enviar solicitud", false);
+                    return false;
+                });
+            }
+
+            // ─── Onboarding Tutorial ───
+            var TUTORIAL_KEY = "budsin_tutorial_done_v2";
+            var TUTORIAL_STEPS = [
+                { icon: "🌐", titleKey: "tutorialLangTitle", descKey: "tutorialLangDesc", selector: null, placement: "center", action: "language" },
+                { icon: "👋", titleKey: "tutorialStep1Title", descKey: "tutorialStep1Desc", selector: null, placement: "center" },
+                { icon: "🔍", titleKey: "tutorialStep2Title", descKey: "tutorialStep2Desc", selector: "#gameSearch", placement: "bottom", offsetY: 8 },
+                { icon: "🏷️", titleKey: "tutorialStep3Title", descKey: "tutorialStep3Desc", selector: "#typeFilters", placement: "bottom", offsetY: 8 },
+                { icon: "🎮", titleKey: "tutorialStep4Title", descKey: "tutorialStep4Desc", selector: "#gamesGrid .game-card", placement: "top", offsetY: -12 },
+                { icon: "⭐", titleKey: "tutorialStep5Title", descKey: "tutorialStep5Desc", selector: "#gamesGrid .game-card:first-child .favorite-btn", placement: "top", offsetY: -12 },
+                { icon: "📁", titleKey: "tutorialStep6Title", descKey: "tutorialStep6Desc", selector: "#collectionsShelf", placement: "top", offsetY: -12 },
+                { icon: "🎲", titleKey: "tutorialStep7Title", descKey: "tutorialStep7Desc", selector: "#randomGameBtn", placement: "bottom", offsetY: 8 },
+                { icon: "⌨️", titleKey: "tutorialStepHideTitle", descKey: "tutorialStepHideDesc", selector: null, placement: "center", action: "hotkey" },
+                { icon: "⚙️", titleKey: "tutorialStep8Title", descKey: "tutorialStep8Desc", selector: "#settingsPageLink", placement: "bottom", offsetY: 8, action: "settings" },
+                { icon: "✅", titleKey: "tutorialStep9Title", descKey: "tutorialStep9Desc", selector: null, placement: "center" },
+            ];
+            var _tutorialStep = 0;
+
+            function startTutorial(stepIndex) {
+                _tutorialStep = typeof stepIndex === "number" ? Math.max(0, Math.min(stepIndex, TUTORIAL_STEPS.length - 1)) : 0;
+                var overlay = document.getElementById("tutorialOverlay");
+                if (overlay) overlay.style.display = "block";
+                renderTutorialStep();
+            }
+
+            function renderTutorialStep() {
+                var t = getTranslations();
+                var overlay = document.getElementById("tutorialOverlay");
+                var highlight = document.getElementById("tutorialHighlight");
+                var card = document.getElementById("tutorialCard");
+                var stepIcon = document.getElementById("tutorialStepIcon");
+                var stepTitle = document.getElementById("tutorialStepTitle");
+                var stepDesc = document.getElementById("tutorialStepDesc");
+                var progress = document.getElementById("tutorialProgress");
+                var prevBtn = document.getElementById("tutorialPrevBtn");
+                var nextBtn = document.getElementById("tutorialNextBtn");
+                var doneBtn = document.getElementById("tutorialDoneBtn");
+                if (!overlay || overlay.style.display !== "block") return;
+
+                var step = TUTORIAL_STEPS[_tutorialStep];
+                if (stepIcon) stepIcon.textContent = step.icon || "👋";
+                if (stepTitle) stepTitle.textContent = t[step.titleKey] || step.titleKey;
+                if (stepDesc) stepDesc.textContent = t[step.descKey] || step.descKey;
+                if (progress) progress.textContent = (_tutorialStep + 1) + " / " + TUTORIAL_STEPS.length;
+
+                // Show tutorial image only for hotkey step
+                var img = document.getElementById("tutorialStepImg");
+                if (img) img.style.display = step.action === "hotkey" ? "block" : "none";
+
+                // Language step: show 3 language options inside the tutorial
+                if (step.action === "language") {
+                    if (prevBtn) prevBtn.style.display = "none";
+                    if (nextBtn) nextBtn.style.display = "none";
+                    if (doneBtn) doneBtn.style.display = "none";
+                    if (stepIcon) stepIcon.textContent = "🌐";
+                    if (stepTitle) stepTitle.textContent = t.tutorialLangTitle || "Select your language";
+                    if (stepDesc) {
+                        stepDesc.innerHTML =
+                            '<div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">' +
+                                '<button type="button" class="tut-lang-btn" data-lang="es" style="padding:10px 16px;border-radius:12px;border:2px solid var(--line);background:var(--surface-strong);cursor:pointer;font:inherit;font-size:.9rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;transition:border-color .2s">🇪🇸 Español</button>' +
+                                '<button type="button" class="tut-lang-btn" data-lang="en" style="padding:10px 16px;border-radius:12px;border:2px solid var(--line);background:var(--surface-strong);cursor:pointer;font:inherit;font-size:.9rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;transition:border-color .2s">🇬🇧 English</button>' +
+                                '<button type="button" class="tut-lang-btn" data-lang="pt" style="padding:10px 16px;border-radius:12px;border:2px solid var(--line);background:var(--surface-strong);cursor:pointer;font:inherit;font-size:.9rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;transition:border-color .2s">🇧🇷 Português</button>' +
+                            '</div>';
+                        stepDesc.querySelectorAll(".tut-lang-btn").forEach(function(btn) {
+                            btn.addEventListener("click", function() {
+                                var lang = this.dataset.lang;
+                                localStorage.setItem("budsin_language", lang);
+                                currentLanguage = lang;
+                                applyLanguage(lang);
+                                _tutorialStep = 1;
+                                renderTutorialStep();
+                            });
+                            btn.addEventListener("mouseenter", function() { this.style.borderColor = "#ffd700"; });
+                            btn.addEventListener("mouseleave", function() { this.style.borderColor = ""; });
+                        });
+                    }
+                    if (progress) progress.textContent = "1 / " + TUTORIAL_STEPS.length;
+                    // Skip normal step rendering below
+                } else
+                // Hotkey step: wait for user to press the backtick key
+                if (step.action === "hotkey") {
+                    if (prevBtn) prevBtn.style.display = _tutorialStep > 0 ? "" : "none";
+                    if (nextBtn) nextBtn.style.display = "none";
+                    if (doneBtn) doneBtn.style.display = "none";
+                    // Read stored hotkey config (default: Backquote)
+                    var _hk = [];
+                    try {
+                        var stored = localStorage.getItem("budsin_hotkey");
+                        if (stored) _hk = JSON.parse(stored);
+                        if (!Array.isArray(_hk)) _hk = [stored];
+                    } catch(_) {}
+                    if (!_hk.length) _hk = ["Backquote", "IntlBackslash"];
+                    // Save original title/favicon to restore if classroom-hotkey changes them
+                    var _origTitle = document.title;
+                    var _origFav = (document.querySelector("link[rel~='icon']") || {}).href || "";
+                    // One-time capture phase listener on window (same phase as classroom-hotkey)
+                    var _hkHandler = function(e) {
+                        if (_hk.indexOf(e.code) !== -1) {
+                            // Reverse overlay if classroom-hotkey already opened it (runs in same tick, no paint)
+                            var _ov = document.getElementById("juanjo-classroom-overlay");
+                            if (_ov && _ov.classList.contains("is-open")) {
+                                _ov.classList.remove("is-open");
+                                document.body.classList.remove("juanjo-classroom-open");
+                                _ov.setAttribute("aria-hidden", "true");
+                                document.title = _origTitle;
+                                var _fi = document.querySelector("link[rel~='icon']");
+                                if (_fi && _origFav) _fi.href = _origFav;
+                            }
+                            e.preventDefault();
+                            e.stopImmediatePropagation();
+                            window.removeEventListener("keydown", _hkHandler, true);
+                            showToast(t.tutorialStepHideSuccess || "✅ Bien!", false);
+                            setTimeout(function() { nextTutorialStep(); }, 800);
+                        }
+                    };
+                    window.addEventListener("keydown", _hkHandler, true);
+                    // Clean up if user goes back
+                    var _origPrev = prevTutorialStep;
+                    prevTutorialStep = function() {
+                        window.removeEventListener("keydown", _hkHandler, true);
+                        _origPrev();
+                        prevTutorialStep = _origPrev;
+                    };
+                } else {
+                    if (prevBtn) prevBtn.style.display = _tutorialStep > 0 ? "" : "none";
+                    if (nextBtn) nextBtn.style.display = _tutorialStep < TUTORIAL_STEPS.length - 1 ? "" : "none";
+                    if (doneBtn) doneBtn.style.display = _tutorialStep === TUTORIAL_STEPS.length - 1 ? "" : "none";
+                }
+
+                // Remove previous highlights
+                document.querySelectorAll(".tutorial-target-highlight").forEach(function(el) {
+                    el.classList.remove("tutorial-target-highlight");
+                });
+
+                if (!step.selector) {
+                    // Center card - no highlight
+                    if (highlight) highlight.style.display = "none";
+                    if (card) {
+                        card.style.left = "50%";
+                        card.style.top = "50%";
+                        card.style.transform = "translate(-50%,-50%)";
+                        card.style.display = "block";
+                    }
+                    return;
+                }
+
+                var target = document.querySelector(step.selector);
+                if (!target || !highlight || !card) {
+                    if (card) { card.style.display = "none"; }
+                    return;
+                }
+
+                // Highlight target
+                target.classList.add("tutorial-target-highlight");
+                target.scrollIntoView({ block: "center" });
+                var rect = target.getBoundingClientRect();
+                highlight.style.display = "block";
+                highlight.style.left = (rect.left - 6) + "px";
+                highlight.style.top = (rect.top - 6) + "px";
+                highlight.style.width = (rect.width + 12) + "px";
+                highlight.style.height = (rect.height + 12) + "px";
+
+                // Position card near target
+                var placement = step.placement || "bottom";
+                var offsetY = step.offsetY || 0;
+                card.style.transform = "none";
+                card.style.position = "fixed";
+
+                if (placement === "bottom") {
+                    card.style.left = Math.max(8, Math.min(rect.left + rect.width / 2 - 180, window.innerWidth - 368)) + "px";
+                    card.style.top = (rect.bottom + 12 + offsetY) + "px";
+                } else if (placement === "top") {
+                    card.style.left = Math.max(8, Math.min(rect.left + rect.width / 2 - 180, window.innerWidth - 368)) + "px";
+                    card.style.top = (rect.top - 12 - 200 + offsetY) + "px";
+                    // If above viewport, show below instead
+                    if (parseInt(card.style.top) < 10) {
+                        card.style.top = (rect.bottom + 12) + "px";
+                    }
+                }
+                card.style.display = "block";
+            }
+
+            function nextTutorialStep() {
+                var step = TUTORIAL_STEPS[_tutorialStep];
+                if (step && step.action === "settings") {
+                    // Save tutorial progress and navigate to settings
+                    try { localStorage.setItem(TUTORIAL_KEY + "_step", "settings_visited"); } catch(_) {}
+                    window.location.href = "settings.html?tutorial=1";
+                    return;
+                }
+                if (_tutorialStep < TUTORIAL_STEPS.length - 1) {
+                    _tutorialStep++;
+                    renderTutorialStep();
+                } else {
+                    finishTutorial();
+                }
+            }
+
+            function prevTutorialStep() {
+                if (_tutorialStep > 0) {
+                    _tutorialStep--;
+                    renderTutorialStep();
+                }
+            }
+
+            function finishTutorial() {
+                try { localStorage.setItem(TUTORIAL_KEY, "1"); } catch(_) {}
+                var overlay = document.getElementById("tutorialOverlay");
+                if (overlay) overlay.style.display = "none";
+                document.querySelectorAll(".tutorial-target-highlight").forEach(function(el) {
+                    el.classList.remove("tutorial-target-highlight");
+                });
+            }
+
+            // ─── Online Status Indicator ───
+            function initOnlineStatus() {
+                var el = document.getElementById("onlineStatus");
+                if (!el) return;
+                function update() {
+                    var isOnline = navigator.onLine;
+                    var isPro = localStorage.getItem("budsin_pro_active") === "1";
+                    if (isPro) {
+                        el.style.display = "";
+                        el.textContent = isOnline ? "🟢 Online" : "🔴 Offline — Pro offline active";
+                        el.style.background = isOnline ? "rgba(47,201,138,0.12)" : "rgba(239,63,69,0.12)";
+                        el.style.color = isOnline ? "var(--green)" : "var(--red)";
+                        el.style.borderColor = isOnline ? "rgba(47,201,138,0.3)" : "rgba(239,63,69,0.3)";
+                    } else {
+                        el.style.display = "none";
+                    }
+                }
+                update();
+                window.addEventListener("online", update);
+                window.addEventListener("offline", update);
+                window.addEventListener("storage", function(e) {
+                    if (e.key === "budsin_pro_active") update();
+                });
+            }
+
+            // ─── Share Collection ───
+            function shareCollection(name) {
+                var isPro = localStorage.getItem("budsin_pro_active") === "1";
+                if (!isPro) {
+                    showToast(getTranslations().shareCollectionProOnly || "Solo Pro puede compartir colecciones", true);
+                    return;
+                }
+                var cols = getCollections();
+                var col = cols.find(function(c) { return c.name === name; });
+                if (!col) { showToast("Colección no encontrada", false); return; }
+                var data = JSON.stringify({ type: "budsin_collection", name: col.name, items: col.items });
+                var encoded = btoa(encodeURIComponent(data));
+                var url = window.location.origin + "/?shared_collection=" + encoded;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(url).then(function() {
+                        showToast(getTranslations().shareCollectionCopied || "🔗 Link copiado!", false);
+                    }).catch(function() {
+                        fallbackCopy(url);
+                    });
+                } else {
+                    fallbackCopy(url);
+                }
+                function fallbackCopy(text) {
+                    var ta = document.createElement("textarea");
+                    ta.value = text;
+                    ta.style.position = "fixed";
+                    ta.style.opacity = "0";
+                    document.body.appendChild(ta);
+                    ta.select();
+                    try { document.execCommand("copy"); showToast("🔗 Link copiado!", false); } catch(e) { showToast("Error al copiar", false); }
+                    document.body.removeChild(ta);
+                }
+                unlockAchievement("social");
+            }
+
+            // ─── Init Online Status ───
+            initOnlineStatus();
 
             // Check localStorage first (set by settings.html), then init Firebase Auth for live updates
             const localPro = localStorage.getItem("budsin_pro_active") === "1";
@@ -4971,6 +5658,111 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     footerContact: "Contacto",
                     footerFeedback: "Comentarios",
                     footerCopy: "© 2026 Budsin Games. Todos los juegos pertenecen a sus respectivos creadores.",
+                    // New Pro features v6.2
+                    focusModeBtn: "🧘 Focus",
+                    focusModeTitle: "Modo sin distracciones",
+                    focusModeDesc: "Oculta toda la interfaz para jugar a pantalla completa.",
+                    focusModeExit: "Presiona ESC para salir del modo Focus",
+                    leaderboardTitle: "🏆 Leaderboards",
+                    leaderboardNoData: "Sé el primero en jugar!",
+                    leaderboardRank: "#",
+                    leaderboardPlayer: "Jugador",
+                    leaderboardScore: "Puntuación",
+                    leaderboardSubmit: "Enviar puntuación",
+                    leaderboardSubmitHint: "Envía tu puntuación a la tabla global",
+                    leaderboardScorePlaceholder: "Tu puntuación...",
+                    leaderboardSubmitted: "Puntuación enviada!",
+                    leaderboardProOnly: "Solo usuarios Pro pueden enviar puntuaciones",
+                    profileTitle: "Perfil",
+                    profileAvatar: "Avatar",
+                    profileDisplayName: "Nombre público",
+                    profileBio: "Biografía",
+                    profileSaved: "Perfil guardado",
+                    profileSave: "Guardar perfil",
+                    achievementsTitle: "🏅 Logros",
+                    achievementsProgress: "Progreso",
+                    achievementsLocked: "🔒",
+                    achievementsUnlocked: "✅",
+                    achievementFirstGame: "Primer juego",
+                    achievementFirstGameDesc: "Juega tu primer juego",
+                    achievementTenGames: "Veterano",
+                    achievementTenGamesDesc: "Juega 10 juegos diferentes",
+                    achievementAllCategories: "Explorador",
+                    achievementAllCategoriesDesc: "Prueba juegos de todas las categorías",
+                    achievementProMember: "Pro Player",
+                    achievementProMemberDesc: "Activa Budsin Pro",
+                    achievementFavFive: "Fanático",
+                    achievementFavFiveDesc: "Añade 5 juegos a favoritos",
+                    achievementCollection: "Coleccionista",
+                    achievementCollectionDesc: "Crea tu primera colección",
+                    achievementStreak: "Racha",
+                    achievementStreakDesc: "Juega 7 días seguidos",
+                    achievementSocial: "Social",
+                    achievementSocialDesc: "Comparte una colección",
+                    exportTitle: "Exportar datos",
+                    exportDesc: "Descarga tus datos (favoritos, colecciones, ajustes)",
+                    exportBtn: "📥 Exportar JSON",
+                    exportSuccess: "Datos exportados",
+                    gameRequestTitle: "Solicitar juego",
+                    gameRequestName: "Nombre del juego",
+                    gameRequestUrl: "URL del juego",
+                    gameRequestDesc: "Descripción",
+                    gameRequestSubmit: "Enviar solicitud",
+                    gameRequestSuccess: "Solicitud enviada! Los admins la revisarán.",
+                    gameRequestProOnly: "Solo Pro puede solicitar juegos",
+                    mySavesTitle: "Mis guardados en la nube",
+                    mySavesEmpty: "No tienes juegos guardados en la nube.",
+                    mySavesDelete: "Eliminar",
+                    mySavesSync: "Sincronizar",
+                    mySavesLastSave: "Último guardado",
+                    statsTitle: "Estadísticas avanzadas",
+                    statsPlayTime: "Tiempo total jugado",
+                    statsSessions: "Sesiones hoy",
+                    statsStreak: "Racha actual",
+                    statsAvgSession: "Promedio por sesión",
+                    statsHours: "horas",
+                    statsMinutes: "min",
+                    shareCollectionTitle: "Compartir colección",
+                    shareCollectionDesc: "Comparte esta colección con tus amigos",
+                    shareCollectionBtn: "🔗 Copiar link",
+                    shareCollectionCopied: "Link copiado!",
+                    shareCollectionProOnly: "Solo Pro puede compartir colecciones",
+                    customThemeTitle: "Tema personalizado",
+                    customThemeDesc: "Elige tus propios colores (Pro)",
+                    customThemePrimary: "Color primario",
+                    customThemeSecondary: "Color secundario",
+                    customThemeAccent: "Color de acento",
+                    customThemeReset: "Restablecer",
+                    customThemeSaved: "Tema guardado",
+                    onlineStatusOnline: "Conectado",
+                    onlineStatusOffline: "Sin conexión — modo offline Pro activo",
+                    // Tutorial
+                    tutorialNext: "Siguiente",
+                    tutorialDone: "✓ Listo",
+                    tutorialSkip: "Saltar tutorial",
+                    tutorialLangTitle: "🌐 Elige tu idioma",
+                    tutorialLangDesc: "Selecciona tu idioma preferido para el portal desde el menú superior.",
+                    tutorialStep1Title: "👋 Bienvenido a Budsin Games",
+                    tutorialStep1Desc: "Este tutorial rápido te mostrará las partes principales del portal.",
+                    tutorialStep2Title: "🔍 Buscador",
+                    tutorialStep2Desc: "Escribe el nombre de cualquier juego para encontrarlo al instante.",
+                    tutorialStep3Title: "🏷️ Filtros",
+                    tutorialStep3Desc: "Filtra juegos por categoría: Acción, Clicker, Multiplayer y más.",
+                    tutorialStep4Title: "🎮 Los juegos",
+                    tutorialStep4Desc: "Haz clic en cualquier portada para abrir el juego al instante.",
+                    tutorialStep5Title: "⭐ Favoritos",
+                    tutorialStep5Desc: "Marca juegos como favoritos para tenerlos siempre a mano.",
+                    tutorialStep6Title: "📁 Colecciones",
+                    tutorialStep6Desc: "Agrupa juegos en colecciones personalizadas.",
+                    tutorialStep7Title: "🎲 Juego al azar",
+                    tutorialStep7Desc: "¿Sin decidir? Prueba el juego al azar.",
+                    tutorialStepHideTitle: "⌨️ Tecla de acceso rápido",
+                    tutorialStepHideDesc: "Presiona la tecla « ` » (backtick) para activar el modo oculto. Es la tecla que está junto al 1, encima de Tab.",
+                    tutorialStepHideSuccess: "✅ Bien! Así se activa el modo oculto. Puedes cerrarlo con la misma tecla.",
+                    tutorialStep8Title: "⚙️ Ajustes y Budsin Pro",
+                    tutorialStep8Desc: "En Ajustes puedes configurar el portal y ver Budsin Pro.",
+                    tutorialStep9Title: "✅ Tutorial completado",
+                    tutorialStep9Desc: "Ya conoces lo básico. ¡Disfruta del portal!",
                 },
                 en: {
                     htmlLang: "en",
@@ -5099,6 +5891,111 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     footerContact: "Contact",
                     footerFeedback: "Feedback",
                     footerCopy: "© 2026 Budsin Games. All games belong to their respective creators.",
+                    // New Pro features v6.2
+                    focusModeBtn: "🧘 Focus",
+                    focusModeTitle: "Distraction-Free Mode",
+                    focusModeDesc: "Hide all UI to play in fullscreen.",
+                    focusModeExit: "Press ESC to exit Focus Mode",
+                    leaderboardTitle: "🏆 Leaderboards",
+                    leaderboardNoData: "Be the first to play!",
+                    leaderboardRank: "#",
+                    leaderboardPlayer: "Player",
+                    leaderboardScore: "Score",
+                    leaderboardSubmit: "Submit score",
+                    leaderboardSubmitHint: "Submit your score to the global leaderboard",
+                    leaderboardScorePlaceholder: "Your score...",
+                    leaderboardSubmitted: "Score submitted!",
+                    leaderboardProOnly: "Only Pro users can submit scores",
+                    profileTitle: "Profile",
+                    profileAvatar: "Avatar",
+                    profileDisplayName: "Display name",
+                    profileBio: "Bio",
+                    profileSaved: "Profile saved",
+                    profileSave: "Save profile",
+                    achievementsTitle: "🏅 Achievements",
+                    achievementsProgress: "Progress",
+                    achievementsLocked: "🔒",
+                    achievementsUnlocked: "✅",
+                    achievementFirstGame: "First game",
+                    achievementFirstGameDesc: "Play your first game",
+                    achievementTenGames: "Veteran",
+                    achievementTenGamesDesc: "Play 10 different games",
+                    achievementAllCategories: "Explorer",
+                    achievementAllCategoriesDesc: "Try games from all categories",
+                    achievementProMember: "Pro Player",
+                    achievementProMemberDesc: "Activate Budsin Pro",
+                    achievementFavFive: "Fan",
+                    achievementFavFiveDesc: "Add 5 games to favorites",
+                    achievementCollection: "Collector",
+                    achievementCollectionDesc: "Create your first collection",
+                    achievementStreak: "Streak",
+                    achievementStreakDesc: "Play 7 days in a row",
+                    achievementSocial: "Social",
+                    achievementSocialDesc: "Share a collection",
+                    exportTitle: "Export data",
+                    exportDesc: "Download your data (favorites, collections, settings)",
+                    exportBtn: "📥 Export JSON",
+                    exportSuccess: "Data exported",
+                    gameRequestTitle: "Request game",
+                    gameRequestName: "Game name",
+                    gameRequestUrl: "Game URL",
+                    gameRequestDesc: "Description",
+                    gameRequestSubmit: "Submit request",
+                    gameRequestSuccess: "Request submitted! Admins will review it.",
+                    gameRequestProOnly: "Only Pro can request games",
+                    mySavesTitle: "My cloud saves",
+                    mySavesEmpty: "No cloud saves yet.",
+                    mySavesDelete: "Delete",
+                    mySavesSync: "Sync",
+                    mySavesLastSave: "Last save",
+                    statsTitle: "Advanced stats",
+                    statsPlayTime: "Total play time",
+                    statsSessions: "Sessions today",
+                    statsStreak: "Current streak",
+                    statsAvgSession: "Avg per session",
+                    statsHours: "hours",
+                    statsMinutes: "min",
+                    shareCollectionTitle: "Share collection",
+                    shareCollectionDesc: "Share this collection with friends",
+                    shareCollectionBtn: "🔗 Copy link",
+                    shareCollectionCopied: "Link copied!",
+                    shareCollectionProOnly: "Only Pro can share collections",
+                    customThemeTitle: "Custom theme",
+                    customThemeDesc: "Choose your own colors (Pro)",
+                    customThemePrimary: "Primary color",
+                    customThemeSecondary: "Secondary color",
+                    customThemeAccent: "Accent color",
+                    customThemeReset: "Reset",
+                    customThemeSaved: "Theme saved",
+                    onlineStatusOnline: "Online",
+                    onlineStatusOffline: "Offline — Pro offline mode active",
+                    // Tutorial
+                    tutorialNext: "Next",
+                    tutorialDone: "✓ Done",
+                    tutorialSkip: "Skip tutorial",
+                    tutorialLangTitle: "🌐 Choose your language",
+                    tutorialLangDesc: "Select your preferred language for the portal from the top menu.",
+                    tutorialStep1Title: "👋 Welcome to Budsin Games",
+                    tutorialStep1Desc: "This quick tutorial will show you the main parts of the portal.",
+                    tutorialStep2Title: "🔍 Search",
+                    tutorialStep2Desc: "Type any game name to find it instantly.",
+                    tutorialStep3Title: "🏷️ Filters",
+                    tutorialStep3Desc: "Filter games by category: Action, Clicker, Multiplayer and more.",
+                    tutorialStep4Title: "🎮 Games",
+                    tutorialStep4Desc: "Click any cover to open the game instantly.",
+                    tutorialStep5Title: "⭐ Favorites",
+                    tutorialStep5Desc: "Mark games as favorites to keep them at hand.",
+                    tutorialStep6Title: "📁 Collections",
+                    tutorialStep6Desc: "Group games into custom collections.",
+                    tutorialStep7Title: "🎲 Random game",
+                    tutorialStep7Desc: "Can't decide? Try a random game.",
+                    tutorialStepHideTitle: "⌨️ Hotkey",
+                    tutorialStepHideDesc: "Press the « ` » (backtick) key to activate hidden mode. It's the key next to 1, above Tab.",
+                    tutorialStepHideSuccess: "✅ Great! That's how you activate hidden mode. Close it with the same key.",
+                    tutorialStep8Title: "⚙️ Settings & Budsin Pro",
+                    tutorialStep8Desc: "In Settings you can configure the portal and see Budsin Pro.",
+                    tutorialStep9Title: "✅ Tutorial complete",
+                    tutorialStep9Desc: "You know the basics. Enjoy the portal!",
                 },
                 pt: {
                     htmlLang: "pt",
@@ -5227,6 +6124,111 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     footerContact: "Contato",
                     footerFeedback: "Comentários",
                     footerCopy: "© 2026 Budsin Games. Todos os jogos pertencem a seus respectivos criadores.",
+                    // New Pro features v6.2
+                    focusModeBtn: "🧘 Focus",
+                    focusModeTitle: "Modo sem distrações",
+                    focusModeDesc: "Oculte toda a interface para jogar em tela cheia.",
+                    focusModeExit: "Pressione ESC para sair do Modo Focus",
+                    leaderboardTitle: "🏆 Leaderboards",
+                    leaderboardNoData: "Seja o primeiro a jogar!",
+                    leaderboardRank: "#",
+                    leaderboardPlayer: "Jogador",
+                    leaderboardScore: "Pontuação",
+                    leaderboardSubmit: "Enviar pontuação",
+                    leaderboardSubmitHint: "Envie sua pontuação para o ranking global",
+                    leaderboardScorePlaceholder: "Sua pontuação...",
+                    leaderboardSubmitted: "Pontuação enviada!",
+                    leaderboardProOnly: "Apenas usuários Pro podem enviar pontuações",
+                    profileTitle: "Perfil",
+                    profileAvatar: "Avatar",
+                    profileDisplayName: "Nome público",
+                    profileBio: "Biografia",
+                    profileSaved: "Perfil salvo",
+                    profileSave: "Salvar perfil",
+                    achievementsTitle: "🏅 Conquistas",
+                    achievementsProgress: "Progresso",
+                    achievementsLocked: "🔒",
+                    achievementsUnlocked: "✅",
+                    achievementFirstGame: "Primeiro jogo",
+                    achievementFirstGameDesc: "Jogue seu primeiro jogo",
+                    achievementTenGames: "Veterano",
+                    achievementTenGamesDesc: "Jogue 10 jogos diferentes",
+                    achievementAllCategories: "Explorador",
+                    achievementAllCategoriesDesc: "Experimente jogos de todas as categorias",
+                    achievementProMember: "Pro Player",
+                    achievementProMemberDesc: "Ative o Budsin Pro",
+                    achievementFavFive: "Fã",
+                    achievementFavFiveDesc: "Adicione 5 jogos aos favoritos",
+                    achievementCollection: "Colecionador",
+                    achievementCollectionDesc: "Crie sua primeira coleção",
+                    achievementStreak: "Sequência",
+                    achievementStreakDesc: "Jogue 7 dias seguidos",
+                    achievementSocial: "Social",
+                    achievementSocialDesc: "Compartilhe uma coleção",
+                    exportTitle: "Exportar dados",
+                    exportDesc: "Baixe seus dados (favoritos, coleções, configurações)",
+                    exportBtn: "📥 Exportar JSON",
+                    exportSuccess: "Dados exportados",
+                    gameRequestTitle: "Solicitar jogo",
+                    gameRequestName: "Nome do jogo",
+                    gameRequestUrl: "URL do jogo",
+                    gameRequestDesc: "Descrição",
+                    gameRequestSubmit: "Enviar solicitação",
+                    gameRequestSuccess: "Solicitação enviada! Os admins revisarão.",
+                    gameRequestProOnly: "Apenas Pro pode solicitar jogos",
+                    mySavesTitle: "Meus saves na nuvem",
+                    mySavesEmpty: "Nenhum jogo salvo na nuvem.",
+                    mySavesDelete: "Excluir",
+                    mySavesSync: "Sincronizar",
+                    mySavesLastSave: "Último save",
+                    statsTitle: "Estatísticas avançadas",
+                    statsPlayTime: "Tempo total jogado",
+                    statsSessions: "Sessões hoje",
+                    statsStreak: "Sequência atual",
+                    statsAvgSession: "Média por sessão",
+                    statsHours: "horas",
+                    statsMinutes: "min",
+                    shareCollectionTitle: "Compartilhar coleção",
+                    shareCollectionDesc: "Compartilhe esta coleção com amigos",
+                    shareCollectionBtn: "🔗 Copiar link",
+                    shareCollectionCopied: "Link copiado!",
+                    shareCollectionProOnly: "Apenas Pro pode compartilhar coleções",
+                    customThemeTitle: "Tema personalizado",
+                    customThemeDesc: "Escolha suas próprias cores (Pro)",
+                    customThemePrimary: "Cor primária",
+                    customThemeSecondary: "Cor secundária",
+                    customThemeAccent: "Cor de destaque",
+                    customThemeReset: "Restaurar",
+                    customThemeSaved: "Tema salvo",
+                    onlineStatusOnline: "Conectado",
+                    onlineStatusOffline: "Sem conexão — modo offline Pro ativo",
+                    // Tutorial
+                    tutorialNext: "Próximo",
+                    tutorialDone: "✓ Pronto",
+                    tutorialSkip: "Pular tutorial",
+                    tutorialLangTitle: "🌐 Escolha seu idioma",
+                    tutorialLangDesc: "Selecione seu idioma preferido para o portal no menu superior.",
+                    tutorialStep1Title: "👋 Bem-vindo ao Budsin Games",
+                    tutorialStep1Desc: "Este tutorial rápido mostrará as principais partes do portal.",
+                    tutorialStep2Title: "🔍 Busca",
+                    tutorialStep2Desc: "Digite o nome de qualquer jogo para encontrá-lo instantaneamente.",
+                    tutorialStep3Title: "🏷️ Filtros",
+                    tutorialStep3Desc: "Filtre jogos por categoria: Ação, Clicker, Multiplayer e mais.",
+                    tutorialStep4Title: "🎮 Jogos",
+                    tutorialStep4Desc: "Clique em qualquer capa para abrir o jogo instantaneamente.",
+                    tutorialStep5Title: "⭐ Favoritos",
+                    tutorialStep5Desc: "Marque jogos como favoritos para tê-los sempre à mão.",
+                    tutorialStep6Title: "📁 Coleções",
+                    tutorialStep6Desc: "Agrupe jogos em coleções personalizadas.",
+                    tutorialStep7Title: "🎲 Jogo aleatório",
+                    tutorialStep7Desc: "Sem decidir? Experimente um jogo aleatório.",
+                    tutorialStepHideTitle: "⌨️ Tecla de atalho",
+                    tutorialStepHideDesc: "Pressione a tecla « ` » (acento grave) para ativar o modo oculto. É a tecla ao lado do 1, acima do Tab.",
+                    tutorialStepHideSuccess: "✅ Bem! Assim se ativa o modo oculto. Feche com a mesma tecla.",
+                    tutorialStep8Title: "⚙️ Ajustes e Budsin Pro",
+                    tutorialStep8Desc: "Em Ajustes você pode configurar o portal e ver o Budsin Pro.",
+                    tutorialStep9Title: "✅ Tutorial concluído",
+                    tutorialStep9Desc: "Você conhece o básico. Aproveite o portal!",
                 },
             };
 
@@ -6180,6 +7182,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                     <strong class="collection-name">📁 ${escHtml(col.name)}</strong>
                                     <div class="collection-actions">
                                         <button class="collection-rename-btn" data-col-name="${col.name}" type="button" title="${t.collectionsRename || "Renombrar"}">✏️</button>
+                                        <button class="collection-share-btn" data-col-name="${col.name}" type="button" title="${t.shareCollectionBtn || "Compartir"}">🔗</button>
                                         <button class="collection-delete-btn" data-col-name="${col.name}" type="button" title="${t.collectionsDelete || "Eliminar"}">🗑️</button>
                                     </div>
                                 </div>
@@ -6212,6 +7215,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                                 if (confirm((t.collectionsDeleteConfirm || "¿Eliminar colección") + ` "${name}"?`)) {
                                     deleteCollection(name);
                                 }
+                            });
+                        });
+                        collectionsContainer.querySelectorAll(".collection-share-btn").forEach((btn) => {
+                            btn.addEventListener("click", function(e) {
+                                e.stopPropagation();
+                                shareCollection(this.dataset.colName);
                             });
                         });
                     } else {
@@ -6413,7 +7422,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         }
                     }
 
+                    // Si el modo Focus está activo, cargar juego en overlay en vez de navegar
+                    if (isFocusModeActive()) {
+                        pendingNavUrl = href;
+                        pendingGameName = gameName;
+                        firebasePromise = incrementRemotePopularity(href, gameName, 1);
+                        const success = await firebasePromise;
+                        if (!success) queueRemoteIncrement(href, gameName, 1);
+                        const recent = readJson(RECENTLY_PLAYED_KEY, []);
+                        const recentIndex = recent.indexOf(href);
+                        if (recentIndex > -1) recent.splice(recentIndex, 1);
+                        recent.unshift(href);
+                        if (recent.length > RECENTLY_PLAYED_MAX) recent.pop();
+                        writeJson(RECENTLY_PLAYED_KEY, recent);
+                        renderShelves();
+                        trackPlaySession(gameName);
+                        popularityState[href] = (Number(popularityState[href]) || 0) + 1;
+                        saveLocalPopularity();
+                        renderShelves();
+                        loadGameInFocus(href);
+                        return;
+                    }
+
                     pendingNavUrl = href;
+                    // Cache game for Pro offline
+                    if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.controller.postMessage({ type: "CACHE_GAME", url: href });
+                    }
                     pendingGameName = gameName;
                     firebasePromise = incrementRemotePopularity(href, gameName, 1);
                     openAppTransition();
@@ -6425,6 +7460,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     if (recent.length > RECENTLY_PLAYED_MAX) recent.pop();
                     writeJson(RECENTLY_PLAYED_KEY, recent);
                     renderShelves();
+                    trackPlaySession(gameName);
                     popularityState[href] =
                         (Number(popularityState[href]) || 0) + 1;
                     saveLocalPopularity();
@@ -6466,6 +7502,50 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     if (e.target === gatingPopup) closeProGatingPopup();
                 });
             }
+
+            // Leaderboard popup
+            document.getElementById("closeLeaderboardPopup")?.addEventListener("click", closeLeaderboardPopup);
+            document.getElementById("leaderboardPopup")?.addEventListener("click", function(e) {
+                if (e.target === this) closeLeaderboardPopup();
+            });
+            document.getElementById("leaderboardSubmitBtn")?.addEventListener("click", function() {
+                var input = document.getElementById("leaderboardScoreInput");
+                if (!input) return;
+                var score = parseInt(input.value, 10);
+                if (isNaN(score) || score < 0) { showToast("Puntuación inválida", false); return; }
+                var isPro = localStorage.getItem("budsin_pro_active") === "1";
+                if (!isPro) {
+                    showToast(getTranslations().leaderboardProOnly || "Solo Pro puede enviar puntuaciones", true);
+                    return;
+                }
+                // Verificar que el usuario haya completado su perfil
+                if (!firebaseEnabled || !firebaseDb) {
+                    showToast("Firebase no disponible", false);
+                    return;
+                }
+                var userRaw = null;
+                try { userRaw = JSON.parse(localStorage.getItem("budsin_pro_user") || "null"); } catch(_) {}
+                if (!userRaw || !userRaw.uid) {
+                    showToast("Debes iniciar sesión en Settings para enviar puntuaciones", false);
+                    return;
+                }
+                firebaseDb.collection("users").doc(userRaw.uid).get().then(function(doc) {
+                    var data = doc.exists ? doc.data() : {};
+                    var profile = data.profile || {};
+                    var displayName = (profile.displayName || "").trim();
+                    if (!displayName) {
+                        showToast("Completa tu perfil en Settings (nombre público) antes de enviar puntuaciones", false);
+                        return;
+                    }
+                    submitLeaderboardScore(_leaderboardCurrentGame, score, displayName).then(function() {
+                        input.value = "";
+                        showLeaderboardPopup(_leaderboardCurrentGame);
+                    });
+                }).catch(function(err) {
+                    console.warn("[Budsin] Profile fetch error:", err);
+                    showToast("Error al verificar perfil", false);
+                });
+            });
 
             if (proPopup) {
                 proPopup.addEventListener("click", function (e) {
@@ -6688,6 +7768,40 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (loadedRemote) {
                     sortGamesByRanking(true);
                 }
+                // Init new Pro features
+                initFocusMode();
+                checkAchievements();
+
+                // Init tutorial
+                document.getElementById("tutorialNextBtn")?.addEventListener("click", nextTutorialStep);
+                document.getElementById("tutorialPrevBtn")?.addEventListener("click", prevTutorialStep);
+                document.getElementById("tutorialDoneBtn")?.addEventListener("click", finishTutorial);
+                document.getElementById("tutorialSkipBtn")?.addEventListener("click", finishTutorial);
+                document.getElementById("tutorialBackdrop")?.addEventListener("click", finishTutorial);
+
+
+                window.addEventListener("resize", function() {
+                    var overlay = document.getElementById("tutorialOverlay");
+                    if (overlay && overlay.style.display === "block") renderTutorialStep();
+                });
+                try {
+                    var urlParams = new URLSearchParams(window.location.search);
+                    if (urlParams.get("tutorial") === "true") {
+                        localStorage.removeItem(TUTORIAL_KEY);
+                        setTimeout(startTutorial, 600);
+                    } else if (localStorage.getItem(TUTORIAL_KEY + "_step") === "settings_visited") {
+                        // Returning from settings tutorial – skip to last step
+                        try { localStorage.removeItem(TUTORIAL_KEY + "_step"); } catch(_) {}
+                        setTimeout(function() {
+                            _tutorialStep = TUTORIAL_STEPS.length - 1;
+                            var overlay = document.getElementById("tutorialOverlay");
+                            if (overlay) overlay.style.display = "block";
+                            renderTutorialStep();
+                        }, 600);
+                    } else if (localStorage.getItem(TUTORIAL_KEY) !== "1") {
+                        setTimeout(startTutorial, 600);
+                    }
+                } catch(_) { setTimeout(startTutorial, 600); }
             })();
         </script>
         <script src="site-theme.js"></script>
@@ -6695,7 +7809,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <script src="lines-bg.js"></script>
         <script>
             if ("serviceWorker" in navigator) {
-                navigator.serviceWorker.register("/sw.js", { scope: "/" });
+                navigator.serviceWorker.register("/sw.js", { scope: "/" }).then(function(reg) {
+                    function notifySW() {
+                        if (reg.active) {
+                            reg.active.postMessage({ type: "PRO_STATUS", isPro: localStorage.getItem("budsin_pro_active") === "1" });
+                        }
+                    }
+                    notifySW();
+                    window.addEventListener("storage", function(e) {
+                        if (e.key === "budsin_pro_active") notifySW();
+                    });
+                    var _orig = navigator.serviceWorker.controller;
+                    if (reg.installing) {
+                        reg.installing.addEventListener("statechange", function() {
+                            if (this.state === "activated") notifySW();
+                        });
+                    }
+                });
             }
         </script>
     </body>

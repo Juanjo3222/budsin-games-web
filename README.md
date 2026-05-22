@@ -197,6 +197,24 @@ Firebase se usa únicamente para el conteo de popularidad.
 
 ## 📝 Changelog
 
+### v6.2
+* **Modo offline Pro** — Service Worker con cache completo para usuarios Pro. El sitio funciona sin internet.
+* **Leaderboards globales** — Tabla de puntuaciones por juego solo para Pro.
+* **Perfiles personalizables** — Avatar, nombre público y biografía (guardado en Firestore).
+* **Estadísticas avanzadas** — Sesiones totales, juegos por día, rachas, calendario de actividad.
+* **Modo Focus** — Pantalla completa sin distracciones. Oculto para Free.
+* **Solicitar juegos** — Formulario para que Pro sugiera juegos, visible en admin.
+* **Exportar datos** — Descarga JSON con favoritos, colecciones, logros y ajustes.
+* **Compartir colecciones** — Link público para compartir playlists. Solo Pro.
+* **Logros/achievements** — 8 logros desbloqueables con tracking automático.
+* **Tema personalizado** — Selector de colores para Pro (primary, secondary, accent, bg).
+* **Online/Offline indicator** — Indicador de conexión visible para Pro en el portal.
+* **Sistema de tracking** — Registro de sesiones de juego para estadísticas y logros.
+
+### v6.1
+* **Bendy and the Ink Machine** — primer juego exclusivo Pro. Disponible para todos el 22 de mayo.
+* **Pro-Gating**: los juegos con `data-pro="true"` muestran popup de suscripción para usuarios Free.
+
 ### v6.0
 * **Budsin Pro** — Nuevo sistema de suscripción manual con Firebase Auth + Firestore.
 * Los usuarios inician sesión con Google desde **Settings**. El admin gestiona suscripciones desde `/admin.html`.

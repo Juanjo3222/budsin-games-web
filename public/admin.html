@@ -137,6 +137,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </table>
                     </div>
                 </div>
+
+                <!-- Game Requests -->
+                <div class="card" style="margin-top:16px">
+                    <h2 style="margin:0 0 12px;font-size:1.1rem">🎮 Solicitudes de juegos</h2>
+                    <div id="requestsLoading" style="color:var(--muted);font-size:.88rem">Cargando solicitudes...</div>
+                    <table id="requestsTable" style="display:none">
+                        <thead>
+                            <tr><th>Juego</th><th>URL</th><th>Usuario</th><th>Fecha</th><th>Estado</th><th>Acción</th></tr>
+                        </thead>
+                        <tbody id="requestsBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -281,6 +293,55 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 });
             }
 
+            function loadGameRequests() {
+                var tbody = document.getElementById("requestsBody");
+                var table = document.getElementById("requestsTable");
+                var loading = document.getElementById("requestsLoading");
+                db.collection("game_requests").orderBy("createdAt", "desc").get().then(function(snapshot) {
+                    loading.style.display = "none";
+                    if (snapshot.empty) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">No hay solicitudes aún.</td></tr>';
+                        table.style.display = "table";
+                        return;
+                    }
+                    table.style.display = "table";
+                    tbody.innerHTML = "";
+                    snapshot.forEach(function(doc) {
+                        var data = doc.data();
+                        var tr = document.createElement("tr");
+                        var created = data.createdAt && data.createdAt.toDate ? data.createdAt.toDate().toLocaleDateString() : "—";
+                        var statusColor = data.status === "approved" ? "var(--green)" : data.status === "rejected" ? "var(--red)" : "var(--blue)";
+                        tr.innerHTML =
+                            '<td style="font-weight:600">' + escHtml(data.gameName || "?") + '</td>' +
+                            '<td style="font-size:.8rem;color:var(--muted);max-width:200px;overflow:hidden;text-overflow:ellipsis">' + (data.gameUrl ? '<a href="' + escHtml(data.gameUrl) + '" target="_blank" style="color:var(--blue)">' + escHtml(data.gameUrl) + '</a>' : "—") + '</td>' +
+                            '<td style="font-size:.8rem;color:var(--muted)">' + escHtml(data.email || data.uid || "?") + '</td>' +
+                            '<td style="font-size:.8rem;color:var(--muted)">' + created + '</td>' +
+                            '<td><span style="display:inline-block;padding:2px 8px;border-radius:999px;background:' + statusColor + '20;color:' + statusColor + ';font-size:.7rem;font-weight:800;text-transform:uppercase">' + escHtml(data.status || "pending") + '</span></td>' +
+                            '<td>' +
+                                (data.status === "pending" ?
+                                    '<button type="button" class="btn btn-sm btn-green" data-req-id="' + doc.id + '" data-action="approve" style="margin-right:4px">✅ Aprobar</button>' +
+                                    '<button type="button" class="btn btn-sm btn-danger" data-req-id="' + doc.id + '" data-action="reject">❌ Rechazar</button>'
+                                : "—") +
+                            '</td>';
+                        tbody.appendChild(tr);
+                    });
+                    tbody.querySelectorAll("button[data-req-id]").forEach(function(btn) {
+                        btn.addEventListener("click", function() {
+                            var reqId = this.dataset.reqId;
+                            var action = this.dataset.action;
+                            db.collection("game_requests").doc(reqId).update({
+                                status: action === "approve" ? "approved" : "rejected",
+                                reviewedAt: window.firebase.firestore.FieldValue.serverTimestamp(),
+                            }).then(function() {
+                                loadGameRequests();
+                            }).catch(function(err) { alert("Error: " + err.message); });
+                        });
+                    });
+                }).catch(function(err) {
+                    loading.textContent = "Error: " + err.message;
+                });
+            }
+
             function escHtml(str) {
                 return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
             }
@@ -293,6 +354,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         adminSection.classList.add("is-visible");
                         document.getElementById("adminEmailDisplay").textContent = user.email;
                         renderAllUsers();
+                        loadGameRequests();
                     });
                 } else if (user) {
                     authSection.classList.add("is-visible");

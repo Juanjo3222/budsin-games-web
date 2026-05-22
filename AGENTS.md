@@ -102,12 +102,26 @@ Estas funcionalidades fueron **aprobadas por el usuario** y deben implementarse 
 | Estadísticas (juegos jugados, favoritos) | ❌ No | ✅ En Settings |
 | Acceso anticipado a juegos nuevos | ❌ No | ✅ Prioridad |
 | Badge "Anticipado para Pro" | ✅ Se muestra en tarjetas marcadas | ❌ Oculto |
+| Modo offline (SW Cache) | ❌ No disponible | ✅ Sitio completo offline |
+| Leaderboards globales | ❌ Solo ver | ✅ Enviar puntuaciones |
+| Perfil personalizado (avatar, bio) | ❌ No | ✅ Sí |
+| Tema personalizado (colores) | ❌ No | ✅ Sí |
+| Modo Focus (sin distracciones) | ❌ No | ✅ Sí |
+| Solicitar juegos nuevos | ❌ No | ✅ Prioridad |
+| Exportar datos (JSON) | ❌ No | ✅ Sí |
+| Compartir colecciones | ❌ No | ✅ Link público |
+| Logros/achievements | ✅ Básico | ✅ Completo |
+| Estadísticas avanzadas | ❌ No | ✅ Sesiones, streaks, calendario |
+| Guardado en nube | Máximo 5 juegos | Ilimitado |
 
 ### 📁 Archivos clave del sistema Pro
 
-- **`public/index.html`**: Contiene la lógica principal (Firebase Auth, `applyProFeatures()`, badges, tema, favoritos, polling cada 5 min, verificación al volver a la pestaña).
-- **`public/settings.html`**: Login con Google, muestra estado Pro, fecha de renovación, estadísticas, selector de tema Pro.
-- **`public/admin.html`**: Panel admin para gestionar usuarios. Botones "Hacer Pro", "✅ Pagar este mes", "Revocar Pro". Muestra columna "Pagado hasta" con fecha.
+- **`public/index.html`**: Contiene la lógica principal (Firebase Auth, `applyProFeatures()`, badges, tema, favoritos, polling cada 5 min, verificación al volver a la pestaña, leaderboards, logros, modo Focus, share collections, online status).
+- **`public/settings.html`**: Login con Google, muestra estado Pro, fecha de renovación, estadísticas, selector de tema Pro, perfil personalizado, estadísticas avanzadas, game requests, my saves, export data, logros, tema personalizado.
+- **`public/admin.html`**: Panel admin para gestionar usuarios. Botones "Hacer Pro", "✅ Pagar este mes", "Revocar Pro". Muestra columna "Pagado hasta" con fecha. Incluye gestión de solicitudes de juegos.
+- **`public/sw.js`**: Service Worker con soporte offline para Pro. Cachea juegos visitados y activos estáticos.
+- **`public/site-theme.js`**: Maneja temas (light, dark, ps5, custom). El tema "custom" permite colores personalizados para Pro.
+- **`public/game-save.js`**: Wrapper GameSave para guardado en nube con detección automática Unity/localStorage.
 - **`AGENTS.md`**: Este archivo.
 - **`README.md`**: Changelog duplicado.
 
