@@ -514,11 +514,11 @@
 
             function isGameIDB(dbNames) {
                 var gameKey = gameName.replace(/[^a-z0-9]/g, "");
-                var excludePrefixes = ["firebase", "google", "ytgame", "__yt", "chrome-"];
+                var excludePrefixes = ["firebase", "google", "ytgame", "__yt", "chrome-", "default", "keyval", "idb"];
                 return dbNames.some(function (n) {
                     var name = n.toLowerCase().replace(/[^a-z0-9]/g, "");
                     if (excludePrefixes.some(function (p) { return name.indexOf(p) === 0; })) return false;
-                    return name === gameKey || name.indexOf(gameKey) !== -1;
+                    return name === gameKey;
                 });
             }
 
