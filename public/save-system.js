@@ -158,29 +158,37 @@
 
     function restoreIDB(snapshot) {
         var names = Object.keys(snapshot);
+        console.log("[BudsinSave] Restoring", names.length, "databases:", names.join(", "));
         var chain = Promise.resolve();
 
         names.forEach(function (name) {
             chain = chain.then(function () {
+                console.log("[BudsinSave] Deleting DB:", name);
                 return new Promise(function (resolve) {
-                    var delReq = indexedDB.deleteDatabase(name);
-                    delReq.onsuccess = function () { resolve(); };
-                    delReq.onerror = function () { resolve(); };
-                    delReq.onblocked = function () { resolve(); };
-                    setTimeout(resolve, 3000);
+                    try {
+                        var delReq = indexedDB.deleteDatabase(name);
+                        var resolved = false;
+                        function done() { if (!resolved) { resolved = true; resolve(); } }
+                        delReq.onsuccess = function () { console.log("[BudsinSave] Deleted DB:", name); done(); };
+                        delReq.onerror = function () { console.warn("[BudsinSave] Delete error:", name); done(); };
+                        delReq.onblocked = function () { console.warn("[BudsinSave] Delete blocked:", name); done(); };
+                        setTimeout(done, 5000);
+                    } catch (e) { console.warn("[BudsinSave] Delete exception:", name, e); resolve(); }
                 });
             }).then(function () {
                 return new Promise(function (resolve) {
                     var dbData = snapshot[name];
                     if (!dbData) { resolve(); return; }
+                    console.log("[BudsinSave] Opening DB:", name, "v" + (dbData.version || 1));
                     var openReq;
-                    try { openReq = indexedDB.open(name, dbData.version || 1); } catch (e) { resolve(); return; }
+                    try { openReq = indexedDB.open(name, dbData.version || 1); } catch (e) { console.warn("[BudsinSave] Open exception:", name, e); resolve(); return; }
                     openReq.onupgradeneeded = function (e) {
                         var d = e.target.result;
                         var stores = dbData.stores || {};
                         Object.keys(stores).forEach(function (sn) {
                             if (!d.objectStoreNames.contains(sn)) {
                                 d.createObjectStore(sn, { autoIncrement: true });
+                                console.log("[BudsinSave] Created store:", sn, "in", name);
                             }
                         });
                     };
@@ -197,8 +205,9 @@
                                         var tx = d.transaction(sn, "readwrite");
                                         var store = tx.objectStore(sn);
                                         var records = stores[sn] || [];
+                                        console.log("[BudsinSave] Restoring", records.length, "records to", sn);
                                         records.forEach(function (rec) {
-                                            try { store.put(rec.value, rec.key); } catch (e) {}
+                                            try { store.put(rec.value, rec.key); } catch (e) { console.warn("[BudsinSave] put error:", e); }
                                         });
                                         tx.oncomplete = function () { res2(); };
                                         tx.onerror = function () { res2(); };
@@ -208,13 +217,15 @@
                         });
                         storeChain.then(function () { d.close(); resolve(); });
                     };
-                    openReq.onerror = function () { resolve(); };
-                    openReq.onblocked = function () { resolve(); };
+                    openReq.onerror = function () { console.warn("[BudsinSave] Open error:", name); resolve(); };
+                    openReq.onblocked = function () { console.warn("[BudsinSave] Open blocked:", name); resolve(); };
                 });
             });
         });
 
-        return chain;
+        return chain.then(function () {
+            console.log("[BudsinSave] Restore complete");
+        });
     }
 
     // ─── Helpers exposed for game-save.js ───
@@ -388,8 +399,10 @@
             return new Promise(function (resolve, reject) {
                 function doSaveChunked() {
                     var json = JSON.stringify(snapshot);
+                    console.log("[BudsinSave] saveIDB size:", (json.length / 1024).toFixed(1), "KB");
 
                     if (json.length <= CHUNK_SIZE) {
+                        console.log("[BudsinSave] Saving directly (small)");
                         doSave(uid, gameName, { idbSnapshot: snapshot, gameType: "unity" }).then(resolve).catch(reject);
                         return;
                     }
@@ -398,6 +411,7 @@
                     for (var i = 0; i < json.length; i += CHUNK_SIZE) {
                         chunks.push(json.substring(i, i + CHUNK_SIZE));
                     }
+                    console.log("[BudsinSave] Splitting into", chunks.length, "chunks of", CHUNK_SIZE / 1024, "KB");
 
                     var batch = db.batch();
                     batch.set(getSaveRef(uid, gameName), {
@@ -414,10 +428,15 @@
                         batch.set(chunkRef, { data: chunks[j], index: j });
                     }
 
+                    console.log("[BudsinSave] Committing batch write...");
                     return batch.commit().then(function () {
+                        console.log("[BudsinSave] Save complete");
                         saveCountCache = null;
                         resolve();
-                    }).catch(reject);
+                    }).catch(function (e) {
+                        console.error("[BudsinSave] Batch commit error:", e);
+                        reject(e);
+                    });
                 }
 
                 if (!isPro) {
@@ -443,24 +462,39 @@
         loadIDB: function (gameName) {
             if (!gameName) return Promise.resolve(null);
             if (!initFirebase()) return Promise.resolve(null);
+            console.log("[BudsinSave] loadIDB starting for", gameName);
 
             var uid = getUserId();
             if (!uid) return Promise.resolve(null);
 
             return getSaveRef(uid, gameName).get().then(function (doc) {
-                if (!doc.exists) return null;
+                if (!doc.exists) { console.log("[BudsinSave] No save doc found"); return null; }
                 var d = doc.data();
 
-                if (d.storagePath) return null;
+                if (d.storagePath) { console.log("[BudsinSave] Old storagePath save, skipping"); return null; }
 
                 if (d.chunkCount) {
+                    console.log("[BudsinSave] Loading", d.chunkCount, "chunks for", gameName);
                     return getChunksRef(uid, gameName).get().then(function (snap) {
+                        console.log("[BudsinSave] Chunk query returned", snap.size, "docs");
                         var chunks = [];
                         snap.forEach(function (c) { chunks.push(c.data()); });
                         chunks.sort(function (a, b) { return a.index - b.index; });
+                        console.log("[BudsinSave] Sorted", chunks.length, "chunks");
+                        if (chunks.length !== d.chunkCount) {
+                            console.warn("[BudsinSave] Chunk count mismatch: expected", d.chunkCount, "got", chunks.length);
+                        }
                         var json = chunks.map(function (c) { return c.data; }).join("");
-                        return JSON.parse(json);
-                    }).catch(function (e) { console.warn("[BudsinSave] loadIDB error:", e); return null; });
+                        console.log("[BudsinSave] Parsing snapshot (", (json.length / 1024).toFixed(1), "KB )");
+                        try {
+                            var result = JSON.parse(json);
+                            console.log("[BudsinSave] Load complete");
+                            return result;
+                        } catch (e) {
+                            console.error("[BudsinSave] JSON parse error:", e);
+                            return null;
+                        }
+                    }).catch(function (e) { console.warn("[BudsinSave] loadIDB chunks error:", e); return null; });
                 }
 
                 if (d.data) {
@@ -472,7 +506,7 @@
                     }
                 }
                 return null;
-            }).catch(function () { return null; });
+            }).catch(function (e) { console.warn("[BudsinSave] loadIDB error:", e); return null; });
         },
 
         autoSaveIDB: function (gameName, getSnapshotFn) {

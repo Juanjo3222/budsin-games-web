@@ -560,11 +560,21 @@
             function doLoad() {
                 return BudsinSave.loadIDB(gameName).then(function (idbSnapshot) {
                     if (idbSnapshot && window.__BudsinIDB && window.__isUnityGame()) {
-                        return window.__BudsinIDB.restore(idbSnapshot).then(function () {
+                        console.log("[BudsinSave] Restoring Unity save...");
+                        var restorePromise = window.__BudsinIDB.restore(idbSnapshot);
+                        var timeoutPromise = new Promise(function (_, reject) {
+                            setTimeout(function () { reject(new Error("Restore timeout after 30s")); }, 30000);
+                        });
+                        return Promise.race([restorePromise, timeoutPromise]).then(function () {
                             btn.textContent = "\u2713";
                             btn.style.background = "rgba(52,152,219,0.7)";
                             showToast("Progreso Unity restaurado. Recargando...", false);
                             setTimeout(function () { location.reload(); }, 1000);
+                        }).catch(function (err) {
+                            console.error("[BudsinSave] Restore failed:", err);
+                            showToast("Error al restaurar: " + err.message, true);
+                            btn.textContent = "\u{1F4BE}";
+                            btn.style.background = "rgba(0,0,0,0.45)";
                         });
                     }
                     return BudsinSave.load(gameName).then(function (data) {
