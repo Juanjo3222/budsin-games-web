@@ -438,6 +438,36 @@
         }, 4000);
     }
 
+    function loadScript(src) {
+        return new Promise(function (resolve, reject) {
+            if (document.querySelector('script[src="' + src + '"]')) {
+                resolve();
+                return;
+            }
+            var s = document.createElement("script");
+            s.src = src;
+            s.onload = resolve;
+            s.onerror = reject;
+            document.head.appendChild(s);
+        });
+    }
+
+    function loadFirebase() {
+        if (window.firebase) return Promise.resolve();
+        return loadScript("https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js")
+            .then(function () {
+                return loadScript("https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js");
+            })
+            .then(function () {
+                return loadScript("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js");
+            });
+    }
+
+    function loadSaveSystem() {
+        if (window.BudsinSave) return Promise.resolve();
+        return loadScript("https://budsin-games.pages.dev/save-system.js");
+    }
+
     function createButton() {
         try {
             var btn = document.createElement("button");
@@ -472,48 +502,56 @@
                 btn.style.background = "rgba(0,0,0,0.45)";
             });
             btn.addEventListener("click", function () {
-                if (!window.BudsinSave) {
-                    showToast("Inicia sesi\u00f3n con Google para guardar en la nube", true);
-                    return;
-                }
-                BudsinSave.init().then(function (ok) {
-                    if (!ok) {
-                        showToast("Inicia sesi\u00f3n con Google para guardar en la nube", true);
+                btn.textContent = "\u23F3";
+                loadFirebase().then(loadSaveSystem).then(function () {
+                    if (!window.BudsinSave) {
+                        showToast("Error al cargar sistema de guardado", true);
+                        btn.textContent = "\u{1F4BE}";
                         return;
                     }
-                    var gameData = {};
-                    try {
-                        for (var i = 0; i < localStorage.length; i++) {
-                            var key = localStorage.key(i);
-                            if (!key) continue;
-                            if (key.indexOf("budsin_") === 0) continue;
-                            if (key.indexOf("firebase:") === 0) continue;
-                            gameData[key] = localStorage.getItem(key);
-                        }
-                    } catch (_) {}
-                    BudsinSave.saveNow(gameName, gameData).then(function () {
-                        btn.textContent = "\u2713";
-                        btn.style.background = "rgba(46,204,113,0.7)";
-                        showToast("Guardado en la nube \u2705", false);
-                        setTimeout(function () {
+                    return BudsinSave.init().then(function (ok) {
+                        if (!ok) {
+                            showToast("Inicia sesi\u00f3n con Google para guardar en la nube", true);
                             btn.textContent = "\u{1F4BE}";
-                            btn.style.background = "rgba(0,0,0,0.45)";
-                        }, 1200);
-                    }).catch(function (err) {
-                        btn.textContent = "\u2717";
-                        btn.style.background = "rgba(231,76,60,0.7)";
-                        if (err === "LIMIT_REACHED") {
-                            showToast("L\u00edmite de 5 juegos alcanzado. Hazte Pro para ilimitados.", true);
-                        } else {
-                            showToast("Error al guardar: " + err, true);
+                            return;
                         }
-                        setTimeout(function () {
-                            btn.textContent = "\u{1F4BE}";
-                            btn.style.background = "rgba(0,0,0,0.45)";
-                        }, 3000);
+                        var gameData = {};
+                        try {
+                            for (var i = 0; i < localStorage.length; i++) {
+                                var key = localStorage.key(i);
+                                if (!key) continue;
+                                if (key.indexOf("budsin_") === 0) continue;
+                                if (key.indexOf("firebase:") === 0) continue;
+                                gameData[key] = localStorage.getItem(key);
+                            }
+                        } catch (_) {}
+                        BudsinSave.saveNow(gameName, gameData).then(function () {
+                            btn.textContent = "\u2713";
+                            btn.style.background = "rgba(46,204,113,0.7)";
+                            showToast("Guardado en la nube \u2705", false);
+                            setTimeout(function () {
+                                btn.textContent = "\u{1F4BE}";
+                                btn.style.background = "rgba(0,0,0,0.45)";
+                            }, 1200);
+                        }).catch(function (err) {
+                            btn.textContent = "\u2717";
+                            btn.style.background = "rgba(231,76,60,0.7)";
+                            if (err === "LIMIT_REACHED") {
+                                showToast("L\u00edmite de 5 juegos alcanzado. Hazte Pro para ilimitados.", true);
+                            } else if (err === "User not logged in") {
+                                showToast("Inicia sesi\u00f3n con Google para guardar en la nube", true);
+                            } else {
+                                showToast("Error al guardar: " + err, true);
+                            }
+                            setTimeout(function () {
+                                btn.textContent = "\u{1F4BE}";
+                                btn.style.background = "rgba(0,0,0,0.45)";
+                            }, 3000);
+                        });
                     });
                 }).catch(function () {
                     showToast("Error al conectar con Firebase", true);
+                    btn.textContent = "\u{1F4BE}";
                 });
             });
             document.body.appendChild(btn);
