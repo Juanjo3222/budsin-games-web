@@ -99,6 +99,17 @@
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZT26944"
   height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
+
+  <!-- Loading Screen -->
+  <div id="loadingScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;background:#0b1220;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:system-ui,-apple-system,sans-serif;transition:opacity .4s">
+    <div style="font-size:2.6rem;margin-bottom:16px;font-weight:800;color:#4a9e4a">🌱 PvZ2</div>
+    <div style="font-size:.88rem;color:#8899aa;margin-bottom:20px">Cargando recursos...</div>
+    <div style="width:260px;height:6px;border-radius:999px;background:#1a2a3a;overflow:hidden">
+      <div id="loadingBar" style="width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg,#4a9e4a,#6ecf6e);transition:width .3s"></div>
+    </div>
+    <div id="loadingPct" style="font-size:.78rem;color:#5a7a8a;margin-top:8px">0%</div>
+  </div>
+
   <div id="GameDiv" cc_exact_fit_screen="true">
     <div id="Cocos3dGameContainer">
       <canvas id="GameCanvas" oncontextmenu="event.preventDefault()" tabindex="99"></canvas>
