@@ -3,11 +3,37 @@ System.register(["./application.js"], function (_export, _context) {
 
   var Application, canvas, $p, bcr, application;
 
-  function updateLoading(pct) {
-    var bar = document.getElementById('loadingBar');
-    var pctEl = document.getElementById('loadingPct');
-    if (bar) bar.style.width = Math.min(pct, 100) + '%';
-    if (pctEl) pctEl.textContent = Math.round(Math.min(pct, 100)) + '%';
+  var _loading = { bar: null, pct: null };
+  function initLoadingUI() {
+    _loading.bar = document.getElementById('loadingBar');
+    _loading.pct = document.getElementById('loadingPct');
+  }
+
+  var _milestones = [
+    { name: 'polyfills', pct: 5, done: false },
+    { name: 'systemjs', pct: 10, done: false },
+    { name: 'index_js', pct: 20, done: false },
+    { name: 'application_js', pct: 30, done: false },
+    { name: 'cc_engine', pct: 55, done: false },
+    { name: 'game_init', pct: 85, done: false },
+    { name: 'game_ready', pct: 100, done: false },
+  ];
+  var _reachedPct = 0;
+
+  function reachMilestone(name) {
+    for (var i = 0; i < _milestones.length; i++) {
+      var m = _milestones[i];
+      if (m.name === name) { m.done = true; break; }
+    }
+    var highest = 0;
+    for (var j = 0; j < _milestones.length; j++) {
+      if (_milestones[j].done) highest = _milestones[j].pct;
+    }
+    if (highest > _reachedPct) {
+      _reachedPct = highest;
+      if (_loading.bar) _loading.bar.style.width = highest + '%';
+      if (_loading.pct) _loading.pct.textContent = highest + '%';
+    }
   }
 
   function hideLoading() {
@@ -26,31 +52,29 @@ System.register(["./application.js"], function (_export, _context) {
       Application = _applicationJs.Application;
     }],
     execute: function () {
+      initLoadingUI();
+      if (window.__polyfillsLoaded) reachMilestone('polyfills');
+      if (window.__systemjsLoaded) reachMilestone('systemjs');
+      reachMilestone('application_js');
+
       canvas = document.getElementById('GameCanvas');
       $p = canvas.parentElement;
       bcr = $p.getBoundingClientRect();
       canvas.width = bcr.width;
       canvas.height = bcr.height;
-
-      // Simular progreso mientras se cargan modulos
-      var progress = 0;
-      var progTimer = setInterval(function () {
-        if (progress < 85) {
-          progress += 1 + Math.random() * 3;
-          updateLoading(progress);
-        }
-      }, 200);
+      reachMilestone('index_js');
 
       application = new Application();
       topLevelImport('cc').then(function (engine) {
+        reachMilestone('cc_engine');
         return application.init(engine);
       }).then(function () {
-        clearInterval(progTimer);
-        updateLoading(100);
-        setTimeout(function () { hideLoading(); }, 200);
+        reachMilestone('game_init');
         return application.start();
+      }).then(function () {
+        reachMilestone('game_ready');
+        setTimeout(function () { hideLoading(); }, 300);
       })["catch"](function (err) {
-        clearInterval(progTimer);
         hideLoading();
         console.error(err);
       });

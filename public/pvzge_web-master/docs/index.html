@@ -118,12 +118,12 @@
 
 
   <!-- Polyfills bundle. -->
-
   <script src="src/polyfills.bundle.js" charset="utf-8"> </script>
-
+  <script>window.__polyfillsLoaded = 1;</script>
 
   <!-- SystemJS support. -->
   <script src="src/system.bundle.js" charset="utf-8"> </script>
+  <script>window.__systemjsLoaded = 1;</script>
 
   <!-- Import map -->
   <script src="src/import-map.json" type="systemjs-importmap" charset="utf-8"> </script>
