@@ -16,7 +16,7 @@
 
 ## 🚀 Demo
 
-🔗 https://budsin-games.pages.dev
+🔗 https://games.budisn.dev
 
 ---
 

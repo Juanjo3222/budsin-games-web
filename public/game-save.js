@@ -455,7 +455,7 @@
 
     function loadSaveSystem() {
         if (window.BudsinSave) return Promise.resolve();
-        return loadScript("https://budsin-games.pages.dev/save-system.js");
+        return loadScript("https://games.budisn.dev/save-system.js");
     }
 
     function createButton() {
