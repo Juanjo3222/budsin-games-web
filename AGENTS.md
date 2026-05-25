@@ -1,6 +1,6 @@
 # 🤖 Configuración de Agentes: Budsin Games (v6.0)
 
-Este archivo centraliza la lógica de desarrollo de `games.budisn.dev`. Es el manual de identidad y comportamiento para las IAs en Zed Pro.
+Este archivo centraliza la lógica de desarrollo de `games.budsin.dev`. Es el manual de identidad y comportamiento para las IAs en Zed Pro.
 
 ---
 
@@ -34,7 +34,7 @@ Este archivo centraliza la lógica de desarrollo de `games.budisn.dev`. Es el ma
 4. **Firebase Minimalista**: Solo para conteo de impactos. Prohibido crear sistemas de Login/Auth por defecto.
 
 5. **Assets obligatorios en TODA página HTML**: Cualquier `.html` dentro de `public/` **debe incluir** en su `<head>` (lo más alto posible, tras `<meta charset>`):
-   - Favicon: `<link rel="icon" type="image/jpeg" href="https://games.budisn.dev/images.jpeg">`
+   - Favicon: `<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">`
    - Google Tag Manager: 
      ```html
      <!-- Google Tag Manager -->
@@ -56,8 +56,8 @@ Este archivo centraliza la lógica de desarrollo de `games.budisn.dev`. Es el ma
      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
      <!-- End Google Tag Manager (noscript) -->
      ```
-    - Script Classroom Hotkey: `<script src="https://games.budisn.dev/classroom-hotkey.js"></script>` (justo antes de `</body>`)
-    - Script Save System (solo si el juego soporta guardado auto): `<script src="https://games.budisn.dev/save-system.js"></script>` (justo antes de `</body>`, después de classroom-hotkey)
+    - Script Classroom Hotkey: `<script src="https://games.budsin.dev/classroom-hotkey.js"></script>` (justo antes de `</body>`)
+    - Script Save System (solo si el juego soporta guardado auto): `<script src="https://games.budsin.dev/save-system.js"></script>` (justo antes de `</body>`, después de classroom-hotkey)
     - Sin excepción. Aplica a **cualquier** `.html` dentro de `public/`.
 
 6. **Traducciones obligatorias al añadir un juego**: Cada vez que se añada una nueva tarjeta de juego al `index.html`, se deben completar **los 3 idiomas** sin excepción:
@@ -210,7 +210,7 @@ Cuando añadas un juego que será **exclusivo para usuarios Pro** (o anticipado)
 ### 6. Assets obligatorios
 - La página del juego **debe** incluir todos los assets de la Regla de Oro #5 (favicon, GTM, AdSense, classroom-hotkey).
 - La portada del juego debe estar en `public/portadas/[nombre].webp`.
-- **⚠️ URL absoluta para enlaces Pro**: Si la página tiene `<base>` tag (ej. CDN), los enlaces como `/settings.html#proCard` NO funcionan porque resuelven contra el origen del base. Usar URL absoluta: `https://games.budisn.dev/settings.html#proCard`.
+- **⚠️ URL absoluta para enlaces Pro**: Si la página tiene `<base>` tag (ej. CDN), los enlaces como `/settings.html#proCard` NO funcionan porque resuelven contra el origen del base. Usar URL absoluta: `https://games.budsin.dev/settings.html#proCard`.
 - **⚠️ Font-family**: El overlay del gating debe incluir `font-family: system-ui, -apple-system, sans-serif` para que herede la tipografía del portal.
 
 ---
@@ -318,8 +318,8 @@ gameSave.delete();
 // <script src="https://www.gstatic.com/firebasejs/9/firebase-auth.js"></script>
 // <script src="https://www.gstatic.com/firebasejs/9/firebase-firestore.js"></script>
 // <script src="https://www.gstatic.com/firebasejs/9/firebase-storage.js"></script>
-// <script src="https://games.budisn.dev/save-system.js"></script>
-// <script src="https://games.budisn.dev/game-save.js"></script>
+// <script src="https://games.budsin.dev/save-system.js"></script>
+// <script src="https://games.budsin.dev/game-save.js"></script>
 
 // ANTES de createUnityInstance(): Initialize save and restore IDB
 var gameSave = new GameSave("nombre-del-juego-unity");
