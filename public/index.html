@@ -643,6 +643,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             }
             html[data-site-theme="dark"] .game-card.keyboard-focus { outline-color: #5b9eff; }
             html[data-site-theme="pro"] .game-card.keyboard-focus { outline-color: #ffd700; }
+            html[data-site-theme="steam"] .game-card.keyboard-focus { outline-color: #66c0f4; }
 
             .chips {
                 display: flex;
@@ -1780,6 +1781,238 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 background: linear-gradient(135deg, #006FCD, #003791);
                 border-color: transparent;
                 color: #fff;
+            }
+
+            /* ════════════════════════════════════════
+               Steam Theme — Full Redesign
+               ════════════════════════════════════════ */
+
+            html[data-site-theme="steam"] {
+                --bg: #1b2838;
+                --bg-2: #172130;
+                --surface: rgba(27,40,56,0.92);
+                --surface-strong: rgba(23,33,45,0.96);
+                --line: rgba(102,192,244,0.15);
+                --text: #c6d4df;
+                --muted: #8091a7;
+                --shadow: 0 24px 64px rgba(0,0,0,0.55);
+                --shadow-soft: 0 16px 36px rgba(0,0,0,0.4);
+            }
+            html[data-site-theme="steam"] body {
+                background: radial-gradient(circle at top left, rgba(102,192,244,0.07), transparent 30%),
+                            radial-gradient(circle at bottom right, rgba(164,208,7,0.04), transparent 30%),
+                            linear-gradient(180deg, #171a21 0%, #1b2838 48%, #172130 100%);
+                color: #c6d4df;
+            }
+            html[data-site-theme="steam"] body::before,
+            html[data-site-theme="steam"] body::after { display: none; }
+            html[data-site-theme="steam"] .shell { padding-top: 16px; }
+
+            html[data-site-theme="steam"] .title {
+                background: linear-gradient(135deg, rgba(27,40,56,0.96), rgba(23,33,45,0.92));
+                border-color: rgba(102,192,244,0.12);
+            }
+            html[data-site-theme="steam"] .title-copy h1 { color: #c6d4df; }
+            html[data-site-theme="steam"] .title-copy p { color: #8091a7; }
+
+            html[data-site-theme="steam"] .hero-badges span {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #c6d4df;
+            }
+
+            html[data-site-theme="steam"] .library {
+                background: rgba(27,40,56,0.88);
+                border-color: rgba(102,192,244,0.1);
+            }
+            html[data-site-theme="steam"] .library h2,
+            html[data-site-theme="steam"] .library p { color: #c6d4df; }
+            html[data-site-theme="steam"] .library p { color: #8091a7; }
+
+            html[data-site-theme="steam"] .games .game-card {
+                background: rgba(23,33,45,0.92);
+                border-color: rgba(102,192,244,0.12);
+            }
+            html[data-site-theme="steam"] .games .game-card .content p { color: #8091a7; }
+            html[data-site-theme="steam"] .games .game-card .content strong { color: #c6d4df; }
+            html[data-site-theme="steam"] .games .game-card .content span { color: #acd8f0; }
+            html[data-site-theme="steam"] .games .game-card .category-tag {
+                background: rgba(27,40,56,0.92);
+                color: #66c0f4;
+                border-color: rgba(102,192,244,0.18);
+            }
+            html[data-site-theme="steam"] .games .game-card .status-badge {
+                background: linear-gradient(135deg, #66c0f4, #1999ff);
+                color: #1b2838;
+            }
+            html[data-site-theme="steam"] .games .game-card .status-badge.available { background: #a4d007; }
+            html[data-site-theme="steam"] .games .game-card::before {
+                background: linear-gradient(135deg, #66c0f4, #1999ff);
+                box-shadow: 0 0 0 6px rgba(102,192,244,0.08);
+            }
+            html[data-site-theme="steam"] .games .game-card:hover {
+                border-color: rgba(102,192,244,0.3);
+                box-shadow: 0 20px 48px rgba(0,0,0,0.5), 0 0 24px rgba(102,192,244,0.04);
+                transform: translateY(-6px) scale(1.01);
+            }
+            html[data-site-theme="steam"] .games .game-card .cover {
+                border-radius: 24px;
+            }
+
+            html[data-site-theme="steam"] .search-wrap {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.18);
+            }
+            html[data-site-theme="steam"] .search-wrap input { color: #c6d4df; }
+            html[data-site-theme="steam"] .search-wrap input:focus { border-color: #66c0f4; }
+
+            html[data-site-theme="steam"] .chip {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #c6d4df;
+            }
+            html[data-site-theme="steam"] .chip.active {
+                background: linear-gradient(135deg, #66c0f4, #1999ff);
+                border-color: transparent;
+                color: #1b2838;
+            }
+
+            html[data-site-theme="steam"] .shelf {
+                background: rgba(27,40,56,0.88);
+                border-color: rgba(102,192,244,0.1);
+            }
+            html[data-site-theme="steam"] .shelf h3 { color: #c6d4df; }
+            html[data-site-theme="steam"] .library-meta {
+                background: linear-gradient(135deg, rgba(23,33,45,0.96), rgba(27,40,56,0.9));
+                color: rgba(150,170,190,0.8);
+            }
+
+            html[data-site-theme="steam"] .favorite-btn {
+                background: rgba(23,33,45,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #8091a7;
+            }
+            html[data-site-theme="steam"] .favorite-btn.active { color: #66c0f4; }
+
+            html[data-site-theme="steam"] .changelog-card {
+                background: rgba(27,40,56,0.88);
+                border-color: rgba(102,192,244,0.1);
+            }
+            html[data-site-theme="steam"] .changelog-card h3 { color: #c6d4df; }
+            html[data-site-theme="steam"] .changelog-card p { color: #8091a7; }
+            html[data-site-theme="steam"] .changelog-card li { color: #acd8f0; }
+
+            html[data-site-theme="steam"] .articles-section { border-color: rgba(102,192,244,0.1); }
+            html[data-site-theme="steam"] .articles-section h2 { color: #c6d4df; }
+
+            html[data-site-theme="steam"] .site-footer {
+                background: rgba(23,33,45,0.82);
+                border-color: rgba(102,192,244,0.1);
+            }
+            html[data-site-theme="steam"] .footer-brand strong { color: #c6d4df; }
+            html[data-site-theme="steam"] .footer-brand span { color: #8091a7; }
+            html[data-site-theme="steam"] .footer-links a {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #c6d4df;
+            }
+            html[data-site-theme="steam"] .footer-copy { color: #607080; }
+
+            html[data-site-theme="steam"] .language-picker,
+            html[data-site-theme="steam"] .settings-link {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #c6d4df;
+            }
+            html[data-site-theme="steam"] .settings-link { color: #66c0f4; }
+
+            /* ── Steam: Library extras ── */
+            html[data-site-theme="steam"] .library-kicker {
+                background: rgba(102,192,244,0.12);
+                color: #66c0f4;
+            }
+
+            /* ── Steam: No results ── */
+            html[data-site-theme="steam"] .no-results {
+                border-color: rgba(102,192,244,0.15);
+                color: #8091a7;
+            }
+
+            /* ── Steam: Changelog extras ── */
+            html[data-site-theme="steam"] .changelog-card span {
+                background: rgba(102,192,244,0.16);
+                color: #66c0f4;
+            }
+            html[data-site-theme="steam"] .changelog-close {
+                background: rgba(102,192,244,0.1);
+                color: #8091a7;
+            }
+            html[data-site-theme="steam"] .changelog-countdown {
+                background: rgba(23,33,45,0.8);
+                border-color: rgba(102,192,244,0.12);
+            }
+            html[data-site-theme="steam"] .suggestions-link {
+                background: linear-gradient(135deg, #66c0f4, #1999ff);
+                color: #1b2838;
+                box-shadow: 0 18px 34px rgba(25,153,255,0.3);
+            }
+
+            /* ── Steam: Articles extras ── */
+            html[data-site-theme="steam"] .articles-section {
+                background: rgba(27,40,56,0.82);
+                border-color: rgba(102,192,244,0.12);
+                backdrop-filter: blur(8px);
+            }
+            html[data-site-theme="steam"] .articles-head h2 { color: #c6d4df; }
+            html[data-site-theme="steam"] .article-card {
+                background: rgba(23,33,45,0.92);
+                border-color: rgba(102,192,244,0.12);
+            }
+            html[data-site-theme="steam"] .article-card h3 { color: #c6d4df; }
+            html[data-site-theme="steam"] .article-card p { color: #8091a7; }
+            html[data-site-theme="steam"] .articles-kicker {
+                background: rgba(102,192,244,0.14);
+                color: #66c0f4;
+            }
+            html[data-site-theme="steam"] .article-link {
+                background: linear-gradient(135deg, #66c0f4, #1999ff);
+                color: #1b2838;
+            }
+
+            /* ── Steam: Random button ── */
+            html[data-site-theme="steam"] .random-btn {
+                background: rgba(23,33,45,0.88);
+                border-color: rgba(102,192,244,0.18);
+                color: #acd8f0;
+            }
+            html[data-site-theme="steam"] .random-btn:hover {
+                border-color: rgba(102,192,244,0.35);
+            }
+
+            /* ── Steam: Tooltips ── */
+            html[data-site-theme="steam"] .card-tooltip {
+                background: rgba(23,33,45,0.96);
+                border: 1px solid rgba(102,192,244,0.15);
+            }
+            html[data-site-theme="steam"] .card-tooltip::after {
+                border-top-color: rgba(23,33,45,0.96);
+            }
+
+            /* ── Steam: App transition overlay ── */
+            html[data-site-theme="steam"] .app-transition {
+                background: rgba(23,33,45,0.88);
+            }
+
+            /* ── Steam: Tools chips ── */
+            html[data-site-theme="steam"] .chip--tools {
+                border-color: rgba(102,192,244,0.18);
+                background: rgba(27,40,56,0.92);
+                color: #66c0f4;
+            }
+            html[data-site-theme="steam"] .chip--tools.active {
+                background: linear-gradient(135deg, #66c0f4, #1999ff);
+                border-color: transparent;
+                color: #1b2838;
             }
 
             /* ════════════════════════════════════════
@@ -7854,6 +8087,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             })();
         </script>
         <script src="site-theme.js"></script>
+        <script>
+            // Re-apply theme: site-theme.js may not know about all themes (e.g. steam)
+            (function() {
+                try {
+                    var t = localStorage.getItem("budsin_site_theme");
+                    if (t) document.documentElement.setAttribute("data-site-theme", t);
+                } catch(_) {}
+            })();
+        </script>
         <script src="classroom-hotkey.js"></script>
         <script src="lines-bg.js"></script>
         <script>

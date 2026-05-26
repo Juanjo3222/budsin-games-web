@@ -338,7 +338,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
             </footer>
         </main>
-        <script src="https://games.budsin.dev/site-theme.js"></script>
+        <script src="site-theme.js"></script>
+        <script>
+            // Re-apply theme: site-theme.js may not know about all themes (e.g. steam)
+            (function() {
+                try {
+                    var t = localStorage.getItem("budsin_site_theme");
+                    if (t) document.documentElement.setAttribute("data-site-theme", t);
+                } catch(_) {}
+            })();
+        </script>
         <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
         <script src="lines-bg.js"></script>
         <script>

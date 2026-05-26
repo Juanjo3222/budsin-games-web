@@ -800,6 +800,125 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 color: #e8d8a0;
             }
             html[data-site-theme="pro"] .footer-copy { color: #8a7a50; }
+
+            /* ────────────────────────────────────────
+               Steam Theme — Full Redesign
+            ──────────────────────────────────────── */
+            html[data-site-theme="steam"] {
+                --bg: #1b2838;
+                --bg-2: #172130;
+                --surface: rgba(27,40,56,0.92);
+                --surface-strong: rgba(23,33,45,0.96);
+                --line: rgba(102,192,244,0.15);
+                --text: #c6d4df;
+                --muted: #8091a7;
+                --shadow: 0 24px 64px rgba(0,0,0,0.55);
+                --shadow-soft: 0 16px 36px rgba(0,0,0,0.4);
+            }
+            html[data-site-theme="steam"] body {
+                color: #c6d4df;
+                background: radial-gradient(circle at top left, rgba(102,192,244,0.07), transparent 30%),
+                            radial-gradient(circle at bottom right, rgba(164,208,7,0.04), transparent 30%),
+                            linear-gradient(180deg, #171a21 0%, #1b2838 48%, #172130 100%);
+            }
+            html[data-site-theme="steam"] body::before,
+            html[data-site-theme="steam"] body::after { display: none; }
+
+            html[data-site-theme="steam"] .page-header {
+                background: linear-gradient(135deg, rgba(27,40,56,0.96), rgba(23,33,45,0.92));
+                border-color: rgba(102,192,244,0.12);
+                box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+            }
+            html[data-site-theme="steam"] .page-header h1 { color: #c6d4df; }
+            html[data-site-theme="steam"] .page-header p { color: #8091a7; }
+
+            html[data-site-theme="steam"] .settings-card {
+                background: rgba(27,40,56,0.88);
+                border-color: rgba(102,192,244,0.1);
+            }
+            html[data-site-theme="steam"] .card-header p { color: #8091a7; }
+
+            html[data-site-theme="steam"] .back-link,
+            html[data-site-theme="steam"] .language-picker {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #c6d4df;
+            }
+            html[data-site-theme="steam"] .language-picker select { color: #c6d4df; }
+
+            html[data-site-theme="steam"] input[type="text"],
+            html[data-site-theme="steam"] input[type="url"],
+            html[data-site-theme="steam"] input[type="number"],
+            html[data-site-theme="steam"] select.field-select {
+                background: rgba(23,33,45,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #c6d4df;
+            }
+            html[data-site-theme="steam"] input:focus,
+            html[data-site-theme="steam"] select.field-select:focus { border-color: #66c0f4; }
+
+            html[data-site-theme="steam"] .btn-secondary {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #c6d4df;
+            }
+            html[data-site-theme="steam"] .btn-ghost {
+                color: #8091a7;
+                border-color: rgba(102,192,244,0.16);
+            }
+            html[data-site-theme="steam"] .btn-primary {
+                background: linear-gradient(135deg, #66c0f4, #1999ff);
+                box-shadow: 0 8px 20px rgba(25,153,255,0.25);
+                color: #1b2838;
+            }
+
+            html[data-site-theme="steam"] .url-item {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.12);
+            }
+            html[data-site-theme="steam"] .url-item.is-active { border-color: var(--green); }
+            html[data-site-theme="steam"] .url-name { color: #c6d4df; }
+            html[data-site-theme="steam"] .url-addr { color: #8091a7; }
+
+            html[data-site-theme="steam"] .toggle-row { border-color: rgba(102,192,244,0.1); }
+            html[data-site-theme="steam"] .toggle-label { color: #c6d4df; }
+            html[data-site-theme="steam"] .toggle-sub { color: #8091a7; }
+
+            html[data-site-theme="steam"] .hotkey-badge {
+                background: rgba(23,33,45,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #c6d4df;
+            }
+
+            html[data-site-theme="steam"] .preview-bar {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.12);
+                color: #c6d4df;
+            }
+
+            html[data-site-theme="steam"] .add-url-form {
+                border-color: rgba(102,192,244,0.14);
+            }
+
+            html[data-site-theme="steam"] .field-label { color: #8091a7; }
+
+            html[data-site-theme="steam"] #toast {
+                background: rgba(198,212,223,0.92);
+                color: #1b2838;
+            }
+
+            html[data-site-theme="steam"] .site-footer {
+                background: rgba(23,33,45,0.82);
+                border-color: rgba(102,192,244,0.1);
+            }
+            html[data-site-theme="steam"] .footer-brand strong { color: #c6d4df; }
+            html[data-site-theme="steam"] .footer-brand span { color: #8091a7; }
+            html[data-site-theme="steam"] .footer-links a {
+                background: rgba(27,40,56,0.92);
+                border-color: rgba(102,192,244,0.18);
+                color: #c6d4df;
+            }
+            html[data-site-theme="steam"] .footer-copy { color: #607080; }
         </style>
         <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
         <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
@@ -1055,6 +1174,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <option value="light">Claro</option>
                         <option value="dark">Oscuro</option>
                         <option value="ps5">PlayStation 5</option>
+                        <option value="steam">Steam</option>
                         <option value="pro" id="proThemeOption" style="background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-weight:800">⭐ Pro (Gold)</option>
                     </select>
                 </div>
@@ -1320,6 +1440,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     themeLight: "Claro",
                     themeDark: "Oscuro",
                     themePS5: "PlayStation 5",
+                    themeSteam: "Steam",
                     themePro: "⭐ Pro (Gold)",
                     cardLoadingTitle: "Pantalla de carga",
                     cardProSub: "Inicia sesión con Google para verificar tu suscripción Pro.",
@@ -1495,6 +1616,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     themeLight: "Light",
                     themeDark: "Dark",
                     themePS5: "PlayStation 5",
+                    themeSteam: "Steam",
                     themePro: "⭐ Pro (Gold)",
                     cardLoadingTitle: "Loading screen",
                     cardProSub: "Sign in with Google to verify your Pro subscription.",
@@ -1670,6 +1792,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     themeLight: "Claro",
                     themeDark: "Escuro",
                     themePS5: "PlayStation 5",
+                    themeSteam: "Steam",
                     themePro: "⭐ Pro (Gold)",
                     cardLoadingTitle: "Tela de carregamento",
                     cardProSub: "Faça login com Google para verificar sua assinatura Pro.",
@@ -2181,9 +2304,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 if (themeOpts[0]) themeOpts[0].textContent = t.themeLight;
                 if (themeOpts[1]) themeOpts[1].textContent = t.themeDark;
                 if (themeOpts[2]) themeOpts[2].textContent = t.themePS5;
-                if (themeOpts[3]) {
-                    themeOpts[3].textContent = t.themePro || "⭐ Pro (Gold)";
-                    themeOpts[3].style.display = localStorage.getItem("budsin_pro_active") === "1" ? "" : "none";
+                if (themeOpts[3]) themeOpts[3].textContent = t.themeSteam;
+                if (themeOpts[4]) {
+                    themeOpts[4].textContent = t.themePro || "⭐ Pro (Gold)";
+                    themeOpts[4].style.display = localStorage.getItem("budsin_pro_active") === "1" ? "" : "none";
                 }
 
                 renderUrlList(); // re-renders with new labels
@@ -2754,7 +2878,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         })();
         </script>
 
-        <script src="https://games.budsin.dev/site-theme.js"></script>
+        <script src="site-theme.js"></script>
         <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
         <script src="lines-bg.js"></script>
         <script>
