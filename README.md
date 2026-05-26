@@ -114,7 +114,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 * CSS3
 * JavaScript (Vanilla)
 * Firebase (conteo de popularidad, Auth para Budsin Pro)
-* Cloudflare Pages
+* Github Pages
 
 ---
 
