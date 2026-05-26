@@ -8088,12 +8088,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </script>
         <script src="site-theme.js"></script>
         <script>
-            // Re-apply theme: site-theme.js may not know about all themes (e.g. steam)
+            // Guard: site-theme.js's resolveTheme may not know about "steam" yet.
             (function() {
-                try {
-                    var t = localStorage.getItem("budsin_site_theme");
-                    if (t) document.documentElement.setAttribute("data-site-theme", t);
-                } catch(_) {}
+                var saved = localStorage.getItem("budsin_site_theme");
+                if (saved) {
+                    var el = document.documentElement;
+                    el.setAttribute("data-site-theme", saved);
+                    var obs = new MutationObserver(function() {
+                        var cur = el.getAttribute("data-site-theme");
+                        if (cur !== saved) el.setAttribute("data-site-theme", saved);
+                    });
+                    obs.observe(el, { attributes: true, attributeFilter: ["data-site-theme"] });
+                }
             })();
         </script>
         <script src="classroom-hotkey.js"></script>

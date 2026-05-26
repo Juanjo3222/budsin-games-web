@@ -2879,6 +2879,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </script>
 
         <script src="site-theme.js"></script>
+        <script>
+            // Guard: site-theme.js's resolveTheme may not know about "steam" yet.
+            // Watch for attribute changes and re-apply the user's saved theme immediately.
+            (function() {
+                var saved = localStorage.getItem("budsin_site_theme");
+                if (saved) {
+                    var el = document.documentElement;
+                    el.setAttribute("data-site-theme", saved);
+                    var obs = new MutationObserver(function() {
+                        var cur = el.getAttribute("data-site-theme");
+                        if (cur !== saved) el.setAttribute("data-site-theme", saved);
+                    });
+                    obs.observe(el, { attributes: true, attributeFilter: ["data-site-theme"] });
+                }
+            })();
+        </script>
         <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
         <script src="lines-bg.js"></script>
         <script>
