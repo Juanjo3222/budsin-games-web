@@ -2,9 +2,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
-  <img src="https://img.shields.io/badge/Games-40-blue" />
+  <img src="https://img.shields.io/badge/Games-50-blue" />
   <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange" />
-  <img src="https://img.shields.io/badge/Version-6.0-purple" />
+  <img src="https://img.shields.io/badge/Version-6.2-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -29,7 +29,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 
 ## ✨ Features
 
-* 🎮 **40+ juegos jugables al instante**
+* 🎮 **50+ juegos jugables al instante**
 * ⚡ **Sin descargas ni instalación**
 * ⭐ **Budsin Pro**: suscripción manual con Firebase Auth (Google Sign-In). Sin anuncios, badge Pro y panel admin en `/admin.html`.
 * 🧩 **UI tipo consola (portadas interactivas)**
