@@ -231,9 +231,45 @@ function isDiffHost() {
 	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics-compat.js"></script>
+	<script type="module">
+		const firebaseConfig = {
+    apiKey: "AIzaSyDUyjnqlS0gquhgZBuoXHs-kRSOMG-htU4",
+    authDomain: "ofree-32967.firebaseapp.com",
+    projectId: "ofree-32967",
+    storageBucket: "ofree-32967.firebasestorage.app",
+    messagingSenderId: "777959803199",
+    appId: "1:777959803199:web:cca8a2a59ce3b36749eb8a",
+    measurementId: "G-MEMBWQ3ZR8"
+  };
+		if (typeof firebaseConfig !== 'undefined'){
+			if(firebaseConfig ){
+				window.dataLayer = window.dataLayer || [];
+				window.gtag = function () { window.dataLayer.push(arguments); }
+
+				window.gtag("config", firebaseConfig.measurementId, {
+				  cookie_domain: window.location.hostname,
+				  cookie_flags: "SameSite=None;Secure",
+				});
+				// Initialize Firebase
+				const app = firebase.initializeApp(firebaseConfig);
+				//const auth = getAuth(app);
+			}
+		}		
+	</script>
 	<script>
-		window.dataLayer = window.dataLayer || [];
-		window.gtag = function () { window.dataLayer.push(arguments); }
+		function firebaseSetUserProperties(props) {
+			if (typeof firebaseConfig === 'undefined') return;
+				firebase.analytics().setUserProperties(props);
+		}
+		function firebaseLogEvent(event_name) {
+			if (typeof firebaseConfig === 'undefined') return;
+				firebase.analytics().logEvent(event_name);
+			
+		}
+		function firebaseLogEventParameter(event_name, event_param) {
+			if (typeof firebaseConfig === 'undefined') return;
+				firebase.analytics().logEvent(event_name, event_param);			
+		}
 	</script>
 	<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
     <script src="https://games.budsin.dev/save-system.js"></script>
