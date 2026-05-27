@@ -2390,8 +2390,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     </ul>
                     <div style="margin-top:8px;text-align:center;color:#ffd700;font-weight:700" data-i18n="proGatingPrice">$2.99 USD / S/ 7 PEN por mes</div>
                 </div>
-                <div id="proGatingFreeDate" style="display:none;font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:8px;border-radius:8px;background:rgba(255,215,0,0.06)" data-i18n="proGatingFreeDate">
-                    🎉 Este juego será <strong style="color:#ffd700">gratis para todos</strong> el <strong style="color:#ffd700">22 de mayo de 2026</strong>.
+                <div id="proGatingFreeDate" style="display:none;font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:10px;padding:8px;border-radius:8px;background:rgba(255,215,0,0.06)">
                 </div>
                 <div style="display:flex;flex-direction:column;gap:6px">
                     <a href="settings.html#proCard" style="display:flex;align-items:center;justify-content:center;gap:6px;min-height:48px;padding:0 16px;border-radius:14px;background:linear-gradient(135deg,#ffd700,#ff8c00);color:#000;font-size:.9rem;font-weight:800;text-decoration:none;box-shadow:0 6px 20px rgba(255,215,0,0.3)" data-i18n="proGatingCta">⭐ Quiero ser Pro</a>
@@ -5941,7 +5940,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proGatingEarlyAccess: "✓ Acceso anticipado a juegos nuevos",
                     proGatingStats: "✓ Estadísticas de tu actividad",
                     proGatingPrice: "$2.99 USD / S/ 7 PEN por mes",
-                    proGatingFreeDate: "🎉 Este juego será gratis para todos el 22 de mayo de 2026.",
                     proGatingCta: "⭐ Quiero ser Pro",
                     proGatingClose: "Cerrar",
                     proBadge: "Anticipado para Pro\npróximamente gratis",
@@ -6174,7 +6172,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proGatingEarlyAccess: "✓ Early access to new games",
                     proGatingStats: "✓ Activity stats",
                     proGatingPrice: "$2.99 USD / S/ 7 PEN per month",
-                    proGatingFreeDate: "🎉 This game will be free for everyone on May 22, 2026.",
                     proGatingCta: "⭐ I want to be Pro",
                     proGatingClose: "Close",
                     proBadge: "Early access for Pro\nfree soon",
@@ -6407,7 +6404,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     proGatingEarlyAccess: "✓ Acesso antecipado a novos jogos",
                     proGatingStats: "✓ Estatísticas da sua atividade",
                     proGatingPrice: "$2.99 USD / S/ 7 PEN por mês",
-                    proGatingFreeDate: "🎉 Este jogo será grátis para todos em 22 de maio de 2026.",
                     proGatingCta: "⭐ Quero ser Pro",
                     proGatingClose: "Fechar",
                     proBadge: "Antecipado para Pro\nem breve grátis",
@@ -6964,6 +6960,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
 
             // ─── Gating Pro: popup para juegos exclusivos ───
+            function formatReleaseDate(dateStr, lang) {
+                var d = new Date(dateStr + "T00:00:00");
+                var day = d.getDate();
+                var year = d.getFullYear();
+                var months = {
+                    es: ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],
+                    en: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+                    pt: ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"]
+                };
+                var m = months[lang] ? months[lang][d.getMonth()] : months["es"][d.getMonth()];
+                if (lang === "en") return m + " " + day + ", " + year;
+                return day + " de " + m + " de " + year;
+            }
+
             function showProGatingPopup() {
                 var popup = document.getElementById("proGatingPopup");
                 if (!popup) return;
@@ -7750,7 +7760,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                             // Show the free date if available
                             if (releaseDate) {
                                 var freeDateEl = document.getElementById("proGatingFreeDate");
-                                if (freeDateEl) freeDateEl.style.display = "block";
+                                if (freeDateEl) {
+                                    var freeDateTexts = {
+                                        es: "\uD83C\uDF89 Este juego ser\u00E1 gratis para todos el",
+                                        en: "\uD83C\uDF89 This game will be free for everyone on",
+                                        pt: "\uD83C\uDF89 Este jogo ser\u00E1 gr\u00E1tis para todos em"
+                                    };
+                                    var prefix = freeDateTexts[currentLanguage] || freeDateTexts["es"];
+                                    freeDateEl.innerHTML = prefix + ' <strong style="color:#ffd700">' + formatReleaseDate(releaseDate, currentLanguage) + "</strong>.";
+                                    freeDateEl.style.display = "block";
+                                }
                             }
                             showProGatingPopup();
                             return;
