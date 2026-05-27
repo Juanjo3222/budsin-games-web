@@ -94,34 +94,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 		</div>
 	</div>
 </div>
-	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
-	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics-compat.js"></script>
-	<script>
-		var firebaseConfig = {
-    apiKey: "AIzaSyDUyjnqlS0gquhgZBuoXHs-kRSOMG-htU4",
-    authDomain: "ofree-32967.firebaseapp.com",
-    projectId: "ofree-32967",
-    storageBucket: "ofree-32967.firebasestorage.app",
-    messagingSenderId: "777959803199",
-    appId: "1:777959803199:web:cca8a2a59ce3b36749eb8a",
-    measurementId: "G-MEMBWQ3ZR8"
-  };
-		window.dataLayer = window.dataLayer || [];
-		window.gtag = function () { window.dataLayer.push(arguments); }
-		window.gtag("config", firebaseConfig.measurementId, {
-		  cookie_domain: window.location.hostname,
-		  cookie_flags: "SameSite=None;Secure",
-		});
-		firebase.initializeApp(firebaseConfig);
-	</script>
-    <script src="https://games.budsin.dev/save-system.js"></script>
-    <script src="https://games.budsin.dev/game-save.js"></script>
-	<script>
+		<script>
     var loadingText = document.querySelector("#loading-text");
     let totalBytes = 0;
     let loadedBytes = 0;
+
+    function initSaveSystem() {
+      var s = document.createElement("script");
+      s.src = "https://games.budsin.dev/game-save.js";
+      s.onload = function() {
+        try {
+          var gs = new GameSave("escape-road-3");
+          gs.init().then(function() {
+            gs.startAutoSave();
+          }).catch(function() {});
+        } catch (e) {}
+      };
+      document.body.appendChild(s);
+    }
 
     async function fetchWithProgress(url) {
       const response = await fetch(url);
@@ -173,92 +163,116 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }
       return parts;
     }
+    (async () => {
+      const [dataUrl, wasmUrl] = await Promise.all([
+        mergeFiles(getParts("Build/escape-road-3-v26041006.data", 1, 7), "escape-road-3-v26041006.data"),
+        mergeFiles(getParts("Build/escape-road-3-v26041006.wasm", 1, 3), "escape-road-3-v26041006.wasm")
+      ]);
 
-    var gameSave;
-    var unityStarted = false;
+		var buildUrl = "Build";
+		var loaderUrl = buildUrl + "/escape-road-3-v26041006.loader.js";
+		var config = {
+			dataUrl: dataUrl,
+			frameworkUrl: buildUrl + "/escape-road-3-v26041006.framework.js",
+			codeUrl: wasmUrl,
+			streamingAssetsUrl: "StreamingAssets",
+			companyName: "ozgames.io",
+			productName: "Escape Road 3",
+			productVersion: "26041006"
+		};
+		config.gameId = "escape-road-3";
+		config.eventLog = true;
+		let currentDate = new Date();
+		let endLogDate = new Date("2026-04-28T09:43:42.671Z");
+		if(currentDate>endLogDate){
+			config.eventLog=false;
+		}
+function isDiffHost() {
+  return false;
+}
+		window["GMSOFT_SDKTYPE"] = "gm";
+		localStorage.setItem("gmsdksigndomain", "ewogICJzaWduZWQiOiAibStVenRwc20xL1dkU05STEFGS0x3YVl0dzg4b296QlA0QktaeHY5cnNadUluNWlMUWZxMUk3ZEcwbnlIN3hKamRBVTEvQUQ5dlFNUW1EeWNZUzRtb3F0VGlFd0N4WHoyTytzbllWMXhyTjBMM3Z4cnVKblJIM2dpMFJpQUVIaW8rU2pDNkEwSFBsN3lTT0V2TCsyY2g5OEdrN2NDRWV6eTEwcEtCTll2akRZNldVRHRZN3ZSdW43dnAvb2VKSXJjeEJNZjl4UWxONURVTkJEN0JvNzRTYlNmWEdYY3dWUi81TkJQQ2hzRnh0cFhOaHpIWURhUVRkYWtrQjdjVENSYVBGQ2VxREN3N1FDQkhoK0ZOZFNXdVEwbm5RMm1QRTJ4alVqOXV1Y0kxWGdQNGZpNmJMVTRRMFhiRkh1SzRsRENLVWF4ZlBmbmxFemZ0UXdOR0MrY09BPT0iLAogICJhcCI6ICJ5ZXMiLAogICJobiI6ICJvZnJlZS5pbyIsCiAgImRvbWFpbiI6ICJvZnJlZS5pbyIsCiAgInMiOiAieWVzIiwKICAic3R5cGUiOiAyCn0=");
 
-    function startUnity() {
-      if (unityStarted) return;
-      unityStarted = true;
-      (async () => {
-        const [dataUrl, wasmUrl] = await Promise.all([
-          mergeFiles(getParts("Build/escape-road-3-v26041006.data", 1, 7), "escape-road-3-v26041006.data"),
-          mergeFiles(getParts("Build/escape-road-3-v26041006.wasm", 1, 3), "escape-road-3-v26041006.wasm")
-        ]);
+		var progressElement = document.getElementById('progress_fill');
+		var container =	document.getElementById("unity-container");
+		var canvas =	document.getElementById("unity-canvas");
+		var loadingBar = document.querySelector("#loadingBlock");
+		var progressBarFull = document.querySelector("#progress_fill");
+		var progress_text = document.querySelector(".gameloader-progress-info");
+		var loadingtext = document.querySelector("#loading-text");
+		let text_percent = "";
+		var script = document.createElement("script");
+		script.src = loaderUrl;
+		script.onload = () => {
+		createUnityInstance(canvas, config, (progress) => {
+			progressElement.style.width = 100 * progress + "%";
+			text_percent = "Downloading file: " + Math.round(progress*100) + "%";
+			progress_text.innerText = text_percent;
+			if (progress >= 99) {
+				progress_text.innerText = "Game Loading ...";
+			}
+		}).then((unityInstance) => {
+			window.unityInstance = unityInstance;
+			setTimeout(function() {
+				loadingBar.style.display = "none";
+			loadingtext.remove()
+				window.focus();
+				initSaveSystem();
+			}, 2000);
+			container.style.display = "block";
+		}).catch((message) => {
+			alert(message);
+		});
+		};
+		document.body.appendChild(script);
+	})();
+	</script>
+	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics-compat.js"></script>
+	<script type="module">
+		const firebaseConfig = {
+    apiKey: "AIzaSyDUyjnqlS0gquhgZBuoXHs-kRSOMG-htU4",
+    authDomain: "ofree-32967.firebaseapp.com",
+    projectId: "ofree-32967",
+    storageBucket: "ofree-32967.firebasestorage.app",
+    messagingSenderId: "777959803199",
+    appId: "1:777959803199:web:cca8a2a59ce3b36749eb8a",
+    measurementId: "G-MEMBWQ3ZR8"
+  };
+		if (typeof firebaseConfig !== 'undefined'){
+			if(firebaseConfig ){
+				window.dataLayer = window.dataLayer || [];
+				window.gtag = function () { window.dataLayer.push(arguments); }
 
-        var buildUrl = "Build";
-        var loaderUrl = buildUrl + "/escape-road-3-v26041006.loader.js";
-        var config = {
-          dataUrl: dataUrl,
-          frameworkUrl: buildUrl + "/escape-road-3-v26041006.framework.js",
-          codeUrl: wasmUrl,
-          streamingAssetsUrl: "StreamingAssets",
-          companyName: "ozgames.io",
-          productName: "Escape Road 3",
-          productVersion: "26041006"
-        };
-        config.gameId = "escape-road-3";
-        config.eventLog = true;
-        let currentDate = new Date();
-        let endLogDate = new Date("2026-04-28T09:43:42.671Z");
-        if(currentDate>endLogDate){
-          config.eventLog=false;
-        }
-        function isDiffHost() {
-          return false;
-        }
-        window["GMSOFT_SDKTYPE"] = "gm";
-        localStorage.setItem("gmsdksigndomain", "ewogICJzaWduZWQiOiAibStVenRwc20xL1dkU05STEFGS0x3YVl0dzg4b296QlA0QktaeHY5cnNadUluNWlMUWZxMUk3ZEcwbnlIN3hKamRBVTEvQUQ5dlFNUW1EeWNZUzRtb3F0VGlFd0N4WHoyTytzbllWMXhyTjBMM3Z4cnVKblJIM2dpMFJpQUVIaW8rU2pDNkEwSFBsN3lTT0V2TCsyY2g5OEdrN2NDRWV6eTEwcEtCTll2akRZNldVRHRZN3ZSdW43dnAvb2VKSXJjeEJNZjl4UWxONURVTkJEN0JvNzRTYlNmWEdYY3dWUi81TkJQQ2hzRnh0cFhOaHpIWURhUVRkYWtrQjdjVENSYVBGQ2VxREN3N1FDQkhoK0ZOZFNXdVEwbm5RMm1QRTJ4alVqOXV1Y0kxWGdQNGZpNmJMVTRRMFhiRkh1SzRsRENLVWF4ZlBmbmxFemZ0UXdOR0MrY09BPT0iLAogICJhcCI6ICJ5ZXMiLAogICJobiI6ICJvZnJlZS5pbyIsCiAgImRvbWFpbiI6ICJvZnJlZS5pbyIsCiAgInMiOiAieWVzIiwKICAic3R5cGUiOiAyCn0=");
-
-        var progressElement = document.getElementById('progress_fill');
-        var container = document.getElementById("unity-container");
-        var canvas = document.getElementById("unity-canvas");
-        var loadingBar = document.querySelector("#loadingBlock");
-        var progressBarFull = document.querySelector("#progress_fill");
-        var progress_text = document.querySelector(".gameloader-progress-info");
-        var loadingtext = document.querySelector("#loading-text");
-        let text_percent = "";
-        var script = document.createElement("script");
-        script.src = loaderUrl;
-        script.onload = () => {
-          createUnityInstance(canvas, config, (progress) => {
-            progressElement.style.width = 100 * progress + "%";
-            text_percent = "Downloading file: " + Math.round(progress*100) + "%";
-            progress_text.innerText = text_percent;
-            if (progress >= 99) {
-              progress_text.innerText = "Game Loading ...";
-            }
-          }).then((unityInstance) => {
-            window.unityInstance = unityInstance;
-            if (gameSave && gameSave.initialized) {
-              gameSave.startAutoSave();
-            }
-            setTimeout(function() {
-              loadingBar.style.display = "none";
-              loadingtext.remove()
-              window.focus();
-            }, 2000);
-            container.style.display = "block";
-          }).catch((message) => {
-            alert(message);
-          });
-        };
-        document.body.appendChild(script);
-      })();
-    }
-
-    startUnity();
-
-    try {
-      gameSave = new GameSave("escape-road-3");
-      gameSave.init().then(function() {
-        if (window.unityInstance) {
-          gameSave.startAutoSave();
-        }
-      }).catch(function() {});
-    } catch (e) {}
+				window.gtag("config", firebaseConfig.measurementId, {
+				  cookie_domain: window.location.hostname,
+				  cookie_flags: "SameSite=None;Secure",
+				});
+				// Initialize Firebase
+				const app = firebase.initializeApp(firebaseConfig);
+				//const auth = getAuth(app);
+			}
+		}		
+	</script>
+	<script>
+		function firebaseSetUserProperties(props) {
+			if (typeof firebaseConfig === 'undefined') return;
+				firebase.analytics().setUserProperties(props);
+		}
+		function firebaseLogEvent(event_name) {
+			if (typeof firebaseConfig === 'undefined') return;
+				firebase.analytics().logEvent(event_name);
+			
+		}
+		function firebaseLogEventParameter(event_name, event_param) {
+			if (typeof firebaseConfig === 'undefined') return;
+				firebase.analytics().logEvent(event_name, event_param);			
+		}
 	</script>
 	<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+    <script src="https://games.budsin.dev/save-system.js"></script>
 </body>	
 </html>
 
