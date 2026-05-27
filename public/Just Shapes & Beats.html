@@ -1,286 +1,161 @@
-en<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en-us">
-<head>
-  <link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
-  <!-- Google Tag Manager -->
-  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-5ZT26944');</script>
-  <!-- End Google Tag Manager -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
-  <base href="https://cdn.jsdelivr.net/gh/web-ports/jsab@main/">
-  <meta charset="utf-8">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Just Shapes & Beats · Budsin Games</title>
-  <link rel="shortcut icon" href="TemplateData/favicon.ico">
-  <link rel="stylesheet" href="TemplateData/style.css">
-  <script src="TemplateData/UnityProgress.js"></script>
-  <script src="Build/UnityLoader.js"></script>
-  <style>
-    * { margin: 0; padding: 0; border: 0; }
-    body {
-      cursor: url('Cursor.png'), auto;
-      background: #000;
-      position: fixed;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-    #unityContainer {
-      position: absolute;
-      width: 100% !important;
-      height: 100% !important;
-    }
-    canvas { width: 100% !important; height: 100% !important; }
-    #loading-text {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 999999;
-      font-size: 48px;
-      font-family: cursive;
-      font-weight: bold;
-      pointer-events: none;
-      background: linear-gradient(270deg,#ff0000,#ff7f00,#ffff00,#00ff00,#0000ff,#4b0082,#8f00ff);
-      background-size: 400% 400%;
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      animation: rainbow 3s ease infinite;
-    }
-    @keyframes rainbow {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    /* ── Pro overlay ── */
-    #proGateOverlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9999999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0,0,0,0.85);
-      backdrop-filter: blur(6px);
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-    #proGateOverlay .gate-card {
-      background: #111;
-      border: 2px solid rgba(255,215,0,0.2);
-      border-radius: 20px;
-      padding: 28px 24px;
-      max-width: 400px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 0 60px rgba(255,215,0,0.06);
-    }
-    #proGateOverlay .gate-card h2 { color: #ffd700; margin: 8px 0 4px; font-size: 1.1rem; }
-    #proGateOverlay .gate-card p { color: #b8a87a; font-size: .82rem; margin: 0 0 14px; }
-    #proGateOverlay .gate-ul { list-style: none; margin: 0; padding: 0; text-align: left; font-size: .78rem; color: #b8a87a; display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
-    #proGateOverlay .gate-ul li::before { content: "✓ "; color: #ffd700; font-weight: 700; }
-    #proGateOverlay .gate-price { color: #ffd700; font-weight: 700; font-size: .95rem; margin-bottom: 14px; }
-    #proGateOverlay .gate-btn { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; border-radius: 14px; background: linear-gradient(135deg,#ffd700,#ff8c00); color: #000; font-size: .9rem; font-weight: 800; text-decoration: none; box-shadow: 0 6px 20px rgba(255,215,0,0.25); margin-bottom: 8px; }
-    #proGateOverlay .gate-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(255,215,0,0.35); }
-  </style>
-</head>
-<body>
-  <!-- Google Tag Manager (noscript) -->
-  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5ZT26944" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-  <!-- End Google Tag Manager (noscript) -->
-
-  <!-- ── Pro Gate Overlay ── -->
-  <div id="proGateOverlay" style="display:none">
-    <div class="gate-card">
-      <div style="position:relative">
-        <button onclick="document.getElementById('proGateOverlay').style.display='none'" style="position:absolute;top:-12px;right:-8px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#b8a87a;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1">×</button>
-      </div>
-      <div style="font-size:2.2rem;margin-bottom:4px">🔒</div>
-      <h2>Juego exclusivo para Budsin Pro</h2>
-      <p id="proGateDateText">Disponible para todos el 30 de mayo de 2026.</p>
-      <div style="background:rgba(255,215,0,0.06);border-radius:12px;padding:12px;margin-bottom:14px;text-align:left">
-        <div style="font-weight:700;color:#ffd700;font-size:.78rem;margin-bottom:6px;text-align:center">⭐ Ventajas de ser Pro</div>
-        <ul class="gate-ul">
-          <li>Sin anuncios en el portal</li>
-          <li>Tema Gold exclusivo</li>
-          <li>Favoritos ilimitados</li>
-          <li>Acceso anticipado a juegos nuevos</li>
-          <li>Estadísticas de tu actividad</li>
-        </ul>
-        <div class="gate-price">$2.99 USD / S/ 7 PEN por mes</div>
-        <a href="https://games.budsin.dev/settings.html#proCard" class="gate-btn" target="_blank">⭐ Quiero ser Pro</a>
-        <div id="proGateDateBottom" style="font-size:.75rem;color:#666;text-align:center;margin-top:8px"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="loading-text">LOADING...</div>
-  <div class="webgl-content">
-    <div id="unityContainer"></div>
-  </div>
-
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
-
-  <script>
-var loadingText = document.querySelector("#loading-text");
-var totalBytes = 0;
-var loadedBytes = 0;
-
-async function fetchWithProgress(url) {
-  var response = await fetch(url);
-  var reader = response.body.getReader();
-  var chunks = [];
-  var received = 0;
-  while (true) {
-    var result = await reader.read();
-    if (result.done) break;
-    received += result.value.length;
-    loadedBytes += result.value.length;
-    chunks.push(result.value);
-    var mbDone = (loadedBytes / (1024 * 1024)).toFixed(2);
-    loadingText.textContent = "LOADING... " + mbDone + " MB / 132.83 MB";
-  }
-  var fullBuffer = new Uint8Array(received);
-  var offset = 0;
-  for (var ci = 0; ci < chunks.length; ci++) {
-    fullBuffer.set(chunks[ci], offset);
-    offset += chunks[ci].length;
-  }
-  return fullBuffer.buffer;
-}
-
-async function mergeFiles(fileParts, cacheKey) {
-  var cache = await caches.open("jsab-cache");
-  var cachedResponse = await cache.match(cacheKey);
-  if (cachedResponse) {
-    var blob = await cachedResponse.blob();
-    return URL.createObjectURL(blob);
-  }
-  var buffers = await Promise.all(
-    fileParts.map(function(p) { return fetchWithProgress(p); })
+  <head>
+    <base href="https://cdn.jsdelivr.net/gh/web-ports/jsab@main/">
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity WebGL Player | JSB</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <script src="TemplateData/UnityProgress.js"></script>
+    <script src="Build/UnityLoader.js"></script>
+    <style>
+      body {
+        cursor: url('Cursor.png'), auto;
+        background-color: black;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      #unityContainer {
+        width: 100vw !important;
+        height: 100vh !important;
+      }
+      canvas {
+        width: 100% !important;
+        height: 100% !important;
+      }
+#loading-text {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999999;
+  font-size: 48px;
+  font-family: cursive;
+  font-weight: bold;
+  pointer-events: none;
+  background: linear-gradient(
+    270deg,
+    #ff0000,
+    #ff7f00,
+    #ffff00,
+    #00ff00,
+    #0000ff,
+    #4b0082,
+    #8f00ff
   );
-  var mergedBlob = new Blob(buffers);
-  var response = new Response(mergedBlob);
-  await cache.put(cacheKey, response);
-  return URL.createObjectURL(mergedBlob);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: rainbow 3s ease infinite;
 }
 
-function getParts(file, start, end) {
-  var parts = [];
-  for (var i = start; i <= end; i++) {
-    parts.push(file + ".part" + i);
-  }
-  return parts;
+@keyframes rainbow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
+    </style>
+  </head>
+  <body>
+<div id="loading-text"
+    style="color: white; font-size: 48px; font-family: cursive; text-align: center; margin-top: 20px;"> LOADING...
+  </div>
+    <div class="webgl-content">
+      <div id="unityContainer"></div>
+    </div>
+ <script>
+var loadingText = document.querySelector("#loading-text");
+    let totalBytes = 0;
+    let loadedBytes = 0;
 
-(function() {
-  "use strict";
-  var releaseDate = new Date("2026-05-30T00:00:00");
-  var isReleased = new Date() >= releaseDate;
-  var overlay = document.getElementById("proGateOverlay");
-  function setGate(show) { overlay.style.display = show ? "flex" : "none"; }
-  setGate(!(localStorage.getItem("budsin_pro_active") === "1" || isReleased));
-
-  // Format release date dynamically
-  (function() {
-    var months = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
-    var day = releaseDate.getDate();
-    var month = months[releaseDate.getMonth()];
-    var year = releaseDate.getFullYear();
-    var dateStr = day + " de " + month + " de " + year;
-    var textEl = document.getElementById("proGateDateText");
-    if (textEl) textEl.textContent = "Disponible para todos el " + dateStr + ".";
-    var bottomEl = document.getElementById("proGateDateBottom");
-    if (bottomEl) bottomEl.innerHTML = "\uD83C\uDF89 Ser\u00E1 gratis para todos el <strong style=\"color:#b8a87a\">" + dateStr + "</strong>.";
-  })();
-
-  var fbConfig = {
-    apiKey: "AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U",
-    authDomain: "juanjo-games.firebaseapp.com",
-    projectId: "juanjo-games",
-    storageBucket: "juanjo-games.firebasestorage.app",
-    messagingSenderId: "927529249414",
-    appId: "1:927529249414:web:410a686dc7f0da25ec3f07",
-  };
-  var app, db;
-  try {
-    if (window.firebase) {
-      app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(fbConfig);
-      db = app.firestore();
-      var gameHref = window.location.pathname + window.location.search;
-      db.collection("game_popularity").doc(gameHref).set({
-        name: "Just Shapes & Beats",
-        count: window.firebase.firestore.FieldValue.increment(1)
-      }, { merge: true }).catch(function() {});
+    async function fetchWithProgress(url) {
+      const response = await fetch(url);
+      const reader = response.body.getReader();
+      let chunks = [];
+      let received = 0;
+      while (true) {
+        const {
+          done,
+          value
+        } = await reader.read();
+        if (done) break;
+        received += value.length;
+        loadedBytes += value.length;
+        chunks.push(value);
+        let mbDone = (loadedBytes / (1024 * 1024)).toFixed(2);
+        let mbTotal = '132.83';
+        loadingText.textContent = `LOADING... ${mbDone} MB / ${mbTotal} MB`;
+      }
+      let fullBuffer = new Uint8Array(received);
+      let offset = 0;
+      for (let chunk of chunks) {
+        fullBuffer.set(chunk, offset);
+        offset += chunk.length;
+      }
+      return fullBuffer.buffer;
     }
-  } catch(e) { console.warn("[JSAB] Firebase init error:", e); }
 
-  try {
-    if (window.firebase && window.firebase.auth && app) {
-      app.auth().onAuthStateChanged(function(user) {
-        if (user && db) {
-          db.collection("users").doc(user.uid).get().then(function(doc) {
-            if (doc.exists) {
-              var data = doc.data();
-              var realPro = data.pro === true;
-              if (data.paidUntil && data.paidUntil.toDate) {
-                realPro = realPro && data.paidUntil.toDate() > new Date();
-              }
-              localStorage.setItem("budsin_pro_active", realPro ? "1" : "0");
-              setGate(!(realPro || isReleased));
-            }
-          }).catch(function() {});
+    async function mergeFiles(fileParts, cacheKey) {
+      const cache = await caches.open("jsab-cache");
+      const cachedResponse = await cache.match(cacheKey);
+      if (cachedResponse) {
+        const blob = await cachedResponse.blob();
+        return URL.createObjectURL(blob);
+      }
+      const buffers = await Promise.all(
+        fileParts.map(part => fetchWithProgress(part))
+      );
+      const mergedBlob = new Blob(buffers);
+      const response = new Response(mergedBlob);
+      await cache.put(cacheKey, response);
+      return URL.createObjectURL(mergedBlob);
+    }
+
+    function getParts(file, start, end) {
+      let parts = [];
+      for (let i = start; i <= end; i++) {
+        parts.push(file + ".part" + i);
+      }
+      return parts;
+    }
+    (async () => {
+      const [dataUrl, wasmUrl, bundle] = await Promise.all([
+        mergeFiles(getParts("Build/jsab.data.unityweb", 1, 4), "jsab.data.unityweb"),
+        mergeFiles(getParts("Build/jsab.wasm.code.unityweb", 1, 2), "jsab.wasm.code.unityweb"),
+        mergeFiles(getParts("StreamingAssets/aa/WebGL/fonts_tmp_assets_all_c2712a523e390d12249a703a5257c93b.bundle", 1, 3), "fonts_tmp_assets_all_c2712a523e390d12249a703a5257c93b.bundle"),
+      ]);
+      const originalOpen = XMLHttpRequest.prototype.open;
+      const originalSend = XMLHttpRequest.prototype.send;
+      XMLHttpRequest.prototype.open = function (method, url, ...rest) {
+        this._requestUrl = url;
+
+        if (url.includes("jsab.data.unityweb")) {
+          url = dataUrl;
+        } else if (url.includes("jsab.wasm.code.unityweb")) {
+          url = wasmUrl;
+        } else if (url.includes("fonts_tmp_assets_all_c2712a523e390d12249a703a5257c93b.bundle")) {
+          url = bundle;
+        } else if (url.includes(".bundle")) {
+          loadingText.style.display = "block";
+          loadingText.textContent = url.split("/").pop().replace(".bundle", "");
         }
-      });
-    }
-  } catch(e) { console.warn("[JSAB] Auth check error:", e); }
-})();
+        this._modifiedUrl = url;
+        return originalOpen.call(this, method, url, ...rest);
+      };
 
-(async function() {
-  var dataUrl, wasmUrl, bundle;
-  try {
-    var results = await Promise.all([
-      mergeFiles(getParts("Build/jsab.data.unityweb", 1, 4), "jsab.data.unityweb"),
-      mergeFiles(getParts("Build/jsab.wasm.code.unityweb", 1, 2), "jsab.wasm.code.unityweb"),
-      mergeFiles(getParts("StreamingAssets/aa/WebGL/fonts_tmp_assets_all_c2712a523e390d12249a703a5257c93b.bundle", 1, 3), "fonts_tmp_assets_all_c2712a523e390d12249a703a5257c93b.bundle"),
-    ]);
-    dataUrl = results[0];
-    wasmUrl = results[1];
-    bundle = results[2];
-  } catch(e) { console.error("[JSAB] Merge error:", e); return; }
-
-  var originalOpen = XMLHttpRequest.prototype.open;
-  var originalSend = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.open = function(method, url) {
-    this._requestUrl = url;
-    var rest = Array.prototype.slice.call(arguments, 2);
-    if (url.includes("jsab.data.unityweb")) { url = dataUrl; }
-    else if (url.includes("jsab.wasm.code.unityweb")) { url = wasmUrl; }
-    else if (url.includes("fonts_tmp_assets_all_c2712a523e390d12249a703a5257c93b.bundle")) { url = bundle; }
-    else if (url.includes(".bundle")) {
-      loadingText.style.display = "block";
-      loadingText.textContent = url.split("/").pop().replace(".bundle", "");
-    }
-    this._modifiedUrl = url;
-    return originalOpen.apply(this, [method, url].concat(rest));
-  };
-
-  XMLHttpRequest.prototype.send = function() {
-    var self = this;
-    if (this._requestUrl && this._requestUrl.includes(".bundle")) {
-      this.addEventListener("loadend", function() {
-        loadingText.style.display = "none";
-      });
-    }
-    return originalSend.apply(this, arguments);
-  };
-
-  var unityInstance = UnityLoader.instantiate("unityContainer", "Build/jsab.json", {onProgress: UnityProgress});
-  loadingText.style.display = "none";
-})();
-  </script>
-
-  <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
-</body>
+      XMLHttpRequest.prototype.send = function (...args) {
+        if (this._requestUrl && this._requestUrl.includes(".bundle")) {
+          this.addEventListener("loadend", () => {
+            loadingText.style.display = "none";
+          });
+        }
+        return originalSend.apply(this, args);
+      };
+      var unityInstance = UnityLoader.instantiate("unityContainer", "Build/jsab.json", {onProgress: UnityProgress});
+      loadingText.style.display = "none";
+    })();
+    </script>
+  </body>
 </html>
