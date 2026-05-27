@@ -5738,6 +5738,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 document.querySelectorAll(".tutorial-target-highlight").forEach(function(el) {
                     el.classList.remove("tutorial-target-highlight");
                 });
+                try {
+                    var seenVersion = localStorage.getItem(STORAGE_KEY);
+                    if (ENABLE_CHANGELOG_POPUP && seenVersion !== SITE_VERSION) {
+                        showChangelog();
+                    }
+                } catch (_) {
+                    if (ENABLE_CHANGELOG_POPUP) showChangelog();
+                }
             }
 
             // ─── Online Status Indicator ───
@@ -7829,7 +7837,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             try {
                 const seenVersion = localStorage.getItem(STORAGE_KEY);
-                if (ENABLE_CHANGELOG_POPUP && seenVersion !== SITE_VERSION) {
+                const tutorialDone = localStorage.getItem(TUTORIAL_KEY) === "1";
+                if (ENABLE_CHANGELOG_POPUP && seenVersion !== SITE_VERSION && tutorialDone) {
                     showChangelog();
                 }
             } catch (error) {
