@@ -175,8 +175,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
 
     var gameSave;
+    var unityStarted = false;
 
     function startUnity() {
+      if (unityStarted) return;
+      unityStarted = true;
       (async () => {
         const [dataUrl, wasmUrl] = await Promise.all([
           mergeFiles(getParts("Build/escape-road-3-v26041006.data", 1, 7), "escape-road-3-v26041006.data"),
@@ -227,7 +230,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             }
           }).then((unityInstance) => {
             window.unityInstance = unityInstance;
-            if (gameSave) {
+            if (gameSave && gameSave.initialized) {
               gameSave.startAutoSave();
             }
             setTimeout(function() {
@@ -244,14 +247,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       })();
     }
 
-    gameSave = new GameSave("escape-road-3");
-    gameSave.init().then(function(snapshot) {
-      console.log("✅ IDB restored from cloud:", snapshot);
-      startUnity();
-    }).catch(function(err) {
-      console.warn("⚠️ Save init failed, starting Unity with local data:", err);
-      startUnity();
-    });
+    startUnity();
+
+    try {
+      gameSave = new GameSave("escape-road-3");
+      gameSave.init().then(function() {
+        if (window.unityInstance) {
+          gameSave.startAutoSave();
+        }
+      }).catch(function() {});
+    } catch (e) {}
 	</script>
 	<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
 </body>	
