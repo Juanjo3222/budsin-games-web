@@ -40,19 +40,16 @@
         if (db) return true;
         if (!window.firebase) return false;
         try {
-            var app;
-            try {
-                app = window.firebase.app("budsinSave");
-            } catch (e) {
-                app = window.firebase.initializeApp({
+            var app = window.firebase.apps.length
+                ? window.firebase.app()
+                : window.firebase.initializeApp({
                     apiKey: "AIzaSyDSq7mtQN0ewJGQ6suMh1gRYFVr_xBvhBs",
                     authDomain: "juanjo-games.firebaseapp.com",
                     projectId: "juanjo-games",
                     storageBucket: "juanjo-games.firebasestorage.app",
                     messagingSenderId: "71973783344",
                     appId: "1:71973783344:web:cc310281715d048aa77c87",
-                }, "budsinSave");
-            }
+                });
             db = app.firestore();
             auth = app.auth();
             auth.onAuthStateChanged(function (u) {

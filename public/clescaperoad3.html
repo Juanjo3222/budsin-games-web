@@ -233,26 +233,20 @@ function isDiffHost() {
 	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics-compat.js"></script>
 	<script type="module">
 		const firebaseConfig = {
-    apiKey: "AIzaSyDUyjnqlS0gquhgZBuoXHs-kRSOMG-htU4",
-    authDomain: "ofree-32967.firebaseapp.com",
-    projectId: "ofree-32967",
-    storageBucket: "ofree-32967.firebasestorage.app",
-    messagingSenderId: "777959803199",
-    appId: "1:777959803199:web:cca8a2a59ce3b36749eb8a",
-    measurementId: "G-MEMBWQ3ZR8"
+    apiKey: "AIzaSyDSq7mtQN0ewJGQ6suMh1gRYFVr_xBvhBs",
+    authDomain: "juanjo-games.firebaseapp.com",
+    projectId: "juanjo-games",
+    storageBucket: "juanjo-games.firebasestorage.app",
+    messagingSenderId: "71973783344",
+    appId: "1:71973783344:web:cc310281715d048aa77c87"
   };
 		if (typeof firebaseConfig !== 'undefined'){
 			if(firebaseConfig ){
 				window.dataLayer = window.dataLayer || [];
 				window.gtag = function () { window.dataLayer.push(arguments); }
 
-				window.gtag("config", firebaseConfig.measurementId, {
-				  cookie_domain: window.location.hostname,
-				  cookie_flags: "SameSite=None;Secure",
-				});
 				// Initialize Firebase
 				const app = firebase.initializeApp(firebaseConfig);
-				//const auth = getAuth(app);
 			}
 		}		
 	</script>
