@@ -96,12 +96,21 @@
 
     // ─── IDB helpers ───
 
+    var SYSTEM_DB_PREFIXES = ["$scramjet", "/idbfs", "unitycache", "firebase", "_", "asmjs", "blob"];
+
     function enumerateIDB() {
         if (!window.indexedDB || !window.indexedDB.databases) {
             return Promise.resolve([]);
         }
         return window.indexedDB.databases().then(function (dbs) {
-            return dbs.map(function (d) { return d.name; }).filter(Boolean);
+            return dbs.map(function (d) { return d.name; }).filter(function (name) {
+                if (!name) return false;
+                var lower = name.toLowerCase();
+                for (var i = 0; i < SYSTEM_DB_PREFIXES.length; i++) {
+                    if (lower.indexOf(SYSTEM_DB_PREFIXES[i]) === 0) return false;
+                }
+                return true;
+            });
         }).catch(function () { return []; });
     }
 
