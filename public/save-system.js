@@ -124,7 +124,13 @@
                     var req;
                     try { req = indexedDB.open(name); } catch (e) { resolve(); return; }
                     req.onupgradeneeded = function () {};
+                    var openTimeout = setTimeout(function () {
+                        console.warn("[BudsinSave] Snapshot open timed out:", name);
+                        try { if (req && req.result) req.result.close(); } catch (_) {}
+                        resolve();
+                    }, 10000);
                     req.onsuccess = function () {
+                        clearTimeout(openTimeout);
                         var d = req.result;
                         if (!d) { resolve(); return; }
                         var dbData = { version: d.version, stores: {} };
@@ -168,8 +174,8 @@
                             resolve();
                         });
                     };
-                    req.onerror = function () { resolve(); };
-                    req.onblocked = function () { resolve(); };
+                    req.onerror = function () { clearTimeout(openTimeout); resolve(); };
+                    req.onblocked = function () { clearTimeout(openTimeout); resolve(); };
                 });
             });
         });
