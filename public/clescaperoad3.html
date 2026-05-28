@@ -101,19 +101,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     function initSaveSystem() {
       var s = document.createElement("script");
-      s.src = "https://games.budsin.dev/save-system.js";
+      s.src = "https://games.budsin.dev/game-save.js";
       s.onload = function() {
-        var s2 = document.createElement("script");
-        s2.src = "https://games.budsin.dev/game-save.js";
-        s2.onload = function() {
-          try {
-            var gs = new GameSave("escape-road-3");
-            gs.init().then(function() {
-              gs.startAutoSave();
-            }).catch(function() {});
-          } catch (e) {}
-        };
-        document.body.appendChild(s2);
+        try {
+          var gs = new GameSave("escape-road-3");
+          gs.init().then(function() {
+            gs.startAutoSave();
+          }).catch(function() {});
+        } catch (e) {}
       };
       document.body.appendChild(s);
     }
@@ -235,11 +230,44 @@ function isDiffHost() {
 	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-firestore-compat.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-auth-compat.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/10.9.0/firebase-analytics-compat.js"></script>
+	<script type="module">
+		const firebaseConfig = {
+    apiKey: "AIzaSyDSq7mtQN0ewJGQ6suMh1gRYFVr_xBvhBs",
+    authDomain: "juanjo-games.firebaseapp.com",
+    projectId: "juanjo-games",
+    storageBucket: "juanjo-games.firebasestorage.app",
+    messagingSenderId: "71973783344",
+    appId: "1:71973783344:web:cc310281715d048aa77c87"
+  };
+		if (typeof firebaseConfig !== 'undefined'){
+			if(firebaseConfig ){
+				window.dataLayer = window.dataLayer || [];
+				window.gtag = function () { window.dataLayer.push(arguments); }
+
+				// Initialize Firebase
+				const app = firebase.initializeApp(firebaseConfig);
+				window.__budsinFirebaseInitialized = true;
+			}
+		}		
+	</script>
 	<script>
-		window.dataLayer = window.dataLayer || [];
-		window.gtag = function () { window.dataLayer.push(arguments); }
+		function firebaseSetUserProperties(props) {
+			if (typeof firebaseConfig === 'undefined') return;
+				firebase.analytics().setUserProperties(props);
+		}
+		function firebaseLogEvent(event_name) {
+			if (typeof firebaseConfig === 'undefined') return;
+				firebase.analytics().logEvent(event_name);
+			
+		}
+		function firebaseLogEventParameter(event_name, event_param) {
+			if (typeof firebaseConfig === 'undefined') return;
+				firebase.analytics().logEvent(event_name, event_param);			
+		}
 	</script>
 	<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+    <script src="https://games.budsin.dev/save-system.js"></script>
 </body>	
 </html>
 
