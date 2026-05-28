@@ -2348,6 +2348,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         ? window.firebase.app()
                         : window.firebase.initializeApp(BUDSIN_FIREBASE_CONFIG);
                     firebaseAuth = firebaseApp.auth();
+                    firebaseAuth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(e) { console.warn("[Budsin] Persistence error:", e); });
                     firebaseDb = firebaseApp.firestore();
                 } catch(e) { console.warn("[Budsin Pro] Firebase init error:", e); }
             }

@@ -54,6 +54,7 @@
                 });
             db = app.firestore();
             auth = app.auth();
+            auth.setPersistence(window.firebase.auth.Auth.Persistence.LOCAL).catch(function (e) { console.warn("[BudsinSave] Persistence error:", e); });
             auth.onAuthStateChanged(function (u) {
                 currentUser = u;
                 saveCountCache = null;

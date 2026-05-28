@@ -172,6 +172,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
             var app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(firebaseConfig);
             var auth = app.auth();
+            auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(function(e) { console.warn("[Budsin] Persistence error:", e); });
             var db = app.firestore();
 
             function ensureUserDoc(user) {

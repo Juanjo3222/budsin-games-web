@@ -5067,6 +5067,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     });
                     if (!app) return;
                     const auth = app.auth();
+                    auth.setPersistence(window.firebase.auth.Auth.Persistence.LOCAL).catch(function(e) { console.warn("[Budsin] Persistence error:", e); });
                     const db = app.firestore();
                     let currentUser = null;
                     let proPollTimer = null;
