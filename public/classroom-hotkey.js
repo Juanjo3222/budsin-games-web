@@ -143,15 +143,25 @@
   // ─────────────────────────────────────────────
 
   var FAVICON_SERVICES = [
+    function(u) { return u.origin + "/favicon.ico"; },
     function(u) { return "https://www.google.com/s2/favicons?sz=64&domain=" + encodeURIComponent(u.hostname); },
-    function(u) { return "https://icon.duckduckgo.com/ip3/" + u.hostname + "/favicon.ico"; },
+    function(u) { return "https://www.google.com/s2/favicons?sz=64&domain=" + encodeURIComponent(u.hostname.replace(/^www\./, "")); },
+    function(u) { return "https://icon.duckduckgo.com/ip3/" + u.hostname + ".ico"; },
+    function(u) { return "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=" + encodeURIComponent(u.origin) + "&size=64"; },
   ];
+
+  function tryLoadFavicon(url, fallback) {
+    var img = new Image();
+    img.onload = function() { setFaviconHref(url); };
+    img.onerror = function() { setFaviconHref(fallback); };
+    img.src = url;
+  }
 
   function getFaviconViaService(url) {
     var u;
     try { u = new URL(url); } catch (_) { return "https://www.google.com/favicon.ico"; }
     for (var i = 0; i < FAVICON_SERVICES.length; i++) {
-      try { return FAVICON_SERVICES[i](u); } catch (_) { continue; }
+      try { var result = FAVICON_SERVICES[i](u); if (result) return result; } catch (_) { continue; }
     }
     return "https://www.google.com/favicon.ico";
   }
@@ -186,6 +196,65 @@
       document.title = disguisedTitle;
       setFaviconHref(disguisedFaviconHref);
     }
+  }
+
+  function tryExtractIframeMetadata(frame) {
+    if (!frame || !frame.src) return;
+    try {
+      var doc = frame.contentDocument || frame.contentWindow.document;
+      if (doc && doc.title && doc.title.length > 0) {
+        disguisedTitle = doc.title;
+        if (document.getElementById(IDS.OVERLAY) && document.getElementById(IDS.OVERLAY).classList.contains("is-open")) {
+          document.title = disguisedTitle;
+        }
+      }
+    } catch (_) {}
+    try {
+      var doc = frame.contentDocument || frame.contentWindow.document;
+      if (doc) {
+        var iconLink = doc.querySelector("link[rel~='icon'], link[rel~='shortcut icon']");
+        if (iconLink) {
+          var href = iconLink.href || iconLink.getAttribute("href") || "";
+          if (href) {
+            var absHref = new URL(href, frame.src).href;
+            disguisedFaviconHref = absHref;
+            if (document.getElementById(IDS.OVERLAY) && document.getElementById(IDS.OVERLAY).classList.contains("is-open")) {
+              setFaviconHref(absHref);
+            }
+            return;
+          }
+        }
+      }
+    } catch (_) {}
+    try {
+      var url = frame.src;
+      fetch(url, { method: "GET", mode: "cors", signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined })
+        .then(function(r) { return r.ok ? r.text() : null; })
+        .then(function(html) {
+          if (!html) return;
+          var m;
+          m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+          if (m && m[1]) {
+            disguisedTitle = m[1].trim().replace(/&#?\w+;/g, "").replace(/\s+/g, " ").substring(0, 128);
+            if (document.getElementById(IDS.OVERLAY) && document.getElementById(IDS.OVERLAY).classList.contains("is-open")) {
+              document.title = disguisedTitle;
+            }
+          }
+          m = html.match(/<link[^>]+rel\s*=\s*["']?(?:icon|shortcut icon|apple-touch-icon)["' >][^>]*href\s*=\s*["']([^"']+)["'][^>]*\/?\s*>/i);
+          if (!m) m = html.match(/<link[^>]+href\s*=\s*["']([^"']+)["'][^>]*rel\s*=\s*["']?(?:icon|shortcut icon|apple-touch-icon)["' >][^>]*\/?\s*>/i);
+          if (m && m[1]) {
+            var href = m[1].trim();
+            try {
+              href = new URL(href, url).href;
+            } catch (_) {}
+            disguisedFaviconHref = href;
+            if (document.getElementById(IDS.OVERLAY) && document.getElementById(IDS.OVERLAY).classList.contains("is-open")) {
+              tryLoadFavicon(href, disguisedFaviconHref);
+            }
+          }
+        })
+        .catch(function() {});
+    } catch (_) {}
   }
 
   // ─────────────────────────────────────────────
@@ -226,6 +295,9 @@
     frame.setAttribute("allow", "fullscreen");
     frame.setAttribute("allowfullscreen", "");
     frame.setAttribute("sandbox", "allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts");
+    frame.addEventListener("load", function () {
+      tryExtractIframeMetadata(frame);
+    });
 
     overlay.appendChild(close);
     overlay.appendChild(frame);
@@ -345,9 +417,9 @@
     if (!isOpen && frame) {
       var prevSrc = frame.src;
       ensureFrameUrl(frame);
-      // If the URL changed (user updated settings), re-register the load listener
-      // so disguisedTitle / disguisedFaviconHref get refreshed for the new site.
       if (frame.src !== prevSrc) refreshDisguiseMetadata();
+      window.setTimeout(function () { tryExtractIframeMetadata(frame); }, 800);
+      window.setTimeout(function () { tryExtractIframeMetadata(frame); }, 3000);
     }
     triggerFunkinEscape();
     resetAutoDisguiseTimer();
