@@ -197,6 +197,9 @@ Firebase se usa únicamente para el conteo de popularidad.
 
 ## 📝 Changelog
 
+### v6.3
+* **Cuphead** — nuevo juego añadido al catálogo con portada propia, assets obligatorios y traducción completa ES/EN/PT.
+
 ### v6.2
 * **Modo offline Pro** — Service Worker con cache completo para usuarios Pro. El sitio funciona sin internet.
 * **Leaderboards globales** — Tabla de puntuaciones por juego solo para Pro.
