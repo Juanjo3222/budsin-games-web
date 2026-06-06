@@ -1,0 +1,145 @@
+@import './style';
+
+.sidebar-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 20vw;
+    height: 100vh;
+
+    header {
+        display: flex;
+        width: 20vw;
+        height: 99vh;
+        // padding: 10px 4px 10px 8px;
+        margin: 0;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        flex-shrink: 0;
+
+        border-radius: 0.4rem;
+
+        position: absolute;
+        left: 0.5rem;
+
+        transition: 0.2s ease-in-out;
+
+        &.closed {
+            background-image: linear-gradient(50deg, rgb(2, 131, 181) 0%, rgb(157, 50, 183) 129.9%);
+
+            border: rgba(240, 240, 240, 0.5) 1px solid;
+            position: fixed;
+
+
+            &:not(:hover):not(.hovered) {
+                transform: translateX(-120%);
+            }
+        }
+
+        .page-data {
+            width: 95%;
+            padding: 0.5rem 0;
+
+            #controls {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                button {
+                    background-color: transparent;
+                    border: none;
+                    outline: none;
+                    color: white;
+                    font: inherit;
+                    font-weight: 500;
+                    cursor: pointer;
+                    padding: 0;
+
+                    .icon {
+                        font-size: 1.2rem;
+                        padding: 0.5rem;
+                        border-radius: 0.5rem;
+                    }
+                }
+            }
+
+            #url-form {
+                padding: 1rem 0;
+                border-bottom: 0.5px solid rgba(240, 240, 240, 0.5);
+
+                input {
+                    background-color: $focus-1;
+                    border: none;
+                    outline: none;
+
+                    color: inherit;
+                    font: inherit;
+                    padding: 0.6rem;
+                    box-sizing: border-box;
+                    border-radius: 0.8rem;
+
+                    font-size: 0.8rem;
+
+                    width: 100%;
+                }
+            }
+
+            #new-tab {
+                width: 100%;
+                margin-top: 1rem;
+
+                border-radius: 0.8rem;
+
+                background-color: $focus-1;
+
+                border: none;
+                outline: none;
+
+                color: inherit;
+                font: inherit;
+
+                padding: 0.6rem;
+
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                gap: 0.5rem;
+
+
+                .icon {
+                    font-size: 1.2rem;
+                }
+            }
+        }
+    }
+}
+
+// .closed + #tab-view {
+//     width: 100vw;
+// }
+
+@keyframes slide-in-from-top {
+    0% {
+        transform: translateY(-150%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-out-from-bottom {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-150%);
+        opacity: 0;
+    }
+}

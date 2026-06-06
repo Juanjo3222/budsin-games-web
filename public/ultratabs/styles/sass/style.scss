@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+$text-50: hsl(0, 0%, 95%);
+$text-100: hsl(0, 0%, 90%);
+$text-200: hsl(0, 0%, 80%);
+$text-300: hsl(0, 0%, 70%);
+$text-400: hsl(0, 0%, 60%);
+$text-500: hsl(0, 0%, 50%);
+$text-600: hsl(0, 0%, 40%);
+$text-700: hsl(0, 0%, 30%);
+$text-800: hsl(0, 0%, 20%);
+$text-900: hsl(0, 0%, 10%);
+$text-950: hsl(0, 0%, 5%);
+
+$background-900: hsl(214, 25%, 10%);
+$background-950: hsl(214, 28%, 5%);
+
+$primary-50: hsl(155, 100%, 95%);
+$primary-100: hsl(155, 100%, 90%);
+$primary-200: hsl(155, 100%, 80%);
+$primary-300: hsl(155, 100%, 70%);
+$primary-400: hsl(155, 100%, 60%);
+$primary-500: hsl(155, 100%, 50%);
+$primary-600: hsl(155, 100%, 40%);
+$primary-700: hsl(155, 100%, 30%);
+$primary-800: hsl(155, 100%, 20%);
+$primary-900: hsl(155, 100%, 10%);
+$primary-950: hsl(155, 100%, 5%);
+
+$secondary-50: hsl(199, 85%, 95%);
+$secondary-100: hsl(201, 88%, 90%);
+$secondary-200: hsl(201, 88%, 80%);
+$secondary-300: hsl(201, 88%, 70%);
+$secondary-400: hsl(201, 88%, 60%);
+$secondary-500: hsl(201, 88%, 50%);
+$secondary-600: hsl(201, 88%, 40%);
+$secondary-700: hsl(201, 88%, 30%);
+$secondary-800: hsl(201, 88%, 20%);
+$secondary-800-rgb: 6, 64, 96;
+$secondary-900: hsl(201, 88%, 10%);
+$secondary-950: hsl(202, 85%, 5%);
+
+$accent-50: hsl(274, 100%, 95%);
+$accent-100: hsl(274, 96%, 90%);
+$accent-200: hsl(274, 98%, 80%);
+$accent-300: hsl(274, 97%, 70%);
+$accent-400: hsl(274, 98%, 60%);
+$accent-500: hsl(274, 98%, 50%);
+$accent-600: hsl(274, 98%, 40%);
+$accent-700: hsl(274, 97%, 30%);
+$accent-800: hsl(274, 98%, 20%);
+$accent-900: hsl(274, 96%, 10%);
+$accent-950: hsl(274, 100%, 5%);
+
+body {
+    background-color: $background-950;
+    color: $text-50;
+
+    font-family: 'Inter', sans-serif;
+
+    padding: 0;
+    margin: 0;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+
+    background-image: linear-gradient(50deg, rgb(2, 131, 181) 0%, rgb(157, 50, 183) 72.9%);
+}
+
+$focus-1: rgba(226, 226, 226, 0.15);
+$focus-2: rgba(226, 226, 226, 0.25);
+$focus-3: rgba(226, 226, 226, 0.8);
+
+.hover-focus1 {
+    transition: 0.1s ease-in-out;
+
+    &:hover:not(.selectedTab) {
+        background-color: $focus-1 !important;
+    }
+}
+
+.hover-focus2 {
+    transition: 0.1s ease-in-out;
+
+    &:hover:not(.selectedTab) {
+        background-color: $focus-2 !important;
+    }
+}

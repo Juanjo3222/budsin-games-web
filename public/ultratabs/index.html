@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultratabs</title>
+
+    <link rel="stylesheet" href="styles/css/style.css">
+    <link rel="stylesheet" href="styles/css/sidebar.css">
+    <link rel="stylesheet" href="styles/css/tablist.css">
+    <link rel="stylesheet" href="styles/css/tabview.css">
+
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/gh/vanjs-org/van/public/van-1.5.2.nomodule.min.js"></script>
+
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+    <script src="/uv/uv.bundle.js" defer></script>
+    <script src="/uv/uv.config.js" defer></script>
+    <script src="scripts/tabs.mjs" type="module" defer></script>
+</head>
+
+<body>
+    <!-- <div class="sidebar-tigger"></div> -->
+    <div id="tab-view" class=""></div>
+    <div class="sidebar-container">
+        <header>
+            <div class="page-data">
+                <span id="controls">
+                    <button id="close-sidebar">
+                        <ion-icon name="file-tray-full-outline" class="icon hover-focus1"></ion-icon>
+                    </button>
+                    <span>
+                        <button id="page-back"><ion-icon name="arrow-back-outline"
+                                class="icon hover-focus1"></ion-icon></button>
+                        <button id="page-forward"><ion-icon name="arrow-forward-outline"
+                                class="icon hover-focus1"></ion-icon></ion-icon></button>
+                        <button id="page-refresh"><ion-icon name="refresh-outline"
+                                class="icon hover-focus1"></ion-icon></ion-icon></button>
+                    </span>
+                </span>
+                <form id="url-form">
+                    <input type="text" id="url-input" onfocus="this.setSelectionRange(0, this.value.length)"
+                        class="hover-focus2">
+                </form>
+                <button id="new-tab" class="hover-focus2">
+                    <ion-icon name="add-outline" class="icon"></ion-icon>
+                    <span>New Tab</span>
+                </button>
+            </div>
+            <div id="tab-list"></div>
+        </header>
+    </div>
+</body>
+
+</html>

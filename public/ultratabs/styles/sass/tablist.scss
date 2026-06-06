@@ -1,0 +1,126 @@
+@import './style';
+
+header {
+    #tab-list {
+        height: 70vh;
+        width: 100%;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.5rem;
+
+        .tab-item {
+            position: relative;
+            display: flex;
+            gap: 0.5rem;
+
+            width: 95%;
+
+            border-radius: 0.8rem;
+            background: rgba(226, 226, 226, 0.0);
+
+            justify-content: flex-start;
+            align-items: center;
+
+            cursor: pointer;
+
+            border: none;
+            outline: none;
+            padding: 0.6rem;
+
+
+            font: inherit;
+            color: inherit;
+            font-weight: 500;
+
+            animation: slide-in-from-top 0.1s cubic-bezier(0.12, 0.64, 1, 1);
+
+            img {
+                height: 1.25em;
+            }
+
+            span {
+                font: inherit;
+                color: inherit;
+                font-weight: 400;
+
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+
+                width: 80%;
+                text-align: left;
+            }
+
+
+            .close {
+                position: absolute;
+                right: 0.5rem;
+
+                background-color: transparent;
+                border: none;
+                outline: none;
+
+                border-radius: 2rem;
+
+                cursor: pointer;
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                aspect-ratio: 1/1;
+
+                transition: 0.1s ease-in-out;
+
+                &:hover {
+                    background-color: $focus-2;
+                }
+
+                .close-icon {
+                    font-size: 1.2rem;
+                    color: transparent;
+
+                    height: 1.2rem;
+                    width: 1.2rem;
+                }
+            }
+
+            &.selectedTab {
+                background: $focus-2;
+            }
+
+            &:hover {
+                .close-icon {
+                    color: rgb(220, 220, 220);
+                }
+            }
+        }
+    }
+}
+
+@keyframes slide-in-from-top {
+    0% {
+        transform: translateY(-150%);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-out-from-bottom {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(-150%);
+        opacity: 0;
+    }
+}
