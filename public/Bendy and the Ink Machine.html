@@ -3,9 +3,17 @@
 
 <head>
   <meta charset="utf-8">
-  <base href="https://gcore.jsdelivr.net/gh/woahhcrackers/BATIMWeb@main/">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Unity Web Player | Bendy and the Ink Machine</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Juega Bendy and the Ink Machine online gratis en Budsin Games. Adéntrate en el oscuro estudio de animación de Joey Drew y descubre los secretos de la máquina de tinta en este survival horror único con estética de dibujos animados vintage.">
+  <meta name="keywords" content="Bendy and the Ink Machine, juego online, horror, supervivencia, animación vintage, Budsin Games">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="Bendy and the Ink Machine — Juega online gratis | Budsin Games">
+  <meta property="og:description" content="Survival horror con estética de dibujos animados clásicos. Explora el estudio de Joey Drew y descubre sus oscuros secretos.">
+  <meta property="og:image" content="https://games.budsin.dev/batim.webp">
+  <meta property="og:url" content="https://games.budsin.dev/Bendy%20and%20the%20Ink%20Machine.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>Bendy and the Ink Machine — Juega online gratis | Budsin Games</title>
   <link rel="shortcut icon" href="TemplateData/favicon.ico">
   <link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
   <link rel="stylesheet" href="TemplateData/style.css">
@@ -23,7 +31,48 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<!-- End Google Tag Manager (noscript) -->
+  <!-- End Google Tag Manager (noscript) -->
+  <style>
+  #gameInfoBtn { position:fixed;top:16px;right:16px;z-index:50;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.6);color:#fff;font-weight:700;font-size:0.88rem;cursor:pointer;backdrop-filter:blur(8px);font-family:system-ui,sans-serif; }
+  #gameInfoOverlay { display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px; }
+  #gameInfoOverlay > div { background:#fff;border-radius:28px;padding:28px 32px;max-width:680px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.3);position:relative;font-family:system-ui,-apple-system,sans-serif; }
+  #gameInfoOverlay h1 { font-family:'Bebas Neue',sans-serif;font-size:2.5rem;margin:0 0 8px;color:#111827; }
+  #gameInfoOverlay h2 { font-family:'Bebas Neue',sans-serif;font-size:1.6rem;margin:16px 0 8px;color:#111827; }
+  #gameInfoOverlay p, #gameInfoOverlay li { font-size:0.95rem;line-height:1.7;color:#5c6678;margin:0 0 12px; }
+  #gameInfoOverlay ul { padding-left:20px;margin-bottom:12px; }
+  #gameInfoOverlay li { margin-bottom:6px; }
+  #gameInfoOverlay strong { color:#111827; }
+  </style>
+  <button id="gameInfoBtn" onclick="document.getElementById('gameInfoOverlay').style.display='flex';">ℹ️ Info</button>
+  <div id="gameInfoOverlay" onclick="if(event.target===this)this.style.display='none'">
+    <div>
+      <button onclick="document.getElementById('gameInfoOverlay').style.display='none'" style="position:sticky;top:0;float:right;width:36px;height:36px;border-radius:999px;border:1px solid rgba(18,24,38,0.1);background:#fff;color:#111827;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;">&times;</button>
+      <h1>Bendy and the Ink Machine</h1>
+      <p>Bendy and the Ink Machine es un juego de survival horror en primera persona con una estética única inspirada en los dibujos animados de los años 30. Desarrollado por TheMeatly Games, el juego te sitúa como Henry Stein, un antiguo animador que regresa al viejo estudio de Joey Drew Studios tras recibir una misteriosa invitación. Lo que encuentra dentro es mucho más oscuro de lo que esperaba.</p>
+      <p>Explora el estudio abandonado, resuelve puzzles y sobrevive a los encuentros con las criaturas de tinta que acechan en cada rincón. La historia se desarrolla a través de cinco capítulos llenos de misterio, tensión y giros inesperados.</p>
+      <h2>Cómo jugar</h2>
+      <p>Explora el estudio buscando objetos, resolviendo puzzles y avanzando por los distintos capítulos. Presta atención a las grabaciones de audio y los mensajes escritos en las paredes: contienen pistas cruciales sobre la historia y la forma de avanzar. Algunas secciones requieren que te escondas o huyas de los enemigos de tinta que te persiguen.</p>
+      <h2>Controles</h2>
+      <ul>
+        <li><strong>WASD / Teclas de flecha:</strong> Moverse</li>
+        <li><strong>Ratón:</strong> Mirar alrededor e interactuar</li>
+        <li><strong>Clic izquierdo:</strong> Usar objeto / Interactuar</li>
+        <li><strong>E:</strong> Recoger objetos</li>
+        <li><strong>Shift:</strong> Correr</li>
+        <li><strong>Ctrl:</strong> Agacharse</li>
+        <li><strong>Tab:</strong> Inventario</li>
+        <li><strong>Esc:</strong> Pausa / Menú</li>
+      </ul>
+      <h2>Consejos</h2>
+      <ul>
+        <li>Explora cada habitación a fondo: muchos objetos clave están escondidos en lugares poco obvios.</li>
+        <li>Escucha las grabaciones de audio: proporcionan contexto de la historia y a veces pistas sobre qué hacer.</li>
+        <li>Cuando aparezca un enemigo de tinta, busca un escondite o corre. No puedes luchar contra la mayoría de ellos.</li>
+        <li>Guarda el progreso con frecuencia si el juego lo permite: algunas secciones son largas y no querrás repetirlas.</li>
+        <li>Presta atención al entorno: los carteles, dibujos y mensajes en las paredes forman parte de la narrativa.</li>
+      </ul>
+    </div>
+  </div>
   <div id="unity-container" class="unity-desktop">
     <canvas id="unity-canvas" width=1280 height=720 tabindex="-1"></canvas>
     <div id="unity-loading-bar">

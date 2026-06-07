@@ -10,18 +10,150 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Play Geometry Dash online on Budsin Games. Rhythm-based platformer with fast-paced action. Jump, fly, and flip your way through impossible levels.">
-    <meta http-equiv="refresh" content="0; url=https://budsin-dash.pages.dev">
-    <title>Geometry Dash - Budsin Dash | Play Online</title>
+    <meta name="description" content="Juega Geometry Dash online gratis en Budsin Games. El adictivo juego de plataformas basado en ritmo. Salta, vuela y atraviesa niveles imposibles sincronizados con la música. Pon a prueba tus reflejos en este desafiante juego de habilidad.">
+    <meta name="keywords" content="Geometry Dash, juego online, plataformas, ritmo, música, niveles, Budsin Games">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Geometry Dash — Juega online gratis | Budsin Games">
+    <meta property="og:description" content="El adictivo juego de plataformas basado en ritmo. Salta y vuela al compás de la música en niveles imposibles.">
+    <meta property="og:image" content="https://games.budsin.dev/geometry.jpeg">
+    <meta property="og:url" content="https://games.budsin.dev/geometry-dash.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Geometry Dash — Juega online gratis | Budsin Games</title>
     <link rel="icon" type="image/x-icon" href="images.ico">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641"
-         crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+    <style>
+        :root {
+            --bg: #edf1f5;
+            --bg-2: #dfe6ee;
+            --surface: rgba(255,255,255,0.92);
+            --line: rgba(18,24,38,0.1);
+            --text: #111827;
+            --muted: #5c6678;
+            --red: #ef3f45;
+            --blue: #2daeff;
+            --shadow: 0 24px 64px rgba(15,23,42,0.12);
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body {
+            margin: 0; min-height: 100vh;
+            font-family: "Sora", sans-serif;
+            color: var(--text);
+            background: radial-gradient(circle at top center, rgba(255,216,74,0.28), transparent 30%),
+                        linear-gradient(180deg, #f7fafc 0%, var(--bg) 55%, var(--bg-2) 100%);
+            overflow-x: hidden;
+        }
+        .shell {
+            position: relative; z-index: 1;
+            width: min(960px, calc(100% - 80px));
+            margin: 0 auto; padding: 28px 0 64px;
+        }
+        .back-link {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: 999px;
+            border: 1px solid var(--line); background: #fff;
+            box-shadow: 0 16px 36px rgba(15,23,42,0.08);
+            color: var(--text); text-decoration: none; font-size: .88rem; font-weight: 700;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .back-link:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .page-header {
+            padding: 28px 32px; border: 1px solid rgba(255,255,255,.8);
+            border-radius: 36px;
+            background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(246,249,252,.88));
+            box-shadow: var(--shadow); margin: 22px 0 24px;
+        }
+        .page-header h1 {
+            margin: 10px 0 8px; font-family: "Bebas Neue", sans-serif;
+            font-size: clamp(3rem, 8vw, 5.5rem); line-height: 0.92; letter-spacing: 0.04em;
+        }
+        .page-header p { margin: 0; color: var(--muted); line-height: 1.7; font-size: 0.98rem; max-width: 48rem; }
+        .content-card {
+            padding: 28px 32px; border: 1px solid rgba(255,255,255,.8);
+            border-radius: 28px; background: var(--surface);
+            box-shadow: 0 16px 36px rgba(15,23,42,0.08); line-height: 1.8; font-size: 0.95rem;
+        }
+        .content-card h2 { font-family: "Bebas Neue", sans-serif; font-size: 1.8rem; letter-spacing: 0.03em; margin: 24px 0 12px; }
+        .content-card h2:first-child { margin-top: 0; }
+        .content-card p { margin: 0 0 14px; color: var(--muted); }
+        .content-card ul { margin: 0 0 14px; padding-left: 20px; color: var(--muted); }
+        .content-card li { margin-bottom: 6px; }
+        .content-card strong { color: var(--text); }
+        .play-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 16px 32px; border-radius: 16px;
+            background: linear-gradient(135deg, var(--red), #ff8c55);
+            color: #fff; text-decoration: none; font-weight: 800; font-size: 1.1rem;
+            transition: transform .2s, box-shadow .2s;
+            margin-top: 20px;
+        }
+        .play-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(239,63,69,0.3); }
+        @media (max-width: 680px) {
+            .shell { padding-top: 18px; width: min(100%, calc(100% - 28px)); }
+            .page-header { padding: 20px; border-radius: 28px; }
+            .content-card { padding: 20px; border-radius: 24px; }
+        }
+    </style>
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-    <p>If you are not redirected automatically, <a href="https://budsin-dash.pages.dev">click here to play Geometry Dash</a>.</p>
+    <main class="shell">
+        <a class="back-link" href="index.html">← Volver al portal</a>
+        <div class="page-header">
+            <h1>Geometry Dash</h1>
+            <p>El adictivo juego de plataformas basado en ritmo. Salta, vuela y atraviesa niveles imposibles sincronizados con la música.</p>
+        </div>
+        <div class="content-card">
+            <h2>Acerca del juego</h2>
+            <p>Geometry Dash es un juego de plataformas rítmico creado por Robert Topala (RobTop Games). Tu objetivo es guiar un cubo (u otra forma geométrica) a través de niveles llenos de obstáculos, sincronizando cada salto y movimiento con la banda sonora. Con millones de niveles creados por la comunidad, una banda sonora electrizante y una dificultad que va de fácil a casi imposible, Geometry Dash es uno de los juegos de habilidad más populares del mundo.</p>
+
+            <h2>Cómo jugar</h2>
+            <p>Cada nivel es una carrera de obstáculos donde debes saltar, volar y esquivar en el momento exacto. La clave está en el ritmo: la música te indica cuándo actuar. Un solo error te envía de vuelta al principio del nivel. La práctica y la memoria muscular son tus mejores aliados.</p>
+
+            <h2>Controles</h2>
+            <ul>
+                <li><strong>Clic / Espacio / Flecha arriba:</strong> Saltar</li>
+                <li><strong>Mantener:</strong> Acción continua (volar, mantener impulso)</li>
+            </ul>
+
+            <h2>Modos de juego</h2>
+            <ul>
+                <li><strong>Cube:</strong> El modo básico. Salta para evitar obstáculos en el suelo y el techo.</li>
+                <li><strong>Ship:</strong> Vuela manteniendo presionado. Suelta para descender.</li>
+                <li><strong>Ball:</strong> Cambia de gravedad con cada toque. Rueda por el suelo y el techo.</li>
+                <li><strong>UFO:</strong> Salta en el aire sin gravedad. Similar al cubo pero más flotante.</li>
+                <li><strong>Wave:</strong> Modo difícil. Vuela en zigzag cambiando de dirección diagonal.</li>
+                <li><strong>Robot:</strong> Salto controlado en altura. Mantén para saltar más alto.</li>
+                <li><strong>Spider:</strong> Teletransporte entre suelo y techo con cada toque.</li>
+            </ul>
+
+            <h2>Consejos</h2>
+            <ul>
+                <li>Juega con auriculares: la música es tu guía para saber cuándo saltar.</li>
+                <li>Empieza por los niveles oficiales más fáciles (Stereo Madness, Back on Track) antes de intentar los difíciles.</li>
+                <li>Practica los niveles en modo práctica: puedes colocar checkpoints para no empezar desde cero.</li>
+                <li>No te frustres: algunos niveles requieren cientos de intentos. La perseverancia es clave.</li>
+                <li>Explora los niveles de la comunidad: hay millones de creaciones con diferentes estilos y dificultades.</li>
+            </ul>
+
+            <p style="text-align: center; margin-top: 28px; font-size: 1.1rem; color: var(--text);">
+                El juego se abrirá en una nueva página dedicada. ¡A jugar!
+            </p>
+            <div style="text-align: center;">
+                <a href="https://budsin-dash.pages.dev" class="play-btn">▶ Jugar Geometry Dash ahora</a>
+            </div>
+            <p style="text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--muted);">
+                Si no eres redirigido automáticamente en 8 segundos, haz clic en el botón de arriba.
+            </p>
+        </div>
+    </main>
+    <script>setTimeout(function(){ window.location.href = "https://budsin-dash.pages.dev"; }, 8000);</script>
+    <script src="classroom-hotkey.js"></script>
 </body>
 </html>

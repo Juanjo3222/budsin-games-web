@@ -1,10 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <base href="https://cdn.jsdelivr.net/gh/web-ports/cuphead@c9ff1b6b16f9d402b78a42fc2200e1c076c0ab6e/">
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Cuphead - Budsin Games</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Juega Cuphead online gratis en Budsin Games. El aclamado juego de plataformas y disparos con estética de dibujos animados de los años 30. Enfréntate a jefes imposibles, colecciona almas y domina el arte del parry.">
+    <meta name="keywords" content="Cuphead, juego online, plataformas, run and gun, jefes, animación clásica, Budsin Games">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Cuphead — Juega online gratis | Budsin Games">
+    <meta property="og:description" content="El clásico de plataformas con estética vintage. Enfréntate a jefes imposibles y colecciona almas.">
+    <meta property="og:image" content="https://games.budsin.dev/Cuphead.avif">
+    <meta property="og:url" content="https://games.budsin.dev/Cuphead.html">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Cuphead — Juega online gratis | Budsin Games</title>
     <link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
     <!-- Google Tag Manager -->
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -60,6 +69,45 @@
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
+<style>
+#gameInfoBtn { position:fixed;top:16px;right:16px;z-index:50;padding:10px 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.6);color:#fff;font-weight:700;font-size:0.88rem;cursor:pointer;backdrop-filter:blur(8px);font-family:system-ui,sans-serif; }
+#gameInfoOverlay { display:none;position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px; }
+#gameInfoOverlay > div { background:#fff;border-radius:28px;padding:28px 32px;max-width:680px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.3);position:relative;font-family:system-ui,-apple-system,sans-serif; }
+#gameInfoOverlay h1 { font-family:'Bebas Neue',sans-serif;font-size:2.5rem;margin:0 0 8px;color:#111827; }
+#gameInfoOverlay h2 { font-family:'Bebas Neue',sans-serif;font-size:1.6rem;margin:16px 0 8px;color:#111827; }
+#gameInfoOverlay p, #gameInfoOverlay li { font-size:0.95rem;line-height:1.7;color:#5c6678;margin:0 0 12px; }
+#gameInfoOverlay ul { padding-left:20px;margin-bottom:12px; }
+#gameInfoOverlay li { margin-bottom:6px; }
+#gameInfoOverlay strong { color:#111827; }
+</style>
+<button id="gameInfoBtn" onclick="document.getElementById('gameInfoOverlay').style.display='flex';">ℹ️ Info</button>
+<div id="gameInfoOverlay" onclick="if(event.target===this)this.style.display='none'">
+  <div>
+    <button onclick="document.getElementById('gameInfoOverlay').style.display='none'" style="position:sticky;top:0;float:right;width:36px;height:36px;border-radius:999px;border:1px solid rgba(18,24,38,0.1);background:#fff;color:#111827;font-size:1.4rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:2;">&times;</button>
+    <h1>Cuphead</h1>
+    <p>Cuphead es un juego de acción y plataformas con estética de dibujos animados clásicos de los años 30, creado por Studio MDHR. Inspirado en las caricaturas de Fleischer Studios y Walt Disney, cada batalla contra jefes y nivel de run-and-gun está dibujado a mano y animado fotograma a fotograma, con una banda sonora de jazz original que completa la experiencia.</p>
+    <p>En el juego, controlas a Cuphead (o Mugman en modo cooperativo) mientras recorres Inkwell Isle para saldar una deuda con el Diablo. Enfréntate a jefes gigantescos, cada uno con patrones de ataque únicos, en batallas que ponen a prueba tus reflejos y tu capacidad de aprendizaje.</p>
+    <h2>Cómo jugar</h2>
+    <p>Tu objetivo es derrotar a los jefes de cada nivel esquivando sus ataques y disparándoles constantemente. Puedes equipar diferentes armas y habilidades especiales (charms) que compras en la tienda de Porkrind con las monedas que encuentras en los niveles de run-and-gun. La clave está en memorizar los patrones de ataque de cada jefe y reaccionar a tiempo.</p>
+    <h2>Controles</h2>
+    <ul>
+      <li><strong>Teclas de flecha / WASD:</strong> Moverse</li>
+      <li><strong>Z / Espacio:</strong> Saltar</li>
+      <li><strong>X / Shift:</strong> Disparar</li>
+      <li><strong>C / Ctrl:</strong> Dash (esquivar)</li>
+      <li><strong>V / Tab:</strong> Súper ataque (cuando esté cargado)</li>
+      <li><strong>Enter:</strong> Pausa</li>
+    </ul>
+    <h2>Consejos</h2>
+    <ul>
+      <li>Domina el parry: salta y presiona saltar de nuevo sobre objetos rosas para desviarlos y cargar tu súper más rápido.</li>
+      <li>Cambia de arma según el jefe: algunas armas funcionan mejor a corta distancia y otras a larga distancia.</li>
+      <li>El dash te da invencibilidad momentánea: úsalo para atravesar proyectiles imposibles de esquivar.</li>
+      <li>Completa los niveles de run-and-gun para conseguir monedas y comprar mejores armas.</li>
+      <li>No te frustres: cada derrota te enseña el patrón del jefe. La perseverancia es parte del juego.</li>
+    </ul>
+  </div>
+</div>
 <div id="loading-text"
     style="color: white; font-size: 48px; font-family: cursive; text-align: center; margin-top: 20px;"> LOADING...
   </div>
