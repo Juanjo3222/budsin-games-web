@@ -371,11 +371,6 @@
     }
   }
 
-  function preloadFrame() {
-    var frame = document.getElementById(IDS.FRAME);
-    if (frame) ensureFrameUrl(frame);
-  }
-
   // ─────────────────────────────────────────────
   //  Overlay state
   // ─────────────────────────────────────────────
@@ -632,7 +627,6 @@
   // ─────────────────────────────────────────────
   createOverlay();
   refreshDisguiseMetadata();
-  window.setTimeout(preloadFrame, 0);
   ensureQuickToggleButton();
   bindIframeHotkeys();
   startActivityListeners();
