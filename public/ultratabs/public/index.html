@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="auto">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Proxy Browser</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Google+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Color Variables ── */
+    :root {
+      /* Dark Theme (Default) */
+      --chrome-bg: #202124;
+      --chrome-surface: #292a2d;
+      --chrome-surface-hover: #3c4043;
+      --chrome-tab-active: #35363a;
+      --chrome-tab-hover: #313235;
+      --chrome-border: #3c4043;
+      --chrome-url-bg: #202124;
+      --chrome-url-focus: #303134;
+      --chrome-text: #e8eaed;
+      --chrome-text-secondary: #9aa0a6;
+      --chrome-accent: #8ab4f8;
+      --modal-bg-overlay: rgba(0,0,0,0.6);
+      --modal-shadow: rgba(0,0,0,0.5);
+
+      --topbar-h: 40px;
+      --tab-h: 34px;
+      --bookmarks-h: 28px;
+    }
+
+    /* Light Theme */
+    html[data-theme="light"] {
+      --chrome-bg: #dfe1e5;
+      --chrome-surface: #ffffff;
+      --chrome-surface-hover: #f1f3f4;
+      --chrome-tab-active: #ffffff;
+      --chrome-tab-hover: #ebeced;
+      --chrome-border: #dadce0;
+      --chrome-url-bg: #f1f3f4;
+      --chrome-url-focus: #ffffff;
+      --chrome-text: #202124;
+      --chrome-text-secondary: #5f6368;
+      --chrome-accent: #1a73e8;
+      --modal-bg-overlay: rgba(0,0,0,0.3);
+      --modal-shadow: rgba(0,0,0,0.2);
+    }
+
+    /* Midnight Blue Theme */
+    html[data-theme="midnight"] {
+      --chrome-bg: #0b1426;
+      --chrome-surface: #14223b;
+      --chrome-surface-hover: #1e3252;
+      --chrome-tab-active: #1a2a46;
+      --chrome-tab-hover: #15243e;
+      --chrome-border: #2a3f61;
+      --chrome-url-bg: #0b1426;
+      --chrome-url-focus: #15243e;
+      --chrome-text: #e1e9f5;
+      --chrome-text-secondary: #8fa5c7;
+      --chrome-accent: #6db0ff;
+      --modal-bg-overlay: rgba(0,0,0,0.7);
+      --modal-shadow: rgba(0,0,0,0.6);
+    }
+
+    /* Cyberpunk Theme */
+    html[data-theme="cyberpunk"] {
+      --chrome-bg: #050014;
+      --chrome-surface: #120529;
+      --chrome-surface-hover: #260f54;
+      --chrome-tab-active: #1d0742;
+      --chrome-tab-hover: #150531;
+      --chrome-border: #3b1778;
+      --chrome-url-bg: #050014;
+      --chrome-url-focus: #180536;
+      --chrome-text: #ffeb3b;
+      --chrome-text-secondary: #f50057;
+      --chrome-accent: #00e5ff;
+      --modal-bg-overlay: rgba(0,0,0,0.8);
+      --modal-shadow: rgba(0,229,255,0.2);
+    }
+
+    /* Auto Theme (OS preference) */
+    @media (prefers-color-scheme: light) {
+      html[data-theme="auto"] {
+        --chrome-bg: #dfe1e5;
+        --chrome-surface: #ffffff;
+        --chrome-surface-hover: #f1f3f4;
+        --chrome-tab-active: #ffffff;
+        --chrome-tab-hover: #ebeced;
+        --chrome-border: #dadce0;
+        --chrome-url-bg: #f1f3f4;
+        --chrome-url-focus: #ffffff;
+        --chrome-text: #202124;
+        --chrome-text-secondary: #5f6368;
+        --chrome-accent: #1a73e8;
+        --modal-bg-overlay: rgba(0,0,0,0.3);
+        --modal-shadow: rgba(0,0,0,0.2);
+      }
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--chrome-bg);
+      color: var(--chrome-text);
+      font-family: 'Inter', 'Google Sans', -apple-system, system-ui, sans-serif;
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #shell { display: flex; flex-direction: column; height: 100vh; }
+
+    /* ── Tab bar ── */
+    #tab-bar {
+      height: var(--tab-h); background: var(--chrome-bg); display: flex;
+      align-items: flex-end; padding: 0 8px; -webkit-app-region: drag;
+      position: relative; flex-shrink: 0; gap: 4px;
+    }
+    #tabs-container {
+      display: flex; align-items: flex-end; gap: 2px; height: 100%;
+      overflow-x: auto; overflow-y: hidden; scroll-behavior: smooth;
+    }
+    #tabs-container::-webkit-scrollbar { display: none; }
+    .tab {
+      height: var(--tab-h); min-width: 120px; max-width: 240px; background: transparent;
+      border-radius: 8px 8px 0 0; display: flex; align-items: center; padding: 0 12px;
+      gap: 8px; font-size: 12px; color: var(--chrome-text-secondary); cursor: pointer;
+      -webkit-app-region: no-drag; position: relative; transition: background 0.15s; flex: 1;
+    }
+    .tab:hover { background: var(--chrome-tab-hover); }
+    .tab.active { background: var(--chrome-tab-active); color: var(--chrome-text); }
+    .tab.active::before, .tab.active::after {
+      content: ''; position: absolute; bottom: 0; width: 8px; height: 8px;
+    }
+    .tab.active::before { left: -8px; box-shadow: 4px 4px 0 var(--chrome-tab-active); border-radius: 0 0 8px 0; }
+    .tab.active::after { right: -8px; box-shadow: -4px 4px 0 var(--chrome-tab-active); border-radius: 0 0 0 8px; }
+    .tab-favicon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .tab-favicon img { width: 16px; height: 16px; display: block; }
+    .tab-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; user-select: none; }
+    .tab-close {
+      width: 16px; height: 16px; border-radius: 50%; border: none; background: transparent;
+      color: var(--chrome-text-secondary); font-size: 14px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; opacity: 0; flex-shrink: 0;
+    }
+    .tab:hover .tab-close, .tab.active .tab-close { opacity: 1; }
+    .tab-close:hover { background: rgba(128,128,128,0.2); color: var(--chrome-text); }
+    #btn-new-tab {
+      width: 28px; height: 28px; border-radius: 50%; background: transparent; border: none;
+      color: var(--chrome-text-secondary); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 18px; margin-bottom: 3px; transition: background 0.15s, color 0.15s;
+      -webkit-app-region: no-drag; flex-shrink: 0;
+    }
+    #btn-new-tab:hover { background: rgba(128,128,128,0.2); color: var(--chrome-text); }
+
+    /* ── Toolbar ── */
+    #toolbar {
+      height: var(--topbar-h); background: var(--chrome-tab-active); display: flex;
+      align-items: center; gap: 4px; padding: 0 8px; flex-shrink: 0; position: relative; z-index: 10;
+    }
+    .nav-btn {
+      width: 28px; height: 28px; background: transparent; border: none; border-radius: 50%;
+      color: var(--chrome-text-secondary); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0; transition: background 0.1s;
+    }
+    .nav-btn:hover { background: rgba(128,128,128,0.15); }
+    .nav-btn:active { background: rgba(128,128,128,0.25); }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .nav-btn:disabled:hover { background: transparent; }
+    .nav-btn svg { width: 16px; height: 16px; fill: currentColor; }
+    
+    #url-bar {
+      flex: 1; height: 28px; display: flex; align-items: center; background: var(--chrome-url-bg);
+      border-radius: 14px; padding: 0 12px; gap: 6px; cursor: text; transition: background 0.2s, box-shadow 0.2s;
+      border: 1px solid transparent;
+    }
+    html[data-theme="light"] #url-bar { border-color: var(--chrome-border); }
+    @media (prefers-color-scheme: light) { html[data-theme="auto"] #url-bar { border-color: var(--chrome-border); } }
+    
+    #url-bar:focus-within { background: var(--chrome-url-focus); box-shadow: 0 0 0 1px var(--chrome-accent); border-color: transparent !important; }
+    #security-icon { color: var(--chrome-text-secondary); display: flex; align-items: center; }
+    #security-icon svg { width: 14px; height: 14px; fill: currentColor; }
+    #url-input {
+      flex: 1; background: transparent; border: none; outline: none; color: var(--chrome-text);
+      font-family: 'Inter', sans-serif; font-size: 13px; line-height: 28px; min-width: 0;
+    }
+    #url-input::placeholder { color: var(--chrome-text-secondary); }
+    #url-input::selection { background: rgba(138,180,248,0.3); }
+    #btn-bookmark {
+      background: transparent; border: none; color: var(--chrome-text-secondary); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%;
+    }
+    #btn-bookmark:hover { background: rgba(128,128,128,0.15); }
+    #btn-bookmark svg { width: 16px; height: 16px; fill: currentColor; }
+    #btn-bookmark.active { color: var(--chrome-accent); }
+
+    /* ── Bookmarks Bar ── */
+    #bookmarks-bar {
+      height: var(--bookmarks-h); background: var(--chrome-tab-active); display: flex;
+      align-items: center; padding: 0 12px; gap: 4px; flex-shrink: 0;
+      border-bottom: 1px solid var(--chrome-border); overflow: visible; position: relative; z-index: 9;
+    }
+    .bookmark-item {
+      display: flex; align-items: center; gap: 6px; padding: 0 8px; height: 24px; border-radius: 12px;
+      background: transparent; border: none; color: var(--chrome-text); font-size: 12px;
+      cursor: pointer; white-space: nowrap; text-decoration: none; position: relative;
+    }
+    .bookmark-item:hover { background: rgba(128,128,128,0.15); }
+    .bookmark-icon { width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+    .bookmark-icon img { width: 14px; height: 14px; }
+    .bookmark-icon svg { width: 14px; height: 14px; fill: var(--chrome-text-secondary); }
+    
+    /* Folder Dropdown */
+    .bookmark-dropdown {
+      position: absolute; top: 100%; left: 0; background: var(--chrome-surface); border: 1px solid var(--chrome-border);
+      border-radius: 6px; box-shadow: 0 4px 12px var(--modal-shadow); padding: 4px 0; z-index: 1000;
+      display: none; flex-direction: column; min-width: 180px; max-height: 400px; overflow-y: auto;
+    }
+    .bookmark-item.folder-open .bookmark-dropdown { display: flex; }
+    .dropdown-item {
+      display: flex; align-items: center; gap: 8px; padding: 6px 12px; font-size: 12px;
+      color: var(--chrome-text); text-decoration: none; cursor: pointer; border: none; background: transparent; text-align: left; width: 100%;
+    }
+    .dropdown-item:hover { background: rgba(128,128,128,0.1); }
+    .dropdown-item .bookmark-icon svg { fill: var(--chrome-text-secondary); }
+
+    /* ── Context Menu ── */
+    #context-menu {
+      position: fixed; background: var(--chrome-surface); border: 1px solid var(--chrome-border);
+      border-radius: 6px; box-shadow: 0 4px 12px var(--modal-shadow); padding: 4px 0; z-index: 9999;
+      display: none; flex-direction: column; min-width: 160px;
+    }
+    #context-menu.visible { display: flex; }
+    .ctx-item {
+      padding: 6px 12px; font-size: 12px; color: var(--chrome-text); cursor: pointer;
+      display: flex; align-items: center; gap: 8px; background: transparent; border: none; width: 100%; text-align: left;
+    }
+    .ctx-item:hover { background: rgba(128,128,128,0.1); }
+    .ctx-divider { height: 1px; background: var(--chrome-border); margin: 4px 0; }
+
+    /* ── Edit Bookmark Modal ── */
+    #modal-overlay {
+      position: fixed; inset: 0; background: var(--modal-bg-overlay); z-index: 10000;
+      display: none; align-items: center; justify-content: center;
+    }
+    #modal-overlay.visible { display: flex; }
+    .modal {
+      background: var(--chrome-surface); border: 1px solid var(--chrome-border); border-radius: 8px;
+      width: 90vw; max-width: 400px; padding: 20px; box-shadow: 0 8px 24px var(--modal-shadow); display: flex; flex-direction: column; gap: 16px;
+    }
+    .modal-header { font-size: 16px; font-weight: 500; color: var(--chrome-text); }
+    .modal-row { display: flex; flex-direction: column; gap: 6px; }
+    .modal-label { font-size: 12px; color: var(--chrome-text-secondary); }
+    .modal-input, .modal-select {
+      background: var(--chrome-bg); border: 1px solid var(--chrome-border); color: var(--chrome-text);
+      padding: 8px 12px; border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 13px; outline: none; width: 100%;
+    }
+    .modal-input:focus, .modal-select:focus { border-color: var(--chrome-accent); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+    .modal-btn {
+      padding: 6px 16px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer;
+      border: 1px solid var(--chrome-border); background: var(--chrome-surface); color: var(--chrome-text); transition: background 0.15s;
+    }
+    .modal-btn:hover { background: var(--chrome-surface-hover); }
+    .modal-btn.primary { background: var(--chrome-accent); color: #fff; border: none; }
+    .modal-btn.primary:hover { opacity: 0.9; }
+
+    /* ── Settings Menu (App menu) ── */
+    #settings-menu {
+      position: absolute; top: calc(var(--tab-h) + var(--topbar-h) + 4px); right: 8px; width: 240px;
+      background: var(--chrome-surface); border: 1px solid var(--chrome-border); border-radius: 8px;
+      box-shadow: 0 4px 12px var(--modal-shadow); padding: 8px 0; z-index: 1000; display: none; flex-direction: column;
+    }
+    #settings-menu.visible { display: flex; }
+    .menu-item {
+      padding: 8px 16px; font-size: 13px; color: var(--chrome-text); cursor: pointer; display: flex; align-items: center;
+      gap: 12px; background: transparent; border: none; width: 100%; text-align: left;
+    }
+    .menu-item:hover { background: rgba(128,128,128,0.1); }
+    .menu-item svg { width: 16px; height: 16px; fill: var(--chrome-text-secondary); }
+    .menu-divider { height: 1px; background: var(--chrome-border); margin: 4px 0; }
+
+    /* ── Load bar ── */
+    #loading-bar { height: 2px; width: 0%; background: var(--chrome-accent); transition: width 0.3s ease; flex-shrink: 0; }
+
+    /* ── Content area ── */
+    #content { flex: 1; position: relative; overflow: hidden; background: #fff; }
+
+    /* ── New tab page ── */
+    #ntp {
+      position: absolute; inset: 0; background-color: var(--chrome-bg); background-size: cover; background-position: center; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 40px; transition: opacity 0.2s; z-index: 2;
+    }
+    #ntp.hidden { opacity: 0; pointer-events: none; }
+    .ntp-logo { font-size: 28px; font-weight: 600; color: var(--chrome-text); letter-spacing: -0.5px; display: flex; align-items: center; gap: 10px; text-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+    .ntp-logo-icon {
+      width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #4285f4, #34a853, #fbbc05, #ea4335);
+      display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .ntp-logo-icon-inner { width: 20px; height: 20px; border-radius: 50%; background: var(--chrome-bg); }
+    #ntp-search {
+      width: min(560px, 90vw); height: 44px; display: flex; align-items: center; background: var(--chrome-surface);
+      border: 1px solid var(--chrome-border); border-radius: 22px; padding: 0 16px; gap: 12px; cursor: text;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    #ntp-search:focus-within { background: var(--chrome-surface-hover); border-color: transparent; box-shadow: 0 4px 12px var(--modal-shadow); }
+    #ntp-search svg { width: 18px; height: 18px; fill: var(--chrome-text-secondary); flex-shrink: 0; }
+    #ntp-search-input { flex: 1; background: transparent; border: none; outline: none; color: var(--chrome-text); font-family: 'Inter', sans-serif; font-size: 15px; }
+    
+    /* ── Internal Page (scram:// settings & history) ── */
+    #internal-page {
+      position: absolute; inset: 0; background: var(--chrome-bg); z-index: 2; display: none; flex-direction: column; overflow-y: auto; padding: 32px max(5vw, 20px);
+    }
+    #internal-page.visible { display: flex; }
+    .internal-container { max-width: 680px; margin: 0 auto; width: 100%; display: none; }
+    .internal-container.active { display: block; }
+
+    .settings-header { font-size: 24px; font-weight: 500; color: var(--chrome-text); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; }
+    .settings-section { background: var(--chrome-surface); border-radius: 8px; padding: 16px 24px; margin-bottom: 16px; border: 1px solid var(--chrome-border); }
+    .settings-section h2 { font-size: 15px; font-weight: 500; color: var(--chrome-accent); margin-bottom: 16px; }
+    .setting-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--chrome-border); gap: 16px; }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-title { font-size: 14px; color: var(--chrome-text); margin-bottom: 4px; }
+    .setting-desc { font-size: 12px; color: var(--chrome-text-secondary); }
+    .settings-select, .settings-input { background: var(--chrome-bg); color: var(--chrome-text); border: 1px solid var(--chrome-border); padding: 6px 12px; border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+    .settings-input { width: 200px; flex-shrink: 1; }
+    .settings-btn { background: var(--chrome-surface-hover); color: var(--chrome-text); border: 1px solid var(--chrome-border); padding: 6px 16px; border-radius: 4px; cursor: pointer; }
+    .settings-btn:hover { filter: brightness(0.9); }
+    .settings-btn.primary { background: var(--chrome-accent); color: #fff; border: none; }
+    .settings-btn.danger { background: var(--chrome-surface); color: var(--chrome-red); border: 1px solid var(--chrome-border); }
+    .settings-btn.danger:hover { background: rgba(242,139,130,0.1); border-color: var(--chrome-red); }
+
+    /* History List */
+    .history-list { display: flex; flex-direction: column; gap: 4px; }
+    .history-day { margin-top: 16px; margin-bottom: 8px; font-size: 14px; font-weight: 500; color: var(--chrome-text-secondary); }
+    .history-item { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: transparent; border-radius: 6px; cursor: pointer; text-decoration: none; border: 1px solid transparent; }
+    .history-item:hover { background: rgba(128,128,128,0.1); border-color: var(--chrome-border); }
+    .history-time { font-size: 12px; color: var(--chrome-text-secondary); min-width: 48px; }
+    .history-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .history-icon img { width: 16px; height: 16px; border-radius: 2px; }
+    .history-title { font-size: 14px; color: var(--chrome-text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-url { font-size: 12px; color: var(--chrome-text-secondary); max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .history-del { opacity: 0; background: transparent; border: none; color: var(--chrome-text-secondary); cursor: pointer; padding: 4px; border-radius: 50%; }
+    .history-item:hover .history-del { opacity: 1; }
+    .history-del:hover { background: rgba(255,0,0,0.2); color: var(--chrome-red); }
+
+    #frames-container { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; }
+    .proxy-frame { position: absolute; inset: 0; width: 100%; height: 100%; border: none; background: #fff; display: none; }
+    .proxy-frame.active { display: block; z-index: 3; }
+
+    #error-page { position: absolute; inset: 0; background: var(--chrome-bg); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; z-index: 4; }
+    #error-page.visible { display: flex; }
+    .error-title { font-size: 18px; color: var(--chrome-text); }
+    .error-btn { background: var(--chrome-accent); color: #fff; border: none; padding: 8px 24px; border-radius: 20px; cursor: pointer; }
+
+    /* ── Responsive Mobile/iPad ── */
+    @media (max-width: 768px) {
+      .tab { min-width: 40px; padding: 0 8px; }
+      .tab-title { display: none; }
+      .tab-close { display: none; }
+      .tab.active .tab-close { display: flex; }
+      .nav-btn { width: 24px; height: 24px; }
+      #url-bar { padding: 0 8px; }
+      #bookmarks-bar { display: none; }
+      .setting-row { flex-direction: column; align-items: flex-start; }
+      .settings-input, .settings-select { width: 100%; margin-top: 8px; }
+      .history-url { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div id="shell">
+  <div id="tab-bar">
+    <div id="tabs-container"></div>
+    <button id="btn-new-tab" title="New Tab" data-i18n-title="new_tab_title">+</button>
+  </div>
+  <div id="toolbar">
+    <button class="nav-btn" id="btn-back" title="Back" data-i18n-title="nav_back" disabled><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg></button>
+    <button class="nav-btn" id="btn-forward" title="Forward" data-i18n-title="nav_forward" disabled><svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button>
+    <button class="nav-btn" id="btn-reload" title="Reload" data-i18n-title="nav_reload"><svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
+    <button class="nav-btn" id="btn-home" title="Home" data-i18n-title="nav_home"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg></button>
+    <div id="url-bar">
+      <span id="security-icon"></span>
+      <input id="url-input" type="text" placeholder="Search or enter URL" data-i18n-placeholder="url_placeholder" autocomplete="off" spellcheck="false" />
+      <button id="btn-bookmark" title="Bookmark this tab" data-i18n-title="nav_bookmark"><svg viewBox="0 0 24 24"><path d="M22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.45 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/></svg></button>
+    </div>
+    <button class="nav-btn" id="btn-menu" title="Menu" data-i18n-title="nav_menu"><svg viewBox="0 0 24 24"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg></button>
+  </div>
+  <div id="bookmarks-bar"></div>
+  <div id="settings-menu">
+    <button class="menu-item" id="menu-history">
+      <svg viewBox="0 0 24 24"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+      <span data-i18n="menu_history">History</span>
+    </button>
+    <div class="menu-divider"></div>
+    <button class="menu-item" id="menu-settings">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.06.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      <span data-i18n="menu_settings">Settings</span>
+    </button>
+  </div>
+  <div id="loading-bar"></div>
+  <div id="content">
+    <div id="ntp" class="hidden">
+      <div class="ntp-logo"><div class="ntp-logo-icon"><div class="ntp-logo-icon-inner"></div></div>Proxy Browser</div>
+      <div id="ntp-search" tabindex="0">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+        <input id="ntp-search-input" type="text" placeholder="Search Google or type a URL" data-i18n-placeholder="ntp_search" autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+    
+    <div id="internal-page">
+      <!-- Settings Page -->
+      <div class="internal-container" id="page-settings">
+        <div class="settings-header" data-i18n="settings_title">Settings</div>
+        
+        <div class="settings-section">
+          <h2 data-i18n="settings_appearance">Appearance & Language</h2>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-title" data-i18n="settings_lang">Language</div></div>
+            <select class="settings-select" id="pref-lang">
+              <option value="auto" data-i18n="lang_auto">Auto</option>
+              <option value="en">English</option>
+              <option value="ja">日本語</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-title" data-i18n="settings_theme">Theme</div></div>
+            <select class="settings-select" id="pref-theme">
+              <option value="auto" data-i18n="theme_auto">Auto</option>
+              <option value="light" data-i18n="theme_light">Light</option>
+              <option value="dark" data-i18n="theme_dark">Dark</option>
+              <option value="midnight" data-i18n="theme_midnight">Midnight Blue</option>
+              <option value="cyberpunk" data-i18n="theme_cyberpunk">Cyberpunk</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-title" data-i18n="settings_bg">New Tab Background URL</div>
+              <div class="setting-desc" data-i18n="settings_bg_desc">Image URL for the new tab page. Leave empty for default.</div>
+            </div>
+            <input type="text" class="settings-input" id="pref-bg-url" placeholder="https://..." />
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h2 data-i18n="settings_search">Search Engine</h2>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-title" data-i18n="settings_search_desc">Search engine used in the address bar</div></div>
+            <select class="settings-select" id="pref-search-engine"><option value="google">Google</option><option value="bing">Bing</option><option value="duckduckgo">DuckDuckGo</option></select>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <h2 data-i18n="settings_proxy">Proxy Settings</h2>
+          <div class="setting-row">
+            <div class="setting-info"><div class="setting-title" data-i18n="settings_wisp">Wisp Server URL</div><div class="setting-desc" data-i18n="settings_wisp_desc">The websocket server to handle bare-mux proxying.</div></div>
+            <input type="text" class="settings-input" id="pref-wisp-url" />
+          </div>
+          <div class="setting-row"><button class="settings-btn primary" id="btn-save-proxy" data-i18n="settings_save_proxy">Save & Reload</button></div>
+        </div>
+      </div>
+
+      <!-- History Page -->
+      <div class="internal-container" id="page-history">
+        <div class="settings-header">
+          <span data-i18n="history_title">History</span>
+          <button class="settings-btn danger" id="btn-clear-history" data-i18n="history_clear">Clear browsing data</button>
+        </div>
+        <div class="settings-section">
+          <div class="history-list" id="history-container">
+            <!-- History items generated here -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="frames-container"></div>
+    <div id="error-page">
+      <div class="error-title" data-i18n="error_title">This page isn't working</div><button class="error-btn" id="error-retry" data-i18n="error_retry">Reload</button>
+    </div>
+  </div>
+</div>
+
+<!-- Context Menu -->
+<div id="context-menu"></div>
+
+<!-- Edit Bookmark Modal -->
+<div id="modal-overlay">
+  <div class="modal">
+    <div class="modal-header" id="modal-title">Edit Bookmark</div>
+    <div class="modal-row">
+      <span class="modal-label" data-i18n="modal_name">Name</span>
+      <input type="text" id="bm-name" class="modal-input" />
+    </div>
+    <div class="modal-row" id="bm-url-row">
+      <span class="modal-label" data-i18n="modal_url">URL</span>
+      <input type="text" id="bm-url" class="modal-input" />
+    </div>
+    <div class="modal-row">
+      <span class="modal-label" data-i18n="modal_folder">Folder</span>
+      <select id="bm-folder" class="modal-select"></select>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn" id="bm-cancel" data-i18n="modal_cancel">Cancel</button>
+      <button class="modal-btn primary" id="bm-save" data-i18n="modal_save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script src="/scram/scramjet.all.js"></script>
+<script type="module" src="/app.js"></script>
+</body>
+</html>
