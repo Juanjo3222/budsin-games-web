@@ -2826,6 +2826,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             color: #d4a574;
             font-weight: 500;
         }
+        #bg-shutdown-overlay .bgs-hope {
+            font-size: 0.88rem;
+            line-height: 1.7;
+            color: #8a7a5a;
+            margin: 0 0 1.8em;
+            padding: 0.6em 0.8em;
+            border: 1px solid #2a2520;
+            border-radius: 8px;
+            text-align: center;
+        }
+        #bg-shutdown-overlay .bgs-hope strong {
+            color: #d4a574;
+            font-weight: 500;
+        }
         #bg-shutdown-overlay .bgs-epitaph {
             font-size: 0.82rem;
             color: #7a6a5a;
@@ -2975,6 +2989,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 momentos. Gracias por ser parte del final.
             </div>
             <div class="bgs-epitaph"></div>
+            <div class="bgs-hope"></div>
             <div class="bgs-divider2"></div>
             <div class="bgs-divider3"></div>
             <div class="bgs-fin">&mdash; Fin &mdash;</div>
@@ -3000,6 +3015,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 note: 'Muchos de ustedes empezaron a jugar en las Chromebooks gracias a Budsin Games. Ahora Budsin est\u00e1 muriendo, y deseamos que ustedes lo <strong>acompa\u00f1en</strong> en sus \u00faltimos momentos. Gracias por ser parte del final.',
                 context: 'Budsin Games fue el peque\u00f1o rinc\u00f3n donde los juegos de navegador cobraban vida en las Chromebooks del colegio. M\u00e1s de 40 t\u00edtulos, cientos de partidas y una comunidad que creci\u00f3 sin esperarlo. Pero el mundo sigue girando: ahora cada Chromebook tiene su propia cuenta, y el portal deja de ser necesario.',
                 epitaph: 'Gracias por hacer de esto algo especial.',
+                hope: 'Budsin recibir\u00e1 sus \u00faltimas actualizaciones, pero a\u00fan hay <strong>esperanza</strong>. Si logramos que vuelvan al menos algunos usuarios, tal vez esto no tenga que terminar.',
                 btnStay: 'Acompa\u00f1ar\u00e9 a Budsin Games',
                 btnLeave: 'Adi\u00f3s',
                 chkLabel: 'No volver a mostrar'
@@ -3009,6 +3025,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 note: 'Many of you started playing on Chromebooks thanks to Budsin Games. Now Budsin is dying, and we hope you <strong>accompany</strong> it in its final moments. Thank you for being part of the end.',
                 context: 'Budsin Games was the little corner where browser games came to life on school Chromebooks. Over 40 titles, hundreds of games played, and a community that grew when no one expected it. But the world keeps turning: now every Chromebook has its own account, and the portal is no longer needed.',
                 epitaph: 'Thank you for making this something special.',
+                hope: 'Budsin will receive its final updates, but there is still <strong>hope</strong>. If we can get at least some users back, maybe this doesn\'t have to end.',
                 btnStay: "I'll stay with Budsin Games",
                 btnLeave: 'Goodbye',
                 chkLabel: "Don't show again"
@@ -3018,6 +3035,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 note: 'Muitos de voc\u00eas come\u00e7aram a jogar nos Chromebooks gra\u00e7as ao Budsin Games. Agora Budsin est\u00e1 morrendo, e desejamos que voc\u00eas o <strong>acompanhem</strong> em seus \u00faltimos momentos. Obrigado por fazer parte do fim.',
                 context: 'Budsin Games foi o cantinho onde os jogos de navegador ganhavam vida nos Chromebooks da escola. Mais de 40 t\u00edtulos, centenas de partidas e uma comunidade que cresceu sem esperar. Mas o mundo continua girando: agora cada Chromebook tem sua pr\u00f3pria conta, e o portal deixa de ser necess\u00e1rio.',
                 epitaph: 'Obrigado por tornar isso especial.',
+                hope: 'Budsin receber\u00e1 suas \u00faltimas atualiza\u00e7\u00f5es, mas ainda h\u00e1 <strong>esperan\u00e7a</strong>. Se conseguirmos que pelo menos alguns usu\u00e1rios voltem, talvez isso n\u00e3o precise acabar.',
                 btnStay: 'Acompanharei o Budsin Games',
                 btnLeave: 'Adeus',
                 chkLabel: 'N\u00e3o mostrar novamente'
@@ -3038,6 +3056,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             context: ov.querySelector('.bgs-context'),
             note: ov.querySelector('.bgs-note'),
             epitaph: ov.querySelector('.bgs-epitaph'),
+            hope: ov.querySelector('.bgs-hope'),
             btnStay: document.getElementById('bgsBtnStay'),
             btnLeave: document.getElementById('bgsBtnLeave'),
             chkLabel: ov.querySelector('.bgs-chk-wrap')
@@ -3050,6 +3069,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             els.context.textContent = t.context;
             els.note.innerHTML = t.note;
             els.epitaph.textContent = t.epitaph;
+            els.hope.innerHTML = t.hope;
             els.btnStay.textContent = t.btnStay;
             els.btnLeave.textContent = t.btnLeave;
             els.chkLabel.querySelector('span').textContent = t.chkLabel;
