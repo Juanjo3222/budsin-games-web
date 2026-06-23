@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Budsin Football</title>
+  
+  <!-- Favicon de Budsin Games -->
+  <link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+  
+  <!-- Script Classroom Hotkey -->
+  <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #0f0f12;
+      --card-bg: #16161a;
+      --accent-green: #22c55e;
+      --accent-blue: #2563eb;
+      --border-color: #27272a;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 2rem;
+      margin: 0;
+    }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+    
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    h1 { 
+      font-size: 2.5rem; 
+      font-weight: 800;
+      margin: 0;
+      letter-spacing: -0.05em;
+    }
+    h1 span { color: var(--accent-green); }
+    
+    .custom-select {
+      background: #1c1c22;
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      outline: none;
+    }
+    .custom-select:hover { border-color: #3f3f46; }
+
+    .proxy-btn {
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      display: none;
+      transition: background 0.2s;
+    }
+    .proxy-btn:hover { background: #1d4ed8; }
+
+    .player-controls { display: flex; gap: 10px; align-items: center; }
+
+    .date-heading {
+      font-size: 1.4rem;
+      color: var(--text-main);
+      margin: 2.5rem 0 1rem 0;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .date-heading span {
+      font-size: 0.9rem;
+      background: #27272a;
+      color: var(--text-muted);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    #theater-mode {
+      background: #000;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+    }
+    .player-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    #theater-mode h3 { margin: 0; color: var(--accent-green); }
+
+    .iframe-wrapper {
+      position: relative;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      background: #050507;
+      border-radius: 6px;
+    }
+    .iframe-wrapper iframe {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      border: none; 
+      border-radius: 6px;
+    }
+    
+    .matches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .match-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .match-card:hover {
+      transform: translateY(-2px);
+      border-color: #3f3f46;
+    }
+
+    .match-time {
+      font-size: 0.85rem;
+      color: var(--accent-green);
+      background: rgba(34, 197, 94, 0.1);
+      padding: 4px 8px;
+      border-radius: 4px;
+      align-self: flex-start;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .vs-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .team-box { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .team-badge { width: 48px; height: 48px; object-fit: contain; }
+    .team-name { font-size: 0.95rem; font-weight: 600; }
+    .vs-divider { font-weight: 700; color: var(--text-muted); font-size: 0.85rem; padding: 0 10px; }
+
+    .stream-btn {
+      background: var(--accent-green);
+      color: #000;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+      transition: opacity 0.2s;
+    }
+    .stream-btn:hover { opacity: 0.9; }
+    .stream-btn:disabled {
+      background: #27272a;
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header-bar">
+      <h1>Budsin <span>Football</span></h1>
+      <select id="app-lang-select" class="custom-select" onchange="cambiarIdiomaApp(this.value)">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="pt">Português</option>
+      </select>
+    </div>
+
+    <div id="theater-mode">
+      <div class="player-header">
+        <h3 id="current-match-title">⚽ Budsin Football</h3>
+        <div class="player-controls">
+          <!-- Botón de Desbloqueo apuntando a proxy.budsin.dev -->
+          <button id="proxy-btn" class="proxy-btn" onclick="abrirStreamConProxy()">🚀 Desbloquear Stream</button>
+          
+          <select id="stream-lang-select" class="custom-select" onchange="cambiarIdiomaStream(this.value)">
+            <option value="">Idiomas disponibles</option>
+          </select>
+        </div>
+      </div>
+      <div class="iframe-wrapper">
+        <iframe id="main-player" allowfullscreen scrolling="no"></iframe>
+      </div>
+    </div>
+
+    <div id="agenda-container"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'https://streamed.pk/api';
+    let opcionesStreamActual = [];
+    let idiomaAppActual = 'es';
+    let datosPartidosGuardados = [];
+    let urlVideoActual = '';
+
+    const traducciones = {
+      es: {
+        select_match: "⚽ Budsin Football",
+        available_languages: "Idiomas disponibles",
+        loading_stream: "Cargando señal en vivo para: ",
+        no_matches: "No hay partidos programados en este momento.",
+        loading_agenda: "Organizando partidos por fechas...",
+        error_agenda: "Error al construir la agenda de partidos.",
+        no_video: "⚠️ No se encontraron señales de video disponibles.",
+        error_video: "❌ Error al conectar con el servidor de video.",
+        btn_watch: "Ver en Vivo",
+        btn_upcoming: "Próximamente",
+        btn_unavailable: "No Disponible",
+        today: "HOY",
+        tomorrow: "MAÑANA",
+        match_count: "partido(s)",
+        time_label: "Hora"
+      },
+      en: {
+        select_match: "⚽ Budsin Football",
+        available_languages: "Available languages",
+        loading_stream: "Loading live stream for: ",
+        no_matches: "No matches scheduled at this time.",
+        loading_agenda: "Organizing matches by dates...",
+        error_agenda: "Error building the match schedule.",
+        no_video: "⚠️ No video streams available.",
+        error_video: "❌ Error connecting to the video server.",
+        btn_watch: "Watch Live",
+        btn_upcoming: "Upcoming",
+        btn_unavailable: "Unavailable",
+        today: "TODAY",
+        tomorrow: "TOMORROW",
+        match_count: "match(es)",
+        time_label: "Time"
+      },
+      pt: {
+        select_match: "⚽ Budsin Football",
+        available_languages: "Idiomas disponíveis",
+        loading_stream: "Carregando transmissão ao vivo para: ",
+        no_matches: "Não há partidas agendadas no momento.",
+        loading_agenda: "Organizando partidas por datas...",
+        error_agenda: "Erro ao construir a agenda de partidas.",
+        no_video: "⚠️ Não foram encontradas transmisões de vídeo disponíveis.",
+        error_video: "❌ Erro ao conectar ao servidor de vídeo.",
+        btn_watch: "Assistir ao Vivo",
+        btn_upcoming: "Em breve",
+        btn_unavailable: "Não Disponible",
+        today: "HOJE",
+        tomorrow: "AMANHÃ",
+        match_count: "partida(s)",
+        time_label: "Hora"
+      }
+    };
+
+    const mapaIdiomasAPI = {
+      es: ['spanish', 'español', 'castellano', 'es'],
+      en: ['english', 'inglés', 'ingles', 'en'],
+      pt: ['portuguese', 'português', 'portugues', 'pt']
+    };
+
+    function obtenerEtiquetaDia(fechaMatch, lang) {
+      const hoy = new Date();
+      const mañana = new Date();
+      mañana.setDate(hoy.getDate() + 1);
+
+      if (fechaMatch.toDateString() === hoy.toDateString()) return traducciones[lang].today;
+      if (fechaMatch.toDateString() === mañana.toDateString()) return traducciones[lang].tomorrow;
+      
+      return fechaMatch.toLocaleDateString(lang === 'en' ? 'en-US' : lang === 'pt' ? 'pt-BR' : 'es-ES', { 
+        weekday: 'long', day: 'numeric', month: 'short' 
+      });
+    }
+
+    function cambiarIdiomaApp(lang) {
+      idiomaAppActual = lang;
+      document.title = `Budsin Football - ${lang === 'en' ? 'Live Matches' : lang === 'pt' ? 'Partidas ao Vivo' : 'Partidos en Vivo'}`;
+      const label = document.getElementById('current-match-title');
+      const keys = Object.keys(traducciones);
+      if (keys.some(k => label.innerText === traducciones[k].select_match)) {
+        label.innerText = traducciones[lang].select_match;
+      }
+      renderizarAgenda(datosPartidosGuardados);
+    }
+
+    async function fetchMatches() {
+      const agendaContainer = document.getElementById('agenda-container');
+      agendaContainer.innerHTML = `<p>${traducciones[idiomaAppActual].loading_agenda}</p>`;
+      try {
+        const response = await fetch(`${API_BASE}/matches/football`);
+        if (!response.ok) throw new Error();
+        datosPartidosGuardados = await response.json();
+        renderizarAgenda(datosPartidosGuardados);
+      } catch (err) {
+        agendaContainer.innerHTML = `<p style="color: #ef4444">${traducciones[idiomaAppActual].error_agenda}</p>`;
+      }
+    }
+
+    function renderizarAgenda(matches) {
+      const agendaContainer = document.getElementById('agenda-container');
+      if (!matches || matches.length === 0) {
+        agendaContainer.innerHTML = `<p style="color: var(--text-muted)">${traducciones[idiomaAppActual].no_matches}</p>`;
+        return;
+      }
+
+      matches.sort((a, b) => a.date - b.date);
+      const partidosAgrupados = {};
+
+      matches.forEach(match => {
+        const etiquetaDia = obtenerEtiquetaDia(new Date(match.date), idiomaAppActual);
+        if (!partidosAgrupados[etiquetaDia]) partidosAgrupados[etiquetaDia] = [];
+        partidosAgrupados[etiquetaDia].push(match);
+      });
+
+      agendaContainer.innerHTML = '';
+
+      for (const [dia, listaDePartidos] of Object.entries(partidosAgrupados)) {
+        const heading = document.createElement('h2');
+        heading.className = 'date-heading';
+        heading.innerHTML = `${dia.toUpperCase()} <span>${listaDePartidos.length} ${traducciones[idiomaAppActual].match_count}</span>`;
+        agendaContainer.appendChild(heading);
+
+        const grid = document.createElement('div');
+        grid.className = 'matches-grid';
+
+        const esSeccionHoy = (dia === traducciones[idiomaAppActual].today);
+
+        listaDePartidos.forEach(match => {
+          const hasSources = match.sources && match.sources.length > 0;
+          const horaFormateada = new Date(match.date).toLocaleTimeString(idiomaAppActual, { hour: '2-digit', minute: '2-digit' });
+
+          const homeBadgeUrl = match.teams?.home?.badge ? `${API_BASE}/images/badge/${match.teams.home.badge}.webp` : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="%233f3f46" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>';
+          const awayBadgeUrl = match.teams?.away?.badge ? `${API_BASE}/images/badge/${match.teams.away.badge}.webp` : 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="%233f3f46" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>';
+
+          let botonHTML = '';
+          
+          if (!esSeccionHoy) {
+            botonHTML = `<button class="stream-btn" disabled>${traducciones[idiomaAppActual].btn_upcoming}</button>`;
+          } else if (!hasSources) {
+            botonHTML = `<button class="stream-btn" disabled>${traducciones[idiomaAppActual].btn_unavailable}</button>`;
+          } else {
+            botonHTML = `
+              <button class="stream-btn" 
+                onclick="autoReproducirPartido('${match.title.replace(/'/g, "\\'")}', '${match.sources[0].source}', '${match.sources[0].id}')">
+                ${traducciones[idiomaAppActual].btn_watch}
+              </button>
+            `;
+          }
+
+          const card = document.createElement('div');
+          card.className = 'match-card';
+          card.innerHTML = `
+            <div class="match-time">🕒 ${traducciones[idiomaAppActual].time_label}: ${horaFormateada}</div>
+            <div class="vs-container">
+              <div class="team-box">
+                <img class="team-badge" src="${homeBadgeUrl}" alt="Home" loading="lazy">
+                <div class="team-name">${match.teams?.home?.name || 'Local'}</div>
+              </div>
+              <div class="vs-divider">VS</div>
+              <div class="team-box">
+                <img class="team-badge" src="${awayBadgeUrl}" alt="Away" loading="lazy">
+                <div class="team-name">${match.teams?.away?.name || 'Visitante'}</div>
+              </div>
+            </div>
+            ${botonHTML}
+          `;
+          grid.appendChild(card);
+        });
+        agendaContainer.appendChild(grid);
+      }
+    }
+
+    async function autoReproducirPartido(title, sourcePlatform, sourceId) {
+      const label = document.getElementById('current-match-title');
+      const langSelect = document.getElementById('stream-lang-select');
+
+      try {
+        label.innerText = `${traducciones[idiomaAppActual].loading_stream}${title}...`;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        const response = await fetch(`${API_BASE}/stream/${sourcePlatform}/${sourceId}`);
+        if (!response.ok) throw new Error();
+        
+        opcionesStreamActual = await response.json();
+
+        if (Array.isArray(opcionesStreamActual) && opcionesStreamActual.length > 0) {
+          langSelect.innerHTML = '';
+          opcionesStreamActual.forEach((stream, index) => {
+            const option = document.createElement('option');
+            option.value = index;
+            option.innerText = `${stream.language} ${stream.hd ? '[HD]' : '[SD]'}`;
+            langSelect.appendChild(option);
+          });
+
+          let indiceSeleccionado = -1;
+          const terminosFavoritos = mapaIdiomasAPI[idiomaAppActual];
+          indiceSeleccionado = opcionesStreamActual.findIndex(s => 
+            terminosFavoritos.some(term => s.language.toLowerCase().includes(term))
+          );
+
+          if (indiceSeleccionado === -1 && idiomaAppActual !== 'en') {
+            const terminosIngles = mapaIdiomasAPI['en'];
+            indiceSeleccionado = opcionesStreamActual.findIndex(s => 
+              terminosIngles.some(term => s.language.toLowerCase().includes(term))
+            );
+          }
+
+          if (indiceSeleccionado === -1) indiceSeleccionado = 0;
+
+          langSelect.value = indiceSeleccionado;
+          cambiarIdiomaStream(indiceSeleccionado);
+          
+          const prefijoEnVivo = idiomaAppActual === 'en' ? '🔴 Live' : idiomaAppActual === 'pt' ? '🔴 Ao Vivo' : '🔴 En Vivo';
+          label.innerHTML = `${prefijoEnVivo}: ${title}`;
+        } else {
+          label.innerText = traducciones[idiomaAppActual].no_video;
+          langSelect.innerHTML = `<option>${traducciones[idiomaAppActual].available_languages}</option>`;
+        }
+      } catch (error) {
+        label.innerText = traducciones[idiomaAppActual].error_video;
+      }
+    }
+
+    function cambiarIdiomaStream(index) {
+      const player = document.getElementById('main-player');
+      const proxyBtn = document.getElementById('proxy-btn');
+      const streamSeleccionado = opcionesStreamActual[index];
+      
+      if (streamSeleccionado && streamSeleccionado.embedUrl) {
+        urlVideoActual = streamSeleccionado.embedUrl;
+        player.src = urlVideoActual;
+        
+        if (proxyBtn) proxyBtn.style.display = 'inline-block';
+      }
+    }
+
+    function abrirStreamConProxy() {
+      if (urlVideoActual) {
+        // Enrutamiento directo al controlador de Scramjet montado en proxy.budsin.dev
+        const urlFinalProxy = `https://proxy.budsin.dev/scramjet/${urlVideoActual}`;
+        window.open(urlFinalProxy, '_blank');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchMatches);
+  </script>
+</body>
+</html>
