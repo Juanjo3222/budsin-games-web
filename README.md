@@ -2,9 +2,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
-  <img src="https://img.shields.io/badge/Games-50-blue" />
-  <img src="https://img.shields.io/badge/Frontend-HTML%20%7C%20CSS%20%7C%20JS-orange" />
-  <img src="https://img.shields.io/badge/Version-6.4-purple" />
+  <img src="https://img.shields.io/badge/Games-54-blue" />
+  <img src="https://img.shields.io/badge/Frontend-React-orange" />
+  <img src="https://img.shields.io/badge/Version-7.0-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -110,11 +110,11 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 
 ## 🛠️ Tech Stack
 
-* HTML5
-* CSS3
-* JavaScript (Vanilla)
+* React 18 + React Router 6 (SPA)
+* Vite 5 (build directo a `public/`)
+* CSS3 glassmorphism
 * Firebase (conteo de popularidad, Auth para Budsin Pro)
-* Github Pages
+* Github Pages / Firebase Hosting
 
 ---
 
@@ -126,23 +126,20 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 ├── AGENTS.md
 ├── .firebaserc
 ├── firebase.json
-└── public/
+├── app/                      ← Código fuente React (Vite)
+│   └── src/
+│       ├── components/
+│       ├── context/
+│       ├── data/
+│       ├── lib/
+│       ├── pages/
+│       └── styles/
+└── public/                   ← Build de producción (raíz de deploy)
     ├── index.html
-    ├── 404.html
-    ├── about.html            ← Acerca de (información del proyecto)
-    ├── contacto.html         ← Contacto y canales de comunicación
-    ├── privacidad.html       ← Política de privacidad
-    ├── settings.html
-    ├── comentarios.html
+    ├── 404.html              ← Fallback SPA para GitHub Pages
+    ├── settings.html         ← Stub de redirect → /#/settings
     ├── [juego].html          ← Páginas de cada juego (estructura plana)
-    ├── Funkin-HTML-Port-main/  ← Friday Night Funkin (port completo)
-    ├── cookie/               ← Cookie Clicker (port completo)
-    ├── fonts/
-    ├── images/
-    ├── lang/
-    ├── lib/
-    ├── scripts/
-    ├── stylesheets/
+    ├── react-assets/         ← JS/CSS generados por Vite
     └── [portadas].jpg/jpeg/webp/avif/png/svg
 ```
 
@@ -196,6 +193,12 @@ Firebase se usa únicamente para el conteo de popularidad.
 ---
 
 ## 📝 Changelog
+
+### v7.0
+* Nuevo diseño **glassmorphism** construido con **React**: más rápido, limpio y totalmente responsive.
+* Migradas a React **todas las páginas** del sitio: portal, ajustes, admin, acerca de, privacidad, términos y contacto.
+* Enrutamiento SPA con hash (`/#/settings`, `/#/admin`…) compatible con GitHub Pages y Firebase Hosting sin configurar rewrites.
+* Las URLs antiguas (`/settings.html`, `/admin.html`, `/about.html`, etc.) redirigen automáticamente al portal React.
 
 ### v6.4
 * Corregidos errores de indexación SEO: eliminadas etiquetas noindex, añadido canonical y robots.txt optimizado.

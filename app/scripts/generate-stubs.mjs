@@ -1,0 +1,80 @@
+import { writeFileSync, mkdirSync } from "node:fs";
+import { join, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PUBLIC = join(__dirname, "..", "..", "public");
+
+const STUBS = [
+  ["settings.html", "/settings"],
+  ["admin.html", "/admin"],
+  ["about.html", "/about"],
+  ["privacidad.html", "/privacidad"],
+  ["terms.html", "/terms"],
+  ["contacto.html", "/contacto"],
+  ["comentarios.html", "/comentarios"],
+  ["404.html", "/404"],
+];
+
+const GTM = `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');`;
+
+function stubHtml(route, title) {
+  return `<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+<!-- Google Tag Manager -->
+<script>${GTM}</script>
+<!-- End Google Tag Manager -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XB8WJ1MR8D"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-XB8WJ1MR8D');</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+<meta http-equiv="refresh" content="0; url=/index.html#${route}" />
+<meta name="robots" content="noindex, nofollow" />
+<title>${title} · Budsin Games</title>
+<script>
+  (function () {
+    try {
+      var p = window.location.pathname.replace(/\\.html$/, "") || "/";
+      if (p === "/index") p = "/";
+      window.location.replace("/index.html#" + p + window.location.search);
+    } catch (e) {
+      window.location.replace("/index.html");
+    }
+  })();
+</script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<p style="font-family:system-ui,-apple-system,sans-serif;text-align:center;margin-top:20vh;color:#666">Redirigiendo…</p>
+<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+</body>
+</html>
+`;
+}
+
+const titles = {
+  "/settings": "Ajustes",
+  "/admin": "Admin",
+  "/about": "Acerca de",
+  "/privacidad": "Privacidad",
+  "/terms": "Términos",
+  "/contacto": "Contacto",
+  "/comentarios": "Comentarios",
+  "/404": "Página no encontrada",
+};
+
+for (const [file, route] of STUBS) {
+  const html = stubHtml(route, titles[route]);
+  writeFileSync(join(PUBLIC, file), html);
+  console.log("wrote", file, "->", route);
+}
+console.log("stubs generated in", PUBLIC);

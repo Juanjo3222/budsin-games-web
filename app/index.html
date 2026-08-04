@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="es" data-site-theme="light">
+  <head>
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+    <!-- End Google Tag Manager -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Budsin Games: portal de juegos gratis en navegador con experiencia tipo consola. Juega Minecraft, Geometry Dash, Among Us y más de 40 juegos online sin descargar nada." />
+    <meta name="keywords" content="juegos gratis, juegos online, navegador, Minecraft, Geometry Dash, Among Us, juegos sin descargar, portal de juegos, Budsin Games" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Budsin Games — Juega gratis desde el navegador" />
+    <meta property="og:description" content="Más de 40 juegos listos para jugar al instante. Interfaz tipo consola, sin descargas, desde cualquier dispositivo." />
+    <meta property="og:image" content="https://games.budsin.dev/Snapshot18-1.jpg" />
+    <meta property="og:url" content="https://games.budsin.dev" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XB8WJ1MR8D"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XB8WJ1MR8D');
+    </script>
+    <title>Budsin Games — Free browser games portal</title>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Budsin Games",
+      "url": "https://games.budsin.dev",
+      "description": "Portal de juegos gratis en navegador con experiencia tipo consola. Más de 40 juegos para jugar al instante.",
+      "inLanguage": ["es", "en", "pt"],
+      "applicationCategory": "Game"
+    }
+    </script>
+    <link rel="canonical" href="https://games.budsin.dev/" />
+    <link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Budsin Games" />
+    <link rel="apple-touch-icon" href="/icon-512.png" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Sora:wght@400;500;700;800&display=swap"
+      rel="stylesheet" media="print" onload="this.media='all'"
+    />
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641"
+      crossorigin="anonymous"></script>
+    <script>
+      (function () {
+        try {
+          var key = "budsin_site_theme";
+          var custom = null;
+          try { custom = JSON.parse(localStorage.getItem("budsin_custom_theme") || "{}"); } catch (e) {}
+          var theme = localStorage.getItem(key) || "light";
+          if (theme !== "custom" && theme !== "ps5" && theme !== "steam" && theme !== "pro" && theme !== "dark") {
+            theme = "light";
+          }
+          var root = document.documentElement;
+          root.setAttribute("data-site-theme", theme);
+          if (theme === "custom" && custom) {
+            if (custom.primary) root.style.setProperty("--custom-primary", custom.primary);
+            if (custom.secondary) root.style.setProperty("--custom-secondary", custom.secondary);
+            if (custom.accent) root.style.setProperty("--custom-accent", custom.accent);
+            if (custom.bg) root.style.setProperty("--custom-bg", custom.bg);
+          }
+          var lang = localStorage.getItem("budsin_language") || "es";
+          if (["es", "en", "pt"].indexOf(lang) !== -1) root.lang = lang;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", function () {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .catch(function () {});
+        });
+      }
+    </script>
+    <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+  </body>
+</html>

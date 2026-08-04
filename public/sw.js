@@ -1,7 +1,7 @@
 importScripts("/scram/scramjet.all.js");
 
-const CACHE = "budsin-v1";
-const PRO_CACHE = "budsin-pro-v1";
+const CACHE = "budsin-v2";
+const PRO_CACHE = "budsin-pro-v2";
 const STATIC = [
   "/",
   "/index.html",
@@ -13,6 +13,7 @@ const STATIC = [
   "/comentarios.html",
   "/404.html",
   "/manifest.json",
+  "/react-assets/",
   "/icon-192.png",
   "/icon-512.png",
   "/favicon.png",
