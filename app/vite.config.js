@@ -64,5 +64,7 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: false,
+    host: "0.0.0.0",
+    allowedHosts: ["5173-iy4fu424hu790xmrwr6xc.e2b.app"],
   },
 });

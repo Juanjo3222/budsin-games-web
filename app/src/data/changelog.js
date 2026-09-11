@@ -1,4 +1,4 @@
-export const SITE_VERSION = "7.0";
+export const SITE_VERSION = "8.0-sunset";
 
 const VERSION_KEY = "juanjos_games_seen_version";
 
@@ -6,27 +6,32 @@ export function changelogForLang(lang) {
   const shared = {
     title:
       lang === "en"
-        ? "Budsin Games News"
+        ? "\u26A0\uFE0F Budsin Games \u2014 Important Notice"
         : lang === "pt"
-        ? "Novidades do Budsin Games"
-        : "Novedades de Budsin Games",
+        ? "\u26A0\uFE0F Budsin Games \u2014 Aviso Importante"
+        : "\u26A0\uFE0F Budsin Games \u2014 Aviso Importante",
     desc:
       lang === "en"
-        ? "This popup appears only once per version or the first time you enter the site."
+        ? "This site will no longer receive updates. We recommend switching to a personal Google account on your Chromebook for the best experience."
         : lang === "pt"
-        ? "Este pop-up aparece apenas uma vez por versão ou na primeira vez que você entra no site."
-        : "Este popup solo aparece una vez por versión o la primera vez que entras al sitio.",
+        ? "Este site n\u00E3o receber\u00E1 mais atualiza\u00E7\u00F5es. Recomendamos mudar para uma conta pessoal do Google no seu Chromebook para a melhor experi\u00EAncia."
+        : "Este sitio ya no recibir\u00E1 actualizaciones. Te recomendamos pasar a una cuenta personal de Google en tu Chromebook para la mejor experiencia.",
     items: [
       lang === "en"
-        ? "Brand-new glassmorphism design built with React: faster, cleaner and fully responsive."
+        ? "Switch to a personal Google account on your Chromebook \u2014 this gives you access to the full Android game catalog from the Play Store."
         : lang === "pt"
-        ? "Novo design glassmorphism construído com React: mais rápido, limpo e totalmente responsivo."
-        : "Nuevo diseño glassmorphism construido con React: más rápido, limpio y totalmente responsive.",
+        ? "Mude para uma conta pessoal do Google no seu Chromebook \u2014 isso d\u00E1 acesso ao cat\u00E1logo completo de jogos Android da Play Store."
+        : "P\u00E1sate a una cuenta personal de Google en tu Chromebook \u2014 as\u00ED tendr\u00E1s acceso al cat\u00E1logo completo de juegos de Android desde la Play Store.",
       lang === "en"
-        ? "All pages (portal, settings, admin, about, privacy, terms, contact) migrated to React."
+        ? "Enjoy native Android games, emulators, and full Chromebook unenrollment for unrestricted access."
         : lang === "pt"
-        ? "Todas as páginas (portal, configurações, admin, sobre, privacidade, termos, contato) migradas para React."
-        : "Todas las páginas (portal, ajustes, admin, acerca de, privacidad, términos, contacto) migradas a React.",
+        ? "Aproveite jogos Android nativos, emuladores e desvincula\u00E7\u00E3o completa do Chromebook para acesso irrestrito."
+        : "Disfruta de juegos Android nativos, emuladores y desenrolamiento completo de la Chromebook para acceso sin restricciones.",
+      lang === "en"
+        ? "The Play Store offers thousands of games \u2014 much more than what this portal could ever provide."
+        : lang === "pt"
+        ? "A Play Store oferece milhares de jogos \u2014 muito mais do que este portal poderia oferecer."
+        : "La Play Store ofrece miles de juegos \u2014 mucho m\u00E1s de lo que este portal podr\u00EDa ofrecer nunca.",
     ],
   };
   return shared;
