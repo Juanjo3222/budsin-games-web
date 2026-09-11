@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useI18n } from "../context/I18nContext";
 import { changelogForLang, shouldShowChangelog, markChangelogSeen, SITE_VERSION } from "../data/changelog";
 
-const CLOSE_DELAY = 3000;
+const CLOSE_DELAY = 5000;
 
 export default function ChangelogModal() {
   const { lang } = useI18n();
@@ -35,31 +35,46 @@ export default function ChangelogModal() {
     setVisible(false);
   };
 
+  const labels = {
+    es: {
+      notice: "Aviso",
+      gotIt: "Entendido, cerrar",
+    },
+    en: {
+      notice: "Notice",
+      gotIt: "Got it, close",
+    },
+    pt: {
+      notice: "Aviso",
+      gotIt: "Entendi, fechar",
+    },
+  };
+  const l = labels[lang] || labels.es;
+
   return (
-    <div className="modal-overlay is-visible">
-      <div className="changelog-card" role="status" aria-live="polite">
-        <div className="changelog-close-wrap">
-          <button
-            type="button"
-            className="changelog-close"
-            onClick={close}
-            disabled={!ready}
-            aria-label="Cerrar notificación"
-          >
-            ×
-          </button>
-          <span className={`changelog-countdown ${ready ? "is-done" : ""}`}>
-            {(remaining / 1000).toFixed(3)}s
-          </span>
+    <div className="modal-overlay is-visible" onClick={ready ? close : undefined}>
+      <div className="sunset-card" role="alert" aria-live="assertive" onClick={(e) => e.stopPropagation()}>
+        <div className="sunset-icon-wrap">
+          <span className="sunset-icon">📢</span>
         </div>
-        <span>Version {SITE_VERSION}</span>
+        <span className="sunset-badge">{l.notice}</span>
         <h2>{content.title}</h2>
         <p>{content.desc}</p>
-        <ul className="changelog-list">
+        <ul className="sunset-list">
           {content.items.map((item, i) => (
             <li key={i}>{item}</li>
           ))}
         </ul>
+        <div className="sunset-actions">
+          <button
+            type="button"
+            className="btn sunset-dismiss"
+            onClick={close}
+            disabled={!ready}
+          >
+            {ready ? l.gotIt : `${(remaining / 1000).toFixed(1)}s`}
+          </button>
+        </div>
       </div>
     </div>
   );

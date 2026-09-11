@@ -724,6 +724,110 @@ html[data-site-theme="custom"] {
 .changelog-countdown.is-done { opacity: 0.5; }
 .changelog-list { margin: 0; padding-left: 18px; font-size: 0.84rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
 
+/* ── Sunset / deprecation notice ── */
+.sunset-card {
+  position: relative;
+  width: min(480px, 100%);
+  max-height: 88vh;
+  overflow-y: auto;
+  padding: 32px 28px 24px;
+  border-radius: 26px;
+  background: var(--surface-strong);
+  backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  animation: popIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  text-align: center;
+}
+.sunset-icon-wrap {
+  margin-bottom: 8px;
+}
+.sunset-icon {
+  font-size: 2.4rem;
+  display: inline-block;
+  animation: sunsetBounce 1.2s ease-in-out infinite;
+}
+.sunset-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.sunset-card h2 {
+  margin: 6px 0 10px;
+  font-size: 1.2rem;
+  line-height: 1.35;
+}
+.sunset-card p {
+  margin: 0 0 14px;
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.65;
+}
+.sunset-list {
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+.sunset-list li {
+  position: relative;
+  padding: 12px 14px 12px 40px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  font-size: 0.84rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+.sunset-list li::before {
+  content: "✅";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+}
+.sunset-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 6px;
+}
+.sunset-dismiss {
+  min-width: 180px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-size: 0.9rem;
+  padding: 0 24px;
+  border-radius: 14px;
+  min-height: 48px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.sunset-dismiss:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.28);
+}
+.sunset-dismiss:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes sunsetBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes popIn { from { opacity: 0; transform: scale(0.94) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
