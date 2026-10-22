@@ -19,6 +19,7 @@ import "./styles/footer.css";
 import "./styles/overlays.css";
 import "./styles/pages.css";
 import "./styles/responsive.css";
+import "./styles/solid-prototype.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
