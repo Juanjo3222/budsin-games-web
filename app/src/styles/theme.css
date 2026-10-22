@@ -1,0 +1,189 @@
+/* ═══════════════════════════════════════════════════════════
+   Budsin Games · React UI (v7.0) · Glassmorphism design
+   Variables compatibles con site-theme.js (juegos comparten look)
+   ═══════════════════════════════════════════════════════════ */
+
+:root {
+  --font-display: "Bebas Neue", system-ui, sans-serif;
+  --font-body: "Sora", system-ui, sans-serif;
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --glass-blur: 18px;
+  --radius-chip: 14px;
+  --radius-xs: 10px;
+  --radius-pill: 999px;
+}
+
+html { font-family: var(--font-body); }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.35s ease, color 0.35s ease;
+}
+
+* { box-sizing: border-box; }
+a { color: inherit; }
+button { font-family: inherit; }
+
+/* ── Theme palettes (mismas claves que site-theme.js) ── */
+html[data-site-theme="light"] {
+  --bg: #eef2f7;
+  --bg-2: #e2e9f2;
+  --surface: rgba(255, 255, 255, 0.62);
+  --surface-strong: rgba(255, 255, 255, 0.86);
+  --panel: rgba(255, 255, 255, 0.72);
+  --line: rgba(18, 24, 38, 0.12);
+  --text: #111827;
+  --muted: #5c6678;
+  --red: #ef3f45;
+  --blue: #2daeff;
+  --yellow: #ffd84a;
+  --green: #2fc98a;
+  --accent: #ef3f45;
+  --accent-2: #ff8c55;
+  --shadow: 0 24px 64px rgba(15, 23, 42, 0.14);
+  --shadow-soft: 0 16px 36px rgba(15, 23, 42, 0.09);
+  --glass-border: rgba(255, 255, 255, 0.55);
+  color-scheme: light;
+}
+html[data-site-theme="light"] body {
+  background:
+    radial-gradient(circle at top left, rgba(255, 140, 85, 0.12), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(45, 174, 255, 0.10), transparent 38%),
+    linear-gradient(180deg, #f6f8fb 0%, var(--bg) 55%, var(--bg-2) 100%);
+}
+
+html[data-site-theme="dark"] {
+  --bg: #0b1322;
+  --bg-2: #111d33;
+  --surface: rgba(14, 23, 42, 0.55);
+  --surface-strong: rgba(11, 19, 34, 0.88);
+  --panel: rgba(16, 27, 48, 0.66);
+  --line: rgba(180, 199, 223, 0.16);
+  --text: #e6edf8;
+  --muted: #a4b6ce;
+  --red: #ff686e;
+  --blue: #61c3ff;
+  --yellow: #ffd166;
+  --green: #2fc98a;
+  --accent: #61c3ff;
+  --accent-2: #3a7fff;
+  --shadow: 0 24px 64px rgba(0, 0, 0, 0.42);
+  --shadow-soft: 0 16px 36px rgba(0, 0, 0, 0.3);
+  --glass-border: rgba(255, 255, 255, 0.10);
+  color-scheme: dark;
+}
+html[data-site-theme="dark"] body {
+  background:
+    radial-gradient(circle at top left, rgba(255, 104, 110, 0.16), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(99, 212, 255, 0.14), transparent 30%),
+    linear-gradient(180deg, #040814 0%, var(--bg) 48%, var(--bg-2) 100%);
+}
+
+html[data-site-theme="ps5"] {
+  --bg: #080a14;
+  --bg-2: #0d1224;
+  --surface: rgba(10, 14, 28, 0.55);
+  --surface-strong: rgba(6, 9, 20, 0.88);
+  --panel: rgba(12, 17, 32, 0.66);
+  --line: rgba(100, 150, 220, 0.16);
+  --text: #eef2f8;
+  --muted: #8b9fc0;
+  --red: #ff5a5f;
+  --blue: #006fcd;
+  --yellow: #ffcc4d;
+  --green: #2fc98a;
+  --accent: #006fcd;
+  --accent-2: #3a8dff;
+  --shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  --shadow-soft: 0 16px 36px rgba(0, 0, 0, 0.38);
+  --glass-border: rgba(100, 150, 220, 0.14);
+  color-scheme: dark;
+}
+html[data-site-theme="ps5"] body {
+  background:
+    radial-gradient(circle at top left, rgba(0, 111, 205, 0.14), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(0, 55, 145, 0.12), transparent 30%),
+    linear-gradient(180deg, #040810 0%, var(--bg) 48%, var(--bg-2) 100%);
+}
+
+html[data-site-theme="steam"] {
+  --bg: #1b2838;
+  --bg-2: #172130;
+  --surface: rgba(27, 40, 56, 0.55);
+  --surface-strong: rgba(23, 33, 45, 0.88);
+  --panel: rgba(27, 40, 56, 0.66);
+  --line: rgba(102, 192, 244, 0.14);
+  --text: #c6d4df;
+  --muted: #8091a7;
+  --red: #cd4a4a;
+  --blue: #66c0f4;
+  --yellow: #ffd84a;
+  --green: #a4d007;
+  --accent: #66c0f4;
+  --accent-2: #1999ff;
+  --shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+  --shadow-soft: 0 16px 36px rgba(0, 0, 0, 0.4);
+  --glass-border: rgba(102, 192, 244, 0.12);
+  color-scheme: dark;
+}
+html[data-site-theme="steam"] body {
+  background:
+    radial-gradient(circle at top left, rgba(102, 192, 244, 0.10), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(164, 208, 7, 0.06), transparent 30%),
+    linear-gradient(180deg, #171a21 0%, var(--bg) 48%, var(--bg-2) 100%);
+}
+
+html[data-site-theme="pro"] {
+  --bg: #0d0b08;
+  --bg-2: #0a0805;
+  --surface: rgba(15, 12, 6, 0.6);
+  --surface-strong: rgba(20, 16, 8, 0.9);
+  --panel: rgba(18, 14, 6, 0.7);
+  --line: rgba(255, 215, 0, 0.14);
+  --text: #e8e0d0;
+  --muted: #b8a87a;
+  --red: #ffd84a;
+  --blue: #ffd700;
+  --yellow: #ffd700;
+  --green: #ffd700;
+  --accent: #ffd700;
+  --accent-2: #ff8c00;
+  --shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+  --shadow-soft: 0 16px 36px rgba(0, 0, 0, 0.4);
+  --glass-border: rgba(255, 215, 0, 0.16);
+  color-scheme: dark;
+}
+html[data-site-theme="pro"] body {
+  background:
+    radial-gradient(circle at top right, rgba(255, 215, 0, 0.08), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(255, 140, 0, 0.06), transparent 30%),
+    linear-gradient(180deg, #0a0a0a 0%, #111 48%, #1a1500 100%);
+}
+
+html[data-site-theme="custom"] {
+  --bg: var(--custom-bg, #0f172a);
+  --bg-2: var(--custom-bg, #0f172a);
+  --surface: rgba(255, 255, 255, 0.08);
+  --surface-strong: rgba(255, 255, 255, 0.14);
+  --panel: rgba(255, 255, 255, 0.10);
+  --line: rgba(255, 255, 255, 0.14);
+  --text: #f1f5f9;
+  --muted: #cbd5e1;
+  --accent: var(--custom-primary, #6366f1);
+  --accent-2: var(--custom-secondary, #a855f7);
+  --blue: var(--custom-accent, #22d3ee);
+  --yellow: var(--custom-accent, #22d3ee);
+  --green: var(--custom-accent, #22d3ee);
+  --red: #ef4444;
+  --shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+  --shadow-soft: 0 16px 36px rgba(0, 0, 0, 0.28);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  color-scheme: dark;
+}
+

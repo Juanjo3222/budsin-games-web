@@ -1,0 +1,14 @@
+/* ── Glass utility ── */
+.glass {
+  background: var(--surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ── Layout ── */
+.site-shell { display: flex; flex-direction: column; min-height: 100vh; }
+.page-main { flex: 1; width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 24px 0 64px; }
+.page-main-narrow { width: min(860px, calc(100% - 32px)); }
+

@@ -8,6 +8,7 @@ import { usePro } from "../context/ProContext";
 import { useTheme, THEMES } from "../context/ThemeContext";
 import { useLibrary } from "../context/LibraryContext";
 import { useToast } from "../context/ToastContext";
+import { readJson } from "../lib/storage";
 
 const CUSTOM_KEY = "budsin_custom_theme";
 const URL_LIST_KEY = "budsin_url_list";
@@ -15,14 +16,6 @@ const CLASSROOM_URL_KEY = "budsin_classroom_url";
 const HOTKEY_KEY = "budsin_hotkey";
 const QUICK_TOGGLE_KEY = "budsin_quick_toggle_visible";
 const AUTO_DISGUISE_KEY = "budsin_auto_disguise_ms";
-
-function readJson(key, fb) {
-  try {
-    return JSON.parse(localStorage.getItem(key) || JSON.stringify(fb));
-  } catch (e) {
-    return fb;
-  }
-}
 
 export default function SettingsPage() {
   const { t, lang } = useI18n();

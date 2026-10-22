@@ -8,7 +8,17 @@ import { ProProvider } from "./context/ProContext";
 import { LibraryProvider } from "./context/LibraryContext";
 import { ToastProvider } from "./context/ToastContext";
 import { GatingProvider } from "./context/GatingContext";
-import "./styles/global.css";
+import "./styles/theme.css";
+import "./styles/layout.css";
+import "./styles/topbar.css";
+import "./styles/home.css";
+import "./styles/cards.css";
+import "./styles/shelves.css";
+import "./styles/articles.css";
+import "./styles/footer.css";
+import "./styles/overlays.css";
+import "./styles/pages.css";
+import "./styles/responsive.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

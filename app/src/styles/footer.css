@@ -1,0 +1,17 @@
+/* ── Footer ── */
+.site-footer { margin-top: 40px; padding: 26px 22px; text-align: center; border-top: 1px solid var(--glass-border); }
+.footer-tagline { margin: 0 0 12px; color: var(--muted); font-size: 0.85rem; }
+.footer-links { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+.footer-links a {
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  text-decoration: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  transition: transform 0.2s;
+}
+.footer-links a:hover { transform: translateY(-2px); }
+.footer-copy { margin: 14px 0 0; font-size: 0.74rem; color: var(--muted); }
+

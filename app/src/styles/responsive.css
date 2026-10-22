@@ -1,0 +1,15 @@
+/* ── Responsive ── */
+@media (max-width: 720px) {
+  .games-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .search-row { flex-direction: column; }
+  .random-btn { width: 100%; }
+  .settings-text { display: none; }
+  .topbar { padding: 10px 14px; }
+  .page-main { padding-top: 12px; }
+  .card-header p { display: none; }
+}
+
+@media (max-width: 480px) {
+  .games-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .game-card .content { padding: 10px; }
+}

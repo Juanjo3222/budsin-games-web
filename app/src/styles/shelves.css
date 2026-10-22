@@ -1,0 +1,74 @@
+/* ── Shelves ── */
+.shelf { margin-top: 18px; padding: 18px; border-radius: var(--radius-lg); }
+.shelf-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.shelf-title { margin: 0; font-size: 1rem; }
+.shelf-share-btn {
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  color: var(--text);
+  border-radius: var(--radius-pill);
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+}
+.shelf-empty { margin: 0; font-size: 0.85rem; color: var(--muted); }
+.shelf-row { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; }
+.recent-mini {
+  position: relative;
+  flex: 0 0 auto;
+  width: 128px;
+  cursor: pointer;
+  border-radius: var(--radius-chip);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  transition: transform 0.2s;
+}
+.recent-mini:hover { transform: translateY(-3px); }
+.recent-mini img { width: 100%; height: 84px; object-fit: cover; display: block; }
+.recent-mini-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 84px;
+  font-size: 2rem;
+  background: var(--bg-2);
+}
+.recent-mini-name {
+  display: block;
+  padding: 7px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.recent-mini-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.collection-shelf { margin-top: 14px; }
+.collection-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.collection-name { font-size: 0.92rem; }
+.collection-actions { display: flex; gap: 6px; }
+.collection-action-btn {
+  border: 1px solid var(--line);
+  background: var(--surface-strong);
+  border-radius: var(--radius-pill);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+}
+.create-collection-btn { min-height: 38px; border-radius: var(--radius-pill); border: 1px solid var(--line); background: var(--surface-strong); color: var(--text); font: 800 0.8rem var(--font-body); cursor: pointer; padding: 0 14px; }
+

@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { usePro } from "./ProContext";
+import { readJson, writeJson } from "../lib/storage";
 
 const LibraryContext = createContext(null);
 
@@ -8,20 +9,6 @@ const RECENTLY_KEY = "budsin_recently_played";
 const COLLECTIONS_KEY = "budsin_collections";
 const RECENTLY_MAX = 5;
 const COLLECTIONS_LIMIT_FREE = 2;
-
-function readJson(key, fallback) {
-  try {
-    return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback));
-  } catch (e) {
-    return fallback;
-  }
-}
-
-function writeJson(key, value) {
-  try {
-    localStorage.setItem(key, JSON.stringify(value));
-  } catch (e) {}
-}
 
 export function LibraryProvider({ children }) {
   const { isPro, favoritesLimit } = usePro();
