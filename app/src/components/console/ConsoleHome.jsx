@@ -137,8 +137,8 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
         input.focus({ preventScroll: true });
       },
       grid: () => {
-        const library = document.getElementById("library");
-        if (library) library.scrollIntoView({ behavior: "smooth", block: "start" });
+        const browse = document.getElementById("browse");
+        if (browse) browse.scrollIntoView({ behavior: "smooth", block: "start" });
       },
       settings: () => {
         window.location.hash = "#/settings";
@@ -152,7 +152,6 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
   return (
     <section className="console-home" ref={sectionRef} aria-label="Budsin Games">
       <div className="console-head">
-        <h2 className="console-title" aria-live="polite">{current ? current.title : ""}</h2>
         <div className="console-head-right">
           {games.length > 1 && (
             <>
@@ -180,15 +179,18 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
         </div>
       </div>
 
-      {games.length === 0 ? (
-        <p className="console-empty">
-          {source === "favorites" ? t("noFavorites", "Aún no tienes favoritos.") : t("noRecent", "Aún no has jugado nada.")}
-        </p>
-      ) : (
-        <div className="console-stage">
-          <ConsoleRow key={rowKey} games={games} focused={focused} onFocusChange={onScrollFocus} onLaunch={onLaunch} rowRef={rowRef} />
-        </div>
-      )}
+      <div className="console-focus">
+        <h2 className="console-title" aria-live="polite">{current ? current.title : ""}</h2>
+        {games.length === 0 ? (
+          <p className="console-empty">
+            {source === "favorites" ? t("noFavorites", "Aún no tienes favoritos.") : t("noRecent", "Aún no has jugado nada.")}
+          </p>
+        ) : (
+          <div className="console-stage">
+            <ConsoleRow key={rowKey} games={games} focused={focused} onFocusChange={onScrollFocus} onLaunch={onLaunch} rowRef={rowRef} />
+          </div>
+        )}
+      </div>
 
       <ConsoleDock source={source} onSource={setSource} actions={actions} />
 

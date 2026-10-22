@@ -6,7 +6,6 @@ import AdsSlot from "../components/AdsSlot";
 import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
 import ConsoleHome from "../components/console/ConsoleHome";
-import HeroSection from "../components/home/HeroSection";
 import SearchBar from "../components/home/SearchBar";
 import FilterBar from "../components/home/FilterBar";
 import CollectionsPanel from "../components/home/CollectionsPanel";
@@ -102,9 +101,9 @@ export default function HomePage() {
           onRandom={randomGame}
         />
 
-        <HeroSection />
+        <h1 className="sr-only">{t("heroTitle", "Budsin Games")}</h1>
 
-        <section className="search-section">
+        <section className="search-section" id="browse">
           <SearchBar
             query={query}
             setQuery={setQuery}

@@ -38,16 +38,6 @@ body {
 /* Topbar */
 .topbar { border-width: 0 0 1px 0; box-shadow: none; padding: 10px 22px; }
 
-/* Hero: más compacto, tipografía de consola */
-.hero { padding: 36px 12px 14px; }
-.hero-badges span {
-  border-radius: var(--radius-sm);
-  background-color: var(--bg);
-  background-image: linear-gradient(var(--surface-strong), var(--surface-strong));
-  border: 1px solid var(--line);
-  backdrop-filter: none;
-}
-
 /* Buscador y filtros: controles sólidos, esquinas rectas suaves */
 .search-wrap { border-radius: var(--radius-sm); }
 .random-btn {

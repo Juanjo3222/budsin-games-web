@@ -1,22 +1,25 @@
 /* ── Consola · inicio estilo menú de consola ── */
 .console-home {
-  --tile-w: clamp(150px, 19vw, 236px);
-  padding: 14px 0 6px;
+  --tile-w: clamp(160px, 21vw, 260px);
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100svh - 100px); /* ocupa la pantalla bajo la topbar */
+  padding: 14px 0 22px;
 }
 
 .console-head {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
-  min-height: 2.4rem;
   padding: 0 4px;
 }
 .console-title {
   margin: 0;
+  padding: 0 10px;
   min-width: 0;
   font-family: var(--font-display);
-  font-size: 1.8rem;
+  font-size: 2.1rem;
   font-weight: 400;
   letter-spacing: 0.05em;
   color: var(--accent);
@@ -32,7 +35,7 @@
 }
 
 /* Fila de carátulas */
-.console-stage { position: relative; }
+.console-focus { margin-block: auto; } /* título + fila, centrados entre la barra superior y el dock */
 .console-row {
   display: flex;
   gap: 14px;
@@ -192,7 +195,7 @@
 }
 
 @media (max-width: 720px) {
-  .console-home { --tile-w: clamp(170px, 64vw, 280px); }
+  .console-home { --tile-w: clamp(170px, 64vw, 280px); min-height: calc(100svh - 150px); }
   .console-title { font-size: 1.4rem; }
   .console-dock { gap: 4px; padding: 8px 10px; }
   .console-dock-btn { width: 40px; height: 40px; font-size: 1.1rem; }
