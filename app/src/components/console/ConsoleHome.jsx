@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GAMES } from "../../data/games";
 import { useI18n } from "../../context/I18nContext";
 import { usePageTransition } from "../../context/TransitionContext";
+import { useFavoriteToggle } from "../../hooks/useFavoriteToggle";
 import { playSelect } from "../../lib/sfx";
 import ConsoleRow, { tileStep } from "./ConsoleRow";
 import ConsoleDock from "./ConsoleDock";
@@ -37,9 +38,12 @@ function isBlocked(e) {
  * Inicio estilo menú de consola: título del juego enfocado, fila de carátulas
  * desplazable, dock redondo y ayuda de teclas. Teclado: ← → mueven, Enter juega.
  */
-export default function ConsoleHome({ popularity, favorites, recently, onLaunch, onRandom }) {
+export default function ConsoleHome({ popularity, favorites, recently, onLaunch, onRandom, hasLibrary = false }) {
   const { lang, t } = useI18n();
+  const toggleFav = useFavoriteToggle();
   const [source, setSource] = useState("all");
+  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(0);
   const rowRef = useRef(null);
   const sectionRef = useRef(null);
@@ -55,15 +59,23 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
   if (!rank.current && Object.keys(popularity).length > 0) rank.current = popularity;
 
   const games = useMemo(() => {
-    if (source === "favorites") return pick(favorites);
-    const recent = pick(recently);
-    if (source === "recent") return recent;
-    const seen = new Set(recent.map((g) => g.href));
-    const score = (g) => Number((rank.current || {})[g.href]) || 0;
-    const rest = GAMES.filter((g) => !seen.has(g.href)).sort((a, b) => score(b) - score(a));
-    return [...recent, ...rest];
+    let base;
+    if (source === "favorites") {
+      base = pick(favorites);
+    } else {
+      const recent = pick(recently);
+      if (source === "recent") {
+        base = recent;
+      } else {
+        const seen = new Set(recent.map((g) => g.href));
+        const score = (g) => Number((rank.current || {})[g.href]) || 0;
+        base = [...recent, ...GAMES.filter((g) => !seen.has(g.href)).sort((a, b) => score(b) - score(a))];
+      }
+    }
+    const q = query.trim().toLowerCase();
+    return q ? base.filter((g) => (g.title + " " + g.name).toLowerCase().includes(q)) : base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [source, favorites, recently, rank.current]);
+  }, [source, favorites, recently, query, rank.current]);
 
   // Al cambiar de fuente o llegar el orden por popularidad, el foco vuelve al inicio. La fila se
   // remonta (ver `key` abajo) para empezar en scroll 0: el scroll-snap del navegador, si no,
@@ -73,7 +85,8 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
     focusedRef.current = 0;
     moveTarget.current = null;
     setFocused(0);
-  }, [rowKey]);
+    if (rowRef.current) rowRef.current.scrollLeft = 0;
+  }, [rowKey, query]);
 
   const onScrollFocus = useCallback((index) => {
     if (moveTarget.current !== null) {
@@ -118,6 +131,12 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         moveTo(focusedRef.current - 1);
+      } else if (e.key === "f" || e.key === "F") {
+        const game = games[focusedRef.current];
+        if (game) {
+          e.preventDefault();
+          toggleFav(game);
+        }
       } else if (e.key === "Enter" && e.target === document.body) {
         const game = games[focusedRef.current];
         if (game) {
@@ -129,16 +148,23 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [games, moveTo, onLaunch]);
+  }, [games, moveTo, onLaunch, toggleFav]);
+
+  const closeSearch = useCallback(() => {
+    setSearching(false);
+    setQuery("");
+  }, []);
 
   const actions = useMemo(
     () => ({
       random: onRandom,
       search: () => {
-        const input = document.querySelector(".search-input");
-        if (!input) return;
-        input.scrollIntoView({ behavior: "smooth", block: "center" });
-        input.focus({ preventScroll: true });
+        playSelect();
+        if (searching) {
+          closeSearch();
+          return;
+        }
+        setSearching(true);
       },
       grid: () => {
         const browse = document.getElementById("browse");
@@ -153,8 +179,17 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
           { settle: "route" }
         ),
     }),
-    [onRandom, run]
+    [onRandom, run, searching, closeSearch]
   );
+
+  const onSearchKey = (e) => {
+    if (e.key === "Escape") {
+      closeSearch();
+    } else if (e.key === "Enter") {
+      const game = games[focusedRef.current];
+      if (game) onLaunch(game, e.currentTarget);
+    }
+  };
 
   const selectSource = useCallback(
     (id) => {
@@ -166,6 +201,7 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
   );
 
   const current = games[focused];
+  const isFav = !!current && favorites.includes(current.href);
 
   return (
     <section className="console-home" ref={sectionRef} aria-label="Budsin Games">
@@ -193,6 +229,18 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
               </button>
             </>
           )}
+          {current && (
+            <button
+              type="button"
+              className={`console-nav console-fav ${isFav ? "is-on" : ""}`}
+              aria-label={t("favoriteSaved", "Favorito")}
+              aria-pressed={isFav}
+              title={t("favoriteSaved", "Favorito")}
+              onClick={() => toggleFav(current)}
+            >
+              {isFav ? "★" : "☆"}
+            </button>
+          )}
           <time className="console-clock">{clock}</time>
         </div>
       </div>
@@ -201,7 +249,11 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
         <h2 className="console-title" aria-live="polite">{current ? current.title : ""}</h2>
         {games.length === 0 ? (
           <p className="console-empty">
-            {source === "favorites" ? t("noFavorites", "Aún no tienes favoritos.") : t("noRecent", "Aún no has jugado nada.")}
+            {query
+              ? t("noResults", "No encontramos juegos con ese filtro. Prueba otra búsqueda.")
+              : source === "favorites"
+              ? t("noFavorites", "Aún no tienes favoritos.")
+              : t("noRecent", "Aún no has jugado nada.")}
           </p>
         ) : (
           <div className="console-stage">
@@ -210,11 +262,40 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
         )}
       </div>
 
-      <ConsoleDock source={source} onSource={selectSource} actions={actions} />
+      {searching && (
+        <div className="console-search">
+          <span aria-hidden="true">🔍</span>
+          <input
+            type="search"
+            autoFocus
+            className="console-search-input"
+            value={query}
+            placeholder={t("searchPlaceholder", "Buscar juego por nombre...")}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={onSearchKey}
+          />
+          <button type="button" className="console-search-close" aria-label={t("consoleSearchClose", "Cerrar")} onClick={closeSearch}>×</button>
+        </div>
+      )}
 
-      <div className="console-hints" aria-hidden="true">
-        <span><kbd>←</kbd><kbd>→</kbd>{t("consoleHintMove", "Navegar")}</span>
-        <span><kbd>Enter</kbd>{t("consoleHintPlay", "Jugar")}</span>
+      <ConsoleDock source={source} onSource={selectSource} actions={actions} hasLibrary={hasLibrary} searching={searching} />
+
+      <div className="console-foot">
+        {!hasLibrary ? (
+          <nav className="console-legal" aria-label="Legal">
+            <a href="#/about">{t("footerAbout", "Acerca de")}</a>
+            <a href="#/privacidad">{t("footerPrivacy", "Privacidad")}</a>
+            <a href="#/terms">{t("footerTerms", "Términos")}</a>
+            <a href="#/contacto">{t("footerContact", "Contacto")}</a>
+          </nav>
+        ) : (
+          <span />
+        )}
+        <div className="console-hints" aria-hidden="true">
+          <span><kbd>←</kbd><kbd>→</kbd>{t("consoleHintMove", "Navegar")}</span>
+          <span><kbd>Enter</kbd>{t("consoleHintPlay", "Jugar")}</span>
+          <span><kbd>F</kbd>{t("consoleHintFav", "Favorito")}</span>
+        </div>
       </div>
     </section>
   );

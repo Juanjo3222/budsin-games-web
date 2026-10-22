@@ -32,8 +32,8 @@ function prerender() {
     console.error("prerender produced suspicious output, skipping injection");
     return;
   }
-  if (!/game-card/.test(html)) {
-    console.error("prerender output has no game cards, skipping injection");
+  if (!/console-tile|game-card/.test(html)) {
+    console.error("prerender output has no game tiles or cards, skipping injection");
     return;
   }
 

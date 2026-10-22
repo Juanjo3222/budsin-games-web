@@ -1,15 +1,15 @@
 import { useI18n } from "../context/I18nContext";
 import { usePro } from "../context/ProContext";
 import { useLibrary } from "../context/LibraryContext";
-import { useToast } from "../context/ToastContext";
 import { isReleased } from "../lib/format";
 import { useAnimatedLaunch } from "../hooks/useAnimatedLaunch";
+import { useFavoriteToggle } from "../hooks/useFavoriteToggle";
 
 export default function GameCard({ game, hits = 0, onPlay }) {
   const { lang, t } = useI18n();
   const { isPro } = usePro();
-  const { toggleFavorite, isFavorite } = useLibrary();
-  const { showToast } = useToast();
+  const { isFavorite } = useLibrary();
+  const toggleFav = useFavoriteToggle();
   const launch = useAnimatedLaunch(onPlay);
 
   const fav = isFavorite(game.href);
@@ -19,12 +19,7 @@ export default function GameCard({ game, hits = 0, onPlay }) {
   const handleFav = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    const res = toggleFavorite(game.href);
-    if (res.limited) {
-      showToast(t("favLimitReached", "Límite de favoritos alcanzado (20). Hazte Pro para ilimitados."), true);
-      return;
-    }
-    if (!fav) showToast("⭐ " + game.title, false, 1500);
+    toggleFav(game);
   };
 
   const handleClick = (e) => {

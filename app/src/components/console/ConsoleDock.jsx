@@ -11,14 +11,14 @@ const ITEMS = [
 ];
 
 /** Dock de botones redondos. Los de tipo `source` cambian lo que muestra la fila. */
-export default function ConsoleDock({ source, onSource, actions }) {
+export default function ConsoleDock({ source, onSource, actions, hasLibrary, searching }) {
   const { t } = useI18n();
 
   return (
     <nav className="console-dock" aria-label="Menú">
-      {ITEMS.map((item) => {
+      {ITEMS.filter((item) => item.id !== "grid" || hasLibrary).map((item) => {
         const label = t(item.key, item.fallback);
-        const active = item.source && source === item.id;
+        const active = item.source ? source === item.id : item.id === "search" && searching;
         return (
           <button
             key={item.id}
@@ -26,7 +26,7 @@ export default function ConsoleDock({ source, onSource, actions }) {
             className={`console-dock-btn ${active ? "is-active" : ""}`}
             title={label}
             aria-label={label}
-            aria-pressed={item.source ? active : undefined}
+            aria-pressed={item.source || item.id === "search" ? active : undefined}
             onClick={(e) => (item.source ? onSource(item.id) : actions[item.id](e.currentTarget))}
           >
             {item.icon}
