@@ -23,11 +23,6 @@ export function changelogForLang(lang) {
         ? "Mude para uma conta pessoal do Google no seu Chromebook \u2014 isso d\u00E1 acesso ao cat\u00E1logo completo de jogos Android da Play Store."
         : "P\u00E1sate a una cuenta personal de Google en tu Chromebook \u2014 as\u00ED tendr\u00E1s acceso al cat\u00E1logo completo de juegos de Android desde la Play Store.",
       lang === "en"
-        ? "Enjoy native Android games, emulators, and full Chromebook unenrollment for unrestricted access."
-        : lang === "pt"
-        ? "Aproveite jogos Android nativos, emuladores e desvincula\u00E7\u00E3o completa do Chromebook para acesso irrestrito."
-        : "Disfruta de juegos Android nativos, emuladores y desenrolamiento completo de la Chromebook para acceso sin restricciones.",
-      lang === "en"
         ? "The Play Store offers thousands of games \u2014 much more than what this portal could ever provide."
         : lang === "pt"
         ? "A Play Store oferece milhares de jogos \u2014 muito mais do que este portal poderia oferecer."

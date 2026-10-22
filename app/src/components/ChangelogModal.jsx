@@ -5,7 +5,7 @@ import { changelogForLang, shouldShowChangelog, markChangelogSeen, SITE_VERSION 
 const CLOSE_DELAY = 5000;
 
 export default function ChangelogModal() {
-  const { lang } = useI18n();
+  const { lang, t } = useI18n();
   const [visible, setVisible] = useState(false);
   const [ready, setReady] = useState(false);
   const [remaining, setRemaining] = useState(CLOSE_DELAY);
@@ -35,29 +35,13 @@ export default function ChangelogModal() {
     setVisible(false);
   };
 
-  const labels = {
-    es: {
-      notice: "Aviso",
-      gotIt: "Entendido, cerrar",
-    },
-    en: {
-      notice: "Notice",
-      gotIt: "Got it, close",
-    },
-    pt: {
-      notice: "Aviso",
-      gotIt: "Entendi, fechar",
-    },
-  };
-  const l = labels[lang] || labels.es;
-
   return (
     <div className="modal-overlay is-visible" onClick={ready ? close : undefined}>
       <div className="sunset-card" role="alert" aria-live="assertive" onClick={(e) => e.stopPropagation()}>
         <div className="sunset-icon-wrap">
           <span className="sunset-icon">📢</span>
         </div>
-        <span className="sunset-badge">{l.notice}</span>
+        <span className="sunset-badge">{t("sunsetNotice")}</span>
         <h2>{content.title}</h2>
         <p>{content.desc}</p>
         <ul className="sunset-list">
@@ -72,7 +56,7 @@ export default function ChangelogModal() {
             onClick={close}
             disabled={!ready}
           >
-            {ready ? l.gotIt : `${(remaining / 1000).toFixed(1)}s`}
+            {ready ? t("sunsetGotIt") : `${(remaining / 1000).toFixed(1)}s`}
           </button>
         </div>
       </div>
