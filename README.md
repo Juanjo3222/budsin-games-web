@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/Games-54-blue" />
   <img src="https://img.shields.io/badge/Frontend-React-orange" />
-  <img src="https://img.shields.io/badge/Version-7.0-purple" />
+  <img src="https://img.shields.io/badge/Version-8.0--sunset-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -193,6 +193,10 @@ Firebase se usa únicamente para el conteo de popularidad.
 ---
 
 ## 📝 Changelog
+
+### v8.0-sunset
+* Aviso de cierre: Budsin Games **ya no recibirá actualizaciones**. Se muestra un popup de una sola vez por versión con cuenta regresiva de 5 s antes de poder cerrarlo.
+* Recomendación: usar una cuenta personal de Google en el Chromebook para acceder al catálogo completo de juegos Android de la Play Store.
 
 ### v7.0
 * Nuevo diseño **glassmorphism** construido con **React**: más rápido, limpio y totalmente responsive.
