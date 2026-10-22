@@ -15,3 +15,8 @@ export function formatReleaseDate(dateStr, lang) {
 export function isReleased(proRelease) {
   return !!proRelease && new Date(proRelease + "T00:00:00") <= new Date();
 }
+
+/** Juego anticipado para Pro que aún no se libera para todos. */
+export function isProLocked(game, isPro) {
+  return !!game.pro && !isPro && !isReleased(game.proRelease);
+}

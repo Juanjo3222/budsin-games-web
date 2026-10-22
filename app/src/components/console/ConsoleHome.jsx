@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GAMES } from "../../data/games";
 import { useI18n } from "../../context/I18nContext";
+import { usePageTransition } from "../../context/TransitionContext";
+import { playSelect } from "../../lib/sfx";
 import ConsoleRow, { tileStep } from "./ConsoleRow";
 import ConsoleDock from "./ConsoleDock";
 
@@ -45,6 +47,7 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
   const onScreen = useRef(true);
   const moveTarget = useRef(null);
   const moveTimer = useRef(0);
+  const { run } = usePageTransition();
   const clock = useClock(lang);
 
   // El orden por popularidad se congela con la primera lectura para que la fila no se reordene mientras se mira.
@@ -119,7 +122,8 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
         const game = games[focusedRef.current];
         if (game) {
           e.preventDefault();
-          onLaunch(game);
+          const tiles = rowRef.current ? rowRef.current.querySelectorAll(".console-tile") : [];
+          onLaunch(game, tiles[focusedRef.current]);
         }
       }
     };
@@ -140,11 +144,25 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
         const browse = document.getElementById("browse");
         if (browse) browse.scrollIntoView({ behavior: "smooth", block: "start" });
       },
-      settings: () => {
-        window.location.hash = "#/settings";
-      },
+      settings: (origin) =>
+        run(
+          origin,
+          () => {
+            window.location.hash = "#/settings";
+          },
+          { settle: "route" }
+        ),
     }),
-    [onRandom]
+    [onRandom, run]
+  );
+
+  const selectSource = useCallback(
+    (id) => {
+      if (id === source) return;
+      playSelect();
+      setSource(id);
+    },
+    [source]
   );
 
   const current = games[focused];
@@ -192,7 +210,7 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
         )}
       </div>
 
-      <ConsoleDock source={source} onSource={setSource} actions={actions} />
+      <ConsoleDock source={source} onSource={selectSource} actions={actions} />
 
       <div className="console-hints" aria-hidden="true">
         <span><kbd>←</kbd><kbd>→</kbd>{t("consoleHintMove", "Navegar")}</span>

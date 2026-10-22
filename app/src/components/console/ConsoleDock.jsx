@@ -27,7 +27,7 @@ export default function ConsoleDock({ source, onSource, actions }) {
             title={label}
             aria-label={label}
             aria-pressed={item.source ? active : undefined}
-            onClick={() => (item.source ? onSource(item.id) : actions[item.id]())}
+            onClick={(e) => (item.source ? onSource(item.id) : actions[item.id](e.currentTarget))}
           >
             {item.icon}
           </button>

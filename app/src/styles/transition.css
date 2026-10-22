@@ -1,0 +1,64 @@
+/* ── Transición de consola ── */
+.transition-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999998; /* por debajo del modo oculto (Classroom Hotkey) */
+  background: var(--bg);
+  clip-path: circle(0 at var(--tx) var(--ty));
+  animation: transitionCover 0.45s cubic-bezier(0.45, 0, 0.2, 1) forwards;
+}
+.transition-overlay.is-out {
+  clip-path: none;
+  animation: transitionFade 0.32s ease forwards;
+}
+
+/* Onda que sale del elemento pulsado */
+.transition-ring {
+  position: absolute;
+  left: var(--tx);
+  top: var(--ty);
+  width: 56px;
+  height: 56px;
+  margin: -28px 0 0 -28px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  animation: transitionRing 0.55s ease-out forwards;
+}
+
+/* Puntos de carga: se mantienen mientras llega la otra pantalla */
+.transition-dots {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  gap: 8px;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: transitionDotsIn 0.2s 0.3s forwards;
+}
+.transition-dots i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: transitionBounce 0.9s infinite ease-in-out;
+}
+.transition-dots i:nth-child(2) { animation-delay: 0.15s; }
+.transition-dots i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes transitionCover { to { clip-path: circle(150vmax at var(--tx) var(--ty)); } }
+@keyframes transitionFade { from { opacity: 1; } to { opacity: 0; } }
+@keyframes transitionFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes transitionRing { from { transform: scale(0.4); opacity: 0.9; } to { transform: scale(14); opacity: 0; } }
+@keyframes transitionDotsIn { to { opacity: 1; } }
+@keyframes transitionBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
+  40% { transform: translateY(-8px); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .transition-overlay { clip-path: none; animation: transitionFadeIn 0.2s ease forwards; }
+  .transition-overlay.is-out { animation: transitionFade 0.2s ease forwards; }
+  .transition-ring { display: none; }
+  .transition-dots i { animation: none; opacity: 1; }
+}

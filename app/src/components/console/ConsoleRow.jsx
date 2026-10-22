@@ -46,7 +46,7 @@ export default function ConsoleRow({ games, focused, onFocusChange, onLaunch, ro
             aria-current={i === focused ? "true" : undefined}
             onClick={(e) => {
               e.preventDefault();
-              onLaunch(g);
+              onLaunch(g, e.currentTarget);
             }}
           >
             {g.cover ? (

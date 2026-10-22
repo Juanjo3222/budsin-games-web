@@ -9,6 +9,7 @@ import { useTheme, THEMES } from "../context/ThemeContext";
 import { useLibrary } from "../context/LibraryContext";
 import { useToast } from "../context/ToastContext";
 import { readJson } from "../lib/storage";
+import { soundsEnabled, setSoundsEnabled } from "../lib/sfx";
 
 const CUSTOM_KEY = "budsin_custom_theme";
 const URL_LIST_KEY = "budsin_url_list";
@@ -37,6 +38,7 @@ export default function SettingsPage() {
   const [urlList, setUrlList] = useState(() => readJson(URL_LIST_KEY, []));
   const [hotkey, setHotkey] = useState(() => localStorage.getItem(HOTKEY_KEY) || "Backquote");
   const [quickToggle, setQuickToggle] = useState(() => localStorage.getItem(QUICK_TOGGLE_KEY) === "1");
+  const [sounds, setSounds] = useState(soundsEnabled);
   const [autoDisguise, setAutoDisguise] = useState(() => Number(localStorage.getItem(AUTO_DISGUISE_KEY) || 0));
 
   const save = (key, value) => {
@@ -308,6 +310,17 @@ export default function SettingsPage() {
             </div>
             <label className="toggle">
               <input type="checkbox" checked={quickToggle} onChange={(e) => { setQuickToggle(e.target.checked); save(QUICK_TOGGLE_KEY, e.target.checked ? "1" : "0"); }} />
+              <span className="toggle-track"></span>
+            </label>
+          </div>
+
+          <div className="toggle-row">
+            <div>
+              <div className="toggle-label">{t("toggleSoundsLabel", "Sonidos del menú")}</div>
+              <div className="toggle-sub">{t("toggleSoundsSub", "Efecto al entrar a un juego o sección.")}</div>
+            </div>
+            <label className="toggle">
+              <input type="checkbox" checked={sounds} onChange={(e) => { setSounds(e.target.checked); setSoundsEnabled(e.target.checked); }} />
               <span className="toggle-track"></span>
             </label>
           </div>

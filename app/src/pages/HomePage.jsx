@@ -14,7 +14,7 @@ import { useI18n } from "../context/I18nContext";
 import { useLibrary } from "../context/LibraryContext";
 import { useToast } from "../context/ToastContext";
 import { subscribePopularity } from "../lib/firebase";
-import { useLaunchGame } from "../hooks/useLaunchGame";
+import { useAnimatedLaunch } from "../hooks/useAnimatedLaunch";
 import { playGame } from "../lib/play";
 import { readJson, writeJson } from "../lib/storage";
 
@@ -83,11 +83,14 @@ export default function HomePage() {
   }, []);
 
   const onPlay = useCallback((game) => playGame(game, addRecent), [addRecent]);
-  const launch = useLaunchGame(onPlay);
+  const launch = useAnimatedLaunch(onPlay);
 
-  const randomGame = useCallback(() => {
-    launch(GAMES[Math.floor(Math.random() * GAMES.length)]);
-  }, [launch]);
+  const randomGame = useCallback(
+    (origin) => {
+      launch(GAMES[Math.floor(Math.random() * GAMES.length)], origin);
+    },
+    [launch]
+  );
 
   return (
     <div className="site-shell">

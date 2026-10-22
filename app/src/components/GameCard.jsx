@@ -3,14 +3,14 @@ import { usePro } from "../context/ProContext";
 import { useLibrary } from "../context/LibraryContext";
 import { useToast } from "../context/ToastContext";
 import { isReleased } from "../lib/format";
-import { useLaunchGame } from "../hooks/useLaunchGame";
+import { useAnimatedLaunch } from "../hooks/useAnimatedLaunch";
 
 export default function GameCard({ game, hits = 0, onPlay }) {
   const { lang, t } = useI18n();
   const { isPro } = usePro();
   const { toggleFavorite, isFavorite } = useLibrary();
   const { showToast } = useToast();
-  const launch = useLaunchGame(onPlay);
+  const launch = useAnimatedLaunch(onPlay);
 
   const fav = isFavorite(game.href);
   const released = isReleased(game.proRelease);
@@ -30,7 +30,7 @@ export default function GameCard({ game, hits = 0, onPlay }) {
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    launch(game);
+    launch(game, e.currentTarget);
   };
   return (
     <a

@@ -45,6 +45,7 @@
   overflow-anchor: none; /* al reordenar por popularidad no debe arrastrar el scroll */
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
+  animation: consoleRowIn 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
   -webkit-mask-image: linear-gradient(to right, #000 90%, transparent);
   mask-image: linear-gradient(to right, #000 90%, transparent);
 }
@@ -201,7 +202,13 @@
   .console-dock-btn { width: 40px; height: 40px; font-size: 1.1rem; }
 }
 
+@keyframes consoleRowIn {
+  from { opacity: 0; transform: translateX(28px); }
+  to { opacity: 1; transform: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .console-row { animation: none; }
   .console-tile,
   .console-nav,
   .console-dock-btn { transition: none; }

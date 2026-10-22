@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { usePro } from "../context/ProContext";
 import { useGating } from "../context/GatingContext";
 import { incrementRemotePopularity } from "../lib/firebase";
-import { isReleased } from "../lib/format";
+import { isProLocked } from "../lib/format";
 import { cacheGameForOffline } from "../lib/sw";
 
 /**
@@ -15,7 +15,7 @@ export function useLaunchGame(onPlay) {
 
   return useCallback(
     (game) => {
-      if (game.pro && !isPro && !isReleased(game.proRelease)) {
+      if (isProLocked(game, isPro)) {
         incrementRemotePopularity(game.href, game.title, 1);
         maybeGate(game);
         return;

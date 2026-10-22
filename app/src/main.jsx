@@ -8,12 +8,14 @@ import { ProProvider } from "./context/ProContext";
 import { LibraryProvider } from "./context/LibraryContext";
 import { ToastProvider } from "./context/ToastContext";
 import { GatingProvider } from "./context/GatingContext";
+import { TransitionProvider } from "./context/TransitionContext";
 import "./styles/theme.css";
 import "./styles/layout.css";
 import "./styles/topbar.css";
 import "./styles/home.css";
 import "./styles/cards.css";
 import "./styles/console.css";
+import "./styles/transition.css";
 import "./styles/shelves.css";
 import "./styles/articles.css";
 import "./styles/footer.css";
@@ -31,7 +33,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
             <LibraryProvider>
               <ToastProvider>
                 <GatingProvider>
-                  <App />
+                  <TransitionProvider>
+                    <App />
+                  </TransitionProvider>
                 </GatingProvider>
               </ToastProvider>
             </LibraryProvider>

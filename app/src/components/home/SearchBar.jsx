@@ -64,7 +64,7 @@ export default function SearchBar({ query, setQuery, onSubmitQuery, history, onR
           </div>
         )}
       </div>
-      <button type="button" className="btn random-btn" onClick={onRandom}>🎲 {t("randomGame", "Juego al azar")}</button>
+      <button type="button" className="btn random-btn" onClick={(e) => onRandom(e.currentTarget)}>🎲 {t("randomGame", "Juego al azar")}</button>
     </div>
   );
 }
