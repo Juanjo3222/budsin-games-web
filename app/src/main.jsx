@@ -13,6 +13,7 @@ import "./styles/layout.css";
 import "./styles/topbar.css";
 import "./styles/home.css";
 import "./styles/cards.css";
+import "./styles/console.css";
 import "./styles/shelves.css";
 import "./styles/articles.css";
 import "./styles/footer.css";

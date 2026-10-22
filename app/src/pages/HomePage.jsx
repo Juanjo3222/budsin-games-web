@@ -5,6 +5,7 @@ import MiniShelf from "../components/MiniShelf";
 import AdsSlot from "../components/AdsSlot";
 import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
+import ConsoleHome from "../components/console/ConsoleHome";
 import HeroSection from "../components/home/HeroSection";
 import SearchBar from "../components/home/SearchBar";
 import FilterBar from "../components/home/FilterBar";
@@ -14,6 +15,7 @@ import { useI18n } from "../context/I18nContext";
 import { useLibrary } from "../context/LibraryContext";
 import { useToast } from "../context/ToastContext";
 import { subscribePopularity } from "../lib/firebase";
+import { useLaunchGame } from "../hooks/useLaunchGame";
 import { playGame } from "../lib/play";
 import { readJson, writeJson } from "../lib/storage";
 
@@ -81,16 +83,25 @@ export default function HomePage() {
     });
   }, []);
 
-  const randomGame = () => {
-    playGame(GAMES[Math.floor(Math.random() * GAMES.length)], addRecent);
-  };
-
   const onPlay = useCallback((game) => playGame(game, addRecent), [addRecent]);
+  const launch = useLaunchGame(onPlay);
+
+  const randomGame = useCallback(() => {
+    launch(GAMES[Math.floor(Math.random() * GAMES.length)]);
+  }, [launch]);
 
   return (
     <div className="site-shell">
       <Topbar />
       <main className="page-main">
+        <ConsoleHome
+          popularity={popularity}
+          favorites={favorites}
+          recently={recently}
+          onLaunch={launch}
+          onRandom={randomGame}
+        />
+
         <HeroSection />
 
         <section className="search-section">
@@ -126,7 +137,7 @@ export default function HomePage() {
 
         <CollectionsPanel />
 
-        <section className="library-section">
+        <section className="library-section" id="library">
           {filtered.length === 0 ? (
             <div className="no-results">{t("noResults", "No encontramos juegos con ese filtro. Prueba otra búsqueda.")}</div>
           ) : (

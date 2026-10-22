@@ -2,17 +2,15 @@ import { useI18n } from "../context/I18nContext";
 import { usePro } from "../context/ProContext";
 import { useLibrary } from "../context/LibraryContext";
 import { useToast } from "../context/ToastContext";
-import { useGating } from "../context/GatingContext";
-import { incrementRemotePopularity } from "../lib/firebase";
 import { isReleased } from "../lib/format";
-import { cacheGameForOffline } from "../lib/sw";
+import { useLaunchGame } from "../hooks/useLaunchGame";
 
 export default function GameCard({ game, hits = 0, onPlay }) {
   const { lang, t } = useI18n();
   const { isPro } = usePro();
   const { toggleFavorite, isFavorite } = useLibrary();
   const { showToast } = useToast();
-  const { maybeGate } = useGating();
+  const launch = useLaunchGame(onPlay);
 
   const fav = isFavorite(game.href);
   const released = isReleased(game.proRelease);
@@ -32,18 +30,7 @@ export default function GameCard({ game, hits = 0, onPlay }) {
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (game.pro && !isPro && !released) {
-      incrementRemotePopularity(game.href, game.title, 1);
-      maybeGate(game);
-      return;
-    }
-    if (onPlay) {
-      onPlay(game);
-      return;
-    }
-    incrementRemotePopularity(game.href, game.title, 1);
-    if (isPro) cacheGameForOffline(game.href);
-    window.location.href = game.href;
+    launch(game);
   };
   return (
     <a
