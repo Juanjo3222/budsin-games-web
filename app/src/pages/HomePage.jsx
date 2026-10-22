@@ -3,7 +3,6 @@ import { GAMES } from "../data/games";
 import GameCard from "../components/GameCard";
 import MiniShelf from "../components/MiniShelf";
 import AdsSlot from "../components/AdsSlot";
-import ChangelogModal from "../components/ChangelogModal";
 import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
 import { useI18n } from "../context/I18nContext";
@@ -336,7 +335,6 @@ export default function HomePage() {
         </section>
       </main>
       <Footer />
-      <ChangelogModal />
     </div>
   );
 }
