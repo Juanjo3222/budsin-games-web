@@ -104,6 +104,8 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 
 Ports web de [wasm.rip](https://github.com/wasmdotrip/wasm.rip). Cada juego vive en `public/<nombre>/` y carga sus archivos desde el repositorio de su porter, por lo que dependen de que ese origen siga disponible.
 
+PEAK carga directamente desde jsDelivr (`wasmdotrip/Peak-Port`, fijado al commit `f1924c4`) con su propio cargador en `public/peak/index.html`; ya no depende de `truffled.lol`, que algunas redes bloquean.
+
 | Juego | Categoría | Port por |
 | ----- | --------- | -------- |
 | MiSide | Port | crackers |
