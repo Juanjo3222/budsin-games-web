@@ -38,6 +38,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             border-radius: 4px; padding: 6px 12px; cursor: pointer;
             font: 12px/1 system-ui, sans-serif; }
       #fs:hover { background: rgba(255,255,255,0.18); }
+      /* Budsin: la barra y el mensaje de carga flotan sobre la pantalla. En el flujo normal
+         iban bajo el lienzo (600 px) y, en ventanas más bajas que ~690 px, quedaban fuera
+         de la vista o la barra se encogía a 2 px. */
+      #bar, #msg { position: fixed; left: 50%; transform: translateX(-50%); z-index: 20; margin: 0; }
+      #bar { bottom: 52px; width: min(320px, 80vw); flex-shrink: 0; }
+      #msg { bottom: 18px; width: 90vw; }
     </style>
   </head>
   <body>
