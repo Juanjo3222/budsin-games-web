@@ -1406,5 +1406,863 @@ export const GAMES = [
     "pro": false,
     "proRelease": null,
     "isNew": true
+  },
+  {
+    "id": "miside/index.html",
+    "name": "miside",
+    "title": "MiSide",
+    "href": "miside/index.html",
+    "cover": "portadas/miside.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Aventura de terror psicológico con estética anime: descubre qué esconde el mundo que te rodea.",
+      "en": "Psychological horror adventure with an anime look: find out what the world around you is hiding.",
+      "pt": "Aventura de terror psicológico com visual anime: descubra o que o mundo ao seu redor esconde."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "baldis-basics-birthday-bash/index.html",
+    "name": "baldi's basics birthday bash",
+    "title": "Baldi's Basics Birthday Bash",
+    "href": "baldis-basics-birthday-bash/index.html",
+    "cover": "portadas/baldis-basics-birthday-bash.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Edición de cumpleaños de Baldi's Basics: sobrevive a la escuela más extraña con nuevos retos.",
+      "en": "The Baldi's Basics birthday edition: survive the strangest school with brand-new challenges.",
+      "pt": "Edição de aniversário de Baldi's Basics: sobreviva à escola mais estranha com novos desafios."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "boil-noodles-at-night/index.html",
+    "name": "boil noodles at night",
+    "title": "Boil Noodles at Night",
+    "href": "boil-noodles-at-night/index.html",
+    "cover": "portadas/boil-noodles-at-night.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego indie corto para jugar directo en el navegador.",
+      "en": "Short indie game you can play right in your browser.",
+      "pt": "Jogo indie curto para jogar direto no navegador."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "cheese-rolling/index.html",
+    "name": "cheese rolling",
+    "title": "Cheese Rolling",
+    "href": "cheese-rolling/index.html",
+    "cover": "portadas/cheese-rolling.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Lánzate colina abajo persiguiendo el queso en este caótico juego de físicas.",
+      "en": "Tumble down the hill chasing the cheese in this chaotic physics game.",
+      "pt": "Role colina abaixo atrás do queijo neste caótico jogo de física."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "brotato-paws-n-claws/index.html",
+    "name": "brotato paws n' claws",
+    "title": "Brotato Paws n' Claws",
+    "href": "brotato-paws-n-claws/index.html",
+    "cover": "portadas/brotato-paws-n-claws.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Sobrevive a oleadas de enemigos en este roguelike de arena donde juegas como una patata.",
+      "en": "Survive waves of enemies in this arena roguelite where you play as a potato.",
+      "pt": "Sobreviva a ondas de inimigos neste roguelite de arena em que você joga como uma batata."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "oneshot-world-machine-edition/index.html",
+    "name": "oneshot: world machine edition",
+    "title": "OneShot: World Machine Edition",
+    "href": "oneshot-world-machine-edition/index.html",
+    "cover": "portadas/oneshot-world-machine-edition.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Aventura de puzles: guía a Niko para devolver la luz a un mundo que se apaga.",
+      "en": "Puzzle adventure: guide Niko to bring light back to a dying world.",
+      "pt": "Aventura de quebra-cabeças: guie Niko para devolver a luz a um mundo que se apaga."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "helltaker/index.html",
+    "name": "helltaker",
+    "title": "Helltaker",
+    "href": "helltaker/index.html",
+    "cover": "portadas/helltaker.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Rompecabezas de movimientos por el infierno para reunir a las demonas más carismáticas.",
+      "en": "Move-based puzzles through hell to win over the most charismatic demon girls.",
+      "pt": "Quebra-cabeças de movimentos pelo inferno para conquistar as demônias mais carismáticas."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "stardew-valley/index.html",
+    "name": "stardew valley",
+    "title": "Stardew Valley",
+    "href": "stardew-valley/index.html",
+    "cover": "portadas/stardew-valley.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Hereda una granja, cultiva, pesca, explora minas y haz amigos en el pueblo.",
+      "en": "Inherit a farm, grow crops, fish, explore the mines and make friends in town.",
+      "pt": "Herde uma fazenda, plante, pesque, explore minas e faça amigos na cidade."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "dice-a-million/index.html",
+    "name": "dice a million",
+    "title": "Dice A Million",
+    "href": "dice-a-million/index.html",
+    "cover": "portadas/dice-a-million.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Tira dados, combina resultados y mejora tu mano hasta llegar al millón.",
+      "en": "Roll dice, combine results and upgrade your hand to reach a million.",
+      "pt": "Jogue dados, combine resultados e melhore sua mão até chegar a um milhão."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "the-man-from-the-window-2/index.html",
+    "name": "the man from the window 2",
+    "title": "The Man From The Window 2",
+    "href": "the-man-from-the-window-2/index.html",
+    "cover": "portadas/the-man-from-the-window-2.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego de terror: sobrevive a la noche mientras algo te observa desde la ventana.",
+      "en": "Horror game: survive the night while something watches you from the window.",
+      "pt": "Jogo de terror: sobreviva à noite enquanto algo observa você da janela."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "fez/index.html",
+    "name": "fez",
+    "title": "Fez",
+    "href": "fez/index.html",
+    "cover": "portadas/fez.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Plataformas en 2D con un giro: rota el mundo en 3D para descubrir nuevos caminos.",
+      "en": "A 2D platformer with a twist: rotate the world in 3D to uncover new paths.",
+      "pt": "Plataforma 2D com uma reviravolta: gire o mundo em 3D para descobrir novos caminhos."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "beatblock/index.html",
+    "name": "beatblock",
+    "title": "Beatblock",
+    "href": "beatblock/index.html",
+    "cover": "portadas/beatblock.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego de ritmo: sigue la música y golpea cada compás en el momento justo.",
+      "en": "Rhythm game: follow the music and hit every beat at just the right time.",
+      "pt": "Jogo de ritmo: siga a música e acerte cada batida no momento certo."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "azahar/index.html",
+    "name": "azahar",
+    "title": "Azahar",
+    "href": "azahar/index.html",
+    "cover": "portadas/azahar.webp",
+    "type": "tools",
+    "category": {
+      "es": "Herramientas",
+      "en": "Tools",
+      "pt": "Ferramentas"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Emulador de Nintendo 3DS en el navegador: carga tus propios juegos para jugarlos aquí.",
+      "en": "Nintendo 3DS emulator in your browser: load your own games to play them here.",
+      "pt": "Emulador de Nintendo 3DS no navegador: carregue seus próprios jogos para jogá-los aqui."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "happy-room/index.html",
+    "name": "happy room",
+    "title": "Happy Room",
+    "href": "happy-room/index.html",
+    "cover": "portadas/happy-room.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Prueba armas y trampas con un muñeco en este sandbox de físicas.",
+      "en": "Test weapons and traps on a dummy in this physics sandbox.",
+      "pt": "Teste armas e armadilhas em um boneco neste sandbox de física."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "inscryption/index.html",
+    "name": "inscryption",
+    "title": "Inscryption",
+    "href": "inscryption/index.html",
+    "cover": "portadas/inscryption.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego de cartas de terror: construye tu mazo y escapa de la cabaña.",
+      "en": "Horror card game: build your deck and escape the cabin.",
+      "pt": "Jogo de cartas de terror: monte seu baralho e escape da cabana."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "lobotomy-corporation/index.html",
+    "name": "lobotomy corporation",
+    "title": "Lobotomy Corporation",
+    "href": "lobotomy-corporation/index.html",
+    "cover": "portadas/lobotomy-corporation.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Gestiona una instalación que contiene criaturas peligrosas y mantén todo bajo control.",
+      "en": "Run a facility that contains dangerous creatures and keep everything under control.",
+      "pt": "Gerencie uma instalação que contém criaturas perigosas e mantenha tudo sob controle."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "ages-of-conflict/index.html",
+    "name": "ages of conflict",
+    "title": "Ages of Conflict",
+    "href": "ages-of-conflict/index.html",
+    "cover": "portadas/ages-of-conflict.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Simulador de guerra mundial: elige un país, conquista territorios y reescribe la historia.",
+      "en": "World war simulator: pick a country, conquer territory and rewrite history.",
+      "pt": "Simulador de guerra mundial: escolha um país, conquiste territórios e reescreva a história."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "while-true-learn/index.html",
+    "name": "while true: learn()",
+    "title": "While True: Learn()",
+    "href": "while-true-learn/index.html",
+    "cover": "portadas/while-true-learn.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego de puzles sobre programación y aprendizaje automático.",
+      "en": "A puzzle game about programming and machine learning.",
+      "pt": "Um jogo de quebra-cabeças sobre programação e aprendizado de máquina."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "granny-3/index.html",
+    "name": "granny 3",
+    "title": "Granny 3",
+    "href": "granny-3/index.html",
+    "cover": "portadas/granny-3.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Terror de escape: encuentra la salida sin hacer ruido antes de que te atrapen.",
+      "en": "Escape horror: find the exit quietly before you get caught.",
+      "pt": "Terror de fuga: encontre a saída em silêncio antes de ser pego."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "gta-3/index.html",
+    "name": "gta 3",
+    "title": "GTA 3",
+    "href": "gta-3/index.html",
+    "cover": "portadas/gta-3.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Acción en mundo abierto por las calles de Liberty City, directo en el navegador.",
+      "en": "Open-world action through the streets of Liberty City, right in your browser.",
+      "pt": "Ação em mundo aberto pelas ruas de Liberty City, direto no navegador."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "clustertruck/index.html",
+    "name": "clustertruck",
+    "title": "ClusterTruck",
+    "href": "clustertruck/index.html",
+    "cover": "portadas/clustertruck.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Salta de camión en camión en movimiento y no toques el suelo.",
+      "en": "Hop from one moving truck to the next and never touch the ground.",
+      "pt": "Pule de caminhão em caminhão em movimento e não toque o chão."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "how-to-fish/index.html",
+    "name": "how to fish",
+    "title": "How To Fish",
+    "href": "how-to-fish/index.html",
+    "cover": "portadas/how-to-fish.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego de pesca para relajarte: lanza la caña y prueba suerte.",
+      "en": "A relaxing fishing game: cast your line and try your luck.",
+      "pt": "Um jogo de pesca relaxante: lance a vara e tente a sorte."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "global-strike/index.html",
+    "name": "global strike (cs 1.6)",
+    "title": "Global Strike (CS 1.6)",
+    "href": "global-strike/index.html",
+    "cover": "portadas/global-strike.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Shooter táctico por equipos inspirado en Counter-Strike 1.6.",
+      "en": "Team-based tactical shooter inspired by Counter-Strike 1.6.",
+      "pt": "Shooter tático por equipes inspirado em Counter-Strike 1.6."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "crashout-crew/index.html",
+    "name": "crashout crew",
+    "title": "Crashout Crew",
+    "href": "crashout-crew/index.html",
+    "cover": "portadas/crashout-crew.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego colorido y caótico para jugar directo en el navegador.",
+      "en": "A colorful, chaotic game you can play right in your browser.",
+      "pt": "Um jogo colorido e caótico para jogar direto no navegador."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "rimworld/index.html",
+    "name": "rimworld",
+    "title": "RimWorld",
+    "href": "rimworld/index.html",
+    "cover": "portadas/rimworld.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Simulador de colonia: dirige a los supervivientes de un planeta lejano.",
+      "en": "Colony sim: lead the survivors of a distant planet.",
+      "pt": "Simulador de colônia: lidere os sobreviventes de um planeta distante."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "the-message-from-deep-space/index.html",
+    "name": "the message from deep space",
+    "title": "The Message From Deep Space",
+    "href": "the-message-from-deep-space/index.html",
+    "cover": "portadas/the-message-from-deep-space.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego indie espacial para jugar directo en el navegador.",
+      "en": "An indie space game you can play right in your browser.",
+      "pt": "Um jogo indie espacial para jogar direto no navegador."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "dude-stop/index.html",
+    "name": "dude, stop",
+    "title": "Dude, Stop",
+    "href": "dude-stop/index.html",
+    "cover": "portadas/dude-stop.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego indie rápido para jugar directo en el navegador.",
+      "en": "A quick indie game you can play right in your browser.",
+      "pt": "Um jogo indie rápido para jogar direto no navegador."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "hill-climb-racing/index.html",
+    "name": "hill climb racing",
+    "title": "Hill Climb Racing",
+    "href": "hill-climb-racing/index.html",
+    "cover": "portadas/hill-climb-racing.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Conduce por colinas imposibles, recoge monedas y no te quedes sin gasolina.",
+      "en": "Drive over impossible hills, collect coins and don't run out of fuel.",
+      "pt": "Dirija por colinas impossíveis, colete moedas e não fique sem combustível."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "toasterball/index.html",
+    "name": "toasterball",
+    "title": "Toasterball",
+    "href": "toasterball/index.html",
+    "cover": "portadas/toasterball.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego arcade para jugar directo en el navegador.",
+      "en": "An arcade game you can play right in your browser.",
+      "pt": "Um jogo de arcade para jogar direto no navegador."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "superflight/index.html",
+    "name": "superflight",
+    "title": "Superflight",
+    "href": "superflight/index.html",
+    "cover": "portadas/superflight.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Planea con tu traje aéreo entre cañones y montañas sin chocar.",
+      "en": "Glide in your wingsuit through canyons and mountains without crashing.",
+      "pt": "Plane com seu traje aéreo entre cânions e montanhas sem bater."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "keep-talking-and-nobody-explodes/index.html",
+    "name": "keep talking and nobody explodes",
+    "title": "Keep Talking And Nobody Explodes",
+    "href": "keep-talking-and-nobody-explodes/index.html",
+    "cover": "portadas/keep-talking-and-nobody-explodes.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Desactiva la bomba en equipo: uno ve la bomba y los demás tienen el manual.",
+      "en": "Defuse the bomb as a team: one player sees the bomb and the others have the manual.",
+      "pt": "Desarme a bomba em equipe: um jogador vê a bomba e os outros têm o manual."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "peak/index.html",
+    "name": "peak",
+    "title": "PEAK",
+    "href": "peak/index.html",
+    "cover": "portadas/peak.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego cooperativo de escalada: sube la montaña con tus amigos sin caer.",
+      "en": "Co-op climbing game: scale the mountain with your friends without falling.",
+      "pt": "Jogo cooperativo de escalada: suba a montanha com seus amigos sem cair."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "horsey-game/index.html",
+    "name": "horsey game",
+    "title": "Horsey Game",
+    "href": "horsey-game/index.html",
+    "cover": "portadas/horsey-game.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Juego de caballos para jugar directo en el navegador.",
+      "en": "A horse game you can play right in your browser.",
+      "pt": "Um jogo de cavalos para jogar direto no navegador."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
   }
 ];

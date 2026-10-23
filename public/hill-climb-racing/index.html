@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+<!-- End Google Tag Manager -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Loader</title>
+  <style>
+    :root { color-scheme: dark; --bg: #07080a; --ink: #e8ecf1; --dim: #8b95a3; --accent: #f2c14e; }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+    #game { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; }
+    #loading { position: fixed; inset: 0; display: grid; place-items: center; background: #000; }
+    #loading.done { display: none; }
+    .card { width: min(380px, calc(100vw - 48px)); font: 13px ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+    #load-times { display: grid; gap: 20px; }
+    .row { display: flex; justify-content: space-between; gap: 18px; margin-bottom: 7px; }
+    .row span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .row span:last-child { flex: none; color: var(--dim); }
+    .loading-track { height: 5px; overflow: hidden; background: #252525; border-radius: 3px; }
+    .loading-fill { height: 100%; width: 0; background: var(--accent); border-radius: inherit; }
+    #detail { display: none; margin: 18px 0 0; color: var(--dim); }
+  </style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <iframe id="game" title="Hill Climb Racing" allow="autoplay; fullscreen"></iframe>
+  <main id="loading" aria-live="polite">
+    <div class="card">
+      <div id="load-times">
+        <div><div class="row"><span id="wasm-file">WASM</span><span id="wasm-percent">0%</span></div><div class="loading-track" id="wasm-progress" role="progressbar" aria-label="WASM download" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="loading-fill" id="wasm-fill"></div></div></div>
+        <div><div class="row"><span id="data-file">Data</span><span id="data-percent">0%</span></div><div class="loading-track" id="data-progress" role="progressbar" aria-label="Data download" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="loading-fill" id="data-fill"></div></div></div>
+        <div><div class="row"><span id="bin-file">BIN</span><span id="bin-percent">0%</span></div><div class="loading-track" id="bin-progress" role="progressbar" aria-label="BIN download" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="loading-fill" id="bin-fill"></div></div></div>
+      </div>
+      <p id="detail"></p>
+    </div>
+  </main>
+  <script>
+    (() => {
+      const BASE = 'https://cdn.jsdelivr.net/gh/NotRexed/HillClimbRacingPort@7467bb544dff9871a1a6dfd15407ecd48bd06bb9/';
+      const parts = {
+        'hcr.wasm': [15221492, 15221492, 15221492, 15221489],
+        'hcr.data': [17201818, 17201818, 17201818, 17201818, 17201818, 17201817],
+        'image.bin': [11042816, 11042816]
+      };
+      const bars = { 'hcr.wasm': 'wasm', 'hcr.data': 'data', 'image.bin': 'bin' };
+      const $ = id => document.getElementById(id);
+
+      function show(asset, file, loaded, total) {
+        const id = bars[asset];
+        const percent = Math.min(100, Math.floor(loaded / total * 100));
+        $(id + '-file').textContent = file;
+        $(id + '-percent').textContent = percent + '%';
+        $(id + '-progress').setAttribute('aria-valuenow', percent);
+        $(id + '-fill').style.width = percent + '%';
+      }
+
+      async function download(name, expectedSize, onChunk) {
+        const response = await fetch(BASE + name);
+        if (!response.ok) throw new Error(`${name}: HTTP ${response.status}`);
+        if (!response.body) throw new Error(`${name}: streaming download is unavailable`);
+        const reader = response.body.getReader();
+        let size = 0;
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          if (expectedSize !== null && size + value.length > expectedSize) throw new Error(`${name}: file is larger than expected`);
+          onChunk(value, size);
+          size += value.length;
+        }
+        if (expectedSize !== null && size !== expectedSize) throw new Error(`${name}: expected ${expectedSize} bytes, received ${size}`);
+      }
+
+      async function downloadText(name) {
+        const decoder = new TextDecoder();
+        let text = '';
+        await download(name, null, chunk => { text += decoder.decode(chunk, { stream: true }); });
+        return text + decoder.decode();
+      }
+
+      async function downloadAsset(name) {
+        const sizes = parts[name];
+        const total = sizes.reduce((a, n) => a + n, 0);
+        const bytes = new Uint8Array(total);
+        let offset = 0;
+        for (let i = 0; i < sizes.length; i++) {
+          const file = `${name}.part${i + 1}`;
+          show(name, file, offset, total);
+          await download(file, sizes[i], (chunk, partOffset) => {
+            bytes.set(chunk, offset + partOffset);
+            show(name, file, offset + partOffset + chunk.length, total);
+          });
+          offset += sizes[i];
+        }
+        show(name, name, total, total);
+        return new Blob([bytes], { type: name === 'hcr.wasm' ? 'application/wasm' : 'application/octet-stream' });
+      }
+
+      function installBridge() {
+        const assets = parent.__hcrLoaderAssets;
+        const originalFetch = window.fetch.bind(window);
+        window.fetch = (input, options) => {
+          const url = input instanceof Request ? input.url : String(input);
+          const name = new URL(url, document.baseURI).pathname.split('/').pop();
+          const blob = assets[name];
+          if (!blob) return originalFetch(input, options);
+          const headers = new Headers(options && options.headers || (input instanceof Request ? input.headers : undefined));
+          const range = /^bytes=(\d+)-(\d*)$/.exec(headers.get('Range') || '');
+          if (range) {
+            const start = Number(range[1]);
+            const end = range[2] ? Math.min(Number(range[2]), blob.size - 1) : blob.size - 1;
+            if (start >= blob.size || end < start) return Promise.resolve(new Response(null, { status: 416, headers: { 'Content-Range': `bytes */${blob.size}` } }));
+            const slice = blob.slice(start, end + 1);
+            return Promise.resolve(new Response(slice, { status: 206, headers: {
+              'Content-Type': blob.type, 'Content-Length': String(slice.size),
+              'Content-Range': `bytes ${start}-${end}/${blob.size}`, 'Accept-Ranges': 'bytes'
+            } }));
+          }
+          return Promise.resolve(new Response(blob, { status: 200, headers: {
+            'Content-Type': blob.type, 'Content-Length': String(blob.size), 'Accept-Ranges': 'bytes'
+          } }));
+        };
+      }
+
+      async function start() {
+        try {
+          if (!('Suspending' in WebAssembly)) throw new Error('This game requires Chrome or Edge 137 or newer.');
+          const [html, script, wasm, data, image] = await Promise.all([
+            downloadText('index.html'), downloadText('hcr.js'),
+            downloadAsset('hcr.wasm'), downloadAsset('hcr.data'), downloadAsset('image.bin')
+          ]);
+          const assets = { 'hcr.wasm': wasm, 'hcr.data': data, 'image.bin': image };
+          const scriptTag = /<script\s+src=["']hcr\.js["']\s*><\/script>/;
+          if (!scriptTag.test(html)) throw new Error('The game page no longer has the expected hcr.js script tag.');
+          parent.__hcrLoaderAssets = assets;
+          const scriptUrl = URL.createObjectURL(new Blob([script], { type: 'application/javascript' }));
+          const bridgeTag = '<script>(' + installBridge.toString() + ')();</' + 'script>';
+          const replacement = bridgeTag + '<script src="' + scriptUrl + '"></' + 'script>';
+          const page = html.replace(scriptTag, replacement)
+            .replace('</head>', '<style>#load-times{display:none!important}</style></head>');
+          $('game').addEventListener('load', () => $('loading').classList.add('done'), { once: true });
+          $('game').srcdoc = page;
+        } catch (error) {
+          console.error(error);
+          $('detail').textContent = 'Loading failed: ' + (error.message || String(error));
+          $('detail').style.display = 'block';
+        }
+      }
+
+      start();
+    })();
+  </script>
+<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+</body>
+</html>

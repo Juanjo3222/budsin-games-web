@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+<!-- End Google Tag Manager -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Global Strike</title>
+    <script type="module" crossorigin src="./assets/index-ZCNf7X22.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-LavI3l2E.css">
+  </head>
+  <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+    <canvas id="canvas"></canvas>
+
+    <div id="launcher">
+      <main class="panel">
+        <h1>Global Strike</h1>
+
+        <h2>Choose a server</h2>
+        <ul id="server-list" class="servers"></ul>
+        <button id="add-toggle" class="link" type="button">+ Add custom server</button>
+        <div id="add-form" class="add-form" hidden>
+          <input id="add-name" class="cs-input" type="text" maxlength="30" placeholder="Server name" autocomplete="off" />
+          <input id="add-address" class="cs-input" type="text" placeholder="/cs16/myserver/websocket or host:port" autocomplete="off" spellcheck="false" />
+          <div class="add-actions">
+            <button id="add-save" class="cs-btn" type="button">Add</button>
+            <button id="add-cancel" class="link" type="button">Cancel</button>
+          </div>
+          <p id="add-error" class="error" hidden></p>
+        </div>
+
+        <h2>Your name</h2>
+        <input
+          id="player-name"
+          class="cs-input"
+          type="text"
+          maxlength="18"
+          placeholder="4-18 characters"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <p id="name-error" class="error" hidden></p>
+
+        <details id="options">
+          <summary>Options</summary>
+          <div id="option-list" class="options"></div>
+        </details>
+
+        <hr class="cs-hr" />
+        <button id="play" class="cs-btn play" type="button" disabled>Play</button>
+        <p id="status" class="status"></p>
+      </main>
+    </div>
+
+    <div id="boot" hidden>
+      <p id="boot-status">Starting&hellip;</p>
+      <div class="cs-progress-bar">
+        <div class="bars"></div>
+        <div id="boot-cover" class="cover"></div>
+      </div>
+    </div>
+
+  <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+</body>
+</html>

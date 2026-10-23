@@ -2,9 +2,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
-  <img src="https://img.shields.io/badge/Games-54-blue" />
+  <img src="https://img.shields.io/badge/Games-87-blue" />
   <img src="https://img.shields.io/badge/Frontend-React-orange" />
-  <img src="https://img.shields.io/badge/Version-7.0-purple" />
+  <img src="https://img.shields.io/badge/Version-7.1-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -29,7 +29,7 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 
 ## ✨ Features
 
-* 🎮 **50+ juegos jugables al instante**
+* 🎮 **80+ juegos jugables al instante**
 * ⚡ **Sin descargas ni instalación**
 * ⭐ **Budsin Pro**: suscripción manual con Firebase Auth (Google Sign-In). Sin anuncios, badge Pro y panel admin en `/admin.html`.
 * 🧩 **UI tipo consola (portadas interactivas)**
@@ -97,6 +97,48 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 | RubDy                          | Clásicos    |
 | Soundboard                     | Clásicos    |
 | Budsin AI                      | Clásicos    |
+
+---
+
+## 🆕 Ports añadidos desde wasm.rip (33 juegos)
+
+Ports web de [wasm.rip](https://github.com/wasmdotrip/wasm.rip). Cada juego vive en `public/<nombre>/` y carga sus archivos desde el repositorio de su porter, por lo que dependen de que ese origen siga disponible.
+
+| Juego | Categoría | Port por |
+| ----- | --------- | -------- |
+| MiSide | Port | crackers |
+| Baldi's Basics Birthday Bash | Port | crackers |
+| Boil Noodles at Night | Port | sexyplankton |
+| Cheese Rolling | Acción | sexyplankton |
+| Brotato Paws n' Claws | Acción | dude |
+| OneShot: World Machine Edition | Port | shayder |
+| Helltaker | Port | shxyder |
+| Stardew Valley | Port | cirsius |
+| Dice A Million | Port | NotRexed |
+| The Man From The Window 2 | Port | dude |
+| Fez | Port | gurtmuncher |
+| Beatblock | Port | sunsuke |
+| Azahar | Herramientas | sexyplankton |
+| Happy Room | Port | gurtmuncher |
+| Inscryption | Port | reeyuki |
+| Lobotomy Corporation | Port | reeyuki |
+| Ages of Conflict | Port | sexyplankton |
+| While True: Learn() | Port | dasher |
+| Granny 3 | Port | crax |
+| GTA 3 | Port | shxyder |
+| ClusterTruck | Acción | NotRexed |
+| How To Fish | Port | NotRexed |
+| Global Strike (CS 1.6) | Acción | crackers |
+| Crashout Crew | Acción | x8r |
+| RimWorld | Port | sexyplankton |
+| The Message From Deep Space | Port | dasher |
+| Dude, Stop | Acción | dasher |
+| Hill Climb Racing | Acción | NotRexed |
+| Toasterball | Acción | dasher |
+| Superflight | Acción | zay |
+| Keep Talking And Nobody Explodes | Port | zay |
+| PEAK | Port | dasher |
+| Horsey Game | Port | crackers |
 
 ---
 
@@ -193,6 +235,10 @@ Firebase se usa únicamente para el conteo de popularidad.
 ---
 
 ## 📝 Changelog
+
+### v7.1
+* **33 juegos nuevos** (ports de [wasm.rip](https://github.com/wasmdotrip/wasm.rip)): MiSide, Stardew Valley, Fez, Inscryption, RimWorld, PEAK, Superflight, Hill Climb Racing, Keep Talking And Nobody Explodes y más. Ver la tabla de ports más arriba.
+* Cada página incluye favicon, Google Tag Manager, AdSense y Classroom Hotkey, y todas las portadas están en `public/portadas/`.
 
 ### v7.0
 * Nuevo diseño **glassmorphism** construido con **React**: más rápido, limpio y totalmente responsive.
