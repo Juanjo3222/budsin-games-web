@@ -31,17 +31,19 @@ jobs:
           if [ "$old_sha" = "$new_sha" ]; then
             echo "No source changes to deploy"
           else
-            changed=$(git diff-tree --no-commit-id --name-status -r "$old_sha" "$new_sha" -- public/ 2>/dev/null || true)
-            if [ -z "$old_sha" ] || [ -z "$changed" ]; then
-              git archive "$new_sha" public | tar -x -C /tmp
-              sudo rsync -a --delete /tmp/public/ "$target/"
-              rm -rf /tmp/public
+            if [ -z "$old_sha" ]; then
+              rm -rf /tmp/deploy-full
+              mkdir -p /tmp/deploy-full
+              git archive "$new_sha" public | tar -x -C /tmp/deploy-full
+              sudo rsync -a --delete /tmp/deploy-full/public/ "$target/"
+              rm -rf /tmp/deploy-full
             else
+              changed=$(git diff-tree --no-commit-id --name-status -r "$old_sha" "$new_sha" -- public/)
               while IFS=$'\t' read -r status path extra; do
                 [ -n "$path" ] || continue
                 case "$status" in
-                  D) sudo rm -f "$target/${path#public/}" ;;
-                  *) mkdir -p "/tmp/deploy/$(dirname "${path#public/}")"; git archive "$new_sha" "$path" | tar -x -C /tmp/deploy; sudo rsync -a "/tmp/deploy/$path" "$target/$(dirname "${path#public/}")/" ;;
+                  D) sudo rm -rf "$target/${path#public/}" ;;
+                  *) rm -rf /tmp/deploy; mkdir -p /tmp/deploy; git archive "$new_sha" "$path" | tar -x -C /tmp/deploy; sudo rsync -a "/tmp/deploy/$path" "$target/$(dirname "${path#public/}")/" ;;
                 esac
               done <<< "$changed"
               rm -rf /tmp/deploy
