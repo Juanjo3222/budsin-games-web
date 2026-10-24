@@ -38,22 +38,10 @@ jobs:
               sudo rsync -a --delete public/ "$target/"
               rm -rf /tmp/deploy-full
             else
-              changed=$(git diff-tree --no-commit-id --name-status -r "$old_sha" "$new_sha" -- public/)
-              while IFS=$'\t' read -r status path extra; do
-                status=${status:-}
-                path=${path:-}
-                extra=${extra:-}
+              while IFS= read -r -d '' status && IFS= read -r -d '' path; do
                 [ -n "$path" ] || continue
                 case "$status" in
                   D) sudo rm -rf "$target/${path#public/}" ;;
-                  R*)
-                    [ -n "$extra" ] && sudo rm -rf "$target/${path#public/}"
-                    path="$extra"
-                    mkdir -p "/tmp/deploy/$(dirname "${path#public/}")"
-                    git show "$new_sha:$path" > "/tmp/deploy/$path"
-                    sudo rsync -a "/tmp/deploy/$path" "$target/$(dirname "${path#public/}")/"
-                    rm -rf /tmp/deploy
-                    ;;
                   *)
                     mkdir -p "/tmp/deploy/$(dirname "${path#public/}")"
                     git show "$new_sha:$path" > "/tmp/deploy/$path"
@@ -61,7 +49,7 @@ jobs:
                     rm -rf /tmp/deploy
                     ;;
                 esac
-              done <<< "$changed"
+              done < <(git diff-tree --no-commit-id --name-status -r -z "$old_sha" "$new_sha" -- public/)
               rm -rf /tmp/deploy
             fi
           fi
