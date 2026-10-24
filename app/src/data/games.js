@@ -2269,7 +2269,7 @@ export const GAMES = [
     "id": "gta-5/index.html",
     "name": "gta 5",
     "title": "GTA V",
-    "href": "gta-5/index.html",
+    "href": "gta-5/",
     "cover": "portadas/gta-5.png?v=4",
     "type": "port",
     "category": {
