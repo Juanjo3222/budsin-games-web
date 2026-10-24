@@ -24,9 +24,8 @@ jobs:
           fi
           cd "$deploy_dir"
           git fetch --filter=blob:none origin main
-          old_sha=$(git rev-parse HEAD 2>/dev/null || true)
-          git reset --mixed origin/main
-          new_sha=$(git rev-parse HEAD)
+          new_sha=$(git rev-parse origin/main)
+          old_sha=$(cat .deploy-sha 2>/dev/null || git rev-parse HEAD 2>/dev/null || true)
           if [ "$old_sha" = "$new_sha" ]; then
             echo "No source changes to deploy"
           else
@@ -67,3 +66,4 @@ jobs:
             fi
           fi
           sudo systemctl reload caddy
+          printf '%s\n' "$new_sha" > .deploy-sha
