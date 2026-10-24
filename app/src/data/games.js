@@ -2264,5 +2264,31 @@ export const GAMES = [
     "pro": false,
     "proRelease": null,
     "isNew": true
+  },
+  {
+    "id": "gta-5/index.html",
+    "name": "gta 5",
+    "title": "GTA V",
+    "href": "gta-5/index.html",
+    "cover": "https://gta5-87g.pages.dev/b/8b0b5899ed/title/logo.png",
+    "type": "port",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "La edición web de Grand Theft Auto V, jugable con WebGPU.",
+      "en": "The web edition of Grand Theft Auto V, playable with WebGPU.",
+      "pt": "A edição web de Grand Theft Auto V, jogável com WebGPU."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
   }
 ];
