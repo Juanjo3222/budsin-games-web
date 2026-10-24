@@ -26,7 +26,7 @@ jobs:
           cd "$deploy_dir"
           git fetch --filter=blob:none origin main
           old_sha=$(git rev-parse HEAD 2>/dev/null || true)
-          git reset --hard origin/main
+          git reset --mixed origin/main
           new_sha=$(git rev-parse HEAD)
           if [ "$old_sha" = "$new_sha" ]; then
             echo "No source changes to deploy"
