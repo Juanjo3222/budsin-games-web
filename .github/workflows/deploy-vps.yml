@@ -41,6 +41,9 @@ jobs:
             else
               changed=$(git diff-tree --no-commit-id --name-status -r "$old_sha" "$new_sha" -- public/)
               while IFS=$'\t' read -r status path extra; do
+                status=${status:-}
+                path=${path:-}
+                extra=${extra:-}
                 [ -n "$path" ] || continue
                 case "$status" in
                   D) sudo rm -rf "$target/${path#public/}" ;;
