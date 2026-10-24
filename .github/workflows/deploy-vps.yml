@@ -31,10 +31,12 @@ jobs:
             echo "No source changes to deploy"
           else
             if [ -z "$old_sha" ]; then
+              echo "Initial deployment requires a complete public tree"
               rm -rf /tmp/deploy-full
               mkdir -p /tmp/deploy-full
-              git archive "$new_sha" public | tar -x -C /tmp/deploy-full
-              sudo rsync -a --delete /tmp/deploy-full/public/ "$target/"
+              git sparse-checkout set public
+              git read-tree -mu "$new_sha"
+              sudo rsync -a --delete public/ "$target/"
               rm -rf /tmp/deploy-full
             else
               changed=$(git diff-tree --no-commit-id --name-status -r "$old_sha" "$new_sha" -- public/)
@@ -42,7 +44,20 @@ jobs:
                 [ -n "$path" ] || continue
                 case "$status" in
                   D) sudo rm -rf "$target/${path#public/}" ;;
-                  *) rm -rf /tmp/deploy; mkdir -p /tmp/deploy; git archive "$new_sha" "$path" | tar -x -C /tmp/deploy; sudo rsync -a "/tmp/deploy/$path" "$target/$(dirname "${path#public/}")/" ;;
+                  R*)
+                    [ -n "$extra" ] && sudo rm -rf "$target/${path#public/}"
+                    path="$extra"
+                    mkdir -p "/tmp/deploy/$(dirname "${path#public/}")"
+                    git show "$new_sha:$path" > "/tmp/deploy/$path"
+                    sudo rsync -a "/tmp/deploy/$path" "$target/$(dirname "${path#public/}")/"
+                    rm -rf /tmp/deploy
+                    ;;
+                  *)
+                    mkdir -p "/tmp/deploy/$(dirname "${path#public/}")"
+                    git show "$new_sha:$path" > "/tmp/deploy/$path"
+                    sudo rsync -a "/tmp/deploy/$path" "$target/$(dirname "${path#public/}")/"
+                    rm -rf /tmp/deploy
+                    ;;
                 esac
               done <<< "$changed"
               rm -rf /tmp/deploy
