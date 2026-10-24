@@ -16,11 +16,10 @@ jobs:
       - name: Deploy public files locally
         run: |
           set -eu
-          deploy_dir=/opt/budsin-deploy
+          deploy_dir=/home/github-runner/budsin-deploy
           target=/var/www/budsin-games-web/public
           if [ ! -d "$deploy_dir/.git" ]; then
-            sudo mkdir -p "$deploy_dir"
-            sudo chown "$(id -u):$(id -g)" "$deploy_dir"
+            mkdir -p "$deploy_dir"
             git clone --filter=blob:none --no-checkout "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$deploy_dir"
           fi
           cd "$deploy_dir"
