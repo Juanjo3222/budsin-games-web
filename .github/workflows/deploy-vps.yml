@@ -20,3 +20,8 @@ jobs:
         run: |
           sudo rsync -a --delete public/ /var/www/budsin-games-web/public/
           sudo systemctl reload caddy
+
+      - name: Clean runner workspace
+        if: always()
+        run: |
+          rm -rf "$GITHUB_WORKSPACE"/* "$GITHUB_WORKSPACE"/.[!.]* "$GITHUB_WORKSPACE"/..?* || true
