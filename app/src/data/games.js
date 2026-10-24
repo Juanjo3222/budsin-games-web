@@ -2270,7 +2270,7 @@ export const GAMES = [
     "name": "gta 5",
     "title": "GTA V",
     "href": "gta-5/index.html",
-    "cover": "https://gta5-87g.pages.dev/b/8b0b5899ed/title/logo.png",
+    "cover": "portadas/gta-5.png",
     "type": "port",
     "category": {
       "es": "Acción",

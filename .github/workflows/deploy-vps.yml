@@ -13,15 +13,38 @@ jobs:
   deploy:
     runs-on: [self-hosted, linux, x64, budsin-vps]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Deploy public files locally
         run: |
-          sudo rsync -a --delete public/ /var/www/budsin-games-web/public/
+          set -eu
+          deploy_dir=/opt/budsin-deploy
+          target=/var/www/budsin-games-web/public
+          if [ ! -d "$deploy_dir/.git" ]; then
+            sudo mkdir -p "$deploy_dir"
+            sudo chown "$(id -u):$(id -g)" "$deploy_dir"
+            git clone --filter=blob:none --no-checkout "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$deploy_dir"
+          fi
+          cd "$deploy_dir"
+          git fetch --filter=blob:none origin main
+          old_sha=$(git rev-parse HEAD 2>/dev/null || true)
+          git reset --hard origin/main
+          new_sha=$(git rev-parse HEAD)
+          if [ "$old_sha" = "$new_sha" ]; then
+            echo "No source changes to deploy"
+          else
+            changed=$(git diff-tree --no-commit-id --name-status -r "$old_sha" "$new_sha" -- public/ 2>/dev/null || true)
+            if [ -z "$old_sha" ] || [ -z "$changed" ]; then
+              git archive "$new_sha" public | tar -x -C /tmp
+              sudo rsync -a --delete /tmp/public/ "$target/"
+              rm -rf /tmp/public
+            else
+              while IFS=$'\t' read -r status path extra; do
+                [ -n "$path" ] || continue
+                case "$status" in
+                  D) sudo rm -f "$target/${path#public/}" ;;
+                  *) mkdir -p "/tmp/deploy/$(dirname "${path#public/}")"; git archive "$new_sha" "$path" | tar -x -C /tmp/deploy; sudo rsync -a "/tmp/deploy/$path" "$target/$(dirname "${path#public/}")/" ;;
+                esac
+              done <<< "$changed"
+              rm -rf /tmp/deploy
+            fi
+          fi
           sudo systemctl reload caddy
-
-      - name: Clean runner workspace
-        if: always()
-        run: |
-          rm -rf "$GITHUB_WORKSPACE"/* "$GITHUB_WORKSPACE"/.[!.]* "$GITHUB_WORKSPACE"/..?* || true
