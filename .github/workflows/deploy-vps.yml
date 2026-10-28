@@ -38,10 +38,16 @@ jobs:
               sudo rsync -a --delete public/ "$target/"
               rm -rf /tmp/deploy-full
             else
-              # El runner solo tiene sudo sin contraseña para rsync, rm y systemctl: se prepara todo en un
-              # directorio temporal (sin sudo, con la estructura de public/) y se copia con un único rsync.
+              # Sin sudo: el único sudo que el runner tiene permitido (comprobado en los logs) es
+              # `rsync -a --delete public/ <destino>` y `systemctl reload caddy`. El destino ya es del usuario del
+              # runner (lo dejó así ese rsync -a), así que se escribe directamente. Si no fuera así, se avisa claro.
+              if [ ! -w "$target" ]; then
+                echo "::error::El usuario del runner no puede escribir en $target. Ejecuta una vez en el VPS: sudo chown -R $(id -un): $target"
+                exit 1
+              fi
+              # Se prepara en un directorio temporal con la estructura de public/ y se copia con un único rsync.
               # -z: nombres separados por NUL, así los archivos con acentos o espacios no llegan entrecomillados.
-              # --chmod fija 755/644 y sin -p ni -o la carpeta raíz del destino conserva sus permisos.
+              # --chmod fija 755/644 y sin -p la carpeta raíz del destino conserva sus permisos.
               stage=$(mktemp -d)
               while IFS= read -r -d '' path; do
                 rel="${path#public/}"
@@ -49,10 +55,10 @@ jobs:
                   mkdir -p "$stage/$(dirname "$rel")"
                   git show "$new_sha:$path" > "$stage/$rel"
                 else
-                  sudo rm -rf "$target/$rel"
+                  rm -rf "$target/$rel"
                 fi
               done < <(git diff-tree -z --no-commit-id --name-only -r "$old_sha" "$new_sha" -- public/)
-              sudo rsync -rt --no-owner --no-group --chmod=D755,F644 "$stage/" "$target/"
+              rsync -rt --chmod=D755,F644 "$stage/" "$target/"
               rm -rf "$stage"
             fi
           fi
