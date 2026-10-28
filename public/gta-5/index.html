@@ -3,6 +3,27 @@
 <head>
 <script src="/chunk-index.js"></script><script src="/chunk-fetch.js"></script><script src="/__support/controller.js"></script><script defer src="/__support/touch.js"></script><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta charset="utf-8">
+<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+<!-- End Google Tag Manager -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+<script>
+/* Budsin: en Chromebook (ChromeOS) se arranca con el perfil ligero del juego, salvo que la URL ya lo indique:
+   ?low=1 (menos memoria: sin sombras, texturas a un cuarto, 2 hilos) y ?scale=0.75 (dibuja al 75 %).
+   Se pueden anular con ?low=0 y ?scale=1. Debe ir antes del script que lee location.search. */
+(function () {
+  if (!/\bCrOS\b/.test(navigator.userAgent)) return;
+  var u = new URL(location.href), changed = false;
+  if (!u.searchParams.has('low')) { u.searchParams.set('low', '1'); changed = true; }
+  if (!u.searchParams.has('scale')) { u.searchParams.set('scale', '0.75'); changed = true; }
+  if (changed) history.replaceState(history.state, '', u.toString());
+})();
+</script>
 <title>game</title>
 <style>
 	html, body { margin: 0; height: 100%; background: #000; color: #ccc; font: 12px monospace; overflow: hidden; }
@@ -43,6 +64,10 @@
 </style>
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 <style>
 @media(pointer:coarse){#canvas{height:100dvh!important;touch-action:none}#modes{position:fixed!important;bottom:70px!important;left:0!important;right:0!important;height:auto!important;display:flex!important;flex-wrap:wrap;justify-content:center;gap:8px;padding:12px;background:#102b27}#modes button{min-height:48px!important;padding:8px 16px!important;font:16px system-ui!important}#ls-stage{transform:none!important;width:100%!important;height:100%!important}#ls-bars{top:auto!important;bottom:170px!important;left:12px!important;right:12px!important;max-width:100%!important}#ls-logo{top:24px!important;left:24px!important;width:100px!important;height:100px!important}#game-tools{bottom:max(8px,env(safe-area-inset-bottom))!important}}
 #game-tools{position:fixed;left:12px;bottom:12px;z-index:10005;display:flex;gap:6px;font:14px system-ui}
@@ -666,6 +691,6 @@ if (!window.PlayGTA5Enhanced) {
 	}, { passive: false });
 }
 </script>
-  <script src="/classroom-hotkey.js"></script>
+  <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
 </body>
 </html>

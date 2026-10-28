@@ -104,10 +104,6 @@ Inspirada en interfaces de consola (como Nintendo Switch), prioriza velocidad, d
 
 Ports web de [wasm.rip](https://github.com/wasmdotrip/wasm.rip). Cada juego vive en `public/<nombre>/` y carga sus archivos desde el repositorio de su porter, por lo que dependen de que ese origen siga disponible.
 
-### GTA V proxificado
-
-GTA V está disponible en `https://games.budsin.dev/gta-5/` mediante un proxy de Caddy hacia `gta5-87g.pages.dev`. Sus archivos grandes permanecen en el hosting remoto; Budsin Games solo sirve localmente la portada (`public/portadas/gta-5.png`).
-
 PEAK carga directamente desde jsDelivr (`wasmdotrip/Peak-Port`, fijado al commit `f1924c4`) con su propio cargador en `public/peak/index.html`; ya no depende de `truffled.lol`, que algunas redes bloquean.
 
 | Juego | Categoría | Port por |
@@ -145,6 +141,16 @@ PEAK carga directamente desde jsDelivr (`wasmdotrip/Peak-Port`, fijado al commit
 | Keep Talking And Nobody Explodes | Port | zay |
 | PEAK | Port | dasher |
 | Horsey Game | Port | crackers |
+
+---
+
+## 🚗 GTA V (proxificado)
+
+GTA V está disponible en `https://games.budsin.dev/gta-5/` mediante un proxy de Caddy hacia `gta5-87g.pages.dev`. Sus archivos grandes permanecen en el hosting remoto; Budsin Games solo sirve localmente la portada (`public/portadas/gta-5.png`).
+
+**Requisitos del navegador:** WebGPU, memoria WebAssembly de 64 bits y compresión de texturas BC. El motor exige además aislamiento entre orígenes, así que la ruta `/gta-5/` (y sus recursos) debe responder con `Cross-Origin-Opener-Policy: same-origin` y `Cross-Origin-Embedder-Policy: require-corp`; sin ellas la página muestra «not cross-origin isolated» y el juego no arranca. Se configuran en el Caddyfile del VPS, no en este repositorio.
+
+**Chromebook:** `public/gta-5/index.html` detecta ChromeOS y, si la URL no lo indica, arranca con `?low=1&scale=0.75` (perfil de poca memoria: sin sombras, texturas a un cuarto y 2 hilos; dibuja al 75 %). Para anularlo, abre `/gta-5/?low=0&scale=1`. Otras opciones del juego: `?scale=0.5` (más rápido), `?res=1280x720` (tamaño fijo) y `?shadows=1` (sombras al mínimo).
 
 ---
 
@@ -245,6 +251,7 @@ Firebase se usa únicamente para el conteo de popularidad.
 ### v7.1
 * **33 juegos nuevos** (ports de [wasm.rip](https://github.com/wasmdotrip/wasm.rip)): MiSide, Stardew Valley, Fez, Inscryption, RimWorld, PEAK, Superflight, Hill Climb Racing, Keep Talking And Nobody Explodes y más. Ver la tabla de ports más arriba.
 * Cada página incluye favicon, Google Tag Manager, AdSense y Classroom Hotkey, y todas las portadas están en `public/portadas/`.
+* GTA V: la página ahora incluye los recursos obligatorios y, en Chromebook, arranca con un perfil ligero (`?low=1&scale=0.75`).
 
 ### v7.0
 * Nuevo diseño **glassmorphism** construido con **React**: más rápido, limpio y totalmente responsive.
