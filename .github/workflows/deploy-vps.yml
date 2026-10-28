@@ -38,19 +38,22 @@ jobs:
               sudo rsync -a --delete public/ "$target/"
               rm -rf /tmp/deploy-full
             else
+              # El runner solo tiene sudo sin contraseña para rsync, rm y systemctl: se prepara todo en un
+              # directorio temporal (sin sudo, con la estructura de public/) y se copia con un único rsync.
               # -z: nombres separados por NUL, así los archivos con acentos o espacios no llegan entrecomillados.
-              # install -D crea las carpetas de destino (antes se creaba otra ruta y fallaba con
-              # "No such file or directory" en cualquier archivo cambiado).
-              tmp_file=$(mktemp)
+              # --chmod fija 755/644 y sin -p ni -o la carpeta raíz del destino conserva sus permisos.
+              stage=$(mktemp -d)
               while IFS= read -r -d '' path; do
+                rel="${path#public/}"
                 if git cat-file -e "$new_sha:$path" 2>/dev/null; then
-                  git show "$new_sha:$path" > "$tmp_file"
-                  sudo install -D -m 0644 "$tmp_file" "$target/${path#public/}"
+                  mkdir -p "$stage/$(dirname "$rel")"
+                  git show "$new_sha:$path" > "$stage/$rel"
                 else
-                  sudo rm -rf "$target/${path#public/}"
+                  sudo rm -rf "$target/$rel"
                 fi
               done < <(git diff-tree -z --no-commit-id --name-only -r "$old_sha" "$new_sha" -- public/)
-              rm -f "$tmp_file"
+              sudo rsync -rt --no-owner --no-group --chmod=D755,F644 "$stage/" "$target/"
+              rm -rf "$stage"
             fi
           fi
           sudo systemctl reload caddy
