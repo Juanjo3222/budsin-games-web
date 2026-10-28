@@ -252,6 +252,7 @@ Firebase se usa únicamente para el conteo de popularidad.
 * **33 juegos nuevos** (ports de [wasm.rip](https://github.com/wasmdotrip/wasm.rip)): MiSide, Stardew Valley, Fez, Inscryption, RimWorld, PEAK, Superflight, Hill Climb Racing, Keep Talking And Nobody Explodes y más. Ver la tabla de ports más arriba.
 * Cada página incluye favicon, Google Tag Manager, AdSense y Classroom Hotkey, y todas las portadas están en `public/portadas/`.
 * How To Fish: en Chromebook (o equipos con ≤4 GB de RAM / ≤4 núcleos) renderiza al 0.75× de resolución en vez de la nativa. Ajustable con `?scale=1` o `?q=high`.
+* PEAK: descarga en paralelo (4 partes a la vez) y guarda los ~250 MB en la caché del navegador; desde la segunda visita arranca sin volver a descargar.
 * GTA V: la página ahora incluye los recursos obligatorios y, en Chromebook, arranca con un perfil ligero (`?low=1&scale=0.75`).
 
 ### v7.0

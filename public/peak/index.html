@@ -134,40 +134,73 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       // Fetch every part and glue them into one Blob, then expose it as a blob: URL.
       // Unity's loader treats it like any other URL, so splitting stays invisible to it.
-      // The body is read through a stream reader so the byte counter moves continuously
-      // instead of jumping once per completed part.
-      async function assemble(entry, label) {
-        var urls = entry.parts || [entry.file];
-        var buffers = [];
-        for (var i = 0; i < urls.length; i++) {
-          var url = BUILD + "/" + urls[i];
-          var res = await fetch(url);
-          if (!res.ok) throw new Error("failed to fetch " + url + " (" + res.status + ")");
-          if (res.body && res.body.getReader) {
-            var reader = res.body.getReader();
-            while (true) {
-              var step = await reader.read();
-              if (step.done) break;
-              buffers.push(step.value);
-              downloaded += step.value.byteLength;
+      // Budsin: parts download in parallel (4 at a time) and are kept in Cache Storage, so
+      // the ~250 MB are only downloaded once; later visits start from disk. The cache key is
+      // the URL, which is pinned to a commit, so it never serves stale files.
+      var CACHE_NAME = "peak-build-v1";
+      var cachePromise = (window.caches ? caches.open(CACHE_NAME) : Promise.resolve(null))
+        .catch(function () { return null; });
+
+      async function getPart(url, label) {
+        var cache = await cachePromise;
+        if (cache) {
+          try {
+            var hit = await cache.match(url);
+            if (hit) {
+              var cached = await hit.blob();
+              downloaded += cached.size;
               report(label);
+              return cached;
             }
-          } else {
-            // no streaming support: fall back to whole-part reads
-            var buf = await res.arrayBuffer();
-            buffers.push(buf);
-            downloaded += buf.byteLength;
+          } catch (e) {}
+        }
+        var res = await fetch(url);
+        if (!res.ok) throw new Error("failed to fetch " + url + " (" + res.status + ")");
+        var chunks = [];
+        if (res.body && res.body.getReader) {
+          var reader = res.body.getReader();
+          while (true) {
+            var step = await reader.read();
+            if (step.done) break;
+            chunks.push(step.value);
+            downloaded += step.value.byteLength;
             report(label);
           }
+        } else {
+          var buf = await res.arrayBuffer();
+          chunks.push(buf);
+          downloaded += buf.byteLength;
+          report(label);
         }
-        return URL.createObjectURL(new Blob(buffers));
+        var blob = new Blob(chunks);
+        if (cache) { try { await cache.put(url, new Response(blob)); } catch (e) {} }
+        return blob;
+      }
+
+      async function assemble(entry, label) {
+        var urls = (entry.parts || [entry.file]).map(function (f) { return BUILD + "/" + f; });
+        var blobs = new Array(urls.length);
+        var next = 0;
+        async function worker() {
+          while (next < urls.length) {
+            var i = next++;
+            blobs[i] = await getPart(urls[i], label);
+          }
+        }
+        var workers = [];
+        for (var w = 0; w < Math.min(4, urls.length); w++) workers.push(worker());
+        await Promise.all(workers);
+        return URL.createObjectURL(new Blob(blobs));
       }
 
       (async function () {
         try {
-          var dataUrl      = await assemble(MANIFEST.data, "game data");
-          var frameworkUrl = await assemble(MANIFEST.framework, "framework");
-          var codeUrl      = await assemble(MANIFEST.code, "code");
+          var all = await Promise.all([
+            assemble(MANIFEST.data, "game"),
+            assemble(MANIFEST.framework, "game"),
+            assemble(MANIFEST.code, "game")
+          ]);
+          var dataUrl = all[0], frameworkUrl = all[1], codeUrl = all[2];
 
           setMsg("Starting…");
           var script = document.createElement("script");
