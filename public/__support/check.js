@@ -9,6 +9,9 @@ report.wasmMemory64 = typeof WebAssembly !== 'undefined' && WebAssembly.validate
   new Uint8Array([0,97,115,109,1,0,0,0,5,4,1,7,0,1]));
 const output = document.getElementById('report');
 const launchLinks = [...document.querySelectorAll('a[href^="/?"], a[href="/"]')];
+// En este sitio el juego vive en /gta-5/ (la raíz es el portal de Budsin Games): los botones «Play» y los
+// perfiles de rendimiento apuntaban a "/?low=1&..." y abrían el portal en vez del juego.
+for (const link of launchLinks) link.setAttribute('href', '/gta-5/' + link.getAttribute('href').slice(1));
 function allowLaunch(allowed) {
   for (const link of launchLinks) {
     link.setAttribute('aria-disabled', String(!allowed));
@@ -43,7 +46,9 @@ async function check() {
     if (build) {
       const manifest = globalThis.GAME_CHUNKS;
       const entry = manifest?.files?.[`/b/${build[1]}/game.wasm`];
-      const chunkUrl = entry?.prefix;
+      // El archivo se sirve troceado: el trozo i está en `${prefix}/${i}.bin` (4 dígitos), como en chunk-fetch.js.
+      // Pedir solo el prefijo da 404 siempre, también en el origen, y daba un falso «delivery check failed».
+      const chunkUrl = entry?.prefix ? `${entry.prefix}/0000.bin` : entry?.url;
       if (!chunkUrl) throw new Error('Game chunk manifest is unavailable.');
       const wasm = await fetch(chunkUrl, { cache: 'no-store' });
       report.wasmHTTP = wasm.status;

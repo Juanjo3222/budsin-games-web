@@ -150,7 +150,7 @@ GTA V está disponible en `https://games.budsin.dev/gta-5/` mediante un proxy de
 
 **Requisitos del navegador:** WebGPU, memoria WebAssembly de 64 bits y compresión de texturas BC. El motor exige además aislamiento entre orígenes, así que la ruta `/gta-5/` (y sus recursos) debe responder con `Cross-Origin-Opener-Policy: same-origin` y `Cross-Origin-Embedder-Policy: require-corp`; sin ellas la página muestra «not cross-origin isolated» y el juego no arranca. Las envía el servidor (Caddy o Cloudflare), no este repositorio.
 
-**Chromebook:** `public/gta-5/index.html` detecta ChromeOS y, si la URL no lo indica, arranca con `?low=1&scale=0.75` (perfil de poca memoria: sin sombras, texturas a un cuarto y 2 hilos; dibuja al 75 %). Para anularlo, abre `/gta-5/?low=0&scale=1`. Otras opciones del juego: `?scale=0.5` (más rápido), `?res=1280x720` (tamaño fijo) y `?shadows=1` (sombras al mínimo).
+**Chromebook:** `public/gta-5/index.html` detecta ChromeOS y, si la URL no trae `low`, `scale`, `res` ni `fps`, arranca con `?low=1&scale=0.75` (perfil de poca memoria: sin sombras, texturas a un cuarto y 2 hilos; dibuja al 75 %). Para anularlo, abre `/gta-5/?low=0&scale=1`. Otras opciones del juego: `?scale=0.5` (más rápido), `?res=1280x720` (tamaño fijo) y `?shadows=1` (sombras al mínimo).
 
 ---
 

@@ -15,13 +15,15 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script>
 /* Budsin: en Chromebook (ChromeOS) se arranca con el perfil ligero del juego, salvo que la URL ya lo indique:
    ?low=1 (menos memoria: sin sombras, texturas a un cuarto, 2 hilos) y ?scale=0.75 (dibuja al 75 %).
+   Si la URL ya trae low, scale, res o fps (p. ej. un perfil elegido en /__support/) no se toca nada.
    Se pueden anular con ?low=0 y ?scale=1. Debe ir antes del script que lee location.search. */
 (function () {
   if (!/\bCrOS\b/.test(navigator.userAgent)) return;
-  var u = new URL(location.href), changed = false;
-  if (!u.searchParams.has('low')) { u.searchParams.set('low', '1'); changed = true; }
-  if (!u.searchParams.has('scale')) { u.searchParams.set('scale', '0.75'); changed = true; }
-  if (changed) history.replaceState(history.state, '', u.toString());
+  var u = new URL(location.href);
+  if (['low', 'scale', 'res', 'fps'].some(function (k) { return u.searchParams.has(k); })) return;
+  u.searchParams.set('low', '1');
+  u.searchParams.set('scale', '0.75');
+  history.replaceState(history.state, '', u.toString());
 })();
 </script>
 <title>game</title>
