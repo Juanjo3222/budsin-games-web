@@ -316,6 +316,24 @@ async function boot() {
     autoSyncPersistentDataPath: true,
   };
 
+  // Unity renders at clientSize * devicePixelRatio. Chromebooks usually report 1.25-2 and have
+  // weak GPUs, so the default draws up to 4x the pixels they can fill. On ChromeOS / low-memory /
+  // low-core devices render at a lower resolution; the canvas is scaled up by CSS.
+  // Override with ?scale=0.5..2 (fixed ratio) or ?q=high (native resolution).
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var dpr = window.devicePixelRatio || 1;
+    var scale = parseFloat(q.get("scale"));
+    if (scale > 0) {
+      config.devicePixelRatio = Math.min(Math.max(scale, 0.25), 2);
+    } else if (q.get("q") !== "high") {
+      var lowEnd = /\bCrOS\b/.test(navigator.userAgent) ||
+        (navigator.deviceMemory && navigator.deviceMemory <= 4) ||
+        (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+      if (lowEnd) config.devicePixelRatio = Math.min(dpr, 0.75);
+    }
+  })();
+
   if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
     container.className = "unity-mobile";
     canvas.className = "unity-mobile";
