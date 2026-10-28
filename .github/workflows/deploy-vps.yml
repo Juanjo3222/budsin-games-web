@@ -38,19 +38,19 @@ jobs:
               sudo rsync -a --delete public/ "$target/"
               rm -rf /tmp/deploy-full
             else
-              changed=$(git diff-tree --no-commit-id --name-only -r "$old_sha" "$new_sha" -- public/)
-              while IFS= read -r path; do
-                [ -n "$path" ] || continue
+              # -z: nombres separados por NUL, así los archivos con acentos o espacios no llegan entrecomillados.
+              # install -D crea las carpetas de destino (antes se creaba otra ruta y fallaba con
+              # "No such file or directory" en cualquier archivo cambiado).
+              tmp_file=$(mktemp)
+              while IFS= read -r -d '' path; do
                 if git cat-file -e "$new_sha:$path" 2>/dev/null; then
-                  mkdir -p "/tmp/deploy/$(dirname "${path#public/}")"
-                  git show "$new_sha:$path" > "/tmp/deploy/$path"
-                  sudo rsync -a "/tmp/deploy/$path" "$target/$(dirname "${path#public/}")/"
-                  rm -rf /tmp/deploy
+                  git show "$new_sha:$path" > "$tmp_file"
+                  sudo install -D -m 0644 "$tmp_file" "$target/${path#public/}"
                 else
                   sudo rm -rf "$target/${path#public/}"
                 fi
-              done <<< "$changed"
-              rm -rf /tmp/deploy
+              done < <(git diff-tree -z --no-commit-id --name-only -r "$old_sha" "$new_sha" -- public/)
+              rm -f "$tmp_file"
             fi
           fi
           sudo systemctl reload caddy
