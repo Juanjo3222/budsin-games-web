@@ -13,6 +13,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <base href="https://cdn.jsdelivr.net/gh/dashiellbenton/ports@5e78364d5bba78d6b7c43fbd890663ff621702f3/tmfds/">
     <title>The Message From Deep Space</title>
     <style>
       /* black, not the Unity brown: whatever the canvas does not cover reads as a
@@ -153,7 +154,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       // this page; this stamps the same root onto our own URL so the C# level streamer
       // (which resolves bundle URLs against Application.absoluteURL, ignoring <base>)
       // fetches LevelBundles from the CDN too instead of from wherever the page is hosted.
-      var CDN_BASE = "";
+      var CDN_BASE = "https://cdn.jsdelivr.net/gh/dashiellbenton/ports@5e78364d5bba78d6b7c43fbd890663ff621702f3/tmfds";
       if (CDN_BASE) {
         var u = new URL(window.location.href);
         if (u.searchParams.get("cdn") !== CDN_BASE) {
