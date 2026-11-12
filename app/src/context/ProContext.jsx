@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback } from "react";
 import { useAuth } from "./AuthContext";
 import { fetchUserStatus, activateTrial } from "../lib/firebase";
+import { fetchPaypalStatus } from "../lib/paypal";
 import { notifyProStatus } from "../lib/sw";
 
 const ProContext = createContext(null);
@@ -23,6 +24,7 @@ export function ProProvider({ children }) {
   const [trialUsed, setTrialUsed] = useState(() => readFlag(TRIAL_KEY));
   const [paidUntil, setPaidUntil] = useState(null);
   const [statusLoading, setStatusLoading] = useState(false);
+  const [paypalActive, setPaypalActive] = useState(false);
 
   const persistPro = useCallback((value) => {
     setIsPro(value);
@@ -32,44 +34,48 @@ export function ProProvider({ children }) {
     } catch (e) {}
   }, []);
 
+  // Pro = lo que diga Firestore (alta manual / prueba) O una suscripción de PayPal activa.
+  const runCheck = useCallback(async () => {
+    setStatusLoading(true);
+    const [status, paypal] = await Promise.all([fetchUserStatus(user.uid), fetchPaypalStatus()]);
+    setStatusLoading(false);
+    const pro = status.pro || paypal.pro;
+    const dates = [status.pro && status.paidUntil, paypal.pro && paypal.paidUntil].filter(Boolean);
+    setPaidUntil(dates.length ? new Date(Math.max(...dates.map((d) => d.getTime()))) : null);
+    setPaypalActive(paypal.active);
+    setTrialUsed(status.trialUsed);
+    persistPro(pro);
+    if (!pro) {
+      try {
+        const favs = JSON.parse(localStorage.getItem("budsin_favorites") || "[]");
+        if (favs.length > FREE_FAVORITES_LIMIT) {
+          localStorage.setItem("budsin_favorites", JSON.stringify(favs.slice(0, FREE_FAVORITES_LIMIT)));
+        }
+      } catch (e) {}
+    }
+    return pro;
+  }, [user, persistPro]);
+
   useEffect(() => {
     if (!user) {
       persistPro(false);
+      setPaypalActive(false);
       try {
         localStorage.setItem(TRIAL_KEY, "0");
       } catch (e) {}
       return;
     }
-    let cancelled = false;
-    const check = async () => {
-      setStatusLoading(true);
-      const status = await fetchUserStatus(user.uid);
-      if (cancelled) return;
-      setStatusLoading(false);
-      setPaidUntil(status.paidUntil);
-      setTrialUsed(status.trialUsed);
-      persistPro(status.pro);
-      if (!status.pro) {
-        try {
-          const favs = JSON.parse(localStorage.getItem("budsin_favorites") || "[]");
-          if (favs.length > FREE_FAVORITES_LIMIT) {
-            localStorage.setItem("budsin_favorites", JSON.stringify(favs.slice(0, FREE_FAVORITES_LIMIT)));
-          }
-        } catch (e) {}
-      }
-    };
-    check();
-    const poll = setInterval(check, 300000);
+    runCheck();
+    const poll = setInterval(runCheck, 300000);
     const onVisible = () => {
-      if (!document.hidden) check();
+      if (!document.hidden) runCheck();
     };
     document.addEventListener("visibilitychange", onVisible);
     return () => {
-      cancelled = true;
       clearInterval(poll);
       document.removeEventListener("visibilitychange", onVisible);
     };
-  }, [user, persistPro]);
+  }, [user, persistPro, runCheck]);
 
   const startTrial = useCallback(async () => {
     if (!user) throw new Error("NO_USER");
@@ -90,8 +96,8 @@ export function ProProvider({ children }) {
   }, [isPro]);
 
   const value = useMemo(
-    () => ({ isPro, trialUsed, paidUntil, statusLoading, startTrial, favoritesLimit: isPro ? Infinity : FREE_FAVORITES_LIMIT }),
-    [isPro, trialUsed, paidUntil, statusLoading, startTrial]
+    () => ({ isPro, trialUsed, paidUntil, statusLoading, paypalActive, refreshPro: runCheck, startTrial, favoritesLimit: isPro ? Infinity : FREE_FAVORITES_LIMIT }),
+    [isPro, trialUsed, paidUntil, statusLoading, paypalActive, runCheck, startTrial]
   );
 
   return <ProContext.Provider value={value}>{children}</ProContext.Provider>;

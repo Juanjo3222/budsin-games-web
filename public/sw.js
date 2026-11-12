@@ -152,6 +152,9 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(event.request.url);
 
+  // La API de suscripciones (PayPal) nunca se cachea: siempre va a la red
+  if (url.pathname.startsWith("/api/")) return;
+
   // Always cache static assets
   if (STATIC.some((s) => url.pathname.startsWith(s) || url.pathname === s)) {
     event.respondWith(

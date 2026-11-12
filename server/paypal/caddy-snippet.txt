@@ -1,0 +1,5 @@
+	# Budsin Pro por PayPal: servicio local (server/paypal)
+	handle /api/paypal/* {
+		header Cache-Control "no-store"
+		reverse_proxy 127.0.0.1:3101
+	}

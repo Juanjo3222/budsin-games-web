@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
+import PaypalSubscribe from "../components/PaypalSubscribe";
 import { useI18n } from "../context/I18nContext";
 import { useAuth } from "../context/AuthContext";
 import { usePro } from "../context/ProContext";
@@ -21,7 +22,7 @@ const AUTO_DISGUISE_KEY = "budsin_auto_disguise_ms";
 export default function SettingsPage() {
   const { t, lang } = useI18n();
   const { user, loading, login, logout } = useAuth();
-  const { isPro, paidUntil, trialUsed, startTrial } = usePro();
+  const { isPro, paidUntil, trialUsed, paypalActive, startTrial } = usePro();
   const { theme, applyTheme, custom, updateCustom } = useTheme();
   const { favorites, recently } = useLibrary();
   const { showToast } = useToast();
@@ -192,6 +193,11 @@ export default function SettingsPage() {
               )}
               {!isPro && trialUsed && (
                 <div className="pro-trial-used">{t("proTrialUsed", "Ya usaste tu prueba gratis. Para ser Pro, contacta a budsinjys@gmail.com.")}</div>
+              )}
+
+              {!isPro && <PaypalSubscribe />}
+              {isPro && paypalActive && (
+                <div className="pro-trial-used">{t("paypalManage", "Tu suscripción se gestiona (y se cancela) desde PayPal → Pagos automáticos.")}</div>
               )}
 
               {isPro && paidUntil && (

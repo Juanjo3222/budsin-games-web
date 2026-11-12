@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/Games-87-blue" />
   <img src="https://img.shields.io/badge/Frontend-React-orange" />
-  <img src="https://img.shields.io/badge/Version-7.1-purple" />
+  <img src="https://img.shields.io/badge/Version-7.2-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -154,6 +154,26 @@ GTA V está disponible en `https://games.budsin.dev/gta-5/` mediante un proxy de
 
 ---
 
+## 💳 Pagos con PayPal (suscripción Pro)
+
+El botón «Suscríbete con PayPal» de **Ajustes** cobra $2.99 USD al mes. La suscripción queda atada al `uid` de Google del usuario y el Pro se activa sin intervención del admin. El alta manual desde `/admin.html` sigue funcionando: un usuario es Pro si Firestore **o** PayPal lo dicen.
+
+Como la web es estática, hay un pequeño servicio en el VPS (`server/paypal/`, Python sin dependencias + SQLite) que:
+
+* valida la sesión del usuario con Firebase Auth (solo como identidad; no escribe en Firebase);
+* consulta a PayPal con el Secret y comprueba plan, estado y propietario de cada suscripción;
+* expone `/api/paypal/status`, `/subscribe`, `/webhook` y `/health` a través de Caddy.
+
+**Instalar o actualizar en el VPS** (desde `server/paypal/`; el Secret se guarda aparte con `sudo budsin-paypal-set-secret`):
+
+```bash
+cd server/paypal && ssh root@VPS 'mkdir -p /root/budsin-paypal-install' && scp budsin_paypal.py env.example budsin-paypal.service install.sh caddy-snippet.txt root@VPS:/root/budsin-paypal-install/ && ssh root@VPS 'bash /root/budsin-paypal-install/install.sh'
+```
+
+Pruebas del servicio: `python3 -I -m unittest discover -s server/paypal/tests`. Hoy funciona en **Sandbox**; para producción hay que crear el plan en la cuenta Live y cambiar `PAYPAL_API_BASE`, `PAYPAL_CLIENT_ID` y `PAYPAL_PLAN_ID` en `/etc/budsin-paypal.env` y `PAYPAL_CLIENT_ID`/`PAYPAL_PLAN_ID` en `app/src/lib/paypal.js`.
+
+---
+
 ## 📸 Preview
 
 <p align="center">
@@ -247,6 +267,10 @@ Firebase se usa únicamente para el conteo de popularidad.
 ---
 
 ## 📝 Changelog
+
+### v7.2
+* **Pagos con PayPal**: suscripción Pro de $2.99 USD/mes desde Ajustes, con servicio propio en el VPS (`server/paypal/`). Ver la sección «Pagos con PayPal».
+* El Service Worker ya no cachea las rutas `/api/`.
 
 ### v7.1
 * **33 juegos nuevos** (ports de [wasm.rip](https://github.com/wasmdotrip/wasm.rip)): MiSide, Stardew Valley, Fez, Inscryption, RimWorld, PEAK, Superflight, Hill Climb Racing, Keep Talking And Nobody Explodes y más. Ver la tabla de ports más arriba.

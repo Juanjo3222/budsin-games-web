@@ -132,6 +132,12 @@ Estas funcionalidades fueron **aprobadas por el usuario** y deben implementarse 
 - **Admin emails hardcodeados**: `juvaldiviam@gmail.com`, `juanjoseguravegamail@gmail.com`.
 - `paidUntil` es un `Timestamp` de Firestore. Si `paidUntil < now`, el Pro se auto-revoca.
 
+### 💳 Pagos con PayPal (excepción autorizada por el usuario)
+- El usuario ordenó explícitamente saltar la regla de «no crear carpetas fuera de `public/`» **solo** para el backend de PayPal: `server/paypal/` (servicio Python sin dependencias, SQLite) más su instalador. No amplía la excepción a nada más.
+- Firebase sigue sin escribirse desde el servicio: Auth se usa solo como identidad. El Pro es **Firestore OR PayPal** (`ProContext`).
+- El Secret de PayPal nunca va al repositorio ni al chat: vive en `/etc/budsin-paypal.env` del VPS (`budsin-paypal-set-secret`).
+- Estado actual: **Sandbox**. Detalles de instalación y paso a producción en la sección «Pagos con PayPal» del `README.md`.
+
 ### 🧠 Lógica de verificación en cliente
 
 1. **Al cargar la página**: `localStorage` cachea `budsin_pro_active` (0/1) para respuesta inmediata.
