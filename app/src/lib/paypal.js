@@ -4,6 +4,7 @@ import { auth } from "./firebase";
 // al cambiar a Live hay que sustituir CLIENT_ID y PLAN_ID por los de la cuenta real.
 export const PAYPAL_CLIENT_ID = "AZdttgce4sOYEFAWwI0EcFWLklyO4tuoW1gGEYvDt_BafdVFqsgNITSxS-8P_buJ7Hsy9L69jIpP3A4S";
 export const PAYPAL_PLAN_ID = "P-60L53243VE599341UNL2QGEY";
+export const DONATE_URL = "https://www.paypal.me/juanbrew";
 const API = "https://games.budsin.dev/api/paypal";
 
 async function authFetch(path, options = {}) {

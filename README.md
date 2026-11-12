@@ -271,6 +271,7 @@ Firebase se usa únicamente para el conteo de popularidad.
 ### v7.2
 * **Pagos con PayPal**: suscripción Pro de $2.99 USD/mes desde Ajustes, con servicio propio en el VPS (`server/paypal/`). Se puede cancelar desde el sitio y el Pro sigue hasta el fin del periodo pagado. Ver la sección «Pagos con PayPal».
 * El Service Worker ya no cachea las rutas `/api/`.
+* Botones **Pro** (solo para quien no es Pro) y **Donar** en el dock del menú principal.
 * Tarjeta **Apoya el proyecto** en Ajustes con enlaces de donación a `paypal.me/juanbrew` ($1, $3, $5 u otro monto).
 
 ### v7.1

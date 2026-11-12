@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
 import PaypalSubscribe from "../components/PaypalSubscribe";
-import { cancelPaypalSubscription } from "../lib/paypal";
+import { cancelPaypalSubscription, DONATE_URL } from "../lib/paypal";
 import { useI18n } from "../context/I18nContext";
 import { useAuth } from "../context/AuthContext";
 import { usePro } from "../context/ProContext";
@@ -14,7 +14,6 @@ import { readJson } from "../lib/storage";
 import { soundsEnabled, setSoundsEnabled } from "../lib/sfx";
 
 const DATE_LOCALES = { es: "es-ES", en: "en-US", pt: "pt-BR" };
-const DONATE_URL = "https://www.paypal.me/juanbrew";
 const DONATE_AMOUNTS = [1, 3, 5];
 const CUSTOM_KEY = "budsin_custom_theme";
 const URL_LIST_KEY = "budsin_url_list";

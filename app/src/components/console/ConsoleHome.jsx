@@ -4,6 +4,7 @@ import { useI18n } from "../../context/I18nContext";
 import { usePageTransition } from "../../context/TransitionContext";
 import { useFavoriteToggle } from "../../hooks/useFavoriteToggle";
 import { playSelect } from "../../lib/sfx";
+import { DONATE_URL } from "../../lib/paypal";
 import ConsoleRow, { tileStep } from "./ConsoleRow";
 import ConsoleDock from "./ConsoleDock";
 
@@ -178,6 +179,18 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
           },
           { settle: "route" }
         ),
+      pro: (origin) =>
+        run(
+          origin,
+          () => {
+            window.location.hash = "#/settings?proCard=1";
+          },
+          { settle: "route" }
+        ),
+      donate: () => {
+        playSelect();
+        window.open(DONATE_URL, "_blank", "noopener,noreferrer");
+      },
     }),
     [onRandom, run, searching, closeSearch]
   );
