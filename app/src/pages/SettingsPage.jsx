@@ -14,6 +14,8 @@ import { readJson } from "../lib/storage";
 import { soundsEnabled, setSoundsEnabled } from "../lib/sfx";
 
 const DATE_LOCALES = { es: "es-ES", en: "en-US", pt: "pt-BR" };
+const DONATE_URL = "https://www.paypal.me/juanbrew";
+const DONATE_AMOUNTS = [1, 3, 5];
 const CUSTOM_KEY = "budsin_custom_theme";
 const URL_LIST_KEY = "budsin_url_list";
 const CLASSROOM_URL_KEY = "budsin_classroom_url";
@@ -392,6 +394,22 @@ export default function SettingsPage() {
           <a className="btn btn-ghost" href="https://forms.gle/bUHTy8Lt6Kz1qkAx8" target="_blank" rel="noreferrer">
             {t("suggestionsLink", "Envia tus sugerencias a Budsin")}
           </a>
+        </section>
+
+        <section className="settings-card glass">
+          <div className="card-header">
+            <div className="card-icon gold">💛</div>
+            <div>
+              <h2>{t("donateTitle", "Apoya el proyecto")}</h2>
+              <p>{t("donateSub", "Budsin Games es gratis. Si te gusta, puedes invitarme un café con PayPal.")}</p>
+            </div>
+          </div>
+          <div className="donate-row">
+            {DONATE_AMOUNTS.map((n) => (
+              <a key={n} className="btn btn-ghost" href={`${DONATE_URL}/${n}USD`} target="_blank" rel="noopener noreferrer">${n}</a>
+            ))}
+            <a className="btn btn-primary" href={DONATE_URL} target="_blank" rel="noopener noreferrer">{t("donateOther", "Otro monto")}</a>
+          </div>
         </section>
       </main>
       <Footer />

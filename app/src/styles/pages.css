@@ -144,6 +144,7 @@
 .pro-stat-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
 .pro-trial-cta { margin-top: 12px; padding: 16px; border-radius: var(--radius-md); background: linear-gradient(135deg, rgba(0, 201, 255, 0.1), rgba(146, 253, 157, 0.1)); border: 1px solid rgba(0, 201, 255, 0.2); text-align: center; }
 .pro-trial-title { font-weight: 800; color: #00c9ff; margin-bottom: 6px; }
+.donate-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .paypal-subscribe { margin-top: 12px; padding: 16px; border-radius: var(--radius-md); background: rgba(255, 196, 57, 0.08); border: 1px solid rgba(255, 196, 57, 0.28); text-align: center; }
 .paypal-subscribe p { font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; }
 .pro-trial-cta p { font-size: 0.78rem; color: var(--muted); margin: 0 0 12px; }
