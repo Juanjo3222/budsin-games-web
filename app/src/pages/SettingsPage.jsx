@@ -13,6 +13,7 @@ import { useToast } from "../context/ToastContext";
 import { readJson } from "../lib/storage";
 import { soundsEnabled, setSoundsEnabled } from "../lib/sfx";
 
+const DATE_LOCALES = { es: "es-ES", en: "en-US", pt: "pt-BR" };
 const CUSTOM_KEY = "budsin_custom_theme";
 const URL_LIST_KEY = "budsin_url_list";
 const CLASSROOM_URL_KEY = "budsin_classroom_url";
@@ -220,13 +221,13 @@ export default function SettingsPage() {
                 </div>
               )}
               {isPro && !paypalActive && paypalState === "CANCELLED" && paidUntil && (
-                <div className="pro-trial-used">{t("paypalCancelledNote", "Suscripción cancelada: tu Pro sigue activo hasta el")} {paidUntil.toLocaleDateString()}.</div>
+                <div className="pro-trial-used">{t("paypalCancelledNote", "Suscripción cancelada: no se renovará.")}</div>
               )}
 
               {isPro && paidUntil && (
                 <div className={`pro-renewal ${renewalDays !== null && renewalDays <= 1 ? "warning" : ""}`}>
-                  <span>{t("proRenewalLabel", "🔄 Renovación:")}</span>
-                  <strong>{paidUntil.toLocaleDateString()} ({renewalDays} {t("proRenewalDays", "días")})</strong>
+                  <span>{paypalState === "CANCELLED" ? t("proUntilLabel", "⏳ Pro hasta:") : t("proRenewalLabel", "🔄 Renovación:")}</span>
+                  <strong>{paidUntil.toLocaleDateString(DATE_LOCALES[lang] || undefined)} ({renewalDays} {t("proRenewalDays", "días")})</strong>
                   {renewalDays !== null && renewalDays <= 1 && <span style={{ color: "var(--red)" }}> ⚠️</span>}
                 </div>
               )}
