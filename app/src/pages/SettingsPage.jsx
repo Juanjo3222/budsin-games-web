@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
 import PaypalSubscribe from "../components/PaypalSubscribe";
+import { cancelPaypalSubscription } from "../lib/paypal";
 import { useI18n } from "../context/I18nContext";
 import { useAuth } from "../context/AuthContext";
 import { usePro } from "../context/ProContext";
@@ -22,11 +23,25 @@ const AUTO_DISGUISE_KEY = "budsin_auto_disguise_ms";
 export default function SettingsPage() {
   const { t, lang } = useI18n();
   const { user, loading, login, logout } = useAuth();
-  const { isPro, paidUntil, trialUsed, paypalActive, startTrial } = usePro();
+  const { isPro, paidUntil, trialUsed, paypalActive, paypalState, refreshPro, startTrial } = usePro();
   const { theme, applyTheme, custom, updateCustom } = useTheme();
   const { favorites, recently } = useLibrary();
   const { showToast } = useToast();
   const [searchParams] = useSearchParams();
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleCancelPaypal = async () => {
+    if (!window.confirm(t("paypalCancelConfirm", "¿Cancelar tu suscripción? Dejará de cobrarse y tu Pro seguirá activo hasta el fin del periodo ya pagado."))) return;
+    setCancelling(true);
+    try {
+      await cancelPaypalSubscription();
+      await refreshPro();
+      showToast(t("paypalCancelled", "Suscripción cancelada. Tu Pro sigue activo hasta el fin del periodo pagado."));
+    } catch (err) {
+      showToast(t("paypalCancelError", "No se pudo cancelar. Inténtalo de nuevo o cancélala desde PayPal → Pagos automáticos."), true);
+    }
+    setCancelling(false);
+  };
 
   useEffect(() => {
     if (searchParams.get("proCard")) {
@@ -197,7 +212,15 @@ export default function SettingsPage() {
 
               {!isPro && <PaypalSubscribe />}
               {isPro && paypalActive && (
-                <div className="pro-trial-used">{t("paypalManage", "Tu suscripción se gestiona (y se cancela) desde PayPal → Pagos automáticos.")}</div>
+                <div className="pro-trial-used">
+                  <p>{t("paypalManage", "Suscripción mensual con PayPal activa.")}</p>
+                  <button type="button" className="btn btn-ghost btn-sm" disabled={cancelling} onClick={handleCancelPaypal}>
+                    {cancelling ? t("paypalCancelling", "Cancelando…") : t("paypalCancelBtn", "Cancelar suscripción")}
+                  </button>
+                </div>
+              )}
+              {isPro && !paypalActive && paypalState === "CANCELLED" && paidUntil && (
+                <div className="pro-trial-used">{t("paypalCancelledNote", "Suscripción cancelada: tu Pro sigue activo hasta el")} {paidUntil.toLocaleDateString()}.</div>
               )}
 
               {isPro && paidUntil && (

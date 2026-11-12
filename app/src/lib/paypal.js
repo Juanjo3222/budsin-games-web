@@ -20,7 +20,7 @@ async function authFetch(path, options = {}) {
 }
 
 function parse(data) {
-  return { pro: !!data.pro, paidUntil: data.paidUntil ? new Date(data.paidUntil) : null, active: !!data.active };
+  return { pro: !!data.pro, paidUntil: data.paidUntil ? new Date(data.paidUntil) : null, active: !!data.active, state: data.status || null };
 }
 
 // Estado Pro según el servidor de PayPal. Nunca lanza: si falla, el usuario sigue con lo de Firestore.
@@ -28,8 +28,13 @@ export async function fetchPaypalStatus() {
   try {
     return parse(await authFetch("/status"));
   } catch (err) {
-    return { pro: false, paidUntil: null, active: false };
+    return { pro: false, paidUntil: null, active: false, state: null };
   }
+}
+
+// Cancela la suscripción activa. El Pro sigue hasta el fin del periodo ya pagado.
+export async function cancelPaypalSubscription() {
+  return parse(await authFetch("/cancel", { method: "POST" }));
 }
 
 // Avisa al servidor de la suscripción aprobada. PayPal puede tardar unos segundos en pasarla a ACTIVE.

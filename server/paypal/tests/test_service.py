@@ -39,6 +39,15 @@ class Fake(BaseHTTPRequestHandler):
         body = self.rfile.read(int(self.headers.get("Content-Length", 0)))
         if self.path.startswith("/v1/oauth2/token"):
             return self.send(200, {"access_token": "pp-token", "expires_in": 3600})
+        if self.path.endswith("/cancel") and "/v1/billing/subscriptions/" in self.path:
+            sid = self.path.split("/")[-2]
+            CALLS["cancel"] = CALLS.get("cancel", 0) + 1
+            if sid in SUBS:
+                SUBS[sid] = {**SUBS[sid], "status": "CANCELLED", "billing_info": {}}
+                self.send_response(204)
+                self.end_headers()
+                return
+            return self.send(404, {})
         if self.path.startswith("/lookup"):
             tok = json.loads(body).get("idToken")
             if tok in TOKENS:
@@ -148,6 +157,30 @@ class ServiceTest(unittest.TestCase):
         self.svc.refresh("I-CAN")
         row = self.svc.store.get("I-CAN")
         self.assertEqual((row["status"], row["paid_until"]), ("CANCELLED", before))
+
+    def test_cancelar_conserva_pro_hasta_fin_de_periodo(self):
+        SUBS["I-CX"] = sub(owner="uid-ana")
+        call(self.base, "POST", "/subscribe", "tok-ana", {"subscriptionId": "I-CX"})
+        before = self.svc.store.get("I-CX")["paid_until"]
+        code, body = call(self.base, "POST", "/cancel", "tok-ana")
+        self.assertEqual(code, 200, body)
+        self.assertEqual(SUBS["I-CX"]["status"], "CANCELLED")
+        row = self.svc.store.get("I-CX")
+        self.assertEqual((row["status"], row["paid_until"]), ("CANCELLED", before))
+        self.assertTrue(body["pro"])
+        self.assertFalse(body["active"])
+        self.assertEqual(call(self.base, "POST", "/cancel", "tok-ana")[0], 404)  # ya no hay activa
+
+    def test_cancelar_no_toca_suscripcion_de_otro(self):
+        SUBS["I-OTRO"] = sub(owner="uid-ana")
+        call(self.base, "POST", "/subscribe", "tok-ana", {"subscriptionId": "I-OTRO"})
+        before = CALLS.get("cancel", 0)
+        self.assertEqual(call(self.base, "POST", "/cancel", "tok-beto")[0], 404)
+        self.assertEqual(CALLS.get("cancel", 0), before)
+        self.assertEqual(SUBS["I-OTRO"]["status"], "ACTIVE")
+
+    def test_cancelar_requiere_sesion(self):
+        self.assertEqual(call(self.base, "POST", "/cancel")[0], 401)
 
     def test_expirada_ya_no_es_pro(self):
         SUBS["I-OLD"] = sub(owner="uid-beto", days=-10)

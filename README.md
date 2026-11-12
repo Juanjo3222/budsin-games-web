@@ -162,7 +162,7 @@ Como la web es estática, hay un pequeño servicio en el VPS (`server/paypal/`, 
 
 * valida la sesión del usuario con Firebase Auth (solo como identidad; no escribe en Firebase);
 * consulta a PayPal con el Secret y comprueba plan, estado y propietario de cada suscripción;
-* expone `/api/paypal/status`, `/subscribe`, `/webhook` y `/health` a través de Caddy.
+* expone `/api/paypal/status`, `/subscribe`, `/cancel`, `/webhook` y `/health` a través de Caddy.
 
 **Instalar o actualizar en el VPS** (desde `server/paypal/`; el Secret se guarda aparte con `sudo budsin-paypal-set-secret`):
 
@@ -269,7 +269,7 @@ Firebase se usa únicamente para el conteo de popularidad.
 ## 📝 Changelog
 
 ### v7.2
-* **Pagos con PayPal**: suscripción Pro de $2.99 USD/mes desde Ajustes, con servicio propio en el VPS (`server/paypal/`). Ver la sección «Pagos con PayPal».
+* **Pagos con PayPal**: suscripción Pro de $2.99 USD/mes desde Ajustes, con servicio propio en el VPS (`server/paypal/`). Se puede cancelar desde el sitio y el Pro sigue hasta el fin del periodo pagado. Ver la sección «Pagos con PayPal».
 * El Service Worker ya no cachea las rutas `/api/`.
 
 ### v7.1

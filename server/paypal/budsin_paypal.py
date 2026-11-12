@@ -193,6 +193,9 @@ class Service:
     def paypal_get(self, path):
         return http_json(f"{self.cfg.paypal_api}{path}", headers={"Authorization": f"Bearer {self.paypal_token()}"})
 
+    def paypal_post(self, path, body):
+        return http_json(f"{self.cfg.paypal_api}{path}", body, {"Authorization": f"Bearer {self.paypal_token()}"}, "POST")
+
     def refresh(self, sub_id, expect_uid=None):
         """Consulta la suscripción a PayPal y actualiza la base. Devuelve la fila guardada."""
         if not sub_id or not all(c.isalnum() or c in "-_" for c in sub_id) or len(sub_id) > 64:
@@ -252,6 +255,19 @@ class Service:
         out = self.status_for(uid)
         out["subscriptionStatus"] = row["status"]
         return out
+
+    def cancel(self, uid):
+        """Cancela la suscripción activa del usuario. El Pro sigue hasta el fin del periodo pagado."""
+        active = [r for r in self.store.for_uid(uid) if r["status"] == "ACTIVE"]
+        if not active:
+            raise HttpError(404, "no_active_subscription")
+        for row in active:
+            status, _ = self.paypal_post(f"/v1/billing/subscriptions/{row['sub_id']}/cancel",
+                                         {"reason": "Cancelado por el usuario desde Budsin Games"})
+            if status not in (200, 204, 422):  # 422: ya estaba cancelada
+                raise HttpError(502, "paypal_cancel_failed")
+            self.refresh(row["sub_id"])
+        return self.status_for(uid)
 
     def webhook(self, headers, raw_body):
         if not self.cfg.webhook_id:
@@ -363,6 +379,9 @@ def make_handler(svc):
                 except ValueError:
                     raise HttpError(400, "bad_json")
                 return svc.subscribe(uid, str(body.get("subscriptionId", "")))
+            if method == "POST" and sub == "/cancel":
+                uid, _ = svc.verify_user(self.headers.get("Authorization"))
+                return svc.cancel(uid)
             if method == "POST" and sub == "/webhook":
                 headers = {k.lower(): v for k, v in self.headers.items()}
                 return svc.webhook(headers, self.read_body())

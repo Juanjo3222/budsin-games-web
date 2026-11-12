@@ -25,6 +25,7 @@ export function ProProvider({ children }) {
   const [paidUntil, setPaidUntil] = useState(null);
   const [statusLoading, setStatusLoading] = useState(false);
   const [paypalActive, setPaypalActive] = useState(false);
+  const [paypalState, setPaypalState] = useState(null);
 
   const persistPro = useCallback((value) => {
     setIsPro(value);
@@ -43,6 +44,7 @@ export function ProProvider({ children }) {
     const dates = [status.pro && status.paidUntil, paypal.pro && paypal.paidUntil].filter(Boolean);
     setPaidUntil(dates.length ? new Date(Math.max(...dates.map((d) => d.getTime()))) : null);
     setPaypalActive(paypal.active);
+    setPaypalState(paypal.state);
     setTrialUsed(status.trialUsed);
     persistPro(pro);
     if (!pro) {
@@ -60,6 +62,7 @@ export function ProProvider({ children }) {
     if (!user) {
       persistPro(false);
       setPaypalActive(false);
+      setPaypalState(null);
       try {
         localStorage.setItem(TRIAL_KEY, "0");
       } catch (e) {}
@@ -96,8 +99,8 @@ export function ProProvider({ children }) {
   }, [isPro]);
 
   const value = useMemo(
-    () => ({ isPro, trialUsed, paidUntil, statusLoading, paypalActive, refreshPro: runCheck, startTrial, favoritesLimit: isPro ? Infinity : FREE_FAVORITES_LIMIT }),
-    [isPro, trialUsed, paidUntil, statusLoading, paypalActive, runCheck, startTrial]
+    () => ({ isPro, trialUsed, paidUntil, statusLoading, paypalActive, paypalState, refreshPro: runCheck, startTrial, favoritesLimit: isPro ? Infinity : FREE_FAVORITES_LIMIT }),
+    [isPro, trialUsed, paidUntil, statusLoading, paypalActive, paypalState, runCheck, startTrial]
   );
 
   return <ProContext.Provider value={value}>{children}</ProContext.Provider>;
