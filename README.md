@@ -170,7 +170,7 @@ Como la web es estática, hay un pequeño servicio en el VPS (`server/paypal/`, 
 cd server/paypal && ssh root@VPS 'mkdir -p /root/budsin-paypal-install' && scp budsin_paypal.py env.example budsin-paypal.service install.sh caddy-snippet.txt root@VPS:/root/budsin-paypal-install/ && ssh root@VPS 'bash /root/budsin-paypal-install/install.sh'
 ```
 
-Pruebas del servicio: `python3 -I -m unittest discover -s server/paypal/tests`. Hoy funciona en **Sandbox**; para producción hay que crear el plan en la cuenta Live y cambiar `PAYPAL_API_BASE`, `PAYPAL_CLIENT_ID` y `PAYPAL_PLAN_ID` en `/etc/budsin-paypal.env` y `PAYPAL_CLIENT_ID`/`PAYPAL_PLAN_ID` en `app/src/lib/paypal.js`.
+Pruebas del servicio: `python3 -I -m unittest discover -s server/paypal/tests`. Funciona en **producción (Live)**. Para volver a probar en Sandbox hay que cambiar `PAYPAL_API_BASE`, `PAYPAL_CLIENT_ID`, `PAYPAL_PLAN_ID` y `PAYPAL_WEBHOOK_ID` en `/etc/budsin-paypal.env` (y el Secret) y `PAYPAL_CLIENT_ID`/`PAYPAL_PLAN_ID` en `app/src/lib/paypal.js`.
 
 ---
 

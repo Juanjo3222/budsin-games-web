@@ -1,9 +1,9 @@
 import { auth } from "./firebase";
 
-// Credenciales PÚBLICAS de PayPal (el Secret vive solo en el servidor). Sandbox hasta pasar a producción:
-// al cambiar a Live hay que sustituir CLIENT_ID y PLAN_ID por los de la cuenta real.
-export const PAYPAL_CLIENT_ID = "AZdttgce4sOYEFAWwI0EcFWLklyO4tuoW1gGEYvDt_BafdVFqsgNITSxS-8P_buJ7Hsy9L69jIpP3A4S";
-export const PAYPAL_PLAN_ID = "P-60L53243VE599341UNL2QGEY";
+// Credenciales PÚBLICAS de PayPal Live (el Secret vive solo en el servidor). Deben coincidir con
+// PAYPAL_CLIENT_ID y PAYPAL_PLAN_ID de /etc/budsin-paypal.env en el VPS.
+export const PAYPAL_CLIENT_ID = "BAAddYOGeX4GL_qKRF1aF49IJuyvZbZDfM_ifF9qUvTMvZ31KuslU9S-UCPDx4WQbU1tL9STnJ9erScKAk";
+export const PAYPAL_PLAN_ID = "P-5XT3502958941325XNL4MD5Y";
 export const DONATE_URL = "https://www.paypal.me/juanbrew";
 const API = "https://games.budsin.dev/api/paypal";
 
