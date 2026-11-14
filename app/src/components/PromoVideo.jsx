@@ -14,7 +14,7 @@ function wasDismissed() {
   }
 }
 
-/** Anuncio de vídeo pequeño al pie de la portada. Sin sonido hasta que se pulsa 🔊; se oculta a los Pro. */
+/** Anuncio de vídeo pequeño, fijo abajo a la derecha. Sin sonido hasta que se pulsa 🔊; se oculta a los Pro. */
 export default function PromoVideo() {
   const { t } = useI18n();
   const { isPro } = usePro();
@@ -36,6 +36,13 @@ export default function PromoVideo() {
     );
     io.observe(el);
     return () => io.disconnect();
+  }, [visible]);
+
+  // Marca el <body> mientras el anuncio está visible para que la portada le deje sitio.
+  useEffect(() => {
+    if (!visible) return undefined;
+    document.body.classList.add("has-promo");
+    return () => document.body.classList.remove("has-promo");
   }, [visible]);
 
   if (!visible) return null;

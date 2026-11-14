@@ -275,11 +275,13 @@
   .console-dock-btn { transition: none; }
 }
 
-/* Anuncio de vídeo al pie de la portada */
+/* Anuncio de vídeo flotante: abajo a la derecha, sigue al usuario al hacer scroll */
 .promo-video {
-  position: relative;
-  width: min(360px, 100%);
-  margin: 4px auto 22px;
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60; /* sobre la barra superior (50), bajo los modales (100) y el modo oculto */
+  width: min(300px, calc(100vw - 32px));
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
@@ -320,3 +322,22 @@
 .promo-video-close { right: 6px; }
 .promo-video-sound { right: 40px; }
 .promo-video-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+body.juanjo-classroom-open .promo-video { display: none; }
+/* Deja sitio al anuncio para que no tape la ayuda de teclas de la consola */
+@media (min-width: 1101px) {
+  body.has-promo .console-hints { margin-right: 320px; }
+}
+@media (min-width: 721px) and (max-width: 1100px) {
+  body.has-promo .console-hints { margin-right: 190px; }
+}
+@media (max-width: 1100px) {
+  .promo-video { right: 10px; bottom: 10px; width: 170px; }
+}
+@media (max-width: 720px) {
+  .promo-video { width: 150px; }
+  .promo-video-tag { top: 4px; left: 4px; font-size: 0.6rem; padding: 1px 6px; }
+  .promo-video-btn { top: 4px; width: 24px; height: 24px; font-size: 0.7rem; }
+  .promo-video-close { right: 4px; }
+  .promo-video-sound { right: 32px; }
+  body.has-promo .console-home { padding-bottom: 120px; }
+}
