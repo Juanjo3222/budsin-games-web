@@ -340,6 +340,8 @@ def make_handler(svc):
             self.send_response(status)
             self.send_header("Content-Type", "application/json")
             self.send_header("Cache-Control", "no-store")
+            self.send_header("CDN-Cache-Control", "no-store")
+            self.send_header("Cloudflare-CDN-Cache-Control", "no-store")
             self.send_header("Content-Length", str(len(raw)))
             self.cors()
             self.end_headers()

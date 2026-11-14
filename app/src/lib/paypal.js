@@ -11,7 +11,10 @@ async function authFetch(path, options = {}) {
   const user = auth.currentUser;
   if (!user) throw new Error("NO_USER");
   const token = await user.getIdToken();
-  const res = await fetch(API + path, {
+  // URL única por petición y sin caché: el CDN delante del sitio no debe reutilizar nunca la respuesta
+  // de un usuario para otro (el estado Pro va en la respuesta).
+  const res = await fetch(`${API}${path}?_=${Date.now()}${Math.random().toString(36).slice(2, 8)}`, {
+    cache: "no-store",
     ...options,
     headers: { ...(options.headers || {}), Authorization: `Bearer ${token}` },
   });
