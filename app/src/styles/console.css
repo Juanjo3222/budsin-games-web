@@ -274,3 +274,49 @@
   .console-nav,
   .console-dock-btn { transition: none; }
 }
+
+/* Anuncio de vídeo al pie de la portada */
+.promo-video {
+  position: relative;
+  width: min(360px, 100%);
+  margin: 4px auto 22px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #000;
+  box-shadow: var(--shadow-soft);
+}
+.promo-video video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; cursor: pointer; }
+.promo-video-tag {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.promo-video-btn {
+  position: absolute;
+  top: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.promo-video-close { right: 6px; }
+.promo-video-sound { right: 40px; }
+.promo-video-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }

@@ -3,6 +3,7 @@ import { GAMES } from "../data/games";
 import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
 import ConsoleHome from "../components/console/ConsoleHome";
+import PromoVideo from "../components/PromoVideo";
 import LibrarySection from "../components/home/LibrarySection";
 import { useI18n } from "../context/I18nContext";
 import { useLibrary } from "../context/LibraryContext";
@@ -59,6 +60,7 @@ export default function HomePage() {
           onRandom={randomGame}
           hasLibrary={SHOW_LIBRARY}
         />
+        <PromoVideo />
         {SHOW_LIBRARY && <LibrarySection popularity={popularity} onPlay={onPlay} />}
       </main>
       {SHOW_LIBRARY && <Footer />}
