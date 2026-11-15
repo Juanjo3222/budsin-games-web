@@ -144,18 +144,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 async function initProxy() {
   try {
-    // Forzar creación de la DB antes de que Scramjet la abra
-    await new Promise((resolve, reject) => {
-      const req = indexedDB.open("scramjet", 1);
+    // Scramjet guarda su estado en la base "$scramjet" (v1) con tres almacenes. Si el service worker la abre antes que el
+    // controlador, la crea VACÍA en v1 y después nadie vuelve a crear los almacenes ("'config' is not a known object store
+    // name"). Se crea aquí con sus almacenes antes de registrar el service worker; una base vacía heredada se recrea.
+    const SJ_STORES = ["config", "cookies", "redirectTrackers"];
+    const openSJ = () => new Promise((resolve, reject) => {
+      const req = indexedDB.open("$scramjet", 1);
       req.onupgradeneeded = (e) => {
         const db = e.target.result;
-        if (!db.objectStoreNames.contains("config")) {
-          db.createObjectStore("config");
-        }
+        SJ_STORES.forEach((n) => { if (!db.objectStoreNames.contains(n)) db.createObjectStore(n); });
       };
-      req.onsuccess = (e) => { e.target.result.close(); resolve(); };
-      req.onerror = reject;
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
     });
+    let sjdb = await openSJ();
+    if (SJ_STORES.some((n) => !sjdb.objectStoreNames.contains(n))) {
+      sjdb.close();
+      await new Promise((resolve) => { const d = indexedDB.deleteDatabase("$scramjet"); d.onsuccess = d.onerror = d.onblocked = () => resolve(); });
+      sjdb = await openSJ();
+    }
+    sjdb.close();
 
     const reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
 
@@ -178,7 +186,7 @@ async function initProxy() {
     await scramjetController.init();
 
     const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
-    await connection.setTransport("/epoxy/index.js", [{ wisp: WISP_URL }]);
+    await connection.setTransport("/epoxy/transport.js", [{ wisp: WISP_URL }]);
 
     swStatus.className = "sw-status ready";
     swStatus.textContent = "✅ Proxy listo";

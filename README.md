@@ -297,6 +297,7 @@ Firebase se usa únicamente para el conteo de popularidad.
 * **Pagos con PayPal**: suscripción Pro de $2.99 USD/mes desde Ajustes, con servicio propio en el VPS (`server/paypal/`). Se puede cancelar desde el sitio y el Pro sigue hasta el fin del periodo pagado. Ver la sección «Pagos con PayPal».
 * El Service Worker ya no cachea las rutas `/api/`.
 * **WebBlox** (`public/webblox/`): Roblox en el navegador con el cliente web oficial. Ver la sección «WebBlox».
+* **Proxy**: corregida la carrera de IndexedDB (`'config' is not a known object store name`: la base `$scramjet` se creaba vacía si el service worker llegaba antes que el controlador) y el transporte epoxy (`/epoxy/transport.js`, envoltorio ES que BareMux puede importar). `/proxy/?go=<url>` abre una URL al cargar.
 * **Anuncio de vídeo** pequeño al pie de la portada (`public/promo/`): silenciado por defecto, con botón de sonido y de cerrar; se oculta a los usuarios Pro.
 * Botones **Pro** (solo para quien no es Pro) y **Donar** en el dock del menú principal.
 * Tarjeta **Apoya el proyecto** en Ajustes con enlaces de donación a `paypal.me/juanbrew` ($1, $3, $5 u otro monto).
