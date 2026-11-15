@@ -112,3 +112,5 @@ $("#friend").addEventListener("keydown", (e) => e.key === "Enter" && joinFriend(
 $("#recheck").onclick = refreshSession;
 document.addEventListener("visibilitychange", () => !document.hidden && refreshSession());
 refreshSession();
+// Se registra aquí para que, al abrir el reproductor, el service worker de WebBlox ya esté listo (el del portal controla "/").
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js", { scope: "./" }).catch(() => {});

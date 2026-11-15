@@ -166,10 +166,10 @@ GTA V está disponible en `https://games.budsin.dev/gta-5/` mediante un proxy de
 | `net.js` + `roblox.js` | Puente: salen por **Wisp con epoxy** (el TLS termina en el navegador), jar de cookies en `localStorage`, reescrituras de Roblox (`rbx-user-agent`, `join-game` → `join-game-instance`, `gameFqdn`). |
 | `session.js` | Lee `.ROBLOSECURITY` del jar de Scramjet (`$scramjet`/`cookies`, o `__scramjet_controller`/`state` en Scramjet 2). La sesión se queda en el navegador: Budsin no la recibe. |
 | `engine.json`, `flags.json` | Versión del motor fijada y sus flags (una actualización de flags de Roblox no rompe un motor antiguo). |
-| `engine/` | El motor (~220 MB, **no está en git**). Se baja con `python3 scripts/webblox-fetch.py`. |
+| `engine/<versión>/` | El motor (~220 MB, **no está en git**). Se baja con `python3 app/scripts/webblox-fetch.py`. |
 
 **Despliegue**
-1. Tras el deploy normal, en el VPS: `python3 scripts/webblox-fetch.py --root /var/www/budsin-games-web/public/webblox` (y `chown -R github-runner:` de `engine/`). Solo hace falta al fijar una versión nueva (`--latest` consulta y fija la actual).
+1. Tras el deploy normal, en el VPS: `python3 app/scripts/webblox-fetch.py --root /var/www/budsin-games-web/public/webblox` (y `chown -R github-runner:` de `engine/`). Solo hace falta al fijar una versión nueva (`--latest` consulta y fija la actual).
 2. Caddy debe servir `/webblox/*` con `Cross-Origin-Opener-Policy: same-origin` y `Cross-Origin-Embedder-Policy: credentialless` (el motor usa pthreads sobre `WebAssembly.Memory` compartida). Se usa `credentialless` y no `require-corp` para que sigan cargando AdSense y GTM (regla 5 de `AGENTS.md`). Safari no lo soporta y verá un aviso.
 3. El reproductor necesita WebTransport (el tráfico de juego va directo a `*.qdmux.roblox.com`, no por Wisp) y `?placeId=` en la URL.
 

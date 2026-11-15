@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""Descarga el cliente web oficial de Roblox (WebClientApp, Emscripten) a <raíz>/engine/.
+"""Descarga el cliente web oficial de Roblox (WebClientApp, Emscripten) a <raíz>/engine/<versión>/.
 
 La versión está fijada en <raíz>/engine.json; las flags se guardan al lado (flags.json) para que una actualización
 de flags de Roblox no rompa un motor más antiguo. El motor (~220 MB) NO se sube a git (public/webblox/engine/ está
-en .gitignore): se ejecuta esto en el VPS tras desplegar (solo hace falta al fijar una versión nueva).
+en .gitignore; cada versión va en su propia carpeta, así una versión nueva nunca se mezcla con otra en caché): se ejecuta esto en el VPS tras desplegar (solo hace falta al fijar una versión nueva).
 
-  python3 scripts/webblox-fetch.py                  descarga la versión fijada (reanuda lo que ya esté bien)
-  python3 scripts/webblox-fetch.py --latest         consulta la versión actual de Roblox, la fija y la descarga
-  python3 scripts/webblox-fetch.py --flags          vuelve a guardar las flags actuales (solo si cambias de motor)
-  python3 scripts/webblox-fetch.py --root DIR       carpeta webblox (por defecto: ../public/webblox)
+  python3 app/scripts/webblox-fetch.py                  descarga la versión fijada (reanuda lo que ya esté bien)
+  python3 app/scripts/webblox-fetch.py --latest         consulta la versión actual de Roblox, la fija y la descarga
+  python3 app/scripts/webblox-fetch.py --flags          vuelve a guardar las flags actuales (solo si cambias de motor)
+  python3 app/scripts/webblox-fetch.py --root DIR       carpeta webblox (por defecto: ../../public/webblox)
 Solo usa la biblioteca estándar de Python 3.
 """
 import argparse, json, os, sys, time, urllib.parse, urllib.request
@@ -21,10 +21,9 @@ CORE = ["WasmPlayer.js", "WebClient.js", "WebClient.wasm", "audio-processor-fast
 ap = argparse.ArgumentParser()
 ap.add_argument("--latest", action="store_true")
 ap.add_argument("--flags", action="store_true")
-ap.add_argument("--root", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "public", "webblox"))
+ap.add_argument("--root", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "public", "webblox"))
 args = ap.parse_args()
 root = os.path.abspath(args.root)
-out = os.path.join(root, "engine")
 pin_file = os.path.join(root, "engine.json")
 
 
@@ -57,6 +56,7 @@ if args.latest or args.flags or not os.path.exists(flags_file):
         fh.write(data)
     print("flags guardadas:", len(json.loads(data).get("applicationSettings", {})))
 
+out = os.path.join(root, "engine", pin["version"])
 base = f"https://setup.rbxcdn.com/webclient/{pin['version']}-RobloxWebClient"
 os.makedirs(out, exist_ok=True)
 meta_raw = get(base + "/WebClient.metadata.json")

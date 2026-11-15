@@ -5,13 +5,15 @@ const HOST = /(^|\.)roblox\.com$|(^|\.)rbxcdn\.com$|(^|\.)robloxlabs\.com$/;
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
 
-async function bridgeClient() {
-  const all = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-  return all.find((c) => /\/webblox\/(player|index)/.test(c.url) || /\/webblox\/?$/.test(c.url));
+// Solo la página del reproductor tiene el puente (el lanzador llama a proxyFetch directamente y no escucha mensajes).
+const isPlayer = (c) => /\/webblox\/player\.html/.test(c.url);
+async function bridgeClient(clientId) {
+  if (clientId) { const c = await self.clients.get(clientId); if (c && isPlayer(c)) return c; }   // petición de la propia página
+  return (await self.clients.matchAll({ type: "window", includeUncontrolled: true })).find(isPlayer);  // petición de un worker
 }
 
-async function forward(request) {
-  const client = await bridgeClient();
+async function forward(request, clientId) {
+  const client = await bridgeClient(clientId);
   if (!client) return new Response("WebBlox: no hay página puente", { status: 503 });
   const body = ["GET", "HEAD"].includes(request.method) ? null : await request.arrayBuffer();
   const headers = [...request.headers];
@@ -49,5 +51,5 @@ async function forward(request) {
 self.addEventListener("fetch", (e) => {
   const u = new URL(e.request.url);
   if (u.origin === self.location.origin || !HOST.test(u.hostname)) return;   // lo demás, sin tocar (WebTransport no pasa por aquí)
-  e.respondWith(forward(e.request).catch((err) => new Response(String(err), { status: 502 })));
+  e.respondWith(forward(e.request, e.clientId).catch((err) => new Response(String(err), { status: 502 })));
 });

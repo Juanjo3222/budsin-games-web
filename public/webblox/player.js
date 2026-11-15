@@ -35,9 +35,13 @@ async function main() {
   setSession(cookie);
   if (gameId) setJoin({ gameId });
 
+  // El portal ya registra su propio service worker en "/" (caché de Pro y proxy): hay que estar controlados por EL DE WEBBLOX
+  // (scope /webblox/), que es más específico y toma el control con clients.claim(). Si no llega a tomarlo, se recarga una vez.
+  const ours = () => (navigator.serviceWorker.controller?.scriptURL || "").endsWith("/webblox/sw.js");
   await navigator.serviceWorker.register("sw.js", { scope: "./" });
   await navigator.serviceWorker.ready;
-  if (!navigator.serviceWorker.controller) {          // primera visita: la página aún no está controlada por el SW
+  if (!ours()) await new Promise((res) => { navigator.serviceWorker.addEventListener("controllerchange", res, { once: true }); setTimeout(res, 4000); });
+  if (!ours()) {
     if (sessionStorage.getItem("webblox-sw-reload")) return gate(t("unsupported"), t("needSW"));
     sessionStorage.setItem("webblox-sw-reload", "1");
     return location.reload();
@@ -47,7 +51,10 @@ async function main() {
   $("#status").textContent = t("connecting");
   await connect();
 
-  window.__wasmLoaderContext = { engineBase: new URL("engine", location.href).href.replace(/\/$/, ""), channel: null, server: "prod" };
+  // El motor vive en engine/<versión>/ (versión fijada en engine.json): una versión nueva nunca se mezcla con otra en caché.
+  const pin = await (await fetch("engine.json", { cache: "no-store" })).json();
+  const engine = new URL(`engine/${pin.version}`, location.href).href;
+  window.__wasmLoaderContext = { engineBase: engine, channel: null, server: "prod" };
   // Opciones que lee WasmPlayer.js (lo mismo que ofrece Roblox en sus páginas de desarrollo): la cookie de sesión y poco más.
   let auth = cookie;
   window.__wasmDevSettings = {
@@ -60,8 +67,8 @@ async function main() {
     getFlagOverrides: () => ({}),
   };
   const s = document.createElement("script");
-  s.src = "engine/WasmPlayer.js";
-  s.onerror = () => $("#status").textContent = "No se pudo cargar el motor (¿falta ejecutar scripts/webblox-fetch.mjs?)";
+  s.src = `${engine}/WasmPlayer.js`;
+  s.onerror = () => $("#status").textContent = "No se pudo cargar el motor (¿falta ejecutar app/scripts/webblox-fetch.py?)";
   document.body.appendChild(s);
 }
 main().catch((e) => { console.error("[webblox]", e); gate(t("unsupported"), String(e && e.message || e)); });
