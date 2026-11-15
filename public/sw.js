@@ -143,9 +143,31 @@ self.addEventListener("message", (e) => {
 const { ScramjetServiceWorker } = $scramjetLoadWorker();
 const scramjet = new ScramjetServiceWorker();
 
+// Scramjet 1.1.0: la configuración global del bundle solo se fija dentro de loadConfig() (lee IndexedDB). Si la página la
+// manda por mensaje, el worker guarda scramjet.config pero NO la configuración global, y la primera petición a /scramjet/…
+// falla con "Cannot read properties of undefined (reading 'prefix')". Se fuerza una carga desde IndexedDB antes de servir.
+const SJ_PREFIX = "/scramjet/";
+const SJ_WASM = "/scram/scramjet.wasm.wasm";
+let sjConfigReady = null;
+function ensureScramjetConfig() {
+  if (!sjConfigReady) {
+    sjConfigReady = (async () => {
+      const had = scramjet.config;
+      scramjet.config = undefined;
+      await scramjet.loadConfig();
+      if (!scramjet.config) { scramjet.config = had; sjConfigReady = null; }   // aún no estaba guardada: se reintenta en la siguiente
+    })().catch((e) => { sjConfigReady = null; throw e; });
+  }
+  return sjConfigReady;
+}
+const isScramjetRequest = (req) => {
+  const u = new URL(req.url);
+  return u.origin === location.origin && (u.pathname.startsWith(SJ_PREFIX) || u.pathname === SJ_WASM);
+};
+
 self.addEventListener("fetch", (event) => {
-  if (scramjet.route(event)) {
-    event.respondWith(scramjet.fetch(event));
+  if (isScramjetRequest(event.request)) {
+    event.respondWith((async () => { await ensureScramjetConfig(); return scramjet.fetch(event); })());
     return;
   }
   if (event.request.method !== "GET") return;

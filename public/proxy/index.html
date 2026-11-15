@@ -144,10 +144,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 async function initProxy() {
   try {
-    // Scramjet guarda su estado en la base "$scramjet" (v1) con tres almacenes. Si el service worker la abre antes que el
+    // Scramjet guarda su estado en la base "$scramjet" (v1) con cinco almacenes. Si el service worker la abre antes que el
     // controlador, la crea VACÍA en v1 y después nadie vuelve a crear los almacenes ("'config' is not a known object store
     // name"). Se crea aquí con sus almacenes antes de registrar el service worker; una base vacía heredada se recrea.
-    const SJ_STORES = ["config", "cookies", "redirectTrackers"];
+    const SJ_STORES = ["config", "cookies", "redirectTrackers", "publicSuffixList", "referrerPolicies"];
     const openSJ = () => new Promise((resolve, reject) => {
       const req = indexedDB.open("$scramjet", 1);
       req.onupgradeneeded = (e) => {
