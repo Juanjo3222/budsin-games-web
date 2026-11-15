@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" role="img" aria-label="Budsin Music">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1d2b64"/>
+      <stop offset="1" stop-color="#7b2ff7"/>
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#g)"/>
+  <g fill="none" stroke="#fff" stroke-opacity=".18" stroke-width="2">
+    <circle cx="520" cy="60" r="90"/><circle cx="520" cy="60" r="140"/><circle cx="520" cy="60" r="190"/>
+  </g>
+  <g fill="#fff">
+    <path d="M300 96v128a40 40 0 1 1-20-34.6V128l140-28v100a40 40 0 1 1-20-34.6V76z" fill-opacity=".95"/>
+  </g>
+  <text x="40" y="320" font-family="system-ui,-apple-system,sans-serif" font-size="34" font-weight="700" fill="#fff">Budsin Music</text>
+</svg>

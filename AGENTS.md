@@ -138,6 +138,12 @@ Estas funcionalidades fueron **aprobadas por el usuario** y deben implementarse 
 - El Secret de PayPal nunca va al repositorio ni al chat: vive en `/etc/budsin-paypal.env` del VPS (`budsin-paypal-set-secret`).
 - Estado actual: **Live** (producción). Detalles de instalación y paso a producción en la sección «Pagos con PayPal» del `README.md`.
 
+### 🎵 Budsin Music (excepción autorizada por el usuario)
+- El usuario ordenó explícitamente anular la regla de «no crear servicios/carpetas fuera de `public/`» **solo** para el backend de música: `server/music/` (copia parcheada de [x8rr/music](https://github.com/x8rr/music), bun + yt-dlp, AGPL-3.0) y su instalador. No amplía la excepción a nada más.
+- La página vive en `public/musica/` y llama a `/api/music/*`, que Caddy reenvía a `127.0.0.1:3103` (servicio `budsin-music`, usuario propio, `MemoryMax=1G`).
+- Sin Firebase ni Auth. Es código AGPL-3.0: se mantiene el enlace al código fuente en la página y `server/music/app/` contiene el fuente modificado.
+- Instalación en el VPS: `sudo bash server/music/install.sh` (idempotente; verifica checksums de bun y yt-dlp y valida el Caddyfile con marcha atrás).
+
 ### 🧠 Lógica de verificación en cliente
 
 1. **Al cargar la página**: `localStorage` cachea `budsin_pro_active` (0/1) para respuesta inmediata.

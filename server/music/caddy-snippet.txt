@@ -1,0 +1,11 @@
+
+	# Budsin Music: backend local (server/music). El audio se pide con Range, nunca se cachea en el borde.
+	handle /api/music/* {
+		header Cache-Control "no-store"
+		reverse_proxy 127.0.0.1:3103 {
+			flush_interval -1
+			transport http {
+				read_timeout 3m
+			}
+		}
+	}

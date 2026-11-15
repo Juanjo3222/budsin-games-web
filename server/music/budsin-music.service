@@ -1,0 +1,30 @@
+[Unit]
+Description=Budsin Music - backend de música (x8rr/music, AGPL-3.0)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=budsin-music
+Group=budsin-music
+EnvironmentFile=/etc/budsin-music.env
+WorkingDirectory=/opt/budsin-music/app
+Environment=HOME=/var/lib/budsin-music
+Environment=XDG_CACHE_HOME=/var/lib/budsin-music/cache
+ExecStart=/usr/local/bin/bun index.ts
+Restart=on-failure
+RestartSec=3
+# Límites para que no pueda afectar a PayPal ni al sitio (cada yt-dlp son ~75 MB)
+MemoryMax=1G
+CPUQuota=150%
+TasksMax=200
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/var/lib/budsin-music
+
+[Install]
+WantedBy=multi-user.target

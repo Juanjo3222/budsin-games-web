@@ -2316,5 +2316,31 @@ export const GAMES = [
     "pro": false,
     "proRelease": null,
     "isNew": true
+  },
+  {
+    "id": "musica/index.html",
+    "name": "budsin music",
+    "title": "Budsin Music",
+    "href": "musica/",
+    "cover": "portadas/musica.svg",
+    "type": "tools",
+    "category": {
+      "es": "Música",
+      "en": "Music",
+      "pt": "Música"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Busca canciones y escúchalas al instante desde el navegador, sin instalar nada.",
+      "en": "Search for songs and listen to them instantly in your browser, with nothing to install.",
+      "pt": "Busque músicas e ouça na hora no navegador, sem instalar nada."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
   }
 ];

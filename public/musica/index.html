@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+<!-- End Google Tag Manager -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Budsin Music</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0d0d0f;
+    color: #e8e8ea;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  header {
+    padding: 1rem;
+    border-bottom: 1px solid #222;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  header a.back { color: #999; text-decoration: none; font-size: 1.3rem; padding: 0 0.3rem; }
+  header a.back:hover { color: #fff; }
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 0.6rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid #333;
+    background: #17171a;
+    color: inherit;
+    font-size: 1rem;
+  }
+  button {
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    border: none;
+    background: #3a6ee8;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  ul { list-style: none; margin: 0; padding: 0; overflow-y: auto; flex: 1; }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    border-bottom: 1px solid #1a1a1d;
+  }
+  li:hover { background: #17171a; }
+  li.playing { background: #1c2a4a; }
+  li img { width: 40px; height: 40px; border-radius: 4px; object-fit: cover; background: #222; flex-shrink: 0; }
+  .meta { display: flex; flex-direction: column; overflow: hidden; }
+  .title { font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .artist { font-size: 0.8rem; color: #999; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #222;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  #nowPlaying { font-size: 0.9rem; color: #aaa; min-height: 1.1em; }
+  audio { width: 100%; }
+  .status { padding: 1rem; color: #888; }
+  .legal { font-size: 0.72rem; color: #666; line-height: 1.4; }
+  .legal a { color: #8a9bd6; }
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<header>
+  <a class="back" href="https://games.budsin.dev/" aria-label="Budsin Games">←</a>
+  <input id="q" type="text" autofocus>
+  <button id="searchBtn"></button>
+</header>
+<ul id="results"></ul>
+<footer>
+  <div id="nowPlaying"></div>
+  <audio id="player" controls></audio>
+  <div class="legal" id="legal"></div>
+</footer>
+<script>
+var I18N = {
+  es: { search: 'Buscar', ph: 'Buscar canciones...', searching: 'Buscando…', failed: 'La búsqueda falló.', none: 'Sin resultados.',
+    playErr: 'No se pudo reproducir esta canción. Prueba con otra.', noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
+    legal: 'Servicio de terceros: el audio proviene de YouTube Music y puede no estar disponible. Código fuente (AGPL-3.0): ' },
+  en: { search: 'Search', ph: 'Search tracks...', searching: 'Searching…', failed: 'Search failed.', none: 'No results.',
+    playErr: 'Could not play this track. Try another one.', noPlay: 'Search works, but playback is not available right now.',
+    legal: 'Third-party service: audio comes from YouTube Music and may be unavailable. Source code (AGPL-3.0): ' },
+  pt: { search: 'Buscar', ph: 'Buscar músicas...', searching: 'Buscando…', failed: 'A busca falhou.', none: 'Sem resultados.',
+    playErr: 'Não foi possível reproduzir esta música. Tente outra.', noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
+    legal: 'Serviço de terceiros: o áudio vem do YouTube Music e pode não estar disponível. Código-fonte (AGPL-3.0): ' }
+};
+var lang = 'es';
+try {
+  var saved = (localStorage.getItem('budsin_language') || '').slice(0, 2).toLowerCase();
+  if (I18N[saved]) lang = saved;
+} catch (e) {}
+function t(k) { return I18N[lang][k]; }
+
+var q = document.getElementById('q');
+var results = document.getElementById('results');
+var player = document.getElementById('player');
+var nowPlaying = document.getElementById('nowPlaying');
+
+document.documentElement.lang = lang;
+q.placeholder = t('ph');
+document.getElementById('searchBtn').textContent = t('search');
+document.getElementById('legal').innerHTML = t('legal') +
+  '<a href="https://github.com/Juanjo3222/budsin-games-web/tree/main/server/music/app" target="_blank" rel="noopener">Budsin</a> · ' +
+  '<a href="https://github.com/x8rr/music" target="_blank" rel="noopener">x8rr/music</a>';
+
+function status(msg) { results.innerHTML = '<div class="status">' + msg + '</div>'; }
+
+async function search() {
+  var query = q.value.trim();
+  if (!query) return;
+  status(t('searching'));
+  try {
+    var res = await fetch('/api/music/search?q=' + encodeURIComponent(query));
+    if (!res.ok) throw new Error('http ' + res.status);
+    var data = await res.json();
+    renderResults(data.items || []);
+  } catch (e) {
+    status(t('failed'));
+  }
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function renderResults(tracks) {
+  results.innerHTML = '';
+  if (!tracks.length) return status(t('none'));
+  tracks.forEach(function (tr) {
+    var li = document.createElement('li');
+    li.innerHTML =
+      '<img src="' + escapeHtml(tr.artwork || '') + '" alt="" referrerpolicy="no-referrer">' +
+      '<div class="meta"><div class="title">' + escapeHtml(tr.title) + '</div>' +
+      '<div class="artist">' + escapeHtml(tr.artist) + '</div></div>';
+    li.addEventListener('click', function () { play(tr, li); });
+    results.appendChild(li);
+  });
+}
+
+function play(track, li) {
+  document.querySelectorAll('#results li.playing').forEach(function (el) { el.classList.remove('playing'); });
+  li.classList.add('playing');
+  nowPlaying.textContent = track.title + ' — ' + track.artist;
+
+  var params = new URLSearchParams({ id: String(track.id) });
+  if (track.isrc) params.set('isrc', track.isrc);
+  if (track.source) params.set('source', track.source);
+  if (track.title) params.set('title', track.title);
+  if (track.artist) params.set('artist', track.artist);
+  if (track.duration) params.set('duration', String(track.duration));
+
+  player.src = '/api/music/stream?' + params.toString();
+  player.play().catch(function () {});
+}
+
+player.addEventListener('error', function () { nowPlaying.textContent = t('playErr'); });
+
+fetch('/api/music/source').then(function (r) { return r.json(); }).then(function (s) {
+  if (s.configured && !s.configured.ytm) status(t('noPlay'));
+}).catch(function () {});
+
+document.getElementById('searchBtn').addEventListener('click', search);
+q.addEventListener('keydown', function (e) { if (e.key === 'Enter') search(); });
+</script>
+<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+</body>
+</html>
