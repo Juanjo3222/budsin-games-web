@@ -184,6 +184,12 @@ async function initProxy() {
     swStatus.textContent = "✅ Proxy listo";
     goBtn.disabled = false;
 
+    // /proxy/?go=https://www.roblox.com/login  (lo usa WebBlox para iniciar sesión en Roblox)
+    const go = new URLSearchParams(location.search).get("go");
+    if (go) {
+      try { if (/(^|\.)roblox\.com$/.test(new URL(go).hostname)) launchProxy(go); } catch (_) {}
+    }
+
   } catch (e) {
     swStatus.className = "sw-status error";
     swStatus.textContent = "❌ Error: " + e.message;

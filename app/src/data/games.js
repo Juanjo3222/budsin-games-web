@@ -2290,5 +2290,31 @@ export const GAMES = [
     "pro": false,
     "proRelease": null,
     "isNew": true
+  },
+  {
+    "id": "webblox/index.html",
+    "name": "webblox",
+    "title": "WebBlox",
+    "href": "webblox/",
+    "cover": "portadas/webblox.svg",
+    "type": "port",
+    "category": {
+      "es": "Multiplayer",
+      "en": "Multiplayer",
+      "pt": "Multiplayer"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Roblox en tu navegador con el cliente web oficial: busca un juego, inicia sesión y juega sin instalar nada.",
+      "en": "Roblox in your browser with the official web client: search for a game, sign in and play with nothing to install.",
+      "pt": "Roblox no seu navegador com o cliente web oficial: busque um jogo, entre na sua conta e jogue sem instalar nada."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
   }
 ];

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+<!-- End Google Tag Manager -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="robots" content="noindex">
+<title>WebBlox — Budsin Games</title>
+<link rel="stylesheet" href="webblox.css">
+</head>
+<body class="player">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+<canvas id="canvas" tabindex="-1"></canvas>
+<div id="input-container"><textarea id="input-textarea" autocomplete="off" autocorrect="off" spellcheck="false"></textarea><input id="input-input" type="text" autocomplete="off" autocorrect="off" spellcheck="false"></div>
+<div class="hud"><span id="server"></span><span id="proxyenabled"></span></div>
+
+<div id="loading-overlay" role="status" aria-busy="true">
+  <div id="loading-background-image"></div>
+  <div class="loading-card">
+    <div id="loading-icon-shell"><img id="loading-experience-icon" alt=""></div>
+    <h1 id="loading-experience-title">WebBlox</h1>
+    <p id="loading-experience-creator"><span id="loading-verified-badge"></span></p>
+    <div id="status" data-t="connecting">Conectando con Roblox…</div>
+    <div class="loading-error-panel" hidden>
+      <h2 id="loading-error-title"></h2>
+      <div id="loading-error-message"></div>
+      <div id="loading-error-code"></div>
+      <button class="btn secondary" id="loading-error-leave" type="button" data-t="back">Volver a WebBlox</button>
+    </div>
+    <button class="btn secondary" id="loading-cancel" type="button" data-t="back">Volver a WebBlox</button>
+  </div>
+</div>
+
+<div id="gate"><div class="box"><h1 id="gate-title"></h1><p id="gate-msg"></p><p><a id="gate-link" href="./"></a></p></div></div>
+
+<script type="module" src="player.js"></script>
+<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+</body>
+</html>
