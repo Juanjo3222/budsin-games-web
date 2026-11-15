@@ -341,3 +341,71 @@ body.juanjo-classroom-open .promo-video { display: none; }
   .promo-video-sound { right: 32px; }
   body.has-promo .console-home { padding-bottom: 120px; }
 }
+
+/* Aviso de Budsin Hosting: abajo a la izquierda (el vídeo va a la derecha) */
+.host-ad {
+  position: fixed;
+  left: 16px;
+  bottom: 140px; /* sobre los enlaces legales y el botón Ocultar */
+  z-index: 60;
+  width: min(300px, calc(100vw - 32px));
+  padding: 34px 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface, #15151a);
+  color: var(--text, #fff);
+  box-shadow: var(--shadow-soft);
+}
+.host-ad-tag {
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(127, 127, 127, 0.25);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.host-ad-close {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 26px;
+  height: 26px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(127, 127, 127, 0.25);
+  color: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+}
+.host-ad-close:focus-visible, .host-ad-cta:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.host-ad-title { display: block; font-size: 0.95rem; margin-bottom: 4px; }
+.host-ad-text { margin: 0 0 10px; font-size: 0.82rem; line-height: 1.4; opacity: 0.8; }
+.host-ad-cta {
+  display: inline-block;
+  padding: 7px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+body.juanjo-classroom-open .host-ad { display: none; }
+@media (min-width: 1101px) {
+  body.has-hostad .console-hints { margin-left: 320px; }
+}
+/* En pantallas pequeñas se apila sobre el vídeo para no solaparlo */
+@media (max-width: 1100px) {
+  .host-ad { left: auto; right: 10px; bottom: 126px; width: 190px; padding: 30px 10px 10px; }
+  .host-ad-text { display: none; }
+}
+@media (max-width: 720px) {
+  .host-ad { width: 150px; bottom: 112px; }
+  .host-ad-title { font-size: 0.8rem; }
+  .host-ad-cta { font-size: 0.72rem; padding: 5px 9px; }
+  body.has-hostad .console-home { padding-bottom: 220px; }
+}

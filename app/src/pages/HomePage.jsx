@@ -4,6 +4,7 @@ import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
 import ConsoleHome from "../components/console/ConsoleHome";
 import PromoVideo from "../components/PromoVideo";
+import HostingNotice from "../components/HostingNotice";
 import LibrarySection from "../components/home/LibrarySection";
 import { useI18n } from "../context/I18nContext";
 import { useLibrary } from "../context/LibraryContext";
@@ -61,6 +62,7 @@ export default function HomePage() {
           hasLibrary={SHOW_LIBRARY}
         />
         <PromoVideo />
+        <HostingNotice />
         {SHOW_LIBRARY && <LibrarySection popularity={popularity} onPlay={onPlay} />}
       </main>
       {SHOW_LIBRARY && <Footer />}

@@ -274,6 +274,7 @@ Firebase se usa únicamente para el conteo de popularidad.
 * **Anuncio de vídeo** pequeño al pie de la portada (`public/promo/`): silenciado por defecto, con botón de sonido y de cerrar; se oculta a los usuarios Pro.
 * Botones **Pro** (solo para quien no es Pro) y **Donar** en el dock del menú principal.
 * Tarjeta **Apoya el proyecto** en Ajustes con enlaces de donación a `paypal.me/juanbrew` ($1, $3, $5 u otro monto).
+* **Aviso de Budsin Hosting** (anuncio) abajo a la izquierda de la portada, en ES/EN/PT: enlaza a `budsin.dev/hosting/`, se puede cerrar y se oculta a los usuarios Pro (`app/src/components/HostingNotice.jsx`).
 
 ### v7.1
 * **33 juegos nuevos** (ports de [wasm.rip](https://github.com/wasmdotrip/wasm.rip)): MiSide, Stardew Valley, Fez, Inscryption, RimWorld, PEAK, Superflight, Hill Climb Racing, Keep Talking And Nobody Explodes y más. Ver la tabla de ports más arriba.
