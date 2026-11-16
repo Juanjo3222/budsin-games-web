@@ -999,10 +999,25 @@ $('#bPrev').addEventListener('click', prev);
 $('#bNext').addEventListener('click', function () { next(false); });
 
 // Tracks from YouTube Music carry no catalogue ids: the link finds the artist/album page by name when clicked.
+var ONE_ARTIST = /^(tyler, the creator|earth, wind & fire|crosby, stills,? (&|and) nash|simon & garfunkel|hall & oates|florence \+ the machine)$/i;
+function artistNames(tr) {      // "Peso Pluma & Tito Double P" -> ["Peso Pluma", "Tito Double P"]
+  var a = String(tr.artist || '').trim();
+  if (!a) return [];
+  if (ONE_ARTIST.test(a)) return [a];
+  var out = a.split(/\s*(?:,|&|;|\bfeat\.?|\bft\.?|\bfeaturing\b|\bx\b)\s*/i).map(function (x) { return x.trim(); }).filter(Boolean);
+  return out.length ? out : [a];
+}
 function artistLink(tr, cls) {
-  if (!tr.artist) return '';
-  return tr.artistId ? '<a href="#/artist/' + esc(tr.artistId) + '">' + esc(tr.artist) + '</a>'
-    : '<a href="#" data-lka="' + esc(primaryArtist(tr)) + '">' + esc(tr.artist) + '</a>';
+  var names = artistNames(tr);
+  if (!names.length) return '';
+  if (names.length === 1) {
+    return tr.artistId ? '<a href="#/artist/' + esc(tr.artistId) + '">' + esc(tr.artist) + '</a>'
+      : '<a href="#" data-lka="' + esc(names[0]) + '">' + esc(tr.artist) + '</a>';
+  }
+  // Several credited artists: each one is its own link (the catalogue id on the track belongs to the first).
+  return names.map(function (n, i) {
+    return i === 0 && tr.artistId ? '<a href="#/artist/' + esc(tr.artistId) + '">' + esc(n) + '</a>' : '<a href="#" data-lka="' + esc(n) + '">' + esc(n) + '</a>';
+  }).join(', ');
 }
 function albumLink(tr, text) {
   if (!tr.albumId && !tr.album) return esc(text);
@@ -1143,9 +1158,15 @@ function openMenu(anchor, items) {
     m.appendChild(b);
   });
   document.body.appendChild(m); menuEl = m;
-  var r = anchor.getBoundingClientRect(), mw = m.offsetWidth, mh = m.offsetHeight;
-  var left = Math.min(window.innerWidth - mw - 8, Math.max(8, r.right - mw));
-  var top = r.bottom + 6; if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 6);
+  var mw = m.offsetWidth, mh = m.offsetHeight, left, top;
+  if (anchor.pt) {        // right click: the menu opens at the pointer
+    left = Math.min(window.innerWidth - mw - 8, Math.max(8, anchor.pt.x));
+    top = anchor.pt.y; if (top + mh > window.innerHeight - 8) top = Math.max(8, window.innerHeight - mh - 8);
+  } else {
+    var r = anchor.getBoundingClientRect();
+    left = Math.min(window.innerWidth - mw - 8, Math.max(8, r.right - mw));
+    top = r.bottom + 6; if (top + mh > window.innerHeight - 8) top = Math.max(8, r.top - mh - 6);
+  }
   m.style.left = left + 'px'; m.style.top = top + 'px';
 }
 document.addEventListener('click', function (e) { if (menuEl && !menuEl.contains(e.target)) closeMenu(); });
@@ -1162,7 +1183,9 @@ function trackMenu(anchor, tr, pl) {
   playlists.forEach(function (p) { items.push({ label: p.name, fn: function () { addToPlaylist(p, tr); } }); });
   items.push({ label: '+ ' + t('newPl'), fn: function () { newPlaylist(tr); } });
   if (tr.artist || tr.album) items.push('-');
-  if (tr.artist) items.push({ label: t('goArtist'), fn: function () { goToArtist(tr); } });
+  var names = artistNames(tr);
+  if (names.length > 1) names.forEach(function (n, i) { items.push({ label: t('goArtist') + ': ' + n, fn: function () { goToArtist(i === 0 ? tr : { artist: n }); } }); });
+  else if (tr.artist) items.push({ label: t('goArtist'), fn: function () { goToArtist(tr); } });
   if (tr.albumId || tr.album) items.push({ label: t('goAlbum'), fn: function () { goToAlbum(tr); } });
   if (pl) { items.push('-'); items.push({ label: t('remove'), fn: function () { pl.tracks = pl.tracks.filter(function (x) { return tid(x) !== tid(tr); }); savePl(); render(); } }); }
   openMenu(anchor, items);
@@ -1584,6 +1607,20 @@ view.addEventListener('click', function (e) {
   var tr3 = t_.closest('.tr');
   if (tr3) { playList(lists[+tr3.getAttribute('data-l')], +tr3.getAttribute('data-i')); return; }
 });
+// Right click (or long-press) on a song: the same menu as the ⋯ button, at the pointer.
+function ctxMenu(e, tr, pl) {
+  e.preventDefault(); e.stopPropagation();
+  trackMenu({ pt: { x: e.clientX, y: e.clientY } }, tr, pl);
+}
+view.addEventListener('contextmenu', function (e) {
+  var el = e.target.closest && e.target.closest('.tr, [data-cardplay]');
+  if (!el || e.target.closest('input, textarea')) return;
+  var tr = lists[+el.getAttribute('data-l')] && lists[+el.getAttribute('data-l')][+el.getAttribute('data-i')];
+  if (!tr) return;
+  var pl = el.classList.contains('tr') && route.name === 'playlist' ? playlists.filter(function (p) { return p.id === route.id; })[0] : null;
+  ctxMenu(e, tr, pl);
+});
+$('#np').addEventListener('contextmenu', function (e) { var c = cur(); if (c) ctxMenu(e, c, null); });
 view.addEventListener('keydown', function (e) {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('[data-cardplay]')) { e.preventDefault(); e.target.click(); }
 });
