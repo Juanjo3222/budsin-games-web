@@ -179,6 +179,7 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .tr .like:hover, .tr .more:hover { color: var(--text); background: var(--hover); }
 .tr .like.on:hover { color: var(--accent); }
 .exp { font-size: .6rem; background: #3a404d; color: #ddd; padding: 1px 5px; border-radius: 3px; font-weight: 800; flex: none; }
+.iconbtn[hidden] { display: none; }
 .eq { display: inline-flex; gap: 2px; align-items: flex-end; height: 14px; }
 .eq i { width: 3px; background: var(--accent); animation: eq 1s infinite ease-in-out; border-radius: 1px; }
 .eq i:nth-child(1) { height: 60%; animation-delay: -.2s; } .eq i:nth-child(2) { height: 100%; animation-delay: -.5s; } .eq i:nth-child(3) { height: 40%; animation-delay: -.8s; }
@@ -529,6 +530,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="right">
       <button class="iconbtn" id="bLyr" data-ti="lyr"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></button>
       <button class="iconbtn" id="bViz" data-ti="viz"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>
+      <button class="iconbtn" id="bPip" data-ti="pip" hidden><svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg></button>
       <button class="iconbtn" id="bQueue" data-ti="queue"><svg viewBox="0 0 24 24"><path d="M3 6h14v2H3zm0 5h14v2H3zm0 5h9v2H3zm13 0l6-3.5v7z"/></svg></button>
       <button class="iconbtn" id="bMute" data-ti="mute"></button>
       <input type="range" id="vol" min="0" max="100" value="80" aria-label="Volumen">
@@ -630,7 +632,7 @@ var I18N = {
     acctTitle: 'Cuenta de Budsin', acctPitch: 'Inicia sesión con Google para que tus ♥, playlists y gustos te sigan a todos tus dispositivos y a Budsin Games.', acctIn: 'Iniciar sesión con Google', acctOut: 'Cerrar sesión', acctWipe: 'Borrar mis datos de la nube', acctWipeAsk: '¿Borrar de la nube tus ♥, playlists, gustos y preferencias? Lo guardado en este navegador se queda.', acctWiped: 'Datos de la nube borrados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'No se pudo sincronizar.', acctErrPerm: 'No se pudo sincronizar: faltan permisos en Firestore.', acctSignedOut: 'Sesión cerrada. Se quitaron de este navegador los datos de la cuenta.', acctFail: 'No se pudo iniciar sesión.', acctSdkFail: 'No se pudo cargar el inicio de sesión. Revisa tu conexión.',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
-    lyr: 'Letra', lyrLoading: 'Buscando letra…', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
+    lyr: 'Letra', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
@@ -661,7 +663,7 @@ var I18N = {
     acctTitle: 'Budsin account', acctPitch: 'Sign in with Google so your ♥, playlists and taste follow you to all your devices and to Budsin Games.', acctIn: 'Sign in with Google', acctOut: 'Sign out', acctWipe: 'Delete my cloud data', acctWipeAsk: 'Delete your ♥, playlists, taste and preferences from the cloud? What is saved in this browser stays.', acctWiped: 'Cloud data deleted.', acctConnecting: 'Connecting…', acctSyncing: 'Syncing…', acctSynced: 'Synced ✓', acctErr: 'Could not sync.', acctErrPerm: 'Could not sync: Firestore permissions are missing.', acctSignedOut: 'Signed out. The account data was removed from this browser.', acctFail: 'Could not sign in.', acctSdkFail: 'Could not load sign-in. Check your connection.',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
-    lyr: 'Lyrics', lyrLoading: 'Looking for lyrics…', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
+    lyr: 'Lyrics', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
     noPlay: 'Search works, but playback is not available right now.',
@@ -692,7 +694,7 @@ var I18N = {
     acctTitle: 'Conta Budsin', acctPitch: 'Entre com o Google para que seus ♥, playlists e gostos acompanhem você em todos os dispositivos e no Budsin Games.', acctIn: 'Entrar com o Google', acctOut: 'Sair', acctWipe: 'Apagar meus dados da nuvem', acctWipeAsk: 'Apagar da nuvem seus ♥, playlists, gostos e preferências? O que está salvo neste navegador permanece.', acctWiped: 'Dados da nuvem apagados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'Não foi possível sincronizar.', acctErrPerm: 'Não foi possível sincronizar: faltam permissões no Firestore.', acctSignedOut: 'Sessão encerrada. Os dados da conta foram removidos deste navegador.', acctFail: 'Não foi possível entrar.', acctSdkFail: 'Não foi possível carregar o login. Verifique sua conexão.',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
-    lyr: 'Letra', lyrLoading: 'Procurando a letra…', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
+    lyr: 'Letra', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
@@ -817,6 +819,73 @@ function dynFor(src) {
   };
   im.onerror = function () { if (my === dyn.seq) dynReset(); };
   im.src = '/api/music/art?u=' + encodeURIComponent(src);
+}
+/* ---- floating mini window (Document Picture-in-Picture, Chrome/Edge desktop and ChromeOS) ----
+ * Optional: a small always-on-top window with cover, title, the current lyric line and the controls, so the music
+ * can be driven from over any other app, not only inside Budsin. Where the browser has no such API the button stays
+ * hidden. The window is plain DOM that this page fills and updates; closing it just stops the updates. */
+var pip = { win: null, timer: 0, ok: !!(window.documentPictureInPicture && window.documentPictureInPicture.requestWindow) };
+var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#0b0d10;color:#eef0f4;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}' +
+  '#pp{display:grid;grid-template-columns:76px 1fr;gap:4px 12px;align-items:center;align-content:center;padding:12px 14px;height:100vh;background:linear-gradient(180deg,rgba(var(--tint,37,208,180),.35),#0b0d10 70%)}' +
+  '#pi{width:76px;height:76px;border-radius:10px;object-fit:cover;background:#1d222c;grid-row:1}.mm{min-width:0}#pt{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#pa{font-size:12px;color:#8d95a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+  '#pl{grid-column:1/3;min-height:34px;text-align:center;font-size:13px;line-height:1.3;color:var(--accent,#25d0b4);font-weight:600;display:flex;align-items:center;justify-content:center;overflow:hidden}#pl:empty{display:none}' +
+  '.bar{grid-column:1/3;display:flex;align-items:center;gap:8px;font-size:11px;color:#8d95a6;font-variant-numeric:tabular-nums}.bar input{flex:1;accent-color:var(--accent,#25d0b4);height:4px}' +
+  '.ct{grid-column:1/3;display:flex;justify-content:center;align-items:center;gap:14px}.ct button{border:0;background:none;color:#eef0f4;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer}.ct button:hover{background:rgba(255,255,255,.1)}.ct svg{width:22px;height:22px;fill:currentColor}' +
+  '.ct #pP{background:#fff;color:#0b0d10;width:44px;height:44px}.ct #pP:hover{background:#fff;opacity:.9}.spinner{width:18px;height:18px;border:2px solid #0b0d10;border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;display:block}@keyframes s{to{transform:rotate(360deg)}}';
+function pipTick() {
+  var w = pip.win; if (!w) return;
+  var d = w.document, tr = cur();
+  var dur = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (tr && tr.duration) || 0, c = audio.getAttribute('src') ? (audio.currentTime || 0) : 0;
+  var el = function (id) { return d.getElementById(id); };
+  if (!el('pc')) return;
+  el('pc').textContent = fmt(c); el('pd').textContent = fmt(dur);
+  if (!el('ps').dataset.drag) el('ps').value = dur ? Math.min(1000, Math.round(c / dur * 1000)) : 0;
+  var ic = loading ? '<span class="spinner"></span>' : (audio.paused ? ICON.play : ICON.pause);
+  if (el('pP').getAttribute('data-ic') !== ic) { el('pP').innerHTML = ic; el('pP').setAttribute('data-ic', ic); }
+  var line = '';
+  if (tr && lyr.status === 'ok' && lyr.synced.length) { var i = lyrIndexAt(c); line = i >= 0 && lyr.synced[i] ? lyr.synced[i].text : ''; }
+  if (el('pl').textContent !== line) el('pl').textContent = line;
+}
+function pipRender() {
+  var w = pip.win; if (!w) return;
+  var d = w.document, tr = cur(), g = function (id) { return d.getElementById(id); };
+  if (!g('pi')) return;
+  var im = g('pi'), src = tr && tr.artwork ? tr.artwork : ART_PLACEHOLDER;
+  if (im.getAttribute('data-src') !== src) {
+    im.setAttribute('data-src', src); im.removeAttribute('data-fb'); im.src = src;
+    // same fallback as every cover: if the CDN does not answer, ask through this site (absolute: the window has no base)
+    im.onerror = function () { if (!im.getAttribute('data-fb') && ART_HOSTS.test(src)) { im.setAttribute('data-fb', '1'); im.src = location.origin + '/api/music/art?u=' + encodeURIComponent(src); } };
+  }
+  g('pt').textContent = tr ? tr.title : t('nothing');
+  g('pa').textContent = tr ? tr.artist : '';
+  var cs = getComputedStyle(document.documentElement);
+  d.documentElement.style.setProperty('--accent', cs.getPropertyValue('--accent').trim() || '#25d0b4');
+  var tint = cs.getPropertyValue('--tint').trim(); if (tint) d.documentElement.style.setProperty('--tint', tint); else d.documentElement.style.removeProperty('--tint');
+  pipTick();
+}
+function pipClosed() { clearInterval(pip.timer); pip.win = null; var b = $('#bPip'); if (b) b.classList.remove('on'); }
+function pipToggle() {
+  if (pip.win) { try { pip.win.close(); } catch (e) {} pipClosed(); return; }
+  if (!pip.ok) return;
+  window.documentPictureInPicture.requestWindow({ width: 360, height: 250 }).then(function (w) {
+    pip.win = w;
+    var d = w.document, st = d.createElement('style'); st.textContent = PIP_CSS; d.head.appendChild(st);
+    d.title = 'Budsin Music';
+    d.body.innerHTML = '<div id="pp"><img id="pi" alt=""><div class="mm"><div id="pt"></div><div id="pa"></div></div><div id="pl"></div>' +
+      '<div class="bar"><span id="pc">0:00</span><input type="range" id="ps" min="0" max="1000" value="0"><span id="pd">0:00</span></div>' +
+      '<div class="ct"><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button></div></div>';
+    d.getElementById('pV').addEventListener('click', function () { prev(); });
+    d.getElementById('pP').addEventListener('click', togglePlay);
+    d.getElementById('pN').addEventListener('click', function () { next(false); });
+    var ps = d.getElementById('ps');
+    ps.addEventListener('input', function () { ps.dataset.drag = '1'; });
+    ps.addEventListener('change', function () { var du = audio.duration; if (isFinite(du) && du > 0) audio.currentTime = du * ps.value / 1000; delete ps.dataset.drag; });
+    w.addEventListener('pagehide', pipClosed);
+    $('#bPip').classList.add('on');
+    pip.timer = setInterval(pipTick, 400);
+    pipRender();
+    lyrOnTrack();        // the lyric line needs the lyrics even if nothing else is showing them
+  }).catch(function () { toast(t('pipFail')); });
 }
 function year(d) { return d ? String(d).slice(0, 4) : ''; }
 
@@ -974,6 +1043,8 @@ function applyVol() {
   $('#bMute').innerHTML = (muted || volume === 0) ? ICON.mute : ICON.vol;
 }
 vol.addEventListener('input', function () { volume = +vol.value; muted = false; store.set('bm_vol', volume); applyVol(); });
+if (pip.ok) $('#bPip').hidden = false;
+$('#bPip').addEventListener('click', pipToggle);
 $('#bMute').addEventListener('click', function () { muted = !muted; applyVol(); });
 
 function syncPlayBtn() {
@@ -1047,6 +1118,7 @@ function updateNowPlaying() {
     el.innerHTML = img('', '') + '<div class="m"><div class="tt">' + esc(t('nothing')) + '</div><div class="aa">' + esc(t('pickSong')) + '</div></div>';
     document.title = 'Budsin Music';
     dynReset();
+    if (pip.win) pipRender();
     return;
   }
   el.innerHTML = img(tr.artwork) +
@@ -1057,6 +1129,7 @@ function updateNowPlaying() {
   $('#npLike').addEventListener('click', function () { toggleLike(tr); });
   document.title = tr.title + ' — ' + tr.artist + ' · Budsin Music';
   dynFor(tr.artwork);
+  if (pip.win) pipRender();
   updateSeek();
   vizSyncInfo();
   lyrOnTrack();
@@ -1202,7 +1275,7 @@ function trackRows(tracks, opts) {
     var idxHtml = isCur ? '<span class="eq"><i></i><i></i><i></i></span>' : (opts.numbered ? (i + 1) : '');
     var showAlbum = opts.album !== false && tr.album;
     return '<div class="tr' + (isCur ? ' playing' : '') + (opts.album !== false ? ' has-album' : '') + '" data-l="' + L + '" data-i="' + i + '" data-tid="' + esc(tid(tr)) + '">' +
-      '<div class="idx">' + idxHtml + '</div>' +
+      '<div class="idx" data-n="' + (opts.numbered ? i + 1 : '') + '">' + idxHtml + '</div>' +
       '<div class="who">' + (opts.cover === false ? '' : img(tr.artwork)) + '<div class="m"><div class="tt"><span style="overflow:hidden;text-overflow:ellipsis">' + esc(tr.title) + '</span>' + (tr.explicit ? '<span class="exp">E</span>' : '') + '</div>' +
       '<div class="aa">' + artistLink(tr) + '</div></div></div>' +
       (opts.album !== false ? '<div class="alb">' + (showAlbum ? albumLink(tr, tr.album) : esc(tr.album || '')) + '</div>' : '') +
@@ -2055,7 +2128,7 @@ function lyrInfo() {
 // A new track: load its lyrics only if something is showing them.
 function lyrOnTrack() {
   if (lyr.on) lyrInfo();
-  if (!(lyr.on || viz.on)) return;
+  if (!(lyr.on || viz.on || pip.win)) return;
   var tr = cur();
   if (tr) lyrLoad(tr); else { lyr.key = null; lyr.status = 'idle'; lyrRender(); vizCaption(-1); }
 }
