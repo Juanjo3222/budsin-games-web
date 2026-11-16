@@ -370,7 +370,7 @@ var snap = gameSave.getSnapshot();  // Devuelve { "dbName": { version, stores: {
 
 // Guardar manualmente snapshot actual
 gameSave.saveNow().then(function() {
-    console.log("✅ IDB guardada a Firestore/Storage");
+    console.log("✅ IDB guardada a Firestore");
 }).catch(function(err) {
     console.log("❌ Error:", err);  // "LIMIT_REACHED" si Free con 5 juegos
 });
@@ -412,14 +412,12 @@ gameSave.delete();
 3. Si no encuentra coincidencias, usa modo localStorage.
 4. El tipo se almacena en `gameSave.gameType` ("localstorage" o "unity").
 
-### 💾 Almacenamiento en Firebase Storage (para grandes snapshots)
-Los snapshots grandes (>900KB) se guardan en **Firebase Storage** en lugar de Firestore (que tiene límite de 1MB):
+### 💾 Snapshots grandes: fragmentos en Firestore (no se usa Firebase Storage)
+Un documento de Firestore admite 1 MB, así que `saveIDB()` parte el snapshot en **trozos de 400 000 caracteres** (`CHUNK_SIZE` en `save-system.js`):
 
-- **Pequeños** (<900KB): Se guardan directamente en Firestore documento `gamesaves/{uid}_{gameName}`.
-- **Grandes** (≥900KB): Se cargan a Storage en `gamesaves/{uid}_{gameName}/idb-snapshot.json`. Firestore solo almacena la referencia (`storagePath`).
-- Al descargar, `loadIDB()` detecta automáticamente si está en Storage o Firestore y recupera desde el origen correcto.
-
-**Requisito**: Firebase Storage debe estar habilitado en el proyecto Firebase (`juanjo-games`).
+- **Pequeños** (≤ 400 KB): un solo documento `gamesaves/{uid}_{gameName}` con el campo `idbSnapshot`.
+- **Grandes**: el documento principal guarda `chunkCount` y cada trozo va a `gamesaves/{uid}_{gameName}/chunks/{índice}` (`{ data, index }`), todo en un solo `batch` (tope de Firestore: 500 escrituras por lote). `loadIDB()` lee los trozos, los ordena y los une.
+- **Firebase Storage no está activado** en el proyecto (la consola pide pasar al plan de pago) **y no hace falta**: ningún juego carga `firebase-storage`. No hay reglas de Storage que mantener. Esta sección decía antes que Storage era un requisito (era código antiguo).
 
 ### 🚫 Límite Free: 5 juegos
 - Se cuentan documentos en `gamesaves` donde `userId == uid`.
@@ -430,8 +428,8 @@ Los snapshots grandes (>900KB) se guardan en **Firebase Storage** en lugar de Fi
 ### 🔥 Métodos adicionales de `window.BudsinSave` para Unity
 | Método | Descripción |
 |---|---|
-| `saveIDB(gameName, snapshot)` | Guarda snapshot IDB. Almacena en Storage si > 900KB. |
-| `loadIDB(gameName)` | Carga y restaura snapshot IDB desde Firestore / Storage. |
+| `saveIDB(gameName, snapshot)` | Guarda snapshot IDB. Lo parte en fragmentos de 400 KB en Firestore si es grande. |
+| `loadIDB(gameName)` | Carga y restaura snapshot IDB desde Firestore (documento único o fragmentos). |
 | `autoSaveIDB(gameName, getSnapshotFn)` | Auto-guardar snapshot cada 5 min. |
 
 ### 👁️ Helpers IDB (en `window.__BudsinIDB`)
