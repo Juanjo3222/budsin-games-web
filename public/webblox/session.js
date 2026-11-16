@@ -53,10 +53,40 @@ export function extractRoblosecurity(raw) {
   return "";
 }
 
+// InvisiProxy ofusca el nombre de la base de cookies de Scramjet 2 en cada compilación (p. ej. "v2faww7t"), así que además de los
+// nombres conocidos se recorren las bases que YA existen buscando la estructura: almacén "state" con la clave "cookies".
+// Solo lectura y solo sobre bases existentes: no se crea ni se borra nada.
+function peekState(dbName) {
+  return new Promise((resolve) => {
+    let req;
+    try { req = indexedDB.open(dbName); } catch { return resolve(null); }
+    req.onerror = req.onblocked = () => resolve(null);
+    req.onupgradeneeded = () => { try { req.transaction.abort(); } catch {} resolve(null); };   // no existía: no crearla
+    req.onsuccess = () => {
+      const db = req.result;
+      try {
+        if (!db.objectStoreNames.contains("state")) { db.close(); return resolve(null); }
+        const get = db.transaction("state").objectStore("state").get("cookies");
+        get.onsuccess = () => { db.close(); resolve(get.result ?? null); };
+        get.onerror = () => { db.close(); resolve(null); };
+      } catch { db.close(); resolve(null); }
+    };
+  });
+}
+
 export async function roblosecurity() {
   for (const [db, store, key] of LOCATIONS) {
     const found = extractRoblosecurity(await readStore(db, store, key));
     if (found) return found;
+  }
+  if (indexedDB.databases) {
+    try {
+      for (const { name } of await indexedDB.databases()) {
+        if (!name || LOCATIONS.some(([n]) => n === name)) continue;
+        const found = extractRoblosecurity(await peekState(name));
+        if (found) return found;
+      }
+    } catch {}
   }
   return "";
 }
