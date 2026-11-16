@@ -10,10 +10,7 @@ import fs from 'node:fs';
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
 import { doc, getDoc, getDocs, setDoc, updateDoc, addDoc, deleteDoc, collection, increment, serverTimestamp, Timestamp } from 'firebase/firestore';
 
-// RULES_FILE=firestore.rules.transition prueba la versión de transición (colecciones desconocidas abiertas).
-const RULES_FILE = process.env.RULES_FILE || 'firestore.rules.proposed';
-const TRANSITION = RULES_FILE.includes('transition');
-const env = await initializeTestEnvironment({ projectId: 'demo-budsin', firestore: { rules: fs.readFileSync(new URL('./' + RULES_FILE, import.meta.url), 'utf8') } });
+const env = await initializeTestEnvironment({ projectId: 'demo-budsin', firestore: { rules: fs.readFileSync(new URL('./firestore.rules.proposed', import.meta.url), 'utf8') } });
 const ADMIN = 'juvaldiviam@gmail.com';
 const as = (uid, email, verified = true) => env.authenticatedContext(uid, { email, email_verified: verified }).firestore();
 const anon = () => env.unauthenticatedContext().firestore();
@@ -123,14 +120,9 @@ await t('ATAQUE: leer el perfil de música de otra persona', 'fail', () => getDo
 await t('ATAQUE: escribir en el perfil de otra persona', 'fail', () => setDoc(doc(as('eve', 'eve@x.com'), 'music_profiles/ana/kv/likes'), { items: [], updatedAt: 9 }));
 await t('ATAQUE: anónimo lee perfiles', 'fail', () => getDocs(collection(anon(), 'music_profiles/ana/playlists')));
 
-console.log(TRANSITION ? '\n— colecciones desconocidas (transición: abiertas, como hoy)' : '\n— todo lo demás denegado');
-const other = TRANSITION ? 'ok' : 'fail';
-await t((TRANSITION ? 'Hosting (u otra app) escribe en una colección desconocida' : 'ATAQUE: escribir en una colección cualquiera'), other, () => setDoc(doc(as('ana', 'ana@x.com'), 'hosting_sites/x'), { a: 1 }));
-await t((TRANSITION ? 'Hosting lee una colección desconocida' : 'ATAQUE: leer una colección no listada'), other, () => getDocs(collection(as('adm', ADMIN), 'hosting_sites')));
-if (TRANSITION) {
-  await t('...pero users sigue protegido aunque haya bloque abierto', 'fail', () => getDoc(doc(anon(), 'users/ana')));
-  await t('...y music_profiles también', 'fail', () => getDocs(collection(anon(), 'music_profiles/ana/playlists')));
-}
+console.log('\n— todo lo demás denegado');
+await t('ATAQUE: escribir en una colección cualquiera', 'fail', () => setDoc(doc(as('ana', 'ana@x.com'), 'cualquier_cosa/x'), { a: 1 }));
+await t('ATAQUE: leer una colección no listada', 'fail', () => getDocs(collection(as('adm', ADMIN), 'secretos')));
 
 console.log(`\n${pass} correctas, ${fail} con fallo`);
 await env.cleanup();
