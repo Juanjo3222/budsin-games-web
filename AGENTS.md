@@ -141,7 +141,9 @@ Estas funcionalidades fueron **aprobadas por el usuario** y deben implementarse 
 ### 🎵 Budsin Music (excepción autorizada por el usuario)
 - El usuario ordenó explícitamente anular la regla de «no crear servicios/carpetas fuera de `public/`» **solo** para el backend de música: `server/music/` (copia parcheada de [x8rr/music](https://github.com/x8rr/music), bun + yt-dlp, AGPL-3.0) y su instalador. No amplía la excepción a nada más.
 - La página vive en `public/musica/` y llama a `/api/music/*`, que Caddy reenvía a `127.0.0.1:3103` (servicio `budsin-music`, usuario propio, `MemoryMax=1G`).
-- Sin Firebase ni Auth. Es código AGPL-3.0: se mantiene el enlace al código fuente en la página y `server/music/app/` contiene el fuente modificado.
+- Es código AGPL-3.0: se mantiene el enlace al código fuente en la página y `server/music/app/` contiene el fuente modificado.
+- **Cuentas (anulación explícita del usuario, 16-nov-2026)**: el usuario ordenó anular, **solo para Budsin Music**, la Regla 4 («Firebase minimalista / sin Login-Auth») y la antigua línea «Sin Firebase ni Auth». Alcance autorizado: iniciar sesión con Google **reutilizando el mismo Firebase Auth y proyecto (`juanjo-games`) de Budsin Games** (Music vive en el mismo origen `games.budsin.dev`, así que comparte la sesión; el portal guarda `budsin_pro_user` al iniciar sesión cualquier usuario) y sincronizar en Firestore, bajo `music_profiles/{uid}/`: `kv/likes`, `kv/taste`, `kv/prefs` y `playlists/{id}`. Solo se sincronizan ♥, playlists, **gustos como resumen agregado por artista y género (nunca historial canción por canción; `seen` y `skips` no salen del navegador)** y preferencias. Local-first (sin sesión todo funciona en `localStorage`). Al cerrar sesión (aquí o en Games) se borran los datos locales de la cuenta, y un cambio de cuenta no mezcla datos. Budsin Hosting queda fuera de esta excepción. Las reglas de Firestore se gestionan en la consola de Firebase (ver README, «Cuentas en Budsin Music»). No amplía la excepción a nada más.
+- Recomendaciones, autoplay y radio se calculan en el cliente con los endpoints existentes (`browse`, `artist/:id`, `artist/:id/similar`, `lookup/artist`); no hay backend nuevo.
 - Instalación en el VPS: `sudo bash server/music/install.sh` (idempotente; verifica checksums de bun y yt-dlp y valida el Caddyfile con marcha atrás).
 
 ### 🧠 Lógica de verificación en cliente
@@ -443,4 +445,4 @@ Accesibles para operaciones manuales de snapshot/restore sin Firebase:
 
 ---
 
-*Última actualización: 21 de mayo de 2026*
+*Última actualización: 16 de noviembre de 2026*

@@ -297,6 +297,31 @@ input[type=range]:hover { --c: var(--accent); }
 .viz-cap .cur { font-size: clamp(1.1rem, 2.4vw, 1.9rem); font-weight: 800; line-height: 1.2; }
 .viz-cap .nxt { margin-top: 6px; font-size: clamp(.82rem, 1.5vw, 1.05rem); color: rgba(255,255,255,.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+/* ---------- recommendations & account ---------- */
+.reco-hint { margin: 18px 0 4px; padding: 14px 18px; border-radius: 14px; background: var(--panel); color: var(--muted); font-size: .92rem; }
+.row-title .chip { font-size: .78rem; padding: 6px 14px; }
+.qsep { padding: 10px 10px 4px; font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); font-weight: 800; }
+.qrow .auto-tag { font-size: .6rem; background: var(--panel2); color: var(--muted); padding: 1px 6px; border-radius: 999px; margin-left: 6px; font-weight: 700; vertical-align: middle; }
+#queue header .chip { font-size: .72rem; padding: 5px 11px; margin-right: 6px; }
+#queue header .chip.on { background: var(--accent); color: #04201b; }
+.box { margin-top: 26px; padding: 18px; border-radius: 14px; background: var(--panel); }
+.box h3 { margin: 0 0 6px; font-size: 1.05rem; }
+.box p { margin: 0 0 14px; color: var(--muted); font-size: .88rem; line-height: 1.5; }
+.box .btns { gap: 10px; }
+.acct { margin: 14px 4px 0; padding: 12px; border-radius: 12px; background: var(--panel); font-size: .8rem; line-height: 1.45; }
+.acct .who { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.acct img.av { width: 34px; height: 34px; border-radius: 50%; background: #222; object-fit: cover; flex: none; }
+.acct .nm { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acct .em { color: var(--muted); font-size: .72rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.acct .sync { color: var(--muted); font-size: .74rem; margin-bottom: 8px; }
+.acct .sync.ok { color: var(--accent); }
+.acct .sync.err { color: var(--danger); }
+.acct .sub { color: var(--muted); margin-bottom: 10px; }
+.acct .btn { padding: 8px 14px; font-size: .8rem; }
+.acct .linkbtn { color: var(--muted); font-size: .72rem; text-decoration: underline; margin-left: 6px; }
+.acct .linkbtn:hover { color: var(--text); }
+#acctLib { display: none; }   /* en escritorio la cuenta ya está en la barra lateral */
+
 /* ---------- lyrics ---------- */
 #lyrics { position: fixed; left: 0; right: 0; top: 0; bottom: var(--player); z-index: 36; background: #07090c; display: none; flex-direction: column; overflow: hidden; }
 #lyrics.on { display: flex; }
@@ -333,7 +358,7 @@ input[type=range]:hover { --c: var(--accent); }
   :root { --player: 80px; --nav: 58px; }
   #app { grid-template-columns: 1fr; grid-template-rows: 1fr auto; grid-template-areas: "main" "player"; padding-bottom: var(--nav); }
   #side { position: fixed; left: 0; right: 0; bottom: 0; height: var(--nav); flex-direction: row; padding: 0; z-index: 60; border-right: 0; border-top: 1px solid var(--line); background: #080a0c; overflow: visible; gap: 0; justify-content: space-around; }
-  #side .brand, #side .sect, #side .plist, #side .side-foot, #side .nav-desktop { display: none; }
+  #side .brand, #side .sect, #side .plist, #side .side-foot, #side .nav-desktop, #side .acct { display: none; }
   #side .navlink { flex-direction: column; gap: 2px; padding: 6px 4px; font-size: .68rem; flex: 1; justify-content: center; border-radius: 0; background: none !important; }
   #side .navlink svg { font-size: 22px; }
   #side .navlink.active { color: var(--accent); }
@@ -377,6 +402,7 @@ input[type=range]:hover { --c: var(--accent); }
   .viz-top { padding: 12px 14px; }
   .viz-bottom { padding: 36px 12px 12px; gap: 10px 16px; }
   .viz-pop { bottom: 150px; }
+  #acctLib { display: block; }
   #toast { bottom: calc(var(--player) + var(--nav) + 12px); }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
@@ -397,6 +423,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="navlink nav-desktop" data-nav="liked" href="#/liked"><svg viewBox="0 0 24 24"><path d="M12 21l-1.4-1.3C5.4 15.4 2 12.3 2 8.5A5.5 5.5 0 017.5 3c1.8 0 3.6.9 4.5 2.2A5.6 5.6 0 0116.5 3 5.5 5.5 0 0122 8.5c0 3.8-3.4 6.9-8.6 11.2z"/></svg><span data-t="liked"></span></a>
     <div class="sect"><span data-t="playlists"></span><button id="newPl" aria-label="+" title="+">+</button></div>
     <div class="plist" id="plist"></div>
+    <div class="acct" id="acct"></div>
     <div class="side-foot" id="sideFoot"></div>
   </nav>
 
@@ -435,7 +462,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </div>
 
 <aside id="queue" aria-label="Cola">
-  <header><span data-t="queue"></span><span><button class="iconbtn" id="qClear" data-ti="clearQ" style="font-size:15px;width:auto;padding:0 10px;border-radius:999px"></button><button class="iconbtn" id="qClose" aria-label="×">✕</button></span></header>
+  <header><span data-t="queue"></span><span><button class="chip" id="qAuto" aria-pressed="true"></button><button class="iconbtn" id="qClear" data-ti="clearQ" style="font-size:15px;width:auto;padding:0 10px;border-radius:999px"></button><button class="iconbtn" id="qClose" aria-label="×">✕</button></span></header>
   <div class="body" id="qBody"></div>
 </aside>
 <div id="viz" role="dialog" aria-label="Visualizer">
@@ -502,6 +529,8 @@ var I18N = {
     failed: 'No se pudo cargar. Revisa tu conexión.', retry: 'Reintentar', loading: 'Cargando…', loadingTrack: 'Cargando canción…',
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espejo', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arcoíris', pal_neon: 'Neón', pal_fire: 'Fuego',
+    forYou: 'Para ti', becauseYou: 'Porque escuchaste', newFromYours: 'Nuevo de tus artistas', yourArtists: 'Tus artistas', playMix: 'Reproducir', radio: 'Iniciar radio', radioLoading: 'Creando tu radio…', radioNone: 'No pude crear la radio ahora.', autoplayOn: 'Autoplay: sí', autoplayOff: 'Autoplay: no', autoplayT: 'Al terminar la cola, seguir con música parecida', upNextAuto: 'Autoplay · sonará después', tasteTitle: 'Tus recomendaciones', tasteInfo: 'Se calculan con lo que escuchas, lo que marcas con ♥ y lo que saltas. Sin sesión, todo se queda en este navegador. Con sesión se guarda en tu cuenta solo un resumen de artistas y géneros (no tu historial canción por canción) para que te siga a otros dispositivos.', tasteClear: 'Borrar lo que aprendió de mí', tasteCleared: 'Listo, empezamos de cero.', tasteConfirm: '¿Borrar lo que Budsin Music aprendió de tus gustos?', homeLearning: 'Escucha unas cuantas canciones y aquí aparecerán recomendaciones hechas para ti.',
+    acctTitle: 'Cuenta de Budsin', acctPitch: 'Inicia sesión con Google para que tus ♥, playlists y gustos te sigan a todos tus dispositivos y a Budsin Games.', acctIn: 'Iniciar sesión con Google', acctOut: 'Cerrar sesión', acctWipe: 'Borrar mis datos de la nube', acctWipeAsk: '¿Borrar de la nube tus ♥, playlists, gustos y preferencias? Lo guardado en este navegador se queda.', acctWiped: 'Datos de la nube borrados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'No se pudo sincronizar.', acctErrPerm: 'No se pudo sincronizar: faltan permisos en Firestore.', acctSignedOut: 'Sesión cerrada. Se quitaron de este navegador los datos de la cuenta.', acctFail: 'No se pudo iniciar sesión.', acctSdkFail: 'No se pudo cargar el inicio de sesión. Revisa tu conexión.',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
     lyr: 'Letra', lyrLoading: 'Buscando letra…', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
@@ -527,6 +556,8 @@ var I18N = {
     failed: 'Could not load. Check your connection.', retry: 'Retry', loading: 'Loading…', loadingTrack: 'Loading track…',
     viz: 'Visualizer', viz_bars: 'Bars', viz_mirror: 'Mirror', viz_wave: 'Wave', viz_area: 'Spectrum', viz_circle: 'Circle', viz_particles: 'Particles',
     pal_mint: 'Budsin', pal_rainbow: 'Rainbow', pal_neon: 'Neon', pal_fire: 'Fire',
+    forYou: 'For you', becauseYou: 'Because you listened to', newFromYours: 'New from your artists', yourArtists: 'Your artists', playMix: 'Play', radio: 'Start radio', radioLoading: 'Building your radio…', radioNone: 'Could not build the radio right now.', autoplayOn: 'Autoplay: on', autoplayOff: 'Autoplay: off', autoplayT: 'When the queue ends, keep going with similar music', upNextAuto: 'Autoplay · plays next', tasteTitle: 'Your recommendations', tasteInfo: 'They are worked out from what you play, heart and skip. Signed out, everything stays in this browser. Signed in, only a summary of artists and genres (not your song-by-song history) is saved to your account so it follows you to other devices.', tasteClear: 'Erase what it learned about me', tasteCleared: 'Done, starting from scratch.', tasteConfirm: 'Erase what Budsin Music learned about your taste?', homeLearning: 'Play a few songs and recommendations made for you will show up here.',
+    acctTitle: 'Budsin account', acctPitch: 'Sign in with Google so your ♥, playlists and taste follow you to all your devices and to Budsin Games.', acctIn: 'Sign in with Google', acctOut: 'Sign out', acctWipe: 'Delete my cloud data', acctWipeAsk: 'Delete your ♥, playlists, taste and preferences from the cloud? What is saved in this browser stays.', acctWiped: 'Cloud data deleted.', acctConnecting: 'Connecting…', acctSyncing: 'Syncing…', acctSynced: 'Synced ✓', acctErr: 'Could not sync.', acctErrPerm: 'Could not sync: Firestore permissions are missing.', acctSignedOut: 'Signed out. The account data was removed from this browser.', acctFail: 'Could not sign in.', acctSdkFail: 'Could not load sign-in. Check your connection.',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
     lyr: 'Lyrics', lyrLoading: 'Looking for lyrics…', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
@@ -552,6 +583,8 @@ var I18N = {
     failed: 'Não foi possível carregar. Verifique sua conexão.', retry: 'Tentar de novo', loading: 'Carregando…', loadingTrack: 'Carregando música…',
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espelho', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arco-íris', pal_neon: 'Neon', pal_fire: 'Fogo',
+    forYou: 'Para você', becauseYou: 'Porque você ouviu', newFromYours: 'Novidades dos seus artistas', yourArtists: 'Seus artistas', playMix: 'Reproduzir', radio: 'Iniciar rádio', radioLoading: 'Criando sua rádio…', radioNone: 'Não consegui criar a rádio agora.', autoplayOn: 'Autoplay: sim', autoplayOff: 'Autoplay: não', autoplayT: 'Quando a fila acabar, continuar com música parecida', upNextAuto: 'Autoplay · toca a seguir', tasteTitle: 'Suas recomendações', tasteInfo: 'São calculadas com o que você ouve, curte com ♥ e pula. Sem login, tudo fica neste navegador. Com login, só um resumo de artistas e gêneros (não seu histórico música por música) é salvo na sua conta para acompanhar você em outros dispositivos.', tasteClear: 'Apagar o que aprendeu sobre mim', tasteCleared: 'Pronto, começamos do zero.', tasteConfirm: 'Apagar o que o Budsin Music aprendeu dos seus gostos?', homeLearning: 'Ouça algumas músicas e as recomendações feitas para você aparecerão aqui.',
+    acctTitle: 'Conta Budsin', acctPitch: 'Entre com o Google para que seus ♥, playlists e gostos acompanhem você em todos os dispositivos e no Budsin Games.', acctIn: 'Entrar com o Google', acctOut: 'Sair', acctWipe: 'Apagar meus dados da nuvem', acctWipeAsk: 'Apagar da nuvem seus ♥, playlists, gostos e preferências? O que está salvo neste navegador permanece.', acctWiped: 'Dados da nuvem apagados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'Não foi possível sincronizar.', acctErrPerm: 'Não foi possível sincronizar: faltam permissões no Firestore.', acctSignedOut: 'Sessão encerrada. Os dados da conta foram removidos deste navegador.', acctFail: 'Não foi possível entrar.', acctSdkFail: 'Não foi possível carregar o login. Verifique sua conexão.',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
     lyr: 'Letra', lyrLoading: 'Procurando a letra…', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
@@ -643,7 +676,7 @@ var loading = false;
 function tid(tr) { return String(tr.id); }
 function isLiked(tr) { return liked.some(function (x) { return tid(x) === tid(tr); }); }
 function slim(tr) {
-  return { id: tr.id, title: tr.title, artist: tr.artist, artistId: tr.artistId, album: tr.album, albumId: tr.albumId, artwork: tr.artwork, duration: tr.duration, explicit: tr.explicit, isrc: tr.isrc, source: tr.source };
+  return { id: tr.id, title: tr.title, artist: tr.artist, artistId: tr.artistId, album: tr.album, albumId: tr.albumId, artwork: tr.artwork, duration: tr.duration, explicit: tr.explicit, isrc: tr.isrc, source: tr.source, auto: tr.auto ? 1 : undefined };
 }
 function cur() { return qi >= 0 ? queue[qi] : null; }
 
@@ -664,6 +697,7 @@ function setLoading(v) {
 }
 function playIndex(i, opts) {
   if (i < 0 || i >= queue.length) return;
+  tasteEnd(opts && opts.reason ? opts.reason : 'change');
   qi = i;
   setLoading(true);
   var tr = queue[qi];
@@ -673,6 +707,8 @@ function playIndex(i, opts) {
   var pr = audio.play();
   if (pr && pr.catch) pr.catch(function () { if (opts && opts.auto) { setLoading(false); toast(t('tapResume')); } });   // autoplay bloqueado tras volver
   becomeOwner();
+  lis = { tr: tr };
+  if (queue.length - qi <= 2) autoExtend();
   recent = [slim(tr)].concat(recent.filter(function (x) { return tid(x) !== tid(tr); })).slice(0, 24);
   store.set('bm_recent', recent);
   updateNowPlaying(); updateMediaSession(); refreshPlayingMarks(); renderQueue();
@@ -695,21 +731,31 @@ function next(auto) {
     do { n = Math.floor(Math.random() * queue.length); } while (n === qi);
   } else {
     n = qi + 1;
-    if (n >= queue.length) { if (repeat === 1 || !auto) n = 0; else { audio.pause(); return; } }
+    if (n >= queue.length) {
+      if (autoplay && repeat === 0) {               // fin de la cola: seguir con música parecida en lugar de parar o dar la vuelta
+        var from = qi, why = auto ? 'change' : 'skip';
+        autoExtend().then(function (added) {
+          if (qi !== from) return;                  // mientras tanto se eligió otra cosa
+          if (added) playIndex(from + 1, { reason: why }); else if (!auto) playIndex(0, { reason: why }); else audio.pause();
+        });
+        return;
+      }
+      if (repeat === 1 || !auto) n = 0; else { audio.pause(); return; }
+    }
   }
-  playIndex(n);
+  playIndex(n, { reason: auto ? 'change' : 'skip' });
 }
 function prev() {
   if (!queue.length) return;
   if (audio.currentTime > 3) { audio.currentTime = 0; return; }
-  playIndex(qi > 0 ? qi - 1 : (repeat === 1 ? queue.length - 1 : 0));
+  playIndex(qi > 0 ? qi - 1 : (repeat === 1 ? queue.length - 1 : 0), { reason: 'skip' });
 }
 function togglePlay() {
   if (!cur()) return;
   if (!audio.getAttribute('src')) { playIndex(qi, { seek: restoreT }); return; }   // sesión restaurada, aún sin cargar
   if (audio.paused) audio.play().catch(function () {}); else { audio.pause(); if (loading) setLoading(false); }
 }
-audio.addEventListener('ended', function () { next(true); });
+audio.addEventListener('ended', function () { tasteEnd('ended'); next(true); });
 audio.addEventListener('error', function () {
   if (!cur()) return;
   setLoading(false);
@@ -814,9 +860,12 @@ function updateMediaSession() {
 function renderQueue() {
   var body = $('#qBody');
   if (!queue.length) { body.innerHTML = '<div class="status">' + esc(t('emptyQ')) + '</div>'; return; }
+  var sepDone = false;
   body.innerHTML = queue.map(function (tr, i) {
-    return '<div class="qrow' + (i === qi ? ' playing' : '') + '" data-qi="' + i + '">' + img(tr.artwork) +
-      '<div class="m"><div class="tt">' + esc(tr.title) + '</div><div class="aa">' + esc(tr.artist) + '</div></div>' +
+    var sep = '';
+    if (tr.auto && !sepDone && i > qi) { sepDone = true; sep = '<div class="qsep">' + esc(t('upNextAuto')) + '</div>'; }
+    return sep + '<div class="qrow' + (i === qi ? ' playing' : '') + '" data-qi="' + i + '">' + img(tr.artwork) +
+      '<div class="m"><div class="tt">' + esc(tr.title) + (tr.auto ? '<span class="auto-tag">AUTO</span>' : '') + '</div><div class="aa">' + esc(tr.artist) + '</div></div>' +
       '<button class="rm" data-rm="' + i + '" aria-label="' + esc(t('remove')) + '">✕</button></div>';
   }).join('');
   var p = body.querySelector('.playing'); if (p && $('#queue').classList.contains('on')) p.scrollIntoView({ block: 'nearest' });
@@ -843,14 +892,15 @@ $('#qClear').addEventListener('click', function () {
 function toggleLike(tr) {
   if (isLiked(tr)) { liked = liked.filter(function (x) { return tid(x) !== tid(tr); }); toast(t('unliked_t')); }
   else { liked.unshift(slim(tr)); toast(t('liked_t')); }
-  store.set('bm_liked', liked);
+  store.set('bm_liked', liked); cloudMark('likes');
+  tasteAdd(tr, isLiked(tr) ? 3 : -2);
   if (cur() && tid(cur()) === tid(tr)) updateNowPlaying();
   $$('[data-like]').forEach(function (b) {
     if (b.getAttribute('data-like') === tid(tr)) { var on = isLiked(tr); b.classList.toggle('on', on); b.innerHTML = on ? ICON.heart : ICON.heartO; }
   });
   if (route.name === 'liked') render();
 }
-function savePl() { store.set('bm_playlists', playlists); renderSidebar(); }
+function savePl() { store.set('bm_playlists', playlists); renderSidebar(); cloudMark('playlists'); }
 function newPlaylist(thenAdd) {
   var name = (prompt(t('plName'), '') || '').trim().slice(0, 60);
   if (!name) return null;
@@ -862,7 +912,7 @@ function newPlaylist(thenAdd) {
 }
 function addToPlaylist(pl, tr) {
   if (pl.tracks.some(function (x) { return tid(x) === tid(tr); })) { toast(t('addedPl') + ' ' + pl.name); return; }
-  pl.tracks.push(slim(tr)); savePl(); toast(t('addedPl') + ' ' + pl.name);
+  pl.tracks.push(slim(tr)); savePl(); tasteAdd(tr, 2); toast(t('addedPl') + ' ' + pl.name);
   if (route.name === 'playlist' && route.id === pl.id) render();
 }
 function renderSidebar() {
@@ -899,6 +949,7 @@ $('#main').addEventListener('scroll', closeMenu);
 function trackMenu(anchor, tr, pl) {
   var items = [
     { label: t('addQ'), fn: function () { queue.push(slim(tr)); if (qi < 0) { qi = 0; playIndex(0); } toast(t('addedQ')); renderQueue(); } },
+    { label: t('radio'), fn: function () { startRadio(tr); } },
     { label: isLiked(tr) ? t('unlike') : t('like'), fn: function () { toggleLike(tr); } },
     '-', { label: t('addPl') }
   ];
@@ -1029,15 +1080,19 @@ function vHome(tok) {
         '<div><small>' + esc(t('feat')) + '</small><h2>' + esc(hero.title) + '</h2><p>' + esc((hero.artist && hero.artist.name) || '') + (hero.releaseDate ? ' · ' + esc(year(hero.releaseDate)) : '') + '</p>' +
         '<div class="btns"><button class="btn" data-herolay="' + esc(hero.id) + '">' + ICON.play + esc(t('play')) + '</button><a class="btn ghost" href="#/album/' + esc(hero.id) + '">' + esc(t('album')) + '</a></div></div></div></div>';
     }
+    html += '<div id="recoBox"></div>';
     if (recent.length) html += rowTitle(t('recent')) + trackCards(recent);
     if (rows.hits && rows.hits.length) html += rowTitle(t('top10')) + '<div class="top10" id="top10">' + '</div>';
     if (albums.length > 1) html += rowTitle(t('newrel')) + albumCards(albums);
-    GENRES.forEach(function (g) {
+    indexBrowse(rows);
+    var gs = {}; tasteScores().genres.forEach(function (x) { gs[x.g] = x.s; });
+    GENRES.slice().sort(function (a, b) { return (gs[b[0]] || 0) - (gs[a[0]] || 0); }).forEach(function (g) {   // tus géneros primero
       var r = rows[g[0]]; if (!r || !r.length) return;
       html += rowTitle(g[1] + ' ' + t('g_' + g[0]), '#/genre/' + g[0]) + trackCards(r);
     });
     html += rowTitle(t('genres')) + genreTiles();
     $('#homeBody').innerHTML = html;
+    recoFill(tok);
     if (rows.hits && rows.hits.length) {
       var top = rows.hits.slice(0, 10);
       var a = trackRows(top.slice(0, 5), { numbered: true, album: false }), b = trackRows(top.slice(5), { numbered: true, album: false });
@@ -1104,7 +1159,7 @@ function vArtist(tok) {
     var pic = a.picture ? img(a.picture, 'art round') : '<div class="ph-fallback">' + esc((a.name || '?').charAt(0).toUpperCase()) + '</div>';
     var html = '<div class="phead">' + pic + '<div><small>' + esc(t('artist')) + '</small><h1>' + esc(a.name) + '</h1>';
     var L = tracks.length ? regList(tracks) : -1;
-    html += '<div class="btns">' + (tracks.length ? '<button class="btn" data-playall="' + L + '">' + ICON.play + esc(t('play')) + '</button><button class="btn ghost" data-shufall="' + L + '">' + esc(t('shuffle')) + '</button>' : '') + '</div></div></div>';
+    html += '<div class="btns">' + (tracks.length ? '<button class="btn" data-playall="' + L + '">' + ICON.play + esc(t('play')) + '</button><button class="btn ghost" data-shufall="' + L + '">' + esc(t('shuffle')) + '</button><button class="btn ghost" data-radioart="' + L + '">📻 ' + esc(t('radio')) + '</button>' : '') + '</div></div></div>';
     if (tracks.length) html += rowTitle(t('popular')) + trackRows(tracks.slice(0, 10), { numbered: true });
     if (albums.length) html += rowTitle(t('albums')) + albumCards(albums);
     if (eps.length) html += rowTitle(t('eps')) + albumCards(eps);
@@ -1177,7 +1232,11 @@ function vLibrary() {
   html += '<div class="btns" style="margin-top:8px"><button class="btn ghost" id="libNew">+ ' + esc(t('newPl')) + '</button></div>';
   if (!playlists.length) html += '<div class="empty-lib" style="margin-top:14px">' + esc(t('emptyLib')) + '</div>';
   if (recent.length) html += rowTitle(t('recent')) + trackCards(recent);
+  html += '<div class="acct" id="acctLib" style="margin:26px 0 0"></div>';
+  html += '<div class="box"><h3>' + esc(t('tasteTitle')) + '</h3><p>' + esc(t('tasteInfo')) + '</p><div class="btns"><button class="btn ghost" id="tasteClear">' + esc(t('tasteClear')) + '</button></div></div>';
   view.innerHTML = html + legalBlock();
+  renderAccount();
+  $('#tasteClear').addEventListener('click', function () { if (confirm(t('tasteConfirm'))) { tasteClear(); toast(t('tasteCleared')); } });
   var nb = $('#libNew'); if (nb) nb.addEventListener('click', function () { var p = newPlaylist(); if (p) location.hash = '#/playlist/' + p.id; });
 }
 
@@ -1202,6 +1261,8 @@ view.addEventListener('click', function (e) {
   if (like) { e.stopPropagation(); var row = like.closest('.tr'); var tr = lists[+row.getAttribute('data-l')][+row.getAttribute('data-i')]; toggleLike(tr); return; }
   var more = t_.closest('[data-more]');
   if (more) { e.stopPropagation(); var r2 = more.closest('.tr'); var tr2 = lists[+r2.getAttribute('data-l')][+r2.getAttribute('data-i')]; var pl = route.name === 'playlist' ? playlists.filter(function (p) { return p.id === route.id; })[0] : null; trackMenu(more, tr2, pl); return; }
+  var ra = t_.closest('[data-radioart]');
+  if (ra) { var rl = lists[+ra.getAttribute('data-radioart')]; if (rl && rl[0]) startRadio(rl[0]); return; }
   var pa = t_.closest('[data-playall]');
   if (pa) { var ls = lists[+pa.getAttribute('data-playall')]; if (ls && ls.length) { if (shuffle) playShuffled(ls); else playList(ls, 0); } return; }
   var sa = t_.closest('[data-shufall]');
@@ -1279,7 +1340,7 @@ function customColor(t) {
 }
 function vizSetCustom(a, b) {
   viz.custom = { a: a, b: b }; viz.cA = hexToHsl(a); viz.cB = hexToHsl(b);
-  store.set('bm_vizcustom', viz.custom);
+  store.set('bm_vizcustom', viz.custom); cloudMark('prefs');
 }
 var viz = {
   on: false, ctx: null, an: null, freq: null, time: null, raf: 0, cv: null, g: null, w: 0, h: 0,
@@ -1465,12 +1526,12 @@ function vizClose() {
   if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
 }
 function vizSetMode(m) {
-  viz.mode = m; viz.peaks = []; viz.parts = []; store.set('bm_vizmode', m);
+  viz.mode = m; viz.peaks = []; viz.parts = []; store.set('bm_vizmode', m); cloudMark('prefs');
   if (viz.g) viz.g.clearRect(0, 0, viz.w, viz.h);
   vizBuildUI();
 }
 function vizStep(d) { vizSetMode(VIZ_MODES[(VIZ_MODES.indexOf(viz.mode) + d + VIZ_MODES.length) % VIZ_MODES.length]); }
-function vizSetPal(k) { viz.pal = k; store.set('bm_vizpal', k); vizBuildUI(); }
+function vizSetPal(k) { viz.pal = k; store.set('bm_vizpal', k); cloudMark('prefs'); vizBuildUI(); }
 
 function vizBuildUI() {
   $('#vizModes').innerHTML = VIZ_MODES.map(function (m) {
@@ -1543,11 +1604,11 @@ function lyrSavePref(key, patch) {
   var p = lyrPrefs[key] || {};
   for (var k in patch) p[k] = patch[k];
   delete lyrPrefs[key];
-  if (!p.off && !p.pick) { store.set('bm_lyrprefs', lyrPrefs); return; }    // nothing to remember
+  if (!p.off && !p.pick) { store.set('bm_lyrprefs', lyrPrefs); cloudMark('prefs'); return; }    // nothing to remember
   lyrPrefs[key] = p;
   var keys = Object.keys(lyrPrefs);
   if (keys.length > 300) delete lyrPrefs[keys[0]];
-  store.set('bm_lyrprefs', lyrPrefs);
+  store.set('bm_lyrprefs', lyrPrefs); cloudMark('prefs');
 }
 function lyrToolsUpdate() {
   var on = lyr.status === 'ok' && lyr.synced.length > 0;
@@ -1794,6 +1855,494 @@ function sessionRestore() {
   if (s.closed && s.playing && gap < 20) playIndex(qi, { seek: restoreT + gap, auto: true });
 }
 
+/* ================= cuenta de Google y sincronización ================= */
+// Misma cuenta que Budsin Games (mismo proyecto de Firebase, y esta página comparte origen con el portal: la sesión
+// ya iniciada allí vale aquí). Local-first: todo funciona sin sesión; con sesión, lo mismo se guarda en
+// music_profiles/{uid}/kv/{likes|taste|prefs} y music_profiles/{uid}/playlists/{id}. Gana la escritura más reciente.
+var FB_BASE = 'https://www.gstatic.com/firebasejs/10.12.5/';
+var FB_CONFIG = {apiKey: "AIzaSyDSq7mtQN0ewJGQ6suMh1gRYFVr_xBvhBs",
+    authDomain: "juanjo-games.firebaseapp.com",
+    projectId: "juanjo-games",
+    storageBucket: "juanjo-games.firebasestorage.app",
+    messagingSenderId: "71973783344",
+    appId: "1:71973783344:web:cc310281715d048aa77c87",};
+var cloud = { state: 'off', user: null, auth: null, db: null, loading: null, err: '', applying: false, timers: {}, unsub: [], plSig: {}, pending: 0,
+  sync: store.get('bm_sync', { uid: null, ts: {} }) };
+function cloudMeta() { store.set('bm_sync', cloud.sync); }
+
+function loadScript(src) {
+  return new Promise(function (ok, ko) {
+    var el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = function () { ko(new Error('load ' + src)); };
+    document.head.appendChild(el);
+  });
+}
+function cloudInit() {
+  if (cloud.loading) return cloud.loading;
+  var have = window.firebase && window.firebase.auth && window.firebase.firestore;
+  cloud.loading = (have ? Promise.resolve() : loadScript(FB_BASE + 'firebase-app-compat.js')
+    .then(function () { return loadScript(FB_BASE + 'firebase-firestore-compat.js'); })
+    .then(function () { return loadScript(FB_BASE + 'firebase-auth-compat.js'); }))
+    .then(function () {
+      var app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(FB_CONFIG);
+      cloud.auth = app.auth(); cloud.db = app.firestore();
+      cloud.auth.onAuthStateChanged(cloudOnUser);
+    }).catch(function (e) { cloud.loading = null; cloud.state = 'err'; cloud.err = 'sdk'; renderAccount(); throw e; });
+  return cloud.loading;
+}
+// Only pull the SDK in for people who might already be signed in; everyone else loads it when they press the button.
+function cloudMaybeInit() {
+  var known = false;
+  try { known = !!(cloud.sync.uid || localStorage.getItem('budsin_pro_user')); } catch (e) {}
+  if (known) return cloudInit().catch(function () {});
+  if (window.indexedDB && indexedDB.databases) {
+    indexedDB.databases().then(function (l) { if (l.some(function (d) { return d.name === 'firebaseLocalStorageDb'; })) cloudInit().catch(function () {}); }).catch(function () {});
+  }
+}
+
+/* ---------- qué se sincroniza ---------- */
+var KINDS = {
+  likes: {
+    get: function () { return { items: liked.slice(0, 1000) }; },
+    set: function (d) { liked = d.items || []; store.set('bm_liked', liked); },
+    merge: function (a, b) { var seen = {}, out = []; (a.items || []).concat(b.items || []).forEach(function (x) { if (!seen[tid(x)]) { seen[tid(x)] = 1; out.push(x); } }); return { items: out.slice(0, 1000) }; }
+  },
+  taste: {
+    get: function () { return { artists: taste.artists, genres: taste.genres }; },
+    set: function (d) { taste.artists = d.artists || {}; taste.genres = d.genres || {}; store.set(TASTE_KEY, taste); try { localStorage.removeItem(RECS_KEY); } catch (e) {} },
+    merge: function (a, b) {      // dos dispositivos que nunca se habían visto: se suman, con el decaimiento aplicado
+      var now = Date.now();
+      function sum(x, y) { var o = {}; [x || {}, y || {}].forEach(function (m) { Object.keys(m).forEach(function (k) { var e = m[k], v = decayed(e, now); if (o[k]) { o[k].s += v; } else { o[k] = { n: e.n, i: e.i || null, s: v, t: now }; } if (e.i && !o[k].i) o[k].i = e.i; }); }); return o; }
+      return { artists: sum(a.artists, b.artists), genres: sum(a.genres, b.genres) };
+    }
+  },
+  prefs: {
+    get: function () { return { autoplay: autoplay, vizmode: viz.mode, vizpal: viz.pal, vizcustom: viz.custom, lyrprefs: lyrPrefs }; },
+    set: function (d) {
+      if (typeof d.autoplay === 'boolean') { autoplay = d.autoplay; store.set('bm_autoplay', autoplay); autoplaySync(); }
+      if (VIZ_MODES.indexOf(d.vizmode) >= 0) { viz.mode = d.vizmode; store.set('bm_vizmode', viz.mode); }
+      if (VIZ_PAL[d.vizpal]) { viz.pal = d.vizpal; store.set('bm_vizpal', viz.pal); }
+      if (d.vizcustom && HEX_RE.test(d.vizcustom.a) && HEX_RE.test(d.vizcustom.b)) vizSetCustom(d.vizcustom.a, d.vizcustom.b);
+      if (d.lyrprefs && typeof d.lyrprefs === 'object') { lyrPrefs = d.lyrprefs; store.set('bm_lyrprefs', lyrPrefs); }
+      vizBuildUI();
+    },
+    merge: function (a, b) { var o = {}; for (var k in a) o[k] = a[k]; for (var j in b) if (j !== 'lyrprefs') o[j] = b[j]; var lp = {}; for (var x in (a.lyrprefs || {})) lp[x] = a.lyrprefs[x]; for (var y in (b.lyrprefs || {})) lp[y] = b.lyrprefs[y]; o.lyrprefs = lp; return o; }
+  }
+};
+
+/* ---------- escribir (local -> nube) ---------- */
+function cloudMark(kind) {
+  // Called from code that also runs while the page starts, before `cloud` exists.
+  if (!cloud || cloud.applying || !cloud.user || cloud.state === 'off') return;
+  if (kind !== 'playlists') { cloud.sync.ts[kind] = Date.now(); cloudMeta(); }
+  var queued = !!cloud.timers[kind];
+  clearTimeout(cloud.timers[kind]);
+  cloud.timers[kind] = setTimeout(function () { cloud.timers[kind] = null; cloudPush(kind); }, 1500);
+  if (!queued) { cloud.pending++; renderAccount(); }
+}
+function cloudDone(err) {
+  cloud.pending = Math.max(0, cloud.pending - 1);
+  if (err) cloudFail(err); else if (cloud.state === 'err' && !cloud.pending) { cloud.state = 'in'; cloud.err = ''; }
+  renderAccount();
+}
+function cloudFail(e) {
+  cloud.state = 'err'; cloud.err = e && e.code === 'permission-denied' ? 'perm' : 'other';
+  console.warn('[music] cloud sync failed:', e && (e.code || e.message || e));
+}
+function cloudPush(kind) {
+  if (!cloud.user || !cloud.refs) { cloudDone(); return; }
+  if (kind === 'playlists') return cloudPushPlaylists();
+  var K = KINDS[kind]; if (!K) { cloudDone(); return; }
+  var doc = K.get(); doc.updatedAt = cloud.sync.ts[kind] || Date.now();
+  cloud.refs.kv.doc(kind).set(doc).then(function () { cloudDone(); }, cloudDone);
+}
+function cloudPushPlaylists() {
+  var ops = [], now = Date.now(), live = {};
+  playlists.forEach(function (p) {
+    live[p.id] = 1;
+    var sig = JSON.stringify([p.name, p.tracks]);
+    if (cloud.plSig[p.id] === sig) return;
+    p.updatedAt = now; cloud.plSig[p.id] = sig;
+    ops.push(cloud.refs.pls.doc(p.id).set({ name: p.name, tracks: p.tracks.slice(0, 1000), updatedAt: now }));
+  });
+  Object.keys(cloud.plSig).forEach(function (id) { if (!live[id]) { delete cloud.plSig[id]; ops.push(cloud.refs.pls.doc(id).delete()); } });
+  if (ops.length) store.set('bm_playlists', playlists);
+  Promise.all(ops).then(function () { cloudDone(); }, cloudDone);
+}
+
+/* ---------- leer (nube -> local) ---------- */
+function cloudOnUser(u) {
+  if (!u) {
+    var had = cloud.sync.uid;
+    cloudDetach(); cloud.user = null; cloud.state = 'off'; cloud.err = '';
+    if (had) { cloudClearLocal(); toast(t('acctSignedOut')); }       // no dejar los datos de una cuenta en un equipo compartido
+    renderAccount(); return;
+  }
+  cloud.user = u; cloud.state = 'loading'; renderAccount();
+  cloudSync(u).then(function () { cloud.state = cloud.state === 'err' ? 'err' : 'in'; renderAccount(); },
+    function (e) { cloudFail(e); renderAccount(); });
+}
+function cloudSync(u) {
+  var uid = u.uid, root = cloud.db.collection('music_profiles').doc(uid);
+  cloud.refs = { kv: root.collection('kv'), pls: root.collection('playlists') };
+  return Promise.all([cloud.refs.kv.get(), cloud.refs.pls.get()]).then(function (res) {
+    var rkv = {}, rpl = {};
+    res[0].docs.forEach(function (d) { rkv[d.id] = d.data(); });
+    res[1].docs.forEach(function (d) { rpl[d.id] = d.data(); });
+    var foreign = !!cloud.sync.uid && cloud.sync.uid !== uid;        // lo que hay aquí es de otra cuenta: se reemplaza, no se mezcla
+    var first = cloud.sync.uid !== uid;
+    if (foreign) cloudClearLocal();
+    cloud.applying = true;
+    try {
+      Object.keys(KINDS).forEach(function (kind) {
+        var K = KINDS[kind], r = rkv[kind], mine = cloud.sync.ts[kind] || 0;
+        if (!r) { if (!foreign && first) cloud.sync.ts[kind] = Date.now(); return; }       // la nube no tiene nada: se sube lo local
+        if (first && !foreign) { K.set(K.merge(K.get(), r)); cloud.sync.ts[kind] = Date.now(); }  // primera vez: unión
+        else if ((r.updatedAt || 0) > mine) { K.set(r); cloud.sync.ts[kind] = r.updatedAt; }       // luego: gana lo más reciente
+      });
+      var local = {}; playlists.forEach(function (p) { local[p.id] = p; });
+      Object.keys(rpl).forEach(function (id) {
+        var r = rpl[id], l = local[id];
+        if (!l) playlists.push({ id: id, name: r.name, tracks: r.tracks || [], updatedAt: r.updatedAt || 0 });
+        else if ((r.updatedAt || 0) > (l.updatedAt || 0)) { l.name = r.name; l.tracks = r.tracks || []; l.updatedAt = r.updatedAt; }
+        var p2 = playlists.filter(function (p) { return p.id === id; })[0];
+        cloud.plSig[id] = JSON.stringify([p2.name, p2.tracks]);
+      });
+      store.set('bm_playlists', playlists);
+    } finally { cloud.applying = false; }
+    cloud.sync.uid = uid; cloudMeta();
+    renderSidebar(); updateNowPlaying(); if (route.name !== 'search') render();
+    cloudAttach();
+    Object.keys(KINDS).forEach(function (kind) { if (!rkv[kind] || first) cloudMark(kind); });    // sube lo que la nube no tenía o se mezcló
+    cloudMark('playlists');
+  });
+}
+function cloudAttach() {
+  cloudDetach();
+  cloud.unsub.push(cloud.refs.kv.onSnapshot(function (snap) {
+    snap.docChanges().forEach(function (c) {
+      if (c.type === 'removed' || c.doc.metadata.hasPendingWrites) return;
+      var r = c.doc.data(), K = KINDS[c.doc.id];
+      if (!K || (r.updatedAt || 0) <= (cloud.sync.ts[c.doc.id] || 0)) return;       // es nuestro eco o algo más viejo
+      cloud.applying = true; try { K.set(r); cloud.sync.ts[c.doc.id] = r.updatedAt; cloudMeta(); } finally { cloud.applying = false; }
+      if (route.name === 'home' || route.name === 'liked' || route.name === 'library') render();
+    });
+  }, function () {}));
+  cloud.unsub.push(cloud.refs.pls.onSnapshot(function (snap) {
+    var changed = false;
+    snap.docChanges().forEach(function (c) {
+      if (c.doc.metadata.hasPendingWrites) return;
+      var id = c.doc.id, r = c.doc.data(), i = -1;
+      playlists.forEach(function (p, k) { if (p.id === id) i = k; });
+      if (c.type === 'removed') { if (i >= 0) { playlists.splice(i, 1); delete cloud.plSig[id]; changed = true; } return; }
+      if (i >= 0 && (r.updatedAt || 0) <= (playlists[i].updatedAt || 0)) return;
+      var np = { id: id, name: r.name, tracks: r.tracks || [], updatedAt: r.updatedAt || 0 };
+      if (i >= 0) playlists[i] = np; else playlists.push(np);
+      cloud.plSig[id] = JSON.stringify([np.name, np.tracks]); changed = true;
+    });
+    if (changed) { store.set('bm_playlists', playlists); renderSidebar(); if (route.name === 'library' || route.name === 'playlist') render(); }
+  }, function () {}));
+}
+function cloudDetach() { cloud.unsub.forEach(function (f) { try { f(); } catch (e) {} }); cloud.unsub = []; }
+
+function cloudClearLocal() {
+  ['bm_liked', 'bm_playlists', 'bm_taste', 'bm_recs', 'bm_recent', 'bm_lyrprefs', 'bm_sync'].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+  liked = []; playlists = []; recent = []; lyrPrefs = {};
+  taste = { v: 2, artists: {}, genres: {}, seen: [], skips: {} };
+  cloud.sync = { uid: null, ts: {} }; cloud.plSig = {};
+  renderSidebar(); updateNowPlaying(); render();
+}
+
+/* ---------- acciones y vista ---------- */
+function cloudSignIn() {
+  cloud.state = 'loading'; renderAccount();
+  cloudInit().then(function () {
+    return cloud.auth.signInWithPopup(new window.firebase.auth.GoogleAuthProvider());
+  }).catch(function (e) {
+    cloud.state = 'off'; renderAccount();
+    if (e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) return;
+    toast(t(cloud.err === 'sdk' ? 'acctSdkFail' : 'acctFail'));
+  });
+}
+function cloudSignOut() { if (cloud.auth) cloud.auth.signOut(); }
+function cloudWipe() {
+  if (!cloud.user || !confirm(t('acctWipeAsk'))) return;
+  var ops = [];
+  ['likes', 'taste', 'prefs'].forEach(function (k) { ops.push(cloud.refs.kv.doc(k).delete()); });
+  cloud.refs.pls.get().then(function (snap) { snap.docs.forEach(function (d) { ops.push(d.ref.delete()); }); return Promise.all(ops); })
+    .then(function () { toast(t('acctWiped')); }, function (e) { cloudFail(e); renderAccount(); });
+}
+function accountHtml() {
+  var u = cloud.user;
+  if (cloud.state === 'loading' && !u) return '<div class="sub">' + esc(t('acctConnecting')) + '</div>';
+  if (!u) return '<div class="sub">' + esc(t('acctPitch')) + '</div><button class="btn" data-acct="in">' + esc(t('acctIn')) + '</button>';
+  var st = cloud.state === 'err' ? '<div class="sync err">' + esc(t(cloud.err === 'perm' ? 'acctErrPerm' : 'acctErr')) + '</div>'
+    : (cloud.state === 'loading' || cloud.pending) ? '<div class="sync">' + esc(t('acctSyncing')) + '</div>' : '<div class="sync ok">' + esc(t('acctSynced')) + '</div>';
+  return '<div class="who">' + (u.photoURL ? '<img class="av" src="' + esc(u.photoURL) + '" alt="" referrerpolicy="no-referrer">' : '<span class="av"></span>') +
+    '<div style="min-width:0"><div class="nm">' + esc(u.displayName || t('acctTitle')) + '</div><div class="em">' + esc(u.email || '') + '</div></div></div>' + st +
+    '<button class="btn ghost" data-acct="out">' + esc(t('acctOut')) + '</button><button class="linkbtn" data-acct="wipe">' + esc(t('acctWipe')) + '</button>';
+}
+function renderAccount() {
+  var h = accountHtml();
+  ['#acct', '#acctLib'].forEach(function (sel) { var el = $(sel); if (el) el.innerHTML = h; });
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-acct]');
+  if (!b) return;
+  var a = b.getAttribute('data-acct');
+  if (a === 'in') cloudSignIn(); else if (a === 'out') cloudSignOut(); else if (a === 'wipe') cloudWipe();
+});
+
+/* ================= gustos, recomendaciones y autoplay ================= */
+// El gusto se guarda AGREGADO (puntaje por artista y por género, con decaimiento), no como historial: sube menos
+// datos y es más privado. 'seen' y 'skips' (ids de canciones) se quedan sólo en este navegador.
+var HALF_LIFE_MS = 21 * 86400000;     // lo que escuchaste hace tres semanas pesa la mitad
+var TASTE_KEY = 'bm_taste', RECS_KEY = 'bm_recs';
+var taste = store.get(TASTE_KEY, null);
+if (!taste || taste.v !== 2) taste = { v: 2, artists: {}, genres: {}, seen: [], skips: {} };
+var autoplay = store.get('bm_autoplay', true);
+var browseGenres = {};                // id de canción -> géneros (filas del Home en las que aparece)
+var extending = null;
+var lis = null;                       // la canción que se está escuchando
+
+function nk(s) { return String(s == null ? '' : s).normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim(); }
+function primaryArtist(tr) { return String(tr.artist || '').split(/\s*(?:,|&|;|\bfeat\.?|\bft\.?|\bx\b)\s*/i)[0].trim(); }
+function decayed(e, now) { return e.s * Math.pow(0.5, (now - e.t) / HALF_LIFE_MS); }
+function dayHash(str) {                // 0..1 estable durante un día: el mix cambia mañana, no en cada recarga
+  var h = 0, x = str + '|' + new Date().toISOString().slice(0, 10);
+  for (var i = 0; i < x.length; i++) h = (h * 31 + x.charCodeAt(i)) >>> 0;
+  return (h % 1000) / 1000;
+}
+
+var tasteTimer;
+function tasteChanged() {
+  clearTimeout(tasteTimer);
+  tasteTimer = setTimeout(function () { store.set(TASTE_KEY, taste); cloudMark('taste'); }, 600);
+}
+function tasteAdd(tr, w) {
+  var name = primaryArtist(tr), k = nk(name);
+  if (!k || !w) return;
+  var now = Date.now();
+  var a = taste.artists[k] || (taste.artists[k] = { n: name, i: null, s: 0, t: now });
+  a.s = decayed(a, now) + w; a.t = now;
+  if (tr.artistId) a.i = tr.artistId;
+  if (w > 0) (browseGenres[tid(tr)] || []).forEach(function (g) {
+    var e = taste.genres[g] || (taste.genres[g] = { s: 0, t: now });
+    e.s = decayed(e, now) + w; e.t = now;
+  });
+  var keys = Object.keys(taste.artists);
+  if (keys.length > 120) {
+    keys.sort(function (x, y) { return decayed(taste.artists[x], now) - decayed(taste.artists[y], now); });
+    keys.slice(0, keys.length - 120).forEach(function (kk) { delete taste.artists[kk]; });
+  }
+  tasteChanged();
+}
+function markSeen(tr) {
+  var id = tid(tr);
+  taste.seen = taste.seen.filter(function (x) { return x !== id; }).concat(id).slice(-150);
+}
+function tasteScores() {
+  var now = Date.now();
+  var artists = Object.keys(taste.artists).map(function (k) { var e = taste.artists[k]; return { k: k, n: e.n, id: e.i, s: decayed(e, now) }; })
+    .filter(function (a) { return a.s > 0.4; }).sort(function (a, b) { return b.s - a.s; });
+  var genres = Object.keys(taste.genres).map(function (g) { return { g: g, s: decayed(taste.genres[g], now) }; })
+    .filter(function (g) { return g.s > 0.3; }).sort(function (a, b) { return b.s - a.s; });
+  return { artists: artists, genres: genres };
+}
+// A song stops being listened to: what it meant depends on how long it played and how it ended.
+function tasteEnd(reason) {
+  if (!lis) return;
+  var tr = lis.tr, pos = audio.currentTime || 0;
+  var d = (isFinite(audio.duration) && audio.duration > 0 ? audio.duration : tr.duration) || 0;
+  lis = null;
+  if (reason === 'ended') { tasteAdd(tr, 1.5); markSeen(tr); return; }                 // la escuchó entera
+  if (pos >= Math.min(30, d * 0.5 || 30)) { tasteAdd(tr, 1); markSeen(tr); }             // la escuchó de verdad
+  else if (pos < 12 && reason === 'skip') { taste.skips[tid(tr)] = (taste.skips[tid(tr)] || 0) + 1; tasteAdd(tr, -0.7); }
+}
+window.addEventListener('pagehide', function () { tasteEnd('change'); if (tasteTimer) { clearTimeout(tasteTimer); store.set(TASTE_KEY, taste); } });
+
+function indexBrowse(rows) {
+  Object.keys(rows || {}).forEach(function (g) {
+    (rows[g] || []).forEach(function (tr) { var a = browseGenres[tid(tr)] || (browseGenres[tid(tr)] = []); if (a.indexOf(g) < 0) a.push(g); });
+  });
+}
+
+/* ---------- candidatos ---------- */
+function artistPage(id) { return api('artist/' + encodeURIComponent(id)); }
+function similarOf(id) { return api('artist/' + encodeURIComponent(id) + '/similar').then(function (d) { return d.artists || []; }).catch(function () { return []; }); }
+function resolveArtistId(a) {          // a: { k, n, id }
+  if (a.id) return Promise.resolve(a.id);
+  return api('lookup/artist?name=' + encodeURIComponent(a.n)).then(function (d) {
+    if (taste.artists[a.k]) { taste.artists[a.k].i = d.id; tasteChanged(); }
+    return d.id;
+  }).catch(function () { return null; });
+}
+// Picks n songs from scored candidates: best first, none already in the queue or skipped twice, one version of each
+// song, and at most `cap` per artist so one name cannot take the whole list.
+function titleKey(tr) { return nk(primaryArtist(tr)) + '|' + nk(String(tr.title).replace(/\(.*?\)|\[.*?\]/g, '')); }
+function pickDiverse(pool, n, have, cap) {
+  var seen = {}; taste.seen.slice(-40).forEach(function (id) { seen[id] = 1; });
+  pool.forEach(function (p) { p.f = p.sc + dayHash(tid(p.tr)) * 0.15 - (seen[tid(p.tr)] ? 0.5 : 0); });
+  pool.sort(function (a, b) { return b.f - a.f; });
+  var out = [], perA = {}, titles = {};
+  pool.forEach(function (p) {
+    if (out.length >= n) return;
+    var id = tid(p.tr);
+    if (have[id] || (taste.skips[id] || 0) >= 2) return;
+    var ak = nk(primaryArtist(p.tr)), tk = titleKey(p.tr);
+    if (titles[tk] || have['t:' + tk] || (perA[ak] || 0) >= cap) return;   // la misma canción con otro id (single, álbum…) no cuenta como nueva
+    titles[tk] = 1; perA[ak] = (perA[ak] || 0) + 1; out.push(p.tr);
+  });
+  return out;
+}
+
+/* ---------- "Para ti" ---------- */
+function getRecs() {
+  var sc = tasteScores(), top = sc.artists.slice(0, 4);
+  if (!top.length) return Promise.resolve(null);
+  var sig = top.slice(0, 3).map(function (a) { return a.k; }).join(',') + '|' + sc.genres.slice(0, 2).map(function (g) { return g.g; }).join(',');
+  var cached = store.get(RECS_KEY, null);
+  if (cached && cached.sig === sig && Date.now() - cached.at < 3 * 3600000 && cached.data) return Promise.resolve(cached.data);
+  var maxS = top[0].s, topKeys = {};
+  top.forEach(function (a) { topKeys[a.k] = 1; });
+  return Promise.all(top.map(function (a) {
+    return resolveArtistId(a).then(function (id) {
+      if (!id) return null;
+      return Promise.all([artistPage(id).catch(function () { return null; }), similarOf(id)]).then(function (r) { return { a: a, id: id, page: r[0], sim: r[1] }; });
+    });
+  })).then(function (parts) {
+    parts = parts.filter(Boolean);
+    var picks = [];
+    parts.slice(0, 3).forEach(function (p) {
+      var n = 0;
+      p.sim.forEach(function (x) {
+        if (n < 2 && !topKeys[nk(x.name)] && !picks.some(function (y) { return y.s.id === x.id; })) { picks.push({ s: x, from: p }); n++; }
+      });
+    });
+    return Promise.all(picks.map(function (x) { return artistPage(x.s.id).catch(function () { return null; }).then(function (pg) { return { x: x, page: pg }; }); })).then(function (simPages) {
+      var pool = [], because = {};
+      parts.forEach(function (p) {
+        var aff = p.a.s / maxS;
+        if (p.page) (p.page.tracks || []).forEach(function (tr, i) { pool.push({ tr: tr, sc: 1 * aff - i * 0.03 }); });
+      });
+      simPages.forEach(function (sp) {
+        if (!sp.page) return;
+        var aff = sp.x.from.a.s / maxS, list = because[sp.x.from.a.k] || (because[sp.x.from.a.k] = { artist: sp.x.from.a.n, tracks: [] });
+        (sp.page.tracks || []).slice(0, 8).forEach(function (tr, i) { pool.push({ tr: tr, sc: 0.6 * aff - i * 0.04 }); list.tracks.push(tr); });
+      });
+      // exploración: lo más escuchado de tus géneros por artistas que todavía no escuchas
+      var explore = api('browse').then(function (d) {
+        var known = {}; sc.artists.forEach(function (a) { known[a.k] = 1; });
+        sc.genres.slice(0, 2).forEach(function (g) {
+          ((d.rows || {})[g.g] || []).filter(function (tr) { return !known[nk(primaryArtist(tr))]; }).slice(0, 8)
+            .forEach(function (tr, i) { pool.push({ tr: tr, sc: 0.28 - i * 0.01 }); });
+        });
+      }).catch(function () {});
+      return explore.then(function () {
+        var mix = pickDiverse(pool, 30, {}, 3);
+        var rows = Object.keys(because).map(function (k) { return because[k]; }).map(function (b) {
+          var seenT = {}; return { artist: b.artist, tracks: b.tracks.filter(function (tr) { var id = tid(tr); if (seenT[id]) return false; seenT[id] = 1; return true; }).slice(0, 12) };
+        }).filter(function (b) { return b.tracks.length >= 4; }).slice(0, 2);
+        var cutoff = new Date(Date.now() - 120 * 86400000).toISOString().slice(0, 10), albums = [], aseen = {};
+        parts.forEach(function (p) {
+          if (!p.page) return;
+          (p.page.albums || []).concat(p.page.eps || []).forEach(function (al) { if (al.releaseDate && al.releaseDate >= cutoff && !aseen[al.id]) { aseen[al.id] = 1; albums.push(al); } });
+        });
+        albums.sort(function (a, b) { return (b.releaseDate || '').localeCompare(a.releaseDate || ''); });
+        var artists = parts.filter(function (p) { return p.page && p.page.artist; }).map(function (p) { return { id: p.page.artist.id, name: p.page.artist.name, picture: p.page.artist.picture }; });
+        var data = { mix: mix, because: rows, albums: albums.slice(0, 10), artists: artists };
+        store.set(RECS_KEY, { at: Date.now(), sig: sig, data: data });
+        return data;
+      });
+    });
+  });
+}
+function recoHtml(r) {
+  if (!r || !r.mix.length) return '';
+  var L = regList(r.mix);
+  var h = '<h2 class="row-title"><span>✨ ' + esc(t('forYou')) + '</span><button class="chip" data-playall="' + L + '">▶ ' + esc(t('playMix')) + '</button></h2>' + trackCardsFor(L, r.mix);
+  r.because.forEach(function (b) { h += rowTitle(t('becauseYou') + ' ' + b.artist) + trackCards(b.tracks); });
+  if (r.albums.length) h += rowTitle(t('newFromYours')) + albumCards(r.albums);
+  if (r.artists.length) h += rowTitle(t('yourArtists')) + artistCards(r.artists);
+  return h;
+}
+function trackCardsFor(L, tracks) {        // as trackCards, but over a list that is already registered
+  return '<div class="hrow">' + tracks.map(function (tr, i) {
+    return '<div class="card" data-l="' + L + '" data-i="' + i + '" data-cardplay tabindex="0"><div class="cv">' + img(tr.artwork) + '<span class="playfab">' + ICON.play + '</span></div>' +
+      '<div class="t">' + esc(tr.title) + '</div><div class="s">' + artistLink(tr) + '</div></div>';
+  }).join('') + '</div>';
+}
+function recoFill(tok) {
+  var box = $('#recoBox');
+  if (!box) return;
+  if (!tasteScores().artists.length) { box.innerHTML = '<div class="reco-hint">' + esc(t('homeLearning')) + '</div>'; return; }
+  box.innerHTML = rowTitle(t('forYou')) + skeletonRow();
+  getRecs().then(function (r) { if (tok === renderToken && $('#recoBox')) $('#recoBox').innerHTML = recoHtml(r); })
+    .catch(function () { if ($('#recoBox')) $('#recoBox').innerHTML = ''; });
+}
+
+/* ---------- radio y autoplay ---------- */
+// Songs that follow `seed`: its artist's best known, similar artists', and a few from what you usually play.
+function radioTracks(seed, n) {
+  var name = primaryArtist(seed), k = nk(name), sc = tasteScores(), aff = {};
+  sc.artists.forEach(function (a) { aff[a.k] = a.s / (sc.artists[0].s || 1); });
+  var have = {}; queue.concat([seed]).forEach(function (q) { have[tid(q)] = 1; have['t:' + titleKey(q)] = 1; });
+  var ta = taste.artists[k];
+  return resolveArtistId({ k: k, n: name, id: seed.artistId || (ta && ta.i) || null }).then(function (id) {
+    if (!id) return [];
+    return Promise.all([artistPage(id).catch(function () { return null; }), similarOf(id)]).then(function (r) {
+      var pool = [];
+      if (r[0]) (r[0].tracks || []).forEach(function (tr, i) { pool.push({ tr: tr, sc: 0.9 - i * 0.04 }); });
+      var sims = r[1].filter(function (x) { return nk(x.name) !== k; }).slice(0, 5);
+      return Promise.all(sims.map(function (x) { return artistPage(x.id).catch(function () { return null; }); })).then(function (pages) {
+        pages.forEach(function (pg, si) {
+          if (pg) (pg.tracks || []).slice(0, 6).forEach(function (tr, i) { pool.push({ tr: tr, sc: 0.8 - si * 0.04 - i * 0.05 + (aff[nk(primaryArtist(tr))] || 0) * 0.4 }); });
+        });
+        var rc = store.get(RECS_KEY, null);
+        if (rc && rc.data && rc.data.mix) rc.data.mix.slice(0, 8).forEach(function (tr) { pool.push({ tr: tr, sc: 0.55 }); });
+        return pickDiverse(pool, n, have, 2);
+      });
+    });
+  }).catch(function () { return []; });
+}
+function autoFlag(tr) { var s = slim(tr); s.auto = 1; return s; }
+// Appends similar songs to the end of the queue; resolves to how many were added. One run at a time.
+function autoExtend() {
+  if (!autoplay || repeat !== 0) return Promise.resolve(0);
+  if (extending) return extending;
+  var tr = cur();
+  if (!tr) return Promise.resolve(0);
+  extending = radioTracks(tr, 12).then(function (list) {
+    var have = {}; queue.forEach(function (q) { have[tid(q)] = 1; });
+    var add = list.filter(function (x) { return !have[tid(x)]; }).map(autoFlag);
+    if (add.length) { queue = queue.concat(add); renderQueue(); }
+    return add.length;
+  }).catch(function () { return 0; }).then(function (n) { extending = null; return n; });
+  return extending;
+}
+function startRadio(tr) {
+  toast(t('radioLoading'));
+  radioTracks(tr, 24).then(function (list) {
+    if (!list.length) { toast(t('radioNone')); return; }
+    playList([tr].concat(list), 0);
+    queue = queue.map(function (q, i) { if (i > 0) q.auto = 1; return q; }); renderQueue();
+  });
+}
+function autoplaySync() {
+  var b = $('#qAuto');
+  b.textContent = t(autoplay ? 'autoplayOn' : 'autoplayOff');
+  b.title = t('autoplayT'); b.classList.toggle('on', autoplay); b.setAttribute('aria-pressed', String(autoplay));
+}
+$('#qAuto').addEventListener('click', function () {
+  autoplay = !autoplay; store.set('bm_autoplay', autoplay); cloudMark('prefs'); autoplaySync();
+  if (autoplay) autoExtend();
+});
+function tasteClear() {
+  taste = { v: 2, artists: {}, genres: {}, seen: [], skips: {} };
+  store.set(TASTE_KEY, taste); try { localStorage.removeItem(RECS_KEY); } catch (e) {}
+  cloudMark('taste');
+}
+api('browse').then(function (d) { indexBrowse(d.rows); }).catch(function () {});
+
 /* ================= init static text ================= */
 function applyStatic() {
   $$('[data-t]').forEach(function (el) { el.textContent = t(el.getAttribute('data-t')); });
@@ -1801,9 +2350,10 @@ function applyStatic() {
   qEl.placeholder = t('ph');
   $('#sideFoot').innerHTML = esc(t('legal')) + '<a href="https://github.com/Juanjo3222/budsin-games-web/tree/main/server/music/app" target="_blank" rel="noopener">Budsin</a> · <a href="https://github.com/x8rr/music" target="_blank" rel="noopener">x8rr/music</a>';
 }
-applyStatic(); vizBuildUI(); syncModes(); applyVol(); syncPlayBtn(); updateNowPlaying(); renderSidebar(); renderQueue();
+applyStatic(); vizBuildUI(); autoplaySync(); renderAccount(); syncModes(); applyVol(); syncPlayBtn(); updateNowPlaying(); renderSidebar(); renderQueue();
 sessionRestore();
 render();
+cloudMaybeInit();
 
 fetch('/api/music/source').then(function (r) { return r.json(); }).then(function (s) {
   if (s.configured && !s.configured.ytm) toast(t('noPlay'));
