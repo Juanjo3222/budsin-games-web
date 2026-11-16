@@ -628,7 +628,7 @@ var I18N = {
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
-    addQ: 'Añadir a la cola', addPl: 'Añadir a playlist', newPl: 'Nueva playlist…', goArtist: 'Ir al artista', goAlbum: 'Ir al álbum',
+    addQ: 'Añadir a la cola', addPl: 'Añadir a playlist', newPl: 'Nueva playlist…', goArtist: 'Ir al artista', goAlbum: 'Ir al álbum', noPage: 'Esa página no está disponible',
     like: 'Me gusta', unlike: 'Quitar de Me gusta', plName: 'Nombre de la playlist', rename: 'Renombrar', del: 'Eliminar playlist', delAsk: '¿Eliminar esta playlist?',
     addedQ: 'Añadida a la cola', addedPl: 'Añadida a', liked_t: 'Guardada en Me gusta', unliked_t: 'Quitada de Me gusta', created: 'Playlist creada',
     emptyLiked: 'Aún no tienes canciones favoritas. Toca el corazón ♥ en cualquier canción.', emptyPl: 'Esta playlist está vacía. Usa el menú ⋯ de una canción para añadirla.',
@@ -659,7 +659,7 @@ var I18N = {
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
     noPlay: 'Search works, but playback is not available right now.',
-    addQ: 'Add to queue', addPl: 'Add to playlist', newPl: 'New playlist…', goArtist: 'Go to artist', goAlbum: 'Go to album',
+    addQ: 'Add to queue', addPl: 'Add to playlist', newPl: 'New playlist…', goArtist: 'Go to artist', goAlbum: 'Go to album', noPage: 'That page isn\'t available',
     like: 'Like', unlike: 'Remove from Liked', plName: 'Playlist name', rename: 'Rename', del: 'Delete playlist', delAsk: 'Delete this playlist?',
     addedQ: 'Added to queue', addedPl: 'Added to', liked_t: 'Saved to Liked songs', unliked_t: 'Removed from Liked songs', created: 'Playlist created',
     emptyLiked: 'No favorite songs yet. Tap the heart ♥ on any song.', emptyPl: 'This playlist is empty. Use the ⋯ menu on a song to add it.',
@@ -690,7 +690,7 @@ var I18N = {
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
-    addQ: 'Adicionar à fila', addPl: 'Adicionar à playlist', newPl: 'Nova playlist…', goArtist: 'Ir ao artista', goAlbum: 'Ir ao álbum',
+    addQ: 'Adicionar à fila', addPl: 'Adicionar à playlist', newPl: 'Nova playlist…', goArtist: 'Ir ao artista', goAlbum: 'Ir ao álbum', noPage: 'Essa página não está disponível',
     like: 'Curtir', unlike: 'Remover das curtidas', plName: 'Nome da playlist', rename: 'Renomear', del: 'Excluir playlist', delAsk: 'Excluir esta playlist?',
     addedQ: 'Adicionada à fila', addedPl: 'Adicionada a', liked_t: 'Salva em Curtidas', unliked_t: 'Removida das Curtidas', created: 'Playlist criada',
     emptyLiked: 'Nenhuma música favorita ainda. Toque no coração ♥ em qualquer música.', emptyPl: 'Esta playlist está vazia. Use o menu ⋯ de uma música para adicioná-la.',
@@ -932,9 +932,34 @@ $('#bPlay').addEventListener('click', togglePlay);
 $('#bPrev').addEventListener('click', prev);
 $('#bNext').addEventListener('click', function () { next(false); });
 
+// Tracks from YouTube Music carry no catalogue ids: the link finds the artist/album page by name when clicked.
 function artistLink(tr, cls) {
-  return tr.artistId ? '<a href="#/artist/' + esc(tr.artistId) + '">' + esc(tr.artist) + '</a>' : esc(tr.artist);
+  if (!tr.artist) return '';
+  return tr.artistId ? '<a href="#/artist/' + esc(tr.artistId) + '">' + esc(tr.artist) + '</a>'
+    : '<a href="#" data-lka="' + esc(primaryArtist(tr)) + '">' + esc(tr.artist) + '</a>';
 }
+function albumLink(tr, text) {
+  if (!tr.albumId && !tr.album) return esc(text);
+  return tr.albumId ? '<a href="#/album/' + esc(tr.albumId) + '">' + esc(text) + '</a>'
+    : '<a href="#" data-lkb="' + esc(tr.album) + '" data-lkr="' + esc(primaryArtist(tr)) + '">' + esc(text) + '</a>';
+}
+function goToArtist(tr) {
+  if (tr.artistId) { location.hash = '#/artist/' + tr.artistId; return; }
+  api('lookup/artist?name=' + encodeURIComponent(primaryArtist(tr))).then(function (d) { location.hash = '#/artist/' + d.id; })
+    .catch(function () { toast(t('noPage')); });
+}
+function goToAlbum(tr) {
+  if (tr.albumId) { location.hash = '#/album/' + tr.albumId; return; }
+  api('lookup/album?artist=' + encodeURIComponent(primaryArtist(tr)) + '&title=' + encodeURIComponent(tr.album || tr.title)).then(function (d) { location.hash = '#/album/' + d.id; })
+    .catch(function () { toast(t('noPage')); });
+}
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('a[data-lka],a[data-lkb]');
+  if (!a) return;
+  e.preventDefault();
+  if (a.hasAttribute('data-lka')) goToArtist({ artist: a.getAttribute('data-lka') });
+  else goToAlbum({ album: a.getAttribute('data-lkb'), artist: a.getAttribute('data-lkr') });
+});
 function updateNowPlaying() {
   var tr = cur(), el = $('#np');
   if (!tr) {
@@ -943,7 +968,7 @@ function updateNowPlaying() {
     return;
   }
   el.innerHTML = img(tr.artwork) +
-    '<div class="m"><div class="tt">' + (tr.albumId ? '<a href="#/album/' + esc(tr.albumId) + '">' + esc(tr.title) + '</a>' : esc(tr.title)) + '</div>' +
+    '<div class="m"><div class="tt">' + albumLink(tr, tr.title) + '</div>' +
     '<div class="aa">' + artistLink(tr) + '</div><div class="ld">' + esc(t('loadingTrack')) + '</div></div>' +
     '<button class="iconbtn' + (isLiked(tr) ? ' on' : '') + '" id="npLike" aria-label="' + esc(t('like')) + '">' + (isLiked(tr) ? ICON.heart : ICON.heartO) + '</button>' +
     '<button class="iconbtn only-m" data-viz aria-label="' + esc(t('viz')) + '"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>';
@@ -1068,9 +1093,9 @@ function trackMenu(anchor, tr, pl) {
   ];
   playlists.forEach(function (p) { items.push({ label: p.name, fn: function () { addToPlaylist(p, tr); } }); });
   items.push({ label: '+ ' + t('newPl'), fn: function () { newPlaylist(tr); } });
-  if (tr.artistId || tr.albumId) items.push('-');
-  if (tr.artistId) items.push({ label: t('goArtist'), fn: function () { location.hash = '#/artist/' + tr.artistId; } });
-  if (tr.albumId) items.push({ label: t('goAlbum'), fn: function () { location.hash = '#/album/' + tr.albumId; } });
+  if (tr.artist || tr.album) items.push('-');
+  if (tr.artist) items.push({ label: t('goArtist'), fn: function () { goToArtist(tr); } });
+  if (tr.albumId || tr.album) items.push({ label: t('goAlbum'), fn: function () { goToAlbum(tr); } });
   if (pl) { items.push('-'); items.push({ label: t('remove'), fn: function () { pl.tracks = pl.tracks.filter(function (x) { return tid(x) !== tid(tr); }); savePl(); render(); } }); }
   openMenu(anchor, items);
 }
@@ -1089,7 +1114,7 @@ function trackRows(tracks, opts) {
       '<div class="idx">' + idxHtml + '</div>' +
       '<div class="who">' + (opts.cover === false ? '' : img(tr.artwork)) + '<div class="m"><div class="tt"><span style="overflow:hidden;text-overflow:ellipsis">' + esc(tr.title) + '</span>' + (tr.explicit ? '<span class="exp">E</span>' : '') + '</div>' +
       '<div class="aa">' + artistLink(tr) + '</div></div></div>' +
-      (opts.album !== false ? '<div class="alb">' + (showAlbum && tr.albumId ? '<a href="#/album/' + esc(tr.albumId) + '">' + esc(tr.album) + '</a>' : esc(tr.album || '')) + '</div>' : '') +
+      (opts.album !== false ? '<div class="alb">' + (showAlbum ? albumLink(tr, tr.album) : esc(tr.album || '')) + '</div>' : '') +
       '<button class="like' + (isLiked(tr) ? ' on' : '') + '" data-like="' + esc(tid(tr)) + '" aria-label="' + esc(t('like')) + '">' + (isLiked(tr) ? ICON.heart : ICON.heartO) + '</button>' +
       '<div class="dur">' + fmt(tr.duration) + '</div>' +
       '<button class="more" data-more aria-label="⋯">' + ICON.more + '</button></div>';
