@@ -45,12 +45,12 @@
             var app = window.firebase.apps.length
                 ? window.firebase.app()
                 : window.firebase.initializeApp({
-                    apiKey: "AIzaSyDSq7mtQN0ewJGQ6suMh1gRYFVr_xBvhBs",
+                    apiKey: "AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U",
                     authDomain: "juanjo-games.firebaseapp.com",
                     projectId: "juanjo-games",
                     storageBucket: "juanjo-games.firebasestorage.app",
-                    messagingSenderId: "71973783344",
-                    appId: "1:71973783344:web:cc310281715d048aa77c87",
+                    messagingSenderId: "927529249414",
+                    appId: "1:927529249414:web:410a686dc7f0da25ec3f07",
                 });
             db = app.firestore();
             auth = app.auth();

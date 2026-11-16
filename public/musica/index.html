@@ -1923,12 +1923,14 @@ function sessionRestore() {
 // ya iniciada allí vale aquí). Local-first: todo funciona sin sesión; con sesión, lo mismo se guarda en
 // music_profiles/{uid}/kv/{likes|taste|prefs} y music_profiles/{uid}/playlists/{id}. Gana la escritura más reciente.
 var FB_BASE = 'https://www.gstatic.com/firebasejs/10.12.5/';
-var FB_CONFIG = {apiKey: "AIzaSyDSq7mtQN0ewJGQ6suMh1gRYFVr_xBvhBs",
-    authDomain: "juanjo-games.firebaseapp.com",
-    projectId: "juanjo-games",
-    storageBucket: "juanjo-games.firebasestorage.app",
-    messagingSenderId: "71973783344",
-    appId: "1:71973783344:web:cc310281715d048aa77c87",};
+var FB_CONFIG = {
+  apiKey: "AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U",
+  authDomain: "juanjo-games.firebaseapp.com",
+  projectId: "juanjo-games",
+  storageBucket: "juanjo-games.firebasestorage.app",
+  messagingSenderId: "927529249414",
+  appId: "1:927529249414:web:410a686dc7f0da25ec3f07",
+};
 var cloud = { state: 'off', user: null, auth: null, db: null, loading: null, err: '', applying: false, timers: {}, unsub: [], plSig: {}, pending: 0,
   sync: store.get('bm_sync', { uid: null, ts: {} }) };
 function cloudMeta() { store.set('bm_sync', cloud.sync); }
