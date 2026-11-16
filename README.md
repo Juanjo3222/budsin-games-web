@@ -314,12 +314,13 @@ Firebase se usa únicamente para el conteo de popularidad.
 
 Budsin Music usa **la misma cuenta de Google que Budsin Games** (mismo proyecto de Firebase, `juanjo-games`). Como `/musica/` y el portal comparten origen (`games.budsin.dev`), la sesión iniciada en uno vale en el otro. Budsin Hosting vive en otro origen (`budsin.dev`): comparte el *uid* (mismo proyecto), pero cada sitio pide iniciar sesión.
 
-**Qué se sincroniza** (siempre local-first: sin sesión todo funciona en `localStorage`): ♥, playlists, gustos y preferencias.
+**Qué se sincroniza** (siempre local-first: sin sesión todo funciona en `localStorage`): ♥, álbumes guardados, playlists, gustos y preferencias.
 Los **gustos** son un resumen agregado por artista y género con decaimiento (vida media de 21 días), **no** un historial canción por canción. Las canciones ya escuchadas y las saltadas no salen del navegador.
 
 | Ruta en Firestore | Contenido |
 |---|---|
 | `music_profiles/{uid}/kv/likes` | `items` (hasta 1000 canciones), `updatedAt` |
+| `music_profiles/{uid}/kv/albums` | `items` (álbumes guardados, hasta 500), `updatedAt` |
 | `music_profiles/{uid}/kv/taste` | `artists`, `genres`, `updatedAt` |
 | `music_profiles/{uid}/kv/prefs` | autoplay, visualizador, ajustes de letras, `updatedAt` |
 | `music_profiles/{uid}/playlists/{id}` | `name`, `tracks` (hasta 1000), `updatedAt` |
@@ -347,7 +348,7 @@ Sin estas reglas, Music sigue funcionando en local y muestra «No se pudo sincro
 * El Service Worker ya no cachea las rutas `/api/`.
 * **WebBlox** (`public/webblox/`): Roblox en el navegador con el cliente web oficial. Ver la sección «WebBlox».
 * **Budsin Music** (`public/musica/`): buscador y reproductor de música. Backend propio en el VPS (`server/music/`, basado en [x8rr/music](https://github.com/x8rr/music), AGPL-3.0, con un parche para escuchar solo en `127.0.0.1`), detrás de Caddy en `/api/music/*`. El audio sale de YouTube Music vía yt-dlp y la búsqueda de Tidal. Tarjeta nueva en el portal (ES/EN/PT) y enlace al código fuente en la propia página.
-* **Budsin Music, segunda tanda**: rediseño tipo streaming (catálogo por género, álbum/artista/similares, playlists, ♥, cola); **visualizador** de audio (6 modos, 4 paletas y una personalizable); **letras sincronizadas** desde LRCLIB a través del backend (`/api/music/lyrics`), con ajuste de sincronía y selector de versión; **mini-reproductor en el portal** (`public/bm-mini.js`) que sigue sonando al ir a Budsin Games o desde otra pestaña; **recomendaciones «Para ti», radio y autoplay** calculadas en el navegador; y **cuentas**: inicio de sesión con Google (misma cuenta y sesión que Budsin Games) con sincronización en Firestore. Ver «Cuentas en Budsin Music».
+* **Budsin Music, segunda tanda**: rediseño tipo streaming (catálogo por género, álbum/artista/similares, playlists, ♥, cola); **visualizador** de audio (6 modos, 4 paletas y una personalizable); **letras sincronizadas** desde LRCLIB a través del backend (`/api/music/lyrics`), con ajuste de sincronía y selector de versión; **mini-reproductor en el portal** (`public/bm-mini.js`) que sigue sonando al ir a Budsin Games o desde otra pestaña; **recomendaciones «Para ti», radio y autoplay** calculadas en el navegador; **álbumes guardados** en la biblioteca (el + de cada portada o «Guardar álbum»); fotos de artista con respaldo (búsqueda, o inicial sobre degradado); y **cuentas**: inicio de sesión con Google (misma cuenta y sesión que Budsin Games) con sincronización en Firestore. Ver «Cuentas en Budsin Music».
 * **Service Worker**: las páginas HTML van red-primero (antes se servía siempre la copia guardada de cualquier ruta y las páginas nuevas no llegaban a quien ya había visitado el sitio). `CACHE` pasa a `budsin-v3`.
 * **Budsin Proxy** pasa a [InvisiProxy LTS](https://github.com/InvisiProxy/InvisiProxyLTS) autoalojado en `proxy.budsin.dev` (ver sección «Budsin Proxy»); WebBlox se sirve desde ese mismo origen.
 * **Proxy**: corregida la carrera de IndexedDB (`'config' is not a known object store name`: la base `$scramjet` se creaba vacía si el service worker llegaba antes que el controlador) y el transporte epoxy (`/epoxy/transport.js`, envoltorio ES que BareMux puede importar). `/proxy/?go=<url>` abre una URL al cargar. Además: `sw.js` carga la configuración de Scramjet desde IndexedDB antes de servir `/scramjet/…` (Scramjet 1.1.0 solo fija su configuración global en `loadConfig()`, y fallaba con «reading 'prefix'»), y `epoxy/transport.js` adapta las cabeceras entre BareMux 2.1.9 (objeto) y epoxy (lista de pares). El proxy crea la base `$scramjet` con sus 5 almacenes antes de registrar el service worker.

@@ -322,6 +322,16 @@ input[type=range]:hover { --c: var(--accent); }
 .acct .linkbtn:hover { color: var(--text); }
 #acctLib { display: none; }   /* en escritorio la cuenta ya está en la barra lateral */
 
+/* ---------- album save & artist avatar ---------- */
+.card .cv .albsave { position: absolute; right: 8px; top: 8px; width: 32px; height: 32px; border-radius: 50%; background: rgba(8,10,12,.72); color: #fff; display: grid; place-items: center; font-size: 18px; line-height: 1; opacity: 0; transition: .15s; cursor: pointer; z-index: 2; backdrop-filter: blur(4px); }
+.card:hover .albsave, .card:focus-within .albsave, .albsave.on { opacity: 1; }
+.albsave:hover { background: var(--accent); color: #04201b; }
+.albsave.on { background: var(--accent); color: #04201b; }
+.cv.ph-av { display: grid; place-items: center; background: linear-gradient(135deg, #2c3342, #1a1f29); color: #7b869c; font-size: 3.2rem; font-weight: 800; }
+.grid-albums { display: grid; grid-template-columns: repeat(auto-fill, minmax(164px, 1fr)); gap: 16px; }
+.grid-albums .card { width: auto; }
+@media (max-width: 760px) { .card .cv .albsave { opacity: 1; } .grid-albums { grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); } }
+
 /* ---------- lyrics ---------- */
 #lyrics { position: fixed; left: 0; right: 0; top: 0; bottom: var(--player); z-index: 36; background: #07090c; display: none; flex-direction: column; overflow: hidden; }
 #lyrics.on { display: flex; }
@@ -421,6 +431,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="navlink" data-nav="search" href="#/search/"><svg viewBox="0 0 24 24"><path d="M10 3a7 7 0 105.3 11.6l4.6 4.6 1.4-1.4-4.6-4.6A7 7 0 0010 3zm0 2a5 5 0 110 10 5 5 0 010-10z"/></svg><span data-t="explore"></span></a>
     <a class="navlink" data-nav="library" href="#/library"><svg viewBox="0 0 24 24"><path d="M4 4h3v16H4zM9 4h3v16H9zm5.2.5l2.9-.8 3.9 15.6-2.9.7z"/></svg><span data-t="library"></span></a>
     <a class="navlink nav-desktop" data-nav="liked" href="#/liked"><svg viewBox="0 0 24 24"><path d="M12 21l-1.4-1.3C5.4 15.4 2 12.3 2 8.5A5.5 5.5 0 017.5 3c1.8 0 3.6.9 4.5 2.2A5.6 5.6 0 0116.5 3 5.5 5.5 0 0122 8.5c0 3.8-3.4 6.9-8.6 11.2z"/></svg><span data-t="liked"></span></a>
+    <a class="navlink nav-desktop" data-nav="albums" href="#/albums"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 14a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z"/></svg><span data-t="albums"></span></a>
     <div class="sect"><span data-t="playlists"></span><button id="newPl" aria-label="+" title="+">+</button></div>
     <div class="plist" id="plist"></div>
     <div class="acct" id="acct"></div>
@@ -530,6 +541,7 @@ var I18N = {
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espejo', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arcoíris', pal_neon: 'Neón', pal_fire: 'Fuego',
     forYou: 'Para ti', becauseYou: 'Porque escuchaste', newFromYours: 'Nuevo de tus artistas', yourArtists: 'Tus artistas', playMix: 'Reproducir', radio: 'Iniciar radio', radioLoading: 'Creando tu radio…', radioNone: 'No pude crear la radio ahora.', autoplayOn: 'Autoplay: sí', autoplayOff: 'Autoplay: no', autoplayT: 'Al terminar la cola, seguir con música parecida', upNextAuto: 'Autoplay · sonará después', tasteTitle: 'Tus recomendaciones', tasteInfo: 'Se calculan con lo que escuchas, lo que marcas con ♥ y lo que saltas. Sin sesión, todo se queda en este navegador. Con sesión se guarda en tu cuenta solo un resumen de artistas y géneros (no tu historial canción por canción) para que te siga a otros dispositivos.', tasteClear: 'Borrar lo que aprendió de mí', tasteCleared: 'Listo, empezamos de cero.', tasteConfirm: '¿Borrar lo que Budsin Music aprendió de tus gustos?', homeLearning: 'Escucha unas cuantas canciones y aquí aparecerán recomendaciones hechas para ti.',
+    yourAlbums: 'Tus álbumes', saveAlbum: 'Guardar álbum', savedAlbum: 'Guardado', albumSaved_t: 'Álbum guardado en tu biblioteca', albumRemoved_t: 'Álbum quitado de tu biblioteca', emptyAlbums: 'Aún no guardas álbumes. Usa «Guardar álbum» en su página o el + sobre cualquier portada.', addAlbumQ: 'Añadir a la cola', albumAdded: 'Álbum añadido a la cola',
     acctTitle: 'Cuenta de Budsin', acctPitch: 'Inicia sesión con Google para que tus ♥, playlists y gustos te sigan a todos tus dispositivos y a Budsin Games.', acctIn: 'Iniciar sesión con Google', acctOut: 'Cerrar sesión', acctWipe: 'Borrar mis datos de la nube', acctWipeAsk: '¿Borrar de la nube tus ♥, playlists, gustos y preferencias? Lo guardado en este navegador se queda.', acctWiped: 'Datos de la nube borrados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'No se pudo sincronizar.', acctErrPerm: 'No se pudo sincronizar: faltan permisos en Firestore.', acctSignedOut: 'Sesión cerrada. Se quitaron de este navegador los datos de la cuenta.', acctFail: 'No se pudo iniciar sesión.', acctSdkFail: 'No se pudo cargar el inicio de sesión. Revisa tu conexión.',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
@@ -557,6 +569,7 @@ var I18N = {
     viz: 'Visualizer', viz_bars: 'Bars', viz_mirror: 'Mirror', viz_wave: 'Wave', viz_area: 'Spectrum', viz_circle: 'Circle', viz_particles: 'Particles',
     pal_mint: 'Budsin', pal_rainbow: 'Rainbow', pal_neon: 'Neon', pal_fire: 'Fire',
     forYou: 'For you', becauseYou: 'Because you listened to', newFromYours: 'New from your artists', yourArtists: 'Your artists', playMix: 'Play', radio: 'Start radio', radioLoading: 'Building your radio…', radioNone: 'Could not build the radio right now.', autoplayOn: 'Autoplay: on', autoplayOff: 'Autoplay: off', autoplayT: 'When the queue ends, keep going with similar music', upNextAuto: 'Autoplay · plays next', tasteTitle: 'Your recommendations', tasteInfo: 'They are worked out from what you play, heart and skip. Signed out, everything stays in this browser. Signed in, only a summary of artists and genres (not your song-by-song history) is saved to your account so it follows you to other devices.', tasteClear: 'Erase what it learned about me', tasteCleared: 'Done, starting from scratch.', tasteConfirm: 'Erase what Budsin Music learned about your taste?', homeLearning: 'Play a few songs and recommendations made for you will show up here.',
+    yourAlbums: 'Your albums', saveAlbum: 'Save album', savedAlbum: 'Saved', albumSaved_t: 'Album saved to your library', albumRemoved_t: 'Album removed from your library', emptyAlbums: 'You have not saved any albums yet. Use “Save album” on its page or the + on any cover.', addAlbumQ: 'Add to queue', albumAdded: 'Album added to the queue',
     acctTitle: 'Budsin account', acctPitch: 'Sign in with Google so your ♥, playlists and taste follow you to all your devices and to Budsin Games.', acctIn: 'Sign in with Google', acctOut: 'Sign out', acctWipe: 'Delete my cloud data', acctWipeAsk: 'Delete your ♥, playlists, taste and preferences from the cloud? What is saved in this browser stays.', acctWiped: 'Cloud data deleted.', acctConnecting: 'Connecting…', acctSyncing: 'Syncing…', acctSynced: 'Synced ✓', acctErr: 'Could not sync.', acctErrPerm: 'Could not sync: Firestore permissions are missing.', acctSignedOut: 'Signed out. The account data was removed from this browser.', acctFail: 'Could not sign in.', acctSdkFail: 'Could not load sign-in. Check your connection.',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
@@ -584,6 +597,7 @@ var I18N = {
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espelho', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arco-íris', pal_neon: 'Neon', pal_fire: 'Fogo',
     forYou: 'Para você', becauseYou: 'Porque você ouviu', newFromYours: 'Novidades dos seus artistas', yourArtists: 'Seus artistas', playMix: 'Reproduzir', radio: 'Iniciar rádio', radioLoading: 'Criando sua rádio…', radioNone: 'Não consegui criar a rádio agora.', autoplayOn: 'Autoplay: sim', autoplayOff: 'Autoplay: não', autoplayT: 'Quando a fila acabar, continuar com música parecida', upNextAuto: 'Autoplay · toca a seguir', tasteTitle: 'Suas recomendações', tasteInfo: 'São calculadas com o que você ouve, curte com ♥ e pula. Sem login, tudo fica neste navegador. Com login, só um resumo de artistas e gêneros (não seu histórico música por música) é salvo na sua conta para acompanhar você em outros dispositivos.', tasteClear: 'Apagar o que aprendeu sobre mim', tasteCleared: 'Pronto, começamos do zero.', tasteConfirm: 'Apagar o que o Budsin Music aprendeu dos seus gostos?', homeLearning: 'Ouça algumas músicas e as recomendações feitas para você aparecerão aqui.',
+    yourAlbums: 'Seus álbuns', saveAlbum: 'Salvar álbum', savedAlbum: 'Salvo', albumSaved_t: 'Álbum salvo na sua biblioteca', albumRemoved_t: 'Álbum removido da sua biblioteca', emptyAlbums: 'Você ainda não salvou álbuns. Use «Salvar álbum» na página dele ou o + em qualquer capa.', addAlbumQ: 'Adicionar à fila', albumAdded: 'Álbum adicionado à fila',
     acctTitle: 'Conta Budsin', acctPitch: 'Entre com o Google para que seus ♥, playlists e gostos acompanhem você em todos os dispositivos e no Budsin Games.', acctIn: 'Entrar com o Google', acctOut: 'Sair', acctWipe: 'Apagar meus dados da nuvem', acctWipeAsk: 'Apagar da nuvem seus ♥, playlists, gostos e preferências? O que está salvo neste navegador permanece.', acctWiped: 'Dados da nuvem apagados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'Não foi possível sincronizar.', acctErrPerm: 'Não foi possível sincronizar: faltam permissões no Firestore.', acctSignedOut: 'Sessão encerrada. Os dados da conta foram removidos deste navegador.', acctFail: 'Não foi possível entrar.', acctSdkFail: 'Não foi possível carregar o login. Verifique sua conexão.',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
@@ -664,6 +678,8 @@ var queue = [];            // current play queue
 var qi = -1;               // index in queue
 var shuffle = !!store.get('bm_shuffle', false);
 var repeat = store.get('bm_repeat', 0);   // 0 off, 1 all, 2 one
+var savedAlbums = store.get('bm_albums', []);   // álbumes guardados en la biblioteca
+var albReg = {};                               // álbumes vistos en esta pantalla, por id, para guardarlos desde la portada
 var liked = store.get('bm_liked', []);     // array of tracks
 var playlists = store.get('bm_playlists', []); // [{id,name,tracks:[]}]
 var recent = store.get('bm_recent', []);
@@ -990,19 +1006,45 @@ function trackCards(tracks) {
       '<div class="t">' + esc(tr.title) + '</div><div class="s">' + artistLink(tr) + '</div></div>';
   }).join('') + '</div>';
 }
-function albumCards(albums) {
-  return '<div class="hrow">' + albums.map(function (a) {
-    return '<a class="card" href="#/album/' + esc(a.id) + '">' +
-      '<div class="cv">' + img(a.cover) + '</div>' +
-      '<div class="t">' + esc(a.title) + '</div><div class="s">' + esc(year(a.releaseDate)) + (a.artist && a.artist.name ? ' · ' + esc(a.artist.name) : '') + '</div></a>';
-  }).join('') + '</div>';
+function albumCard(a) {
+  albReg[a.id] = a;
+  var on = isAlbumSaved(a.id);
+  return '<a class="card" href="#/album/' + esc(a.id) + '">' +
+    '<div class="cv">' + img(a.cover) + '<span class="albsave' + (on ? ' on' : '') + '" role="button" tabindex="0" data-albsave="' + esc(a.id) + '" title="' + esc(t(on ? 'savedAlbum' : 'saveAlbum')) + '" aria-label="' + esc(t('saveAlbum')) + '">' + (on ? '✓' : '+') + '</span></div>' +
+    '<div class="t">' + esc(a.title) + '</div><div class="s">' + esc(year(a.releaseDate)) + (a.artist && a.artist.name ? ' · ' + esc(a.artist.name) : '') + '</div></a>';
 }
+function albumCards(albums) { return '<div class="hrow">' + albums.map(albumCard).join('') + '</div>'; }
+function albumGrid(albums) { return '<div class="grid-albums">' + albums.map(albumCard).join('') + '</div>'; }
+// An artist without a photo gets the first letter on a gradient instead of an empty square.
 function artistCards(artists) {
   return '<div class="hrow">' + artists.map(function (a) {
     return '<a class="card round" href="#/artist/' + esc(a.id) + '">' +
-      '<div class="cv">' + img(a.picture) + '</div>' +
+      (a.picture ? '<div class="cv">' + img(a.picture) + '</div>' : '<div class="cv ph-av"><span>' + esc((a.name || '?').charAt(0).toUpperCase()) + '</span></div>') +
       '<div class="t">' + esc(a.name) + '</div><div class="s">' + esc(t('artist')) + '</div></a>';
   }).join('') + '</div>';
+}
+// The artist page sometimes comes without a photo that the search does have: look it up there.
+function findArtistPicture(a) {
+  return api('search?q=' + encodeURIComponent(a.name)).then(function (d) {
+    var hit = (d.artists || []).filter(function (x) { return String(x.id) === String(a.id) || nk(x.name) === nk(a.name); })[0];
+    return (hit && hit.picture) || '';
+  }).catch(function () { return ''; });
+}
+
+/* ---- álbumes guardados ---- */
+function isAlbumSaved(id) { return savedAlbums.some(function (x) { return String(x.id) === String(id); }); }
+function slimAlbum(a) { return { id: a.id, title: a.title, cover: a.cover, artist: a.artist ? { id: a.artist.id, name: a.artist.name } : null, releaseDate: a.releaseDate, numberOfTracks: a.numberOfTracks, type: a.type }; }
+function toggleAlbum(a) {
+  if (isAlbumSaved(a.id)) { savedAlbums = savedAlbums.filter(function (x) { return String(x.id) !== String(a.id); }); toast(t('albumRemoved_t')); }
+  else {
+    savedAlbums.unshift(slimAlbum(a)); savedAlbums = savedAlbums.slice(0, 500); toast(t('albumSaved_t'));
+    if (a.artist && a.artist.name) tasteAdd({ id: 'al' + a.id, title: a.title, artist: a.artist.name, artistId: a.artist.id }, 2);
+  }
+  store.set('bm_albums', savedAlbums); cloudMark('albums');
+  var on = isAlbumSaved(a.id);
+  $$('[data-albsave="' + a.id + '"]').forEach(function (el) { el.classList.toggle('on', on); el.textContent = on ? '✓' : '+'; el.title = t(on ? 'savedAlbum' : 'saveAlbum'); });
+  var b = $('[data-albsaveb]'); if (b && String(b.getAttribute('data-albsaveb')) === String(a.id)) { b.textContent = on ? '✓ ' + t('savedAlbum') : '💿 ' + t('saveAlbum'); b.classList.toggle('on', on); }
+  if (route.name === 'albums') render();
 }
 function skeletonRow() { var s = ''; for (var i = 0; i < 8; i++) s += '<div class="skel"></div>'; return '<div class="hrow">' + s + '</div>'; }
 function statusErr(retry) {
@@ -1037,7 +1079,7 @@ function parseRoute() {
   var arg = decodeURIComponent(parts.slice(1).join('/') || '');
   if (name === 'search') return { name: 'search', q: arg };
   if (['album', 'artist', 'playlist', 'genre'].indexOf(name) >= 0) return { name: name, id: arg };
-  if (name === 'liked' || name === 'library') return { name: name };
+  if (name === 'liked' || name === 'library' || name === 'albums') return { name: name };
   return { name: 'home' };
 }
 function markNav() {
@@ -1052,7 +1094,7 @@ function render() {
   var q = $('#q');
   if (route.name === 'search') { if (document.activeElement !== q) q.value = route.q; }
   $('#clearQ').classList.toggle('on', !!q.value);
-  ({ home: vHome, search: vSearch, album: vAlbum, artist: vArtist, playlist: vPlaylist, genre: vGenre, liked: vLiked, library: vLibrary })[route.name](tok);
+  ({ home: vHome, search: vSearch, album: vAlbum, artist: vArtist, playlist: vPlaylist, genre: vGenre, liked: vLiked, library: vLibrary, albums: vAlbums })[route.name](tok);
 }
 function top() { $('#main').scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' }); }
 window.addEventListener('hashchange', function () { render(); top(); });
@@ -1142,12 +1184,22 @@ function vAlbum(tok) {
       '<div class="phead">' + img(a.cover, 'art') + '<div><small>' + esc(type) + '</small><h1>' + esc(a.title) + '</h1>' +
       '<div class="meta">' + (a.artist && a.artist.id ? '<a href="#/artist/' + esc(a.artist.id) + '"><b>' + esc(a.artist.name) + '</b></a>' : esc((a.artist && a.artist.name) || '')) +
       (a.releaseDate ? ' · ' + esc(year(a.releaseDate)) : '') + ' · ' + tracks.length + ' ' + esc(tracks.length === 1 ? t('track1') : t('tracks')) + ' · ' + esc(totalDur(tracks)) + '</div>' +
-      '<div class="btns"><button class="btn" data-playall="' + L + '">' + ICON.play + esc(t('play')) + '</button><button class="btn ghost" data-shufall="' + L + '">' + esc(t('shuffle')) + '</button></div></div></div>' +
+      '<div class="btns"><button class="btn" data-playall="' + L + '">' + ICON.play + esc(t('play')) + '</button><button class="btn ghost" data-shufall="' + L + '">' + esc(t('shuffle')) + '</button>' +
+      '<button class="btn ghost' + (isAlbumSaved(a.id) ? ' on' : '') + '" data-albsaveb="' + esc(a.id) + '">' + (isAlbumSaved(a.id) ? '✓ ' + esc(t('savedAlbum')) : '💿 ' + esc(t('saveAlbum'))) + '</button>' +
+      '<button class="btn ghost" data-albq="' + L + '">' + esc(t('addAlbumQ')) + '</button></div></div></div>' +
       trackRows(tracks, { numbered: true, album: false, cover: false }) + legalBlock();
+    albReg[a.id] = a;
     document.title = a.title + ' · Budsin Music';
     // numbered tracks use a different registry id, re-point playall to the list used for rows
-    var rowsEl = $('.tracks', view); if (rowsEl) { var rl = rowsEl.querySelector('.tr'); if (rl) { var rid = rl.getAttribute('data-l'); $('[data-playall]', view).setAttribute('data-playall', rid); $('[data-shufall]', view).setAttribute('data-shufall', rid); } }
+    var rowsEl = $('.tracks', view); if (rowsEl) { var rl = rowsEl.querySelector('.tr'); if (rl) { var rid = rl.getAttribute('data-l'); $('[data-playall]', view).setAttribute('data-playall', rid); $('[data-shufall]', view).setAttribute('data-shufall', rid); $('[data-albq]', view).setAttribute('data-albq', rid); } }
   }).catch(function () { if (tok === renderToken) view.innerHTML = statusErr(); });
+}
+
+/* ---- álbumes guardados ---- */
+function vAlbums() {
+  var html = '<h1 class="page">' + esc(t('yourAlbums')) + '</h1>';
+  html += savedAlbums.length ? albumGrid(savedAlbums) : '<div class="empty-lib">' + esc(t('emptyAlbums')) + '</div>';
+  view.innerHTML = html + legalBlock();
 }
 
 /* ---- artist ---- */
@@ -1157,7 +1209,7 @@ function vArtist(tok) {
     if (tok !== renderToken) return;
     var a = d.artist || {}, tracks = d.tracks || [], albums = d.albums || [], eps = d.eps || [];
     var pic = a.picture ? img(a.picture, 'art round') : '<div class="ph-fallback">' + esc((a.name || '?').charAt(0).toUpperCase()) + '</div>';
-    var html = '<div class="phead">' + pic + '<div><small>' + esc(t('artist')) + '</small><h1>' + esc(a.name) + '</h1>';
+    var html = '<div class="phead" id="artHead">' + pic + '<div><small>' + esc(t('artist')) + '</small><h1>' + esc(a.name) + '</h1>';
     var L = tracks.length ? regList(tracks) : -1;
     html += '<div class="btns">' + (tracks.length ? '<button class="btn" data-playall="' + L + '">' + ICON.play + esc(t('play')) + '</button><button class="btn ghost" data-shufall="' + L + '">' + esc(t('shuffle')) + '</button><button class="btn ghost" data-radioart="' + L + '">📻 ' + esc(t('radio')) + '</button>' : '') + '</div></div></div>';
     if (tracks.length) html += rowTitle(t('popular')) + trackRows(tracks.slice(0, 10), { numbered: true });
@@ -1168,9 +1220,13 @@ function vArtist(tok) {
     document.title = a.name + ' · Budsin Music';
     var tr0 = $('.tracks', view);
     if (tr0 && tracks.length) { var rid = tr0.querySelector('.tr').getAttribute('data-l'); $$('.tr', tr0).forEach(function (el) { el.setAttribute('data-l', L); }); }
+    if (!a.picture) findArtistPicture(a).then(function (pic) {
+      var fb = $('#artHead .ph-fallback');
+      if (pic && tok === renderToken && fb) fb.outerHTML = img(pic, 'art round');
+    });
     api('artist/' + encodeURIComponent(route.id) + '/similar').then(function (s) {
       if (tok !== renderToken) return;
-      var arr = (s.artists || []).filter(function (x) { return x.picture; }).slice(0, 12);
+      var arr = (s.artists || []).slice().sort(function (x, y) { return (y.picture ? 1 : 0) - (x.picture ? 1 : 0); }).slice(0, 12);   // con foto primero
       if (arr.length) $('#simBox').innerHTML = rowTitle(t('similar')) + artistCards(arr);
     }).catch(function () {});
   }).catch(function () { if (tok === renderToken) view.innerHTML = statusErr(); });
@@ -1231,6 +1287,7 @@ function vLibrary() {
     }).join('') + '</div>';
   html += '<div class="btns" style="margin-top:8px"><button class="btn ghost" id="libNew">+ ' + esc(t('newPl')) + '</button></div>';
   if (!playlists.length) html += '<div class="empty-lib" style="margin-top:14px">' + esc(t('emptyLib')) + '</div>';
+  if (savedAlbums.length) html += rowTitle(t('yourAlbums'), '#/albums') + albumCards(savedAlbums.slice(0, 14));
   if (recent.length) html += rowTitle(t('recent')) + trackCards(recent);
   html += '<div class="acct" id="acctLib" style="margin:26px 0 0"></div>';
   html += '<div class="box"><h3>' + esc(t('tasteTitle')) + '</h3><p>' + esc(t('tasteInfo')) + '</p><div class="btns"><button class="btn ghost" id="tasteClear">' + esc(t('tasteClear')) + '</button></div></div>';
@@ -1256,6 +1313,12 @@ function refreshPlayingMarks() {
 
 view.addEventListener('click', function (e) {
   var t_ = e.target;
+  var asv = t_.closest('[data-albsave]');             // el + de una portada: guarda sin abrir el álbum
+  if (asv) { e.preventDefault(); e.stopPropagation(); var al0 = albReg[asv.getAttribute('data-albsave')]; if (al0) toggleAlbum(al0); return; }
+  var asb = t_.closest('[data-albsaveb]');
+  if (asb) { var al1 = albReg[asb.getAttribute('data-albsaveb')]; if (al1) toggleAlbum(al1); return; }
+  var aq = t_.closest('[data-albq]');
+  if (aq) { var al2 = lists[+aq.getAttribute('data-albq')]; if (al2 && al2.length) { al2.forEach(function (tr) { queue.push(slim(tr)); }); if (qi < 0) playIndex(0); toast(t('albumAdded')); renderQueue(); } return; }
   if (t_.closest('a')) return; // links navigate
   var like = t_.closest('[data-like]');
   if (like) { e.stopPropagation(); var row = like.closest('.tr'); var tr = lists[+row.getAttribute('data-l')][+row.getAttribute('data-i')]; toggleLike(tr); return; }
@@ -1906,6 +1969,11 @@ var KINDS = {
     set: function (d) { liked = d.items || []; store.set('bm_liked', liked); },
     merge: function (a, b) { var seen = {}, out = []; (a.items || []).concat(b.items || []).forEach(function (x) { if (!seen[tid(x)]) { seen[tid(x)] = 1; out.push(x); } }); return { items: out.slice(0, 1000) }; }
   },
+  albums: {
+    get: function () { return { items: savedAlbums.slice(0, 500) }; },
+    set: function (d) { savedAlbums = d.items || []; store.set('bm_albums', savedAlbums); },
+    merge: function (a, b) { var seen = {}, out = []; (a.items || []).concat(b.items || []).forEach(function (x) { if (!seen[x.id]) { seen[x.id] = 1; out.push(x); } }); return { items: out.slice(0, 500) }; }
+  },
   taste: {
     get: function () { return { artists: taste.artists, genres: taste.genres }; },
     set: function (d) { taste.artists = d.artists || {}; taste.genres = d.genres || {}; store.set(TASTE_KEY, taste); try { localStorage.removeItem(RECS_KEY); } catch (e) {} },
@@ -2024,7 +2092,7 @@ function cloudAttach() {
       var r = c.doc.data(), K = KINDS[c.doc.id];
       if (!K || (r.updatedAt || 0) <= (cloud.sync.ts[c.doc.id] || 0)) return;       // es nuestro eco o algo más viejo
       cloud.applying = true; try { K.set(r); cloud.sync.ts[c.doc.id] = r.updatedAt; cloudMeta(); } finally { cloud.applying = false; }
-      if (route.name === 'home' || route.name === 'liked' || route.name === 'library') render();
+      if (route.name === 'home' || route.name === 'liked' || route.name === 'library' || route.name === 'albums') render();
     });
   }, function () {}));
   cloud.unsub.push(cloud.refs.pls.onSnapshot(function (snap) {
@@ -2045,8 +2113,8 @@ function cloudAttach() {
 function cloudDetach() { cloud.unsub.forEach(function (f) { try { f(); } catch (e) {} }); cloud.unsub = []; }
 
 function cloudClearLocal() {
-  ['bm_liked', 'bm_playlists', 'bm_taste', 'bm_recs', 'bm_recent', 'bm_lyrprefs', 'bm_sync'].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
-  liked = []; playlists = []; recent = []; lyrPrefs = {};
+  ['bm_liked', 'bm_albums', 'bm_playlists', 'bm_taste', 'bm_recs', 'bm_recent', 'bm_lyrprefs', 'bm_sync'].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+  liked = []; savedAlbums = []; playlists = []; recent = []; lyrPrefs = {};
   taste = { v: 2, artists: {}, genres: {}, seen: [], skips: {} };
   cloud.sync = { uid: null, ts: {} }; cloud.plSig = {};
   renderSidebar(); updateNowPlaying(); render();
@@ -2067,7 +2135,7 @@ function cloudSignOut() { if (cloud.auth) cloud.auth.signOut(); }
 function cloudWipe() {
   if (!cloud.user || !confirm(t('acctWipeAsk'))) return;
   var ops = [];
-  ['likes', 'taste', 'prefs'].forEach(function (k) { ops.push(cloud.refs.kv.doc(k).delete()); });
+  ['likes', 'albums', 'taste', 'prefs'].forEach(function (k) { ops.push(cloud.refs.kv.doc(k).delete()); });
   cloud.refs.pls.get().then(function (snap) { snap.docs.forEach(function (d) { ops.push(d.ref.delete()); }); return Promise.all(ops); })
     .then(function () { toast(t('acctWiped')); }, function (e) { cloudFail(e); renderAccount(); });
 }
@@ -2249,9 +2317,11 @@ function getRecs() {
         });
         albums.sort(function (a, b) { return (b.releaseDate || '').localeCompare(a.releaseDate || ''); });
         var artists = parts.filter(function (p) { return p.page && p.page.artist; }).map(function (p) { return { id: p.page.artist.id, name: p.page.artist.name, picture: p.page.artist.picture }; });
-        var data = { mix: mix, because: rows, albums: albums.slice(0, 10), artists: artists };
-        store.set(RECS_KEY, { at: Date.now(), sig: sig, data: data });
-        return data;
+        return Promise.all(artists.map(function (a) { return a.picture ? a : findArtistPicture(a).then(function (pic) { a.picture = pic; return a; }); })).then(function (fixed) {
+          var data = { mix: mix, because: rows, albums: albums.slice(0, 10), artists: fixed };
+          store.set(RECS_KEY, { at: Date.now(), sig: sig, data: data });
+          return data;
+        });
       });
     });
   });
