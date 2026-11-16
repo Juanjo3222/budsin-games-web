@@ -1,6 +1,6 @@
 importScripts("/scram/scramjet.all.js");
 
-const CACHE = "budsin-v2";
+const CACHE = "budsin-v3";
 const PRO_CACHE = "budsin-pro-v2";
 const STATIC = [
   "/",
@@ -176,6 +176,29 @@ self.addEventListener("fetch", (event) => {
 
   // La API de suscripciones (PayPal) nunca se cachea: siempre va a la red
   if (url.pathname.startsWith("/api/")) return;
+
+  // Páginas HTML: red primero y la copia guardada sólo sin conexión. Antes se servía SIEMPRE la copia guardada
+  // (STATIC incluye "/", que coincide con toda ruta), así que quien ya había visitado el sitio nunca veía una
+  // versión nueva de una página (portal, /musica/…) hasta cambiar el nombre de CACHE.
+  const accept = event.request.headers.get("accept") || "";
+  if (event.request.mode === "navigate" || accept.includes("text/html")) {
+    event.respondWith(
+      fetch(event.request)
+        .then((res) => {
+          if (res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE).then((c) => {
+              try { c.put(event.request, clone); } catch {}
+            });
+          }
+          return res;
+        })
+        .catch(() =>
+          caches.match(event.request).then((cached) => cached || caches.match("/index.html"))
+        )
+    );
+    return;
+  }
 
   // Always cache static assets
   if (STATIC.some((s) => url.pathname.startsWith(s) || url.pathname === s)) {

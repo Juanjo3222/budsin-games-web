@@ -488,7 +488,7 @@ var I18N = {
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyr: 'Letra', lyrLoading: 'Buscando letra…', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
-    playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.',
+    playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
     addQ: 'Añadir a la cola', addPl: 'Añadir a playlist', newPl: 'Nueva playlist…', goArtist: 'Ir al artista', goAlbum: 'Ir al álbum',
     like: 'Me gusta', unlike: 'Quitar de Me gusta', plName: 'Nombre de la playlist', rename: 'Renombrar', del: 'Eliminar playlist', delAsk: '¿Eliminar esta playlist?',
@@ -512,7 +512,7 @@ var I18N = {
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyr: 'Lyrics', lyrLoading: 'Looking for lyrics…', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
-    playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.',
+    playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
     noPlay: 'Search works, but playback is not available right now.',
     addQ: 'Add to queue', addPl: 'Add to playlist', newPl: 'New playlist…', goArtist: 'Go to artist', goAlbum: 'Go to album',
     like: 'Like', unlike: 'Remove from Liked', plName: 'Playlist name', rename: 'Rename', del: 'Delete playlist', delAsk: 'Delete this playlist?',
@@ -536,7 +536,7 @@ var I18N = {
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyr: 'Letra', lyrLoading: 'Procurando a letra…', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
-    playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.',
+    playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
     addQ: 'Adicionar à fila', addPl: 'Adicionar à playlist', newPl: 'Nova playlist…', goArtist: 'Ir ao artista', goAlbum: 'Ir ao álbum',
     like: 'Curtir', unlike: 'Remover das curtidas', plName: 'Nome da playlist', rename: 'Renomear', del: 'Excluir playlist', delAsk: 'Excluir esta playlist?',
@@ -642,13 +642,17 @@ function setLoading(v) {
   $('#player').classList.toggle('loading', v);
   syncPlayBtn();
 }
-function playIndex(i) {
+function playIndex(i, opts) {
   if (i < 0 || i >= queue.length) return;
   qi = i;
   setLoading(true);
   var tr = queue[qi];
   audio.src = streamUrl(tr);
-  audio.play().catch(function () {});
+  restoreT = 0;
+  if (opts && opts.seek > 0) { try { audio.currentTime = opts.seek; } catch (e) {} }
+  var pr = audio.play();
+  if (pr && pr.catch) pr.catch(function () { if (opts && opts.auto) { setLoading(false); toast(t('tapResume')); } });   // autoplay bloqueado tras volver
+  becomeOwner();
   recent = [slim(tr)].concat(recent.filter(function (x) { return tid(x) !== tid(tr); })).slice(0, 24);
   store.set('bm_recent', recent);
   updateNowPlaying(); updateMediaSession(); refreshPlayingMarks(); renderQueue();
@@ -682,6 +686,7 @@ function prev() {
 }
 function togglePlay() {
   if (!cur()) return;
+  if (!audio.getAttribute('src')) { playIndex(qi, { seek: restoreT }); return; }   // sesión restaurada, aún sin cargar
   if (audio.paused) audio.play().catch(function () {}); else { audio.pause(); if (loading) setLoading(false); }
 }
 audio.addEventListener('ended', function () { next(true); });
@@ -708,7 +713,7 @@ function updateSeek() {
   var d = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (cur() && cur().duration) || 0;
   $('#tDur').textContent = fmt(d);
   if (seeking) return;
-  var c = audio.currentTime || 0;
+  var c = audio.getAttribute('src') ? (audio.currentTime || 0) : restoreT;
   $('#tCur').textContent = fmt(c);
   var v = d ? Math.min(1000, Math.round(c / d * 1000)) : 0;
   seek.value = v; setRange(seek, v / 10);
@@ -1636,6 +1641,74 @@ $('#lyrics').addEventListener('click', function (e) {
   $('#lyrBody').addEventListener(ev, function () { lyr.holdUntil = Date.now() + 3500; }, { passive: true });
 });
 
+/* ================= relevo con Budsin Games (mini-reproductor) ================= */
+// Protocolo documentado en public/bm-mini.js. Una sola página tiene el audio: la que lo tiene (owner) guarda la
+// sesión, manda latidos y obedece órdenes; las demás sólo miran.
+var SESSION_KEY = 'bm_session';
+var tabId = Math.random().toString(36).slice(2);
+var bc = null;
+try { bc = new BroadcastChannel('budsin-music'); } catch (e) {}
+var owner = false;      // esta página tiene la música
+var restoreT = 0;       // desde dónde seguirá una canción restaurada que todavía no se ha cargado
+
+function bcPost(m) { if (bc) { m.id = tabId; try { bc.postMessage(m); } catch (e) {} } }
+function bmState() {
+  var tr = cur();
+  if (!tr) return null;
+  var d = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (tr.duration || 0);
+  return { track: { id: tr.id, title: tr.title, artist: tr.artist, artwork: tr.artwork }, qi: qi, n: queue.length, pos: audio.getAttribute('src') ? (audio.currentTime || 0) : restoreT, dur: d, playing: !audio.paused };
+}
+function bmBeat() { if (!owner) return; var st = bmState(); if (st) bcPost({ t: 'hb', from: 'bm', st: st }); }
+function sessionSave(closed) {
+  if (qi < 0 || !queue.length) return;
+  var start = Math.max(0, qi - 3), end = Math.min(queue.length, start + 60);   // una ventana de la cola basta
+  store.set(SESSION_KEY, {
+    v: 1, ts: Date.now(), owner: 'bm', closed: !!closed, playing: !audio.paused && !!audio.getAttribute('src'),
+    qi: qi - start, t: audio.getAttribute('src') ? (audio.currentTime || 0) : restoreT, queue: queue.slice(start, end)
+  });
+}
+function becomeOwner() { owner = true; bcPost({ t: 'claim', from: 'bm', st: bmState() }); }
+
+audio.addEventListener('play', function () { if (!owner) becomeOwner(); bmBeat(); sessionSave(false); });
+audio.addEventListener('pause', function () { bmBeat(); sessionSave(false); });
+setInterval(bmBeat, 1000);
+setInterval(function () { if (owner) sessionSave(false); }, 5000);
+
+if (bc) bc.onmessage = function (e) {
+  var m = e.data || {};
+  if (!m || m.id === tabId) return;
+  if (m.t === 'claim' && owner) { owner = false; if (!audio.paused) audio.pause(); }          // otra página empezó a sonar
+  else if (m.t === 'cmd' && owner && m.to === tabId) {
+    if (m.a === 'toggle') togglePlay();
+    else if (m.a === 'play') { if (audio.paused) togglePlay(); }
+    else if (m.a === 'pause') { if (!audio.paused) togglePlay(); }
+    else if (m.a === 'next') next(false);
+    else if (m.a === 'prev') prev();
+    else if (m.a === 'seek' && isFinite(m.v)) audio.currentTime = Math.max(0, Number(m.v));
+  }
+};
+
+// Al irse (botón "Budsin Games", atrás, cerrar): deja la sesión marcada como cerrada y avisa.
+window.addEventListener('pagehide', function () {
+  if (!owner) return;
+  sessionSave(true);
+  bcPost({ t: 'bye', from: 'bm', closed: true, playing: !audio.paused });
+});
+// "Atrás" puede devolver esta página desde la caché con el audio ya parado: se recarga para retomar la sesión.
+window.addEventListener('pageshow', function (e) { if (e.persisted) location.reload(); });
+
+function sessionRestore() {
+  var s = store.get(SESSION_KEY, null);
+  if (!s || s.v !== 1 || !Array.isArray(s.queue) || Date.now() - (s.ts || 0) > 30 * 60000) return;
+  var q = s.queue.filter(function (x) { return x && x.id != null && x.title; });
+  if (!q.length) return;
+  queue = q; qi = Math.max(0, Math.min(s.qi | 0, q.length - 1)); restoreT = Math.max(0, Number(s.t) || 0);
+  updateNowPlaying(); updateMediaSession(); renderQueue();
+  var gap = (Date.now() - s.ts) / 1000;
+  // Venía sonando y se fue hace un momento (Budsin Games, recarga): sigue por donde iba.
+  if (s.closed && s.playing && gap < 20) playIndex(qi, { seek: restoreT + gap, auto: true });
+}
+
 /* ================= init static text ================= */
 function applyStatic() {
   $$('[data-t]').forEach(function (el) { el.textContent = t(el.getAttribute('data-t')); });
@@ -1644,6 +1717,7 @@ function applyStatic() {
   $('#sideFoot').innerHTML = esc(t('legal')) + '<a href="https://github.com/Juanjo3222/budsin-games-web/tree/main/server/music/app" target="_blank" rel="noopener">Budsin</a> · <a href="https://github.com/x8rr/music" target="_blank" rel="noopener">x8rr/music</a>';
 }
 applyStatic(); vizBuildUI(); syncModes(); applyVol(); syncPlayBtn(); updateNowPlaying(); renderSidebar(); renderQueue();
+sessionRestore();
 render();
 
 fetch('/api/music/source').then(function (r) { return r.json(); }).then(function (s) {
