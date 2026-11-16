@@ -227,6 +227,13 @@
       '<button class="bmm-x" data-c="close" aria-label="' + TX.close + '" title="' + TX.close + '">' + ICON.close + '</button>' +
       '</div></div>';
     document.body.appendChild(root);
+    // Si la portada no carga directa del CDN (filtro de red, extensión), se pide por el propio servidor.
+    root.querySelector('img').addEventListener('error', function () {
+      var src = this.getAttribute('src') || '';
+      if (!this.getAttribute('data-fb') && /^https:\/\/(resources\.tidal\.com|i\.ytimg\.com|[a-z0-9.\-]+\.googleusercontent\.com)\//.test(src)) {
+        this.setAttribute('data-fb', '1'); this.src = '/api/music/art?u=' + encodeURIComponent(src);
+      }
+    });
     ui = { root: root, img: root.querySelector('img'), t: root.querySelector('.bmm-t'), a: root.querySelector('.bmm-a'), play: root.querySelector('.bmm-play'), fill: root.querySelector('.bmm-fill'), bar: root.querySelector('.bmm-bar'), art: null, playing: null, last: {} };
     root.addEventListener('click', function (e) {
       var b = e.target.closest('[data-c]');
@@ -271,7 +278,7 @@
     var L = ui.last;
     ui.root.style.display = 'block';
     document.body.classList.add('has-bmmini');
-    if (L.art !== v.track.artwork) { L.art = v.track.artwork; ui.img.src = v.track.artwork || ''; }
+    if (L.art !== v.track.artwork) { L.art = v.track.artwork; ui.img.removeAttribute('data-fb'); ui.img.src = v.track.artwork || ''; }
     if (L.title !== v.track.title) { L.title = v.track.title; ui.t.textContent = v.track.title || ''; }
     var sub = st.mode === 'local' && st.blocked && !v.playing ? '!' + TX.tap : (v.track.artist || '');
     if (L.sub !== sub) { L.sub = sub; var warn = sub.charAt(0) === '!'; ui.a.textContent = warn ? sub.slice(1) : sub; ui.a.className = 'bmm-a' + (warn ? ' warn' : ''); }

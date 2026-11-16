@@ -653,8 +653,20 @@ var ICON = {
 };
 var ART_PLACEHOLDER = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"><rect width="10" height="10" fill="#1d222c"/><text x="5" y="6.8" font-size="5" text-anchor="middle" fill="#46505f">♪</text></svg>');
 function img(src, cls) {
-  return '<img ' + (cls ? 'class="' + cls + '" ' : '') + 'src="' + esc(src || ART_PLACEHOLDER) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src=\'' + ART_PLACEHOLDER.replace(/'/g, '%27') + '\'">';
+  return '<img ' + (cls ? 'class="' + cls + '" ' : '') + 'src="' + esc(src || ART_PLACEHOLDER) + '" alt="" loading="lazy" referrerpolicy="no-referrer">';
 }
+// An image that does not load straight from its CDN (a school or network filter, an extension, a hiccup) is asked
+// for again through this site's own /api/music/art, same origin and cached on the server; only if that fails too
+// does the placeholder stay. Error events do not bubble, hence the capture phase.
+var ART_HOSTS = /^https:\/\/(resources\.tidal\.com|i\.ytimg\.com|[a-z0-9.\-]+\.googleusercontent\.com|[a-z0-9.\-]+\.ggpht\.com)\//;
+document.addEventListener('error', function (e) {
+  var im = e.target;
+  if (!im || im.tagName !== 'IMG' || im.getAttribute('data-fb') === '2') return;
+  var src = im.getAttribute('src') || '';
+  if (src.indexOf('data:') === 0) return;
+  if (!im.getAttribute('data-fb') && ART_HOSTS.test(src)) { im.setAttribute('data-fb', '1'); im.src = '/api/music/art?u=' + encodeURIComponent(src); return; }
+  im.setAttribute('data-fb', '2'); im.src = ART_PLACEHOLDER;
+}, true);
 function year(d) { return d ? String(d).slice(0, 4) : ''; }
 
 var toastT;

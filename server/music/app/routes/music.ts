@@ -1368,7 +1368,9 @@ export async function musicRoutes(fastify: FastifyInstance) {
   // artwork Chrome fetches for the OS media controls.
   fastify.get(
     "/api/music/art",
-    { config: { rateLimit: { max: 300, timeWindow: "1 minute" } } },
+    // Una portada se pide una sola vez por visitante (el navegador la guarda), pero el Inicio trae ~130 de golpe y, si el CDN
+    // de Tidal está bloqueado en su red, todas pasan por aquí.
+    { config: { rateLimit: { max: 900, timeWindow: "1 minute" } } },
     async (req, reply) => {
     const { u } = req.query as { u?: string };
     if (!u) return musicError(reply, 400, "Missing required parameter: u");
