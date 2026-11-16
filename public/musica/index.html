@@ -285,6 +285,28 @@ input[type=range]:hover { --c: var(--accent); }
 .viz-tr .main { width: 44px; height: 44px; background: var(--text); color: #0b0d10; }
 .viz-idle { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 1rem; pointer-events: none; text-align: center; padding: 0 30px; }
 .np img { cursor: pointer; }
+.viz-cap { position: absolute; left: 0; right: 0; top: 70px; height: 76px; display: flex; flex-direction: column; justify-content: center; text-align: center; padding: 0 5vw; z-index: 1; pointer-events: none; text-shadow: 0 2px 14px rgba(0,0,0,.85); overflow: hidden; }
+.viz-cap .cur { font-size: clamp(1.1rem, 2.4vw, 1.9rem); font-weight: 800; line-height: 1.2; }
+.viz-cap .nxt { margin-top: 6px; font-size: clamp(.82rem, 1.5vw, 1.05rem); color: rgba(255,255,255,.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- lyrics ---------- */
+#lyrics { position: fixed; left: 0; right: 0; top: 0; bottom: var(--player); z-index: 36; background: #07090c; display: none; flex-direction: column; overflow: hidden; }
+#lyrics.on { display: flex; }
+.lyr-bg { position: absolute; inset: -60px; background-size: cover; background-position: center; filter: blur(80px) saturate(1.3); opacity: .32; transform: scale(1.2); }
+.lyr-top { position: relative; z-index: 2; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 22px; background: linear-gradient(to bottom, rgba(7,9,12,.85), transparent); flex: none; }
+#lyrBody { position: relative; flex: 1; overflow-y: auto; padding: 0 22px; scrollbar-width: none; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 12%, #000 88%, transparent 100%); }
+#lyrBody::-webkit-scrollbar { display: none; }
+.lyr-pad { max-width: 780px; margin: 0 auto; padding: 38vh 0 38vh; }
+.lyr-line { margin: 0; padding: 7px 0; font-size: clamp(1.35rem, 2.7vw, 2.3rem); font-weight: 800; line-height: 1.22; letter-spacing: -.4px; color: rgba(255,255,255,.34); transition: color .25s, transform .25s; transform-origin: left center; cursor: pointer; overflow-wrap: anywhere; }
+.lyr-line:hover { color: rgba(255,255,255,.7); }
+.lyr-line.cur { color: #fff; transform: scale(1.04); }
+.lyr-plain { white-space: pre-wrap; font-size: 1.15rem; line-height: 1.85; color: #d5d9e2; padding-bottom: 20px; }
+.lyr-note { display: inline-block; margin-bottom: 16px; padding: 4px 12px; border-radius: 999px; background: var(--panel2); color: var(--muted); font-size: .78rem; }
+.lyr-msg { text-align: center; color: var(--muted); padding: 30px 0; font-size: 1.05rem; }
+.lyr-msg .big { font-size: 2.6rem; margin-bottom: 8px; }
+.lyr-credit { position: relative; text-align: center; font-size: .72rem; color: #566; padding: 0 0 28px; }
+.lyr-credit a { color: #7f93c9; text-decoration: underline; }
+.lyr-pad.plain-pad { padding: 18px 0 24px; }
 
 /* ---------- tablet / mobile ---------- */
 @media (max-width: 960px) {
@@ -293,7 +315,7 @@ input[type=range]:hover { --c: var(--accent); }
   .tr .alb { display: none; }
 }
 @media (max-width: 760px) {
-  :root { --player: 132px; --nav: 58px; }
+  :root { --player: 80px; --nav: 58px; }
   #app { grid-template-columns: 1fr; grid-template-rows: 1fr auto; grid-template-areas: "main" "player"; padding-bottom: var(--nav); }
   #side { position: fixed; left: 0; right: 0; bottom: 0; height: var(--nav); flex-direction: row; padding: 0; z-index: 60; border-right: 0; border-top: 1px solid var(--line); background: #080a0c; overflow: visible; gap: 0; justify-content: space-around; }
   #side .brand, #side .sect, #side .plist, #side .side-foot, #side .nav-desktop { display: none; }
@@ -329,6 +351,10 @@ input[type=range]:hover { --c: var(--accent); }
   .tr .aa a, .tr .alb a { pointer-events: none; }
   #queue { width: 100%; bottom: calc(var(--player) + var(--nav)); }
   #viz { bottom: calc(var(--player) + var(--nav)); }
+  #lyrics { bottom: calc(var(--player) + var(--nav)); }
+  .lyr-top { padding: 12px 14px; }
+  #lyrBody { padding: 0 16px; }
+  .viz-cap { top: 62px; }
   #viz:fullscreen { bottom: 0; }
   .only-m { display: inline-grid; }
   .viz-top { padding: 12px 14px; }
@@ -381,6 +407,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="seek"><span id="tCur">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Progreso"><span id="tDur">0:00</span></div>
     </div>
     <div class="right">
+      <button class="iconbtn" id="bLyr" data-ti="lyr"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></button>
       <button class="iconbtn" id="bViz" data-ti="viz"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>
       <button class="iconbtn" id="bQueue" data-ti="queue"><svg viewBox="0 0 24 24"><path d="M3 6h14v2H3zm0 5h14v2H3zm0 5h9v2H3zm13 0l6-3.5v7z"/></svg></button>
       <button class="iconbtn" id="bMute" data-ti="mute"></button>
@@ -397,9 +424,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="viz-bg" id="vizBg"></div>
   <canvas id="vizCv"></canvas>
   <div class="viz-idle" id="vizIdle"></div>
+  <div class="viz-cap" id="vizCap"></div>
   <div class="viz-top">
     <div class="viz-info" id="vizInfo"></div>
     <div style="display:flex;gap:4px;flex:none">
+      <button class="iconbtn" id="vizLyr" data-ti="lyr"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></button>
       <button class="iconbtn" id="vizFs" data-ti="vizFs"><svg viewBox="0 0 24 24"><path d="M5 5h5v2H7v3H5zm9 0h5v5h-2V7h-3zM5 14h2v3h3v2H5zm12 0h2v5h-5v-2h3z"/></svg></button>
       <button class="iconbtn" id="vizClose" data-ti="vizClose">✕</button>
     </div>
@@ -413,6 +442,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="viz-colors" id="vizColors"></div>
   </div>
+</div>
+<div id="lyrics" role="dialog" aria-label="Lyrics">
+  <div class="lyr-bg" id="lyrBg"></div>
+  <div class="lyr-top">
+    <div class="viz-info" id="lyrInfo"></div>
+    <button class="iconbtn" id="lyrClose" data-ti="vizClose">✕</button>
+  </div>
+  <div id="lyrBody"></div>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
 <audio id="audio" preload="auto"></audio>
@@ -433,6 +470,7 @@ var I18N = {
     failed: 'No se pudo cargar. Revisa tu conexión.', retry: 'Reintentar', loading: 'Cargando…', loadingTrack: 'Cargando canción…',
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espejo', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arcoíris', pal_neon: 'Neón', pal_fire: 'Fuego',
+    lyr: 'Letra', lyrLoading: 'Buscando letra…', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
@@ -455,6 +493,7 @@ var I18N = {
     failed: 'Could not load. Check your connection.', retry: 'Retry', loading: 'Loading…', loadingTrack: 'Loading track…',
     viz: 'Visualizer', viz_bars: 'Bars', viz_mirror: 'Mirror', viz_wave: 'Wave', viz_area: 'Spectrum', viz_circle: 'Circle', viz_particles: 'Particles',
     pal_mint: 'Budsin', pal_rainbow: 'Rainbow', pal_neon: 'Neon', pal_fire: 'Fire',
+    lyr: 'Lyrics', lyrLoading: 'Looking for lyrics…', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.',
     noPlay: 'Search works, but playback is not available right now.',
@@ -477,6 +516,7 @@ var I18N = {
     failed: 'Não foi possível carregar. Verifique sua conexão.', retry: 'Tentar de novo', loading: 'Carregando…', loadingTrack: 'Carregando música…',
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espelho', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arco-íris', pal_neon: 'Neon', pal_fire: 'Fogo',
+    lyr: 'Letra', lyrLoading: 'Procurando a letra…', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
@@ -709,6 +749,7 @@ function updateNowPlaying() {
   document.title = tr.title + ' — ' + tr.artist + ' · Budsin Music';
   updateSeek();
   vizSyncInfo();
+  lyrOnTrack();
 }
 function updateMediaSession() {
   if (!('mediaSession' in navigator)) return;
@@ -1154,13 +1195,14 @@ document.addEventListener('keydown', function (e) {
   if (e.target.matches('input, textarea') || e.ctrlKey || e.metaKey || e.altKey) { if (e.key === 'Escape') e.target.blur(); return; }
   if (e.key === ' ' && !e.target.closest('button, a, [data-cardplay]')) { e.preventDefault(); togglePlay(); }
   else if (e.key === '/') { e.preventDefault(); qEl.focus(); }
+  else if (e.key.toLowerCase() === 'l') { if (lyr.on) lyrClose(); else lyrOpen(); }
   else if (e.key.toLowerCase() === 'v') { if (viz.on) vizClose(); else vizOpen(); }
   else if (e.key === 'ArrowRight' && !e.shiftKey && viz.on) vizStep(1);
   else if (e.key === 'ArrowLeft' && !e.shiftKey && viz.on) vizStep(-1);
   else if (e.key === 'ArrowRight' && e.shiftKey) next(false);
   else if (e.key === 'ArrowLeft' && e.shiftKey) prev();
   else if (e.key.toLowerCase() === 'm') { muted = !muted; applyVol(); }
-  else if (e.key === 'Escape') { closeMenu(); $('#queue').classList.remove('on'); vizClose(); }
+  else if (e.key === 'Escape') { closeMenu(); $('#queue').classList.remove('on'); if (lyr.on) lyrClose(); else vizClose(); }
 });
 
 /* ================= visualizer ================= */
@@ -1313,6 +1355,7 @@ function vizDraw(now) {
   viz.raf = requestAnimationFrame(vizDraw);
   var g = viz.g, W = viz.w, H = viz.h;
   if (!g || !W || !H) return;
+  lyrSync();
   viz.an.getByteFrequencyData(viz.freq);
   viz.an.getByteTimeDomainData(viz.time);
   var b = 0;
@@ -1321,7 +1364,11 @@ function vizDraw(now) {
   if (viz.mode === 'particles') {   // fade instead of clear: that is the trail
     g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,0.22)'; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over';
   } else g.clearRect(0, 0, W, H);
-  VIZ_DRAW[viz.mode](g, W, H, now);
+  // Room above the picture for the lyric caption while there is one.
+  var pad = viz.cap ? 150 : 0;
+  g.save(); if (pad) g.translate(0, pad);
+  VIZ_DRAW[viz.mode](g, W, H - pad, now);
+  g.restore();
 }
 
 function vizSize() {
@@ -1338,12 +1385,12 @@ function vizOpen() {
   if (!vizGraph()) { toast(t('vizFail')); return; }
   viz.on = true;
   $('#viz').classList.add('on'); $('#bViz').classList.add('on');
-  vizSize(); vizSyncInfo();
+  vizSize(); vizSyncInfo(); lyrOnTrack(); lyrSync(true);
   cancelAnimationFrame(viz.raf); viz.raf = requestAnimationFrame(vizDraw);
 }
 function vizClose() {
   if (!viz.on) return;
-  viz.on = false;
+  viz.on = false; viz.cap = false; $('#vizCap').innerHTML = '';
   $('#viz').classList.remove('on'); $('#bViz').classList.remove('on');
   cancelAnimationFrame(viz.raf);
   if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
@@ -1389,6 +1436,132 @@ $('#vizPlay').addEventListener('click', togglePlay);
 $('#vizNext').addEventListener('click', function () { next(false); });
 $('#bViz').addEventListener('click', function () { if (viz.on) vizClose(); else vizOpen(); });
 $('#np').addEventListener('click', function (e) { if (cur() && (e.target.closest('[data-viz]') || e.target.tagName === 'IMG')) vizOpen(); });
+
+/* ================= lyrics ================= */
+var lyr = { on: false, key: null, status: 'idle', synced: [], plain: '', instr: false, idx: -1, raf: 0, holdUntil: 0, cache: {} };
+
+function lyrApplyResult(d) {
+  if (d.none) lyr.status = 'none';
+  else {
+    lyr.synced = d.synced || []; lyr.plain = d.plain || ''; lyr.instr = !!d.instrumental;
+    lyr.status = (lyr.synced.length || lyr.plain || lyr.instr) ? 'ok' : 'none';
+  }
+  lyrRender(); lyrSync(true);
+}
+function lyrLoad(tr, force) {
+  if (!tr) return;
+  var key = tid(tr);
+  if (lyr.key === key && !force && lyr.status !== 'error') return;
+  lyr.key = key; lyr.synced = []; lyr.plain = ''; lyr.instr = false; lyr.idx = -1;
+  if (lyr.cache[key]) { lyrApplyResult(lyr.cache[key]); return; }
+  lyr.status = 'loading'; lyrRender(); vizCaption(-1);
+  var q = new URLSearchParams({ title: tr.title, artist: tr.artist });
+  if (tr.album) q.set('album', tr.album);
+  if (tr.duration) q.set('duration', String(tr.duration));
+  fetch('/api/music/lyrics?' + q.toString()).then(function (r) {
+    if (r.status === 404) return { none: true };
+    if (!r.ok) throw new Error('http ' + r.status);
+    return r.json();
+  }).then(function (d) {
+    if (Object.keys(lyr.cache).length > 60) lyr.cache = {};
+    lyr.cache[key] = d;
+    if (lyr.key === key) lyrApplyResult(d);
+  }).catch(function () {
+    if (lyr.key === key) { lyr.status = 'error'; lyrRender(); vizCaption(-1); }
+  });
+}
+
+function lyrMsg(icon, text) { return '<div class="lyr-msg"><div class="big">' + icon + '</div>' + esc(text) + '</div>'; }
+function lyrRender() {
+  var h, plain = false;
+  if (!cur()) h = lyrMsg('🎤', t('lyrNothing'));
+  else if (lyr.status === 'loading' || lyr.status === 'idle') h = lyrMsg('⏳', t('lyrLoading'));
+  else if (lyr.status === 'error') h = lyrMsg('📡', t('lyrErr')) + '<div style="text-align:center"><button class="btn" data-lyrretry>' + esc(t('retry')) + '</button></div>';
+  else if (lyr.status === 'none') h = lyrMsg('🎤', t('lyrNone'));
+  else if (lyr.instr) h = lyrMsg('🎵', t('lyrInstr'));
+  else if (lyr.synced.length) {
+    h = lyr.synced.map(function (l, i) { return '<p class="lyr-line" data-i="' + i + '">' + (l.text ? esc(l.text) : '♪') + '</p>'; }).join('');
+  } else { plain = true; h = '<div class="lyr-note">' + esc(t('lyrPlainNote')) + '</div><div class="lyr-plain">' + esc(lyr.plain) + '</div>'; }
+  var body = $('#lyrBody');
+  body.innerHTML = '<div class="lyr-pad' + (plain || !lyr.synced.length ? ' plain-pad' : '') + '">' + h + '</div>' +
+    '<div class="lyr-credit">' + esc(t('lyrBy')) + ' <a href="https://lrclib.net" target="_blank" rel="noopener">LRCLIB</a></div>';
+  body.scrollTop = 0; lyr.idx = -1;
+}
+
+// Last line whose stamp has passed (a quarter second early, so the highlight lands on the word, not after it).
+function lyrIndexAt(time) {
+  var a = lyr.synced, lo = 0, hi = a.length - 1, ans = -1, x = time + 0.25;
+  while (lo <= hi) { var mid = (lo + hi) >> 1; if (a[mid].t <= x) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+  return ans;
+}
+function lyrSync(force) {
+  if (lyr.status !== 'ok' || !lyr.synced.length || !cur()) { vizCaption(null); return; }
+  var i = lyrIndexAt(audio.currentTime || 0);
+  if (i === lyr.idx && !force) return;
+  lyr.idx = i;
+  if (lyr.on) {
+    var body = $('#lyrBody'), old = body.querySelector('.lyr-line.cur');
+    if (old) old.classList.remove('cur');
+    var el = i >= 0 ? body.querySelector('.lyr-line[data-i="' + i + '"]') : null;
+    if (el) {
+      el.classList.add('cur');
+      if (force || Date.now() > lyr.holdUntil) body.scrollTo({ top: el.offsetTop - body.clientHeight / 2 + el.offsetHeight / 2, behavior: force ? 'auto' : 'smooth' });
+    }
+  }
+  vizCaption(i);
+}
+function vizCaption(i) {
+  var cap = $('#vizCap'), a = lyr.synced, on = viz.on && lyr.status === 'ok' && a.length > 0 && !!cur();
+  if (!on) { if (viz.cap || cap.innerHTML) { viz.cap = false; cap.innerHTML = ''; } return; }
+  viz.cap = true;
+  var now = i >= 0 && a[i] ? a[i].text : '', nxt = i >= 0 ? (a[i + 1] ? a[i + 1].text : '') : a[0].text;
+  cap.innerHTML = '<div class="cur">' + (now ? esc(now) : '♪') + '</div>' + (nxt ? '<div class="nxt">' + esc(nxt) + '</div>' : '');
+}
+
+function lyrInfo() {
+  var tr = cur();
+  $('#lyrInfo').innerHTML = tr ? img(tr.artwork) + '<div class="m"><div class="tt">' + esc(tr.title) + '</div><div class="aa">' + esc(tr.artist) + '</div></div>' : '';
+  $('#lyrBg').style.backgroundImage = tr && tr.artwork ? 'url(' + JSON.stringify(tr.artwork) + ')' : 'none';
+}
+// A new track: load its lyrics only if something is showing them.
+function lyrOnTrack() {
+  if (lyr.on) lyrInfo();
+  if (!(lyr.on || viz.on)) return;
+  var tr = cur();
+  if (tr) lyrLoad(tr); else { lyr.key = null; lyr.status = 'idle'; lyrRender(); vizCaption(-1); }
+}
+function lyrLoop() { lyr.raf = requestAnimationFrame(lyrLoop); lyrSync(); }
+function lyrOpen() {
+  if (lyr.on) return;
+  lyr.on = true;
+  $('#lyrics').classList.add('on'); $('#bLyr').classList.add('on');
+  lyrInfo();
+  if (cur()) lyrLoad(cur()); else lyrRender();
+  lyrSync(true);
+  cancelAnimationFrame(lyr.raf); lyr.raf = requestAnimationFrame(lyrLoop);
+}
+function lyrClose() {
+  if (!lyr.on) return;
+  lyr.on = false;
+  $('#lyrics').classList.remove('on'); $('#bLyr').classList.remove('on');
+  cancelAnimationFrame(lyr.raf);
+}
+
+$('#bLyr').addEventListener('click', function () { if (lyr.on) lyrClose(); else lyrOpen(); });
+$('#vizLyr').addEventListener('click', lyrOpen);
+$('#lyrClose').addEventListener('click', lyrClose);
+$('#lyrics').addEventListener('click', function (e) {
+  if (e.target.closest('[data-lyrretry]')) { lyrLoad(cur(), true); return; }
+  var line = e.target.closest('.lyr-line');
+  if (line && lyr.synced[+line.getAttribute('data-i')]) {
+    audio.currentTime = lyr.synced[+line.getAttribute('data-i')].t;
+    lyr.holdUntil = 0; lyrSync(true);
+  }
+});
+// A reader scrolling by hand is not fought for a few seconds.
+['wheel', 'touchmove'].forEach(function (ev) {
+  $('#lyrBody').addEventListener(ev, function () { lyr.holdUntil = Date.now() + 3500; }, { passive: true });
+});
 
 /* ================= init static text ================= */
 function applyStatic() {

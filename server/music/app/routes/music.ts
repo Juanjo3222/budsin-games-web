@@ -19,6 +19,7 @@ import { touchIfStale } from "../lib/cacheSweep";
 import { r2 } from "../lib/r2";
 import { musicSourceBreaker, SourceParkedError } from "../lib/sourceBreaker";
 import { LruCache } from "../lib/lruCache";
+import { lyricsFor } from "../lib/lyrics";
 
 /**
  * Release a response we're not going to read.
@@ -1069,6 +1070,30 @@ export async function musicRoutes(fastify: FastifyInstance) {
     const whole = browse.albums.length > 0 && Object.values(browse.rows).every((r) => r.length > 0);
     reply.header("cache-control", whole ? "public, max-age=600" : "no-store");
     return reply.send(browse);
+  });
+
+  // Lyrics come from LRCLIB through this server (lib/lyrics.ts): synced lines when it has them, plain text otherwise.
+  fastify.get("/api/music/lyrics", perMinute(60), async (req, reply) => {
+    const q = req.query as { title?: string; artist?: string; album?: string; duration?: string };
+    const title = String(q.title ?? "").trim();
+    const artist = String(q.artist ?? "").trim();
+    const album = String(q.album ?? "").trim();
+    if (!title || !artist || title.length > 200 || artist.length > 200 || album.length > 200)
+      return musicError(reply, 400, "title and artist are required (200 characters at most)");
+    const secs = Number(q.duration);
+    const duration = Number.isFinite(secs) && secs > 0 && secs < 3600 ? Math.round(secs) : undefined;
+    try {
+      const lyrics = await lyricsFor(artist, title, album || undefined, duration);
+      if (!lyrics) {
+        reply.header("cache-control", "public, max-age=600");
+        return musicError(reply, 404, "No lyrics found");
+      }
+      reply.header("cache-control", "public, max-age=3600");
+      return reply.send(lyrics);
+    } catch (err) {
+      console.warn("[music] lyrics lookup failed:", err instanceof Error ? err.message : err);
+      return musicError(reply, 502, "Lyrics lookup failed");
+    }
   });
 
   fastify.get("/api/music/search", perMinute(60), async (req, reply) => {
