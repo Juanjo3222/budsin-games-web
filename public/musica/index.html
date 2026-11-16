@@ -261,6 +261,31 @@ input[type=range]:hover { --c: var(--accent); }
 .legal { font-size: .72rem; color: #5f6777; line-height: 1.5; padding: 24px 0 0; border-top: 1px solid var(--line); margin-top: 40px; }
 .legal a { color: #7f93c9; text-decoration: underline; }
 
+/* ---------- visualizer ---------- */
+.only-m { display: none; }
+#viz { position: fixed; left: 0; right: 0; top: 0; bottom: var(--player); z-index: 35; background: #07090c; display: none; flex-direction: column; overflow: hidden; }
+#viz.on { display: flex; }
+#viz:fullscreen { bottom: 0; }
+.viz-bg { position: absolute; inset: -60px; background-size: cover; background-position: center; filter: blur(70px) saturate(1.3); opacity: .3; transform: scale(1.2); transition: background-image .4s; }
+#vizCv { position: relative; flex: 1; width: 100%; min-height: 0; display: block; }
+.viz-top { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 22px; z-index: 2; background: linear-gradient(to bottom, rgba(7,9,12,.85), transparent); }
+.viz-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.viz-info img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; background: #222; flex: none; }
+.viz-info .tt { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.viz-info .aa { font-size: .82rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.viz-info .m { min-width: 0; }
+.viz-bottom { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 12px 24px; padding: 40px 18px 18px; z-index: 2; background: linear-gradient(to top, rgba(7,9,12,.9) 40%, transparent); }
+.viz-modes { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.viz-colors { display: flex; gap: 10px; align-items: center; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; box-shadow: 0 0 0 2px rgba(255,255,255,.12); }
+.swatch:hover { transform: scale(1.12); }
+.swatch.on { border-color: #fff; box-shadow: 0 0 0 2px rgba(255,255,255,.5); }
+.viz-tr { display: flex; align-items: center; gap: 4px; }
+.viz-tr .iconbtn { color: var(--text); }
+.viz-tr .main { width: 44px; height: 44px; background: var(--text); color: #0b0d10; }
+.viz-idle { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 1rem; pointer-events: none; text-align: center; padding: 0 30px; }
+.np img { cursor: pointer; }
+
 /* ---------- tablet / mobile ---------- */
 @media (max-width: 960px) {
   .top10 { grid-template-columns: 1fr; }
@@ -279,7 +304,8 @@ input[type=range]:hover { --c: var(--accent); }
   .np img { width: 44px; height: 44px; }
   .right { display: none; }
   .ctrl { flex-direction: column-reverse; gap: 0; }
-  .np { padding-right: 90px; }
+  .np { padding-right: 124px; gap: 8px; }
+  .np .iconbtn { width: 34px; height: 34px; font-size: 19px; flex: none; }
   .ctrl .row { position: absolute; right: 10px; top: 14px; gap: 0; }
   .ctrl .row .hide-m { display: none; }
   .seek { margin-top: 2px; }
@@ -299,7 +325,14 @@ input[type=range]:hover { --c: var(--accent); }
   .tr { grid-template-columns: 26px minmax(0, 1fr) 34px 34px; gap: 8px; padding: 6px 4px; }
   .tr.has-album { grid-template-columns: 26px minmax(0, 1fr) 34px 34px; }
   .tr .dur { display: none; }
+  /* Chrome móvil "pega" el toque al enlace más cercano: tocar el título abría el artista en vez de reproducir. */
+  .tr .aa a, .tr .alb a { pointer-events: none; }
   #queue { width: 100%; bottom: calc(var(--player) + var(--nav)); }
+  #viz { bottom: calc(var(--player) + var(--nav)); }
+  #viz:fullscreen { bottom: 0; }
+  .only-m { display: inline-grid; }
+  .viz-top { padding: 12px 14px; }
+  .viz-bottom { padding: 36px 12px 12px; gap: 10px 16px; }
   #toast { bottom: calc(var(--player) + var(--nav) + 12px); }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
@@ -348,6 +381,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="seek"><span id="tCur">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Progreso"><span id="tDur">0:00</span></div>
     </div>
     <div class="right">
+      <button class="iconbtn" id="bViz" data-ti="viz"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>
       <button class="iconbtn" id="bQueue" data-ti="queue"><svg viewBox="0 0 24 24"><path d="M3 6h14v2H3zm0 5h14v2H3zm0 5h9v2H3zm13 0l6-3.5v7z"/></svg></button>
       <button class="iconbtn" id="bMute" data-ti="mute"></button>
       <input type="range" id="vol" min="0" max="100" value="80" aria-label="Volumen">
@@ -359,6 +393,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <header><span data-t="queue"></span><span><button class="iconbtn" id="qClear" data-ti="clearQ" style="font-size:15px;width:auto;padding:0 10px;border-radius:999px"></button><button class="iconbtn" id="qClose" aria-label="×">✕</button></span></header>
   <div class="body" id="qBody"></div>
 </aside>
+<div id="viz" role="dialog" aria-label="Visualizer">
+  <div class="viz-bg" id="vizBg"></div>
+  <canvas id="vizCv"></canvas>
+  <div class="viz-idle" id="vizIdle"></div>
+  <div class="viz-top">
+    <div class="viz-info" id="vizInfo"></div>
+    <div style="display:flex;gap:4px;flex:none">
+      <button class="iconbtn" id="vizFs" data-ti="vizFs"><svg viewBox="0 0 24 24"><path d="M5 5h5v2H7v3H5zm9 0h5v5h-2V7h-3zM5 14h2v3h3v2H5zm12 0h2v5h-5v-2h3z"/></svg></button>
+      <button class="iconbtn" id="vizClose" data-ti="vizClose">✕</button>
+    </div>
+  </div>
+  <div class="viz-bottom">
+    <div class="viz-modes" id="vizModes"></div>
+    <div class="viz-tr">
+      <button class="iconbtn" id="vizPrev" data-ti="prev"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zm3.5 7L19 5v14z"/></svg></button>
+      <button class="iconbtn main" id="vizPlay" data-ti="play"></button>
+      <button class="iconbtn" id="vizNext" data-ti="next"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM5 5l9.5 7L5 19z"/></svg></button>
+    </div>
+    <div class="viz-colors" id="vizColors"></div>
+  </div>
+</div>
 <div id="toast" role="status" aria-live="polite"></div>
 <audio id="audio" preload="auto"></audio>
 
@@ -376,6 +431,9 @@ var I18N = {
     songs: 'Canciones', artists: 'Artistas', albums: 'Álbumes', eps: 'EPs y sencillos', popular: 'Populares', similar: 'Artistas similares', album: 'Álbum', single: 'Sencillo', ep: 'EP', artist: 'Artista', playlist: 'Playlist',
     tracks: 'canciones', track1: 'canción', min: 'min', noresults: 'Sin resultados para', searchhint: 'Busca lo que quieras escuchar',
     failed: 'No se pudo cargar. Revisa tu conexión.', retry: 'Reintentar', loading: 'Cargando…', loadingTrack: 'Cargando canción…',
+    viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espejo', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
+    pal_mint: 'Budsin', pal_rainbow: 'Arcoíris', pal_neon: 'Neón', pal_fire: 'Fuego',
+    vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
     addQ: 'Añadir a la cola', addPl: 'Añadir a playlist', newPl: 'Nueva playlist…', goArtist: 'Ir al artista', goAlbum: 'Ir al álbum',
@@ -395,6 +453,9 @@ var I18N = {
     songs: 'Songs', artists: 'Artists', albums: 'Albums', eps: 'EPs & singles', popular: 'Popular', similar: 'Similar artists', album: 'Album', single: 'Single', ep: 'EP', artist: 'Artist', playlist: 'Playlist',
     tracks: 'songs', track1: 'song', min: 'min', noresults: 'No results for', searchhint: 'Search for anything you want to hear',
     failed: 'Could not load. Check your connection.', retry: 'Retry', loading: 'Loading…', loadingTrack: 'Loading track…',
+    viz: 'Visualizer', viz_bars: 'Bars', viz_mirror: 'Mirror', viz_wave: 'Wave', viz_area: 'Spectrum', viz_circle: 'Circle', viz_particles: 'Particles',
+    pal_mint: 'Budsin', pal_rainbow: 'Rainbow', pal_neon: 'Neon', pal_fire: 'Fire',
+    vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.',
     noPlay: 'Search works, but playback is not available right now.',
     addQ: 'Add to queue', addPl: 'Add to playlist', newPl: 'New playlist…', goArtist: 'Go to artist', goAlbum: 'Go to album',
@@ -414,6 +475,9 @@ var I18N = {
     songs: 'Músicas', artists: 'Artistas', albums: 'Álbuns', eps: 'EPs e singles', popular: 'Populares', similar: 'Artistas semelhantes', album: 'Álbum', single: 'Single', ep: 'EP', artist: 'Artista', playlist: 'Playlist',
     tracks: 'músicas', track1: 'música', min: 'min', noresults: 'Sem resultados para', searchhint: 'Busque o que quiser ouvir',
     failed: 'Não foi possível carregar. Verifique sua conexão.', retry: 'Tentar de novo', loading: 'Carregando…', loadingTrack: 'Carregando música…',
+    viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espelho', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
+    pal_mint: 'Budsin', pal_rainbow: 'Arco-íris', pal_neon: 'Neon', pal_fire: 'Fogo',
+    vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
     addQ: 'Adicionar à fila', addPl: 'Adicionar à playlist', newPl: 'Nova playlist…', goArtist: 'Ir ao artista', goAlbum: 'Ir ao álbum',
@@ -609,6 +673,7 @@ function syncPlayBtn() {
   $('#bPlay').innerHTML = loading ? '<span class="spinner"></span>' : (playing ? ICON.pause : ICON.play);
   $('#bPlay').setAttribute('aria-label', playing ? t('pause') : t('play'));
   $('#bPlay').title = playing ? t('pause') : t('play');
+  $('#vizPlay').innerHTML = $('#bPlay').innerHTML;
   document.body.classList.toggle('paused', !playing);
   if ('mediaSession' in navigator) navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
   refreshPlayingMarks();
@@ -638,10 +703,12 @@ function updateNowPlaying() {
   el.innerHTML = img(tr.artwork) +
     '<div class="m"><div class="tt">' + (tr.albumId ? '<a href="#/album/' + esc(tr.albumId) + '">' + esc(tr.title) + '</a>' : esc(tr.title)) + '</div>' +
     '<div class="aa">' + artistLink(tr) + '</div><div class="ld">' + esc(t('loadingTrack')) + '</div></div>' +
-    '<button class="iconbtn' + (isLiked(tr) ? ' on' : '') + '" id="npLike" aria-label="' + esc(t('like')) + '">' + (isLiked(tr) ? ICON.heart : ICON.heartO) + '</button>';
+    '<button class="iconbtn' + (isLiked(tr) ? ' on' : '') + '" id="npLike" aria-label="' + esc(t('like')) + '">' + (isLiked(tr) ? ICON.heart : ICON.heartO) + '</button>' +
+    '<button class="iconbtn only-m" data-viz aria-label="' + esc(t('viz')) + '"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>';
   $('#npLike').addEventListener('click', function () { toggleLike(tr); });
   document.title = tr.title + ' — ' + tr.artist + ' · Budsin Music';
   updateSeek();
+  vizSyncInfo();
 }
 function updateMediaSession() {
   if (!('mediaSession' in navigator)) return;
@@ -1087,11 +1154,241 @@ document.addEventListener('keydown', function (e) {
   if (e.target.matches('input, textarea') || e.ctrlKey || e.metaKey || e.altKey) { if (e.key === 'Escape') e.target.blur(); return; }
   if (e.key === ' ' && !e.target.closest('button, a, [data-cardplay]')) { e.preventDefault(); togglePlay(); }
   else if (e.key === '/') { e.preventDefault(); qEl.focus(); }
+  else if (e.key.toLowerCase() === 'v') { if (viz.on) vizClose(); else vizOpen(); }
+  else if (e.key === 'ArrowRight' && !e.shiftKey && viz.on) vizStep(1);
+  else if (e.key === 'ArrowLeft' && !e.shiftKey && viz.on) vizStep(-1);
   else if (e.key === 'ArrowRight' && e.shiftKey) next(false);
   else if (e.key === 'ArrowLeft' && e.shiftKey) prev();
   else if (e.key.toLowerCase() === 'm') { muted = !muted; applyVol(); }
-  else if (e.key === 'Escape') { closeMenu(); $('#queue').classList.remove('on'); }
+  else if (e.key === 'Escape') { closeMenu(); $('#queue').classList.remove('on'); vizClose(); }
 });
+
+/* ================= visualizer ================= */
+var VIZ_MODES = ['bars', 'mirror', 'wave', 'area', 'circle', 'particles'];
+// Each palette maps a position t (0..1) to [hue, saturation %, lightness %].
+var VIZ_PAL = {
+  mint: function (t) { return [172 + t * 24, 78, 52 + t * 8]; },
+  rainbow: function (t, now) { return [(t * 300 + now / 30) % 360, 85, 58]; },
+  neon: function (t) { return [320 - t * 130, 95, 62]; },
+  fire: function (t) { return [t * 52, 95, 52 + t * 8]; }
+};
+var viz = {
+  on: false, ctx: null, an: null, freq: null, time: null, raf: 0, cv: null, g: null, w: 0, h: 0,
+  mode: store.get('bm_vizmode', 'bars'), pal: store.get('bm_vizpal', 'mint'), peaks: [], parts: [], bass: 0
+};
+if (VIZ_MODES.indexOf(viz.mode) < 0) viz.mode = 'bars';
+if (!VIZ_PAL[viz.pal]) viz.pal = 'mint';
+var TAU = Math.PI * 2;
+
+function hsla(c, a) { return 'hsl(' + c[0].toFixed(0) + ' ' + c[1] + '% ' + c[2].toFixed(0) + '% / ' + a + ')'; }
+function pal(t, now) { return VIZ_PAL[viz.pal](Math.max(0, Math.min(1, t)), now || 0); }
+function rr(g, x, y, w, h, r) {
+  g.beginPath();
+  if (g.roundRect) g.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2)); else g.rect(x, y, w, h);
+  g.fill();
+}
+
+/* The audio element goes through an analyser. Built on first open, from the click that opens it: an AudioContext
+   made earlier would start suspended. The page and /api/music/stream share an origin, so the element stays readable. */
+function vizGraph() {
+  if (viz.an) { if (viz.ctx.state === 'suspended') viz.ctx.resume().catch(function () {}); return true; }
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
+    var ctx = new AC();
+    var src = ctx.createMediaElementSource(audio);
+    var an = ctx.createAnalyser();
+    an.fftSize = 2048; an.smoothingTimeConstant = 0.8;
+    src.connect(an); an.connect(ctx.destination);
+    viz.ctx = ctx; viz.an = an;
+    viz.freq = new Uint8Array(an.frequencyBinCount);
+    viz.time = new Uint8Array(an.fftSize);
+    if (ctx.state === 'suspended') ctx.resume().catch(function () {});
+    return true;
+  } catch (e) { return false; }
+}
+audio.addEventListener('play', function () { if (viz.ctx && viz.ctx.state === 'suspended') viz.ctx.resume().catch(function () {}); });
+
+// Average of the bins in slice i of n, on a log scale (bass gets as much width as treble), 0..1.
+function band(i, n) {
+  var lo = 2, hi = 700;
+  var a = Math.floor(lo * Math.pow(hi / lo, i / n)), b = Math.floor(lo * Math.pow(hi / lo, (i + 1) / n));
+  if (b <= a) b = a + 1;
+  var sum = 0;
+  for (var k = a; k < b; k++) sum += viz.freq[k];
+  return Math.min(1, sum / (b - a) / 255 * (1 + 0.7 * i / n));
+}
+
+function newParticle(m) { return { a: Math.random() * TAU, r: m * 0.08 + Math.random() * m * 0.1, sp: 0.4 + Math.random() * 1.6, s: 1 + Math.random() * 2.6, t: Math.random() }; }
+
+var VIZ_DRAW = {
+  bars: function (g, W, H, now) {
+    var n = W < 560 ? 32 : 64, gap = W < 560 ? 3 : 4, left = W * 0.06, span = W * 0.88;
+    var bw = (span - gap * (n - 1)) / n, base = H * 0.84, maxH = H * 0.68;
+    for (var i = 0; i < n; i++) {
+      var h = Math.max(4, band(i, n) * maxH), x = left + i * (bw + gap), c = pal(i / n, now);
+      var gr = g.createLinearGradient(0, base - h, 0, base);
+      gr.addColorStop(0, hsla(c, 1)); gr.addColorStop(1, hsla(c, 0.55));
+      g.fillStyle = gr; rr(g, x, base - h, bw, h, bw / 2);
+      g.fillStyle = hsla(c, 0.12); rr(g, x, base + 4, bw, h * 0.35, bw / 2);
+      var pk = Math.max(h, (viz.peaks[i] || 0) - 1.6); viz.peaks[i] = pk;
+      g.fillStyle = hsla(c, 0.9); g.fillRect(x, base - pk - 6, bw, 3);
+    }
+  },
+  mirror: function (g, W, H, now) {
+    var n = W < 560 ? 24 : 44, gap = 4, cx = W / 2, cy = H / 2 - 10, step = (W * 0.46) / n, bw = Math.max(2, step - gap), maxH = H * 0.36;
+    for (var i = 0; i < n; i++) {
+      var h = Math.max(3, band(i, n) * maxH), dx = i * step;
+      g.fillStyle = hsla(pal(i / n, now), 0.95);
+      rr(g, cx + dx, cy - h, bw, h * 2, bw / 2);
+      rr(g, cx - dx - bw, cy - h, bw, h * 2, bw / 2);
+    }
+  },
+  wave: function (g, W, H, now) {
+    var n = viz.time.length, gr = g.createLinearGradient(0, 0, W, 0);
+    for (var s = 0; s <= 4; s++) gr.addColorStop(s / 4, hsla(pal(s / 4, now), 1));
+    function path(amp, off) {
+      g.beginPath();
+      for (var i = 0; i < n; i += 2) {
+        var x = i / n * W, y = H / 2 - 10 + off + ((viz.time[i] - 128) / 128) * H * amp;
+        if (i === 0) g.moveTo(x, y); else g.lineTo(x, y);
+      }
+      g.stroke();
+    }
+    g.lineJoin = 'round'; g.lineCap = 'round'; g.strokeStyle = gr;
+    g.globalAlpha = 0.16; g.lineWidth = 16; path(0.6, 0);
+    g.globalAlpha = 0.32; g.lineWidth = 7; path(0.6, 0);
+    g.globalAlpha = 1; g.lineWidth = 2.5; path(0.6, 0);
+    g.globalAlpha = 0.22; g.lineWidth = 2; path(0.32, H * 0.14);
+    g.globalAlpha = 1;
+  },
+  area: function (g, W, H, now) {
+    var n = 72, base = H * 0.86, maxH = H * 0.7, left = W * 0.04, span = W * 0.92, pts = [];
+    for (var i = 0; i < n; i++) pts.push([left + span * i / (n - 1), base - Math.max(2, band(i, n) * maxH)]);
+    function top() {
+      g.beginPath(); g.moveTo(pts[0][0], pts[0][1]);
+      for (var i = 1; i < pts.length; i++) {
+        var mx = (pts[i - 1][0] + pts[i][0]) / 2, my = (pts[i - 1][1] + pts[i][1]) / 2;
+        g.quadraticCurveTo(pts[i - 1][0], pts[i - 1][1], mx, my);
+      }
+      g.lineTo(pts[n - 1][0], pts[n - 1][1]);
+    }
+    top(); g.lineTo(pts[n - 1][0], base); g.lineTo(pts[0][0], base); g.closePath();
+    var fg = g.createLinearGradient(0, base - maxH, 0, base);
+    fg.addColorStop(0, hsla(pal(0.85, now), 0.85)); fg.addColorStop(1, hsla(pal(0.1, now), 0.06));
+    g.fillStyle = fg; g.fill();
+    var sg = g.createLinearGradient(left, 0, left + span, 0);
+    for (var s = 0; s <= 4; s++) sg.addColorStop(s / 4, hsla(pal(s / 4, now), 1));
+    top(); g.strokeStyle = sg; g.lineWidth = 3; g.lineJoin = 'round'; g.stroke();
+  },
+  circle: function (g, W, H, now) {
+    var cx = W / 2, cy = H / 2 - 10, m = Math.min(W, H), r0 = m * 0.15 * (1 + viz.bass * 0.25), n = 120, rot = now / 5000, len = m * 0.2;
+    var glow = g.createRadialGradient(cx, cy, 0, cx, cy, r0);
+    glow.addColorStop(0, hsla(pal(0.3, now), 0.25 + viz.bass * 0.35)); glow.addColorStop(1, hsla(pal(0.3, now), 0));
+    g.fillStyle = glow; g.beginPath(); g.arc(cx, cy, r0, 0, TAU); g.fill();
+    g.lineCap = 'round'; g.lineWidth = Math.max(2, m * 0.007);
+    for (var i = 0; i < n; i++) {
+      var k = i < n / 2 ? i : n - 1 - i, l = Math.max(2, band(k, n / 2) * len), a = rot + i / n * TAU;
+      g.strokeStyle = hsla(pal(k / (n / 2), now), 0.95);
+      g.beginPath(); g.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0); g.lineTo(cx + Math.cos(a) * (r0 + l), cy + Math.sin(a) * (r0 + l)); g.stroke();
+    }
+    g.strokeStyle = hsla(pal(0.5, now), 0.5); g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, r0 - 6, 0, TAU); g.stroke();
+  },
+  particles: function (g, W, H, now) {
+    var cx = W / 2, cy = H / 2 - 10, m = Math.min(W, H), maxR = Math.hypot(W, H) / 2;
+    while (viz.parts.length < 150) viz.parts.push(newParticle(m));
+    for (var i = 0; i < viz.parts.length; i++) {
+      var p = viz.parts[i];
+      p.r += p.sp * (1 + viz.bass * 7); p.a += 0.0025 * (1 + viz.bass * 3);
+      if (p.r > maxR * 0.95) viz.parts[i] = p = newParticle(m);
+      g.fillStyle = hsla(pal(p.t, now), Math.max(0.15, 1 - p.r / maxR));
+      g.beginPath(); g.arc(cx + Math.cos(p.a) * p.r, cy + Math.sin(p.a) * p.r, p.s * (1 + viz.bass * 2.2), 0, TAU); g.fill();
+    }
+    g.strokeStyle = hsla(pal(0.6, now), 0.5 + viz.bass * 0.5); g.lineWidth = 2 + viz.bass * 6;
+    g.beginPath(); g.arc(cx, cy, m * 0.07 + viz.bass * m * 0.08, 0, TAU); g.stroke();
+  }
+};
+
+function vizDraw(now) {
+  viz.raf = requestAnimationFrame(vizDraw);
+  var g = viz.g, W = viz.w, H = viz.h;
+  if (!g || !W || !H) return;
+  viz.an.getByteFrequencyData(viz.freq);
+  viz.an.getByteTimeDomainData(viz.time);
+  var b = 0;
+  for (var i = 1; i < 9; i++) b += viz.freq[i];
+  viz.bass += (b / 8 / 255 - viz.bass) * 0.35;
+  if (viz.mode === 'particles') {   // fade instead of clear: that is the trail
+    g.globalCompositeOperation = 'destination-out'; g.fillStyle = 'rgba(0,0,0,0.22)'; g.fillRect(0, 0, W, H); g.globalCompositeOperation = 'source-over';
+  } else g.clearRect(0, 0, W, H);
+  VIZ_DRAW[viz.mode](g, W, H, now);
+}
+
+function vizSize() {
+  var cv = $('#vizCv'), dpr = Math.min(2, window.devicePixelRatio || 1);
+  viz.cv = cv; viz.w = cv.clientWidth; viz.h = cv.clientHeight;
+  cv.width = Math.round(viz.w * dpr); cv.height = Math.round(viz.h * dpr);
+  viz.g = cv.getContext('2d'); viz.g.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+window.addEventListener('resize', function () { if (viz.on) vizSize(); });
+document.addEventListener('fullscreenchange', function () { if (viz.on) setTimeout(vizSize, 60); });
+
+function vizOpen() {
+  if (viz.on) return;
+  if (!vizGraph()) { toast(t('vizFail')); return; }
+  viz.on = true;
+  $('#viz').classList.add('on'); $('#bViz').classList.add('on');
+  vizSize(); vizSyncInfo();
+  cancelAnimationFrame(viz.raf); viz.raf = requestAnimationFrame(vizDraw);
+}
+function vizClose() {
+  if (!viz.on) return;
+  viz.on = false;
+  $('#viz').classList.remove('on'); $('#bViz').classList.remove('on');
+  cancelAnimationFrame(viz.raf);
+  if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+}
+function vizSetMode(m) {
+  viz.mode = m; viz.peaks = []; viz.parts = []; store.set('bm_vizmode', m);
+  if (viz.g) viz.g.clearRect(0, 0, viz.w, viz.h);
+  vizBuildUI();
+}
+function vizStep(d) { vizSetMode(VIZ_MODES[(VIZ_MODES.indexOf(viz.mode) + d + VIZ_MODES.length) % VIZ_MODES.length]); }
+function vizSetPal(k) { viz.pal = k; store.set('bm_vizpal', k); vizBuildUI(); }
+
+function vizBuildUI() {
+  $('#vizModes').innerHTML = VIZ_MODES.map(function (m) {
+    return '<button class="chip' + (m === viz.mode ? ' on' : '') + '" data-vmode="' + m + '">' + esc(t('viz_' + m)) + '</button>';
+  }).join('');
+  $('#vizColors').innerHTML = Object.keys(VIZ_PAL).map(function (k) {
+    var a = VIZ_PAL[k](0, 0), b = VIZ_PAL[k](1, 0);
+    return '<button class="swatch' + (k === viz.pal ? ' on' : '') + '" data-vpal="' + k + '" title="' + esc(t('pal_' + k)) + '" aria-label="' + esc(t('pal_' + k)) +
+      '" style="background:linear-gradient(135deg,' + hsla(a, 1) + ',' + hsla(b, 1) + ')"></button>';
+  }).join('');
+}
+function vizSyncInfo() {
+  var tr = cur();
+  $('#vizIdle').textContent = tr ? '' : t('vizIdle');
+  $('#vizInfo').innerHTML = tr
+    ? img(tr.artwork) + '<div class="m"><div class="tt">' + esc(tr.title) + '</div><div class="aa">' + esc(tr.artist) + '</div></div>'
+    : '';
+  $('#vizBg').style.backgroundImage = tr && tr.artwork ? 'url(' + JSON.stringify(tr.artwork) + ')' : 'none';
+}
+
+$('#viz').addEventListener('click', function (e) {
+  var m = e.target.closest('[data-vmode]'); if (m) return vizSetMode(m.getAttribute('data-vmode'));
+  var p = e.target.closest('[data-vpal]'); if (p) return vizSetPal(p.getAttribute('data-vpal'));
+  if (e.target.closest('#vizClose')) return vizClose();
+  if (e.target.closest('#vizFs')) {
+    if (document.fullscreenElement) document.exitFullscreen().catch(function () {});
+    else if ($('#viz').requestFullscreen) $('#viz').requestFullscreen().catch(function () {});
+  }
+});
+$('#vizPrev').addEventListener('click', prev);
+$('#vizPlay').addEventListener('click', togglePlay);
+$('#vizNext').addEventListener('click', function () { next(false); });
+$('#bViz').addEventListener('click', function () { if (viz.on) vizClose(); else vizOpen(); });
+$('#np').addEventListener('click', function (e) { if (cur() && (e.target.closest('[data-viz]') || e.target.tagName === 'IMG')) vizOpen(); });
 
 /* ================= init static text ================= */
 function applyStatic() {
@@ -1100,7 +1397,7 @@ function applyStatic() {
   qEl.placeholder = t('ph');
   $('#sideFoot').innerHTML = esc(t('legal')) + '<a href="https://github.com/Juanjo3222/budsin-games-web/tree/main/server/music/app" target="_blank" rel="noopener">Budsin</a> · <a href="https://github.com/x8rr/music" target="_blank" rel="noopener">x8rr/music</a>';
 }
-applyStatic(); syncModes(); applyVol(); syncPlayBtn(); updateNowPlaying(); renderSidebar(); renderQueue();
+applyStatic(); vizBuildUI(); syncModes(); applyVol(); syncPlayBtn(); updateNowPlaying(); renderSidebar(); renderQueue();
 render();
 
 fetch('/api/music/source').then(function (r) { return r.json(); }).then(function (s) {
