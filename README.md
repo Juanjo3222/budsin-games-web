@@ -344,7 +344,11 @@ Gana la escritura más reciente (`updatedAt`). Al iniciar sesión por primera ve
 
 Admins (mismos correos que el panel): `juvaldiviam@gmail.com`, `juanjoseguravegamail@gmail.com`, con correo verificado. **Revisa que el segundo no tenga una errata.**
 
-**Pruebas**: `firestore.rules.test.mjs` (60 comprobaciones: lo que el sitio hace y los ataques que hoy se permiten) contra el emulador oficial. Con las reglas propuestas pasan 60/60; con las abiertas fallan 37 (los ataques). Cómo correrlas está en la cabecera del archivo.
+**Dos versiones** (todo Budsin comparte este proyecto de Firebase, y las colecciones de Budsin Hosting, que vive en otro repositorio, no están inventariadas):
+- `firestore.rules.transition` — **publicar esta primero**. Protege todo lo conocido (tabla de arriba) y deja **como hoy** (abiertas) las colecciones desconocidas, para no romper Hosting. Mientras exista ese bloque, los datos de Hosting siguen expuestos.
+- `firestore.rules.proposed` — la definitiva: lo que no está listado queda denegado. Se publica cuando cada colección de Hosting tenga su propio bloque de reglas.
+
+**Pruebas**: `firestore.rules.test.mjs` (60 comprobaciones: lo que el sitio hace y los ataques que hoy se permiten) contra el emulador oficial. Estrictas: 60/60; transición (`RULES_FILE=firestore.rules.transition`): 62/62; con las abiertas de hoy fallan 37 (los ataques). Cómo correrlas está en la cabecera del archivo.
 
 **Antes de publicar**
 1. Si **otra aplicación** usa este mismo proyecto de Firebase (p. ej. Budsin Hosting, que vive en otro repositorio), sus colecciones no están en este inventario y quedarían **denegadas**. Compruébalo antes, o añade sus reglas.
