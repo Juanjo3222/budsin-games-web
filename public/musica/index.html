@@ -1537,7 +1537,14 @@ function lyrLoad(tr, force) {
   if (tr.album) q.set('album', tr.album);
   if (tr.duration) q.set('duration', String(tr.duration));
   fetch('/api/music/lyrics?' + q.toString()).then(function (r) {
-    if (r.status === 404) return { none: true };
+    if (r.status === 404) {
+      // "No lyrics found" is the server's answer for a song without lyrics; any other 404 means the server has
+      // no lyrics route at all (backend not updated), which is an error, not "this song has none".
+      return r.json().then(function (j) {
+        if (j && j.error === 'No lyrics found') return { none: true };
+        throw new Error('no lyrics route');
+      });
+    }
     if (!r.ok) throw new Error('http ' + r.status);
     return r.json();
   }).then(function (d) {
