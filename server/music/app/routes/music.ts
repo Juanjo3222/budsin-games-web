@@ -19,7 +19,7 @@ import { touchIfStale } from "../lib/cacheSweep";
 import { r2 } from "../lib/r2";
 import { musicSourceBreaker, SourceParkedError } from "../lib/sourceBreaker";
 import { LruCache } from "../lib/lruCache";
-import { lyricsFor } from "../lib/lyrics";
+import { lyricsById, lyricsFor, lyricVersions } from "../lib/lyrics";
 
 /**
  * Release a response we're not going to read.
@@ -1074,7 +1074,23 @@ export async function musicRoutes(fastify: FastifyInstance) {
 
   // Lyrics come from LRCLIB through this server (lib/lyrics.ts): synced lines when it has them, plain text otherwise.
   fastify.get("/api/music/lyrics", perMinute(60), async (req, reply) => {
-    const q = req.query as { title?: string; artist?: string; album?: string; duration?: string };
+    const q = req.query as { title?: string; artist?: string; album?: string; duration?: string; id?: string };
+    // A listener who chose another version of the lyrics asks for that exact record.
+    if (q.id !== undefined) {
+      if (!/^\d{1,10}$/.test(String(q.id))) return musicError(reply, 400, "Invalid id");
+      try {
+        const picked = await lyricsById(Number(q.id));
+        if (!picked) {
+          reply.header("cache-control", "public, max-age=600");
+          return musicError(reply, 404, "No lyrics found");
+        }
+        reply.header("cache-control", "public, max-age=3600");
+        return reply.send(picked);
+      } catch (err) {
+        console.warn("[music] lyrics by id failed:", err instanceof Error ? err.message : err);
+        return musicError(reply, 502, "Lyrics lookup failed");
+      }
+    }
     const title = String(q.title ?? "").trim();
     const artist = String(q.artist ?? "").trim();
     const album = String(q.album ?? "").trim();
@@ -1092,6 +1108,24 @@ export async function musicRoutes(fastify: FastifyInstance) {
       return reply.send(lyrics);
     } catch (err) {
       console.warn("[music] lyrics lookup failed:", err instanceof Error ? err.message : err);
+      return musicError(reply, 502, "Lyrics lookup failed");
+    }
+  });
+
+  fastify.get("/api/music/lyrics/versions", perMinute(30), async (req, reply) => {
+    const q = req.query as { title?: string; artist?: string; duration?: string; album?: string };
+    const title = String(q.title ?? "").trim();
+    const artist = String(q.artist ?? "").trim();
+    const album = String(q.album ?? "").trim();
+    if (!title || !artist || title.length > 200 || artist.length > 200 || album.length > 200)
+      return musicError(reply, 400, "title and artist are required (200 characters at most)");
+    const secs = Number(q.duration);
+    try {
+      const versions = await lyricVersions(artist, title, Number.isFinite(secs) && secs > 0 && secs < 3600 ? Math.round(secs) : undefined, album || undefined);
+      reply.header("cache-control", "public, max-age=3600");
+      return reply.send({ versions });
+    } catch (err) {
+      console.warn("[music] lyric versions failed:", err instanceof Error ? err.message : err);
       return musicError(reply, 502, "Lyrics lookup failed");
     }
   });

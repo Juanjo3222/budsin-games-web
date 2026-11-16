@@ -32,6 +32,7 @@ interface Row {
   id: number;
   trackName?: string;
   artistName?: string;
+  albumName?: string;
   duration?: number;
   instrumental?: boolean;
   plainLyrics?: string | null;
@@ -152,6 +153,61 @@ async function lookup(artist: string, title: string, album: string | undefined, 
   const loose = (await lrclib<Row[]>("api/search", { q: `${a} ${t}` })) ?? [];
   return pickBest(Array.isArray(loose) ? loose : [], t, duration);
 }
+
+export interface LyricVersion {
+  id: number;
+  album: string;
+  duration: number;
+  /** When the first sung line starts: the quickest way to tell two timings of one song apart. */
+  start: number;
+}
+
+/** Other synced records of the same song. LRCLIB often holds several (single, album, compilations, the video cut)
+ * whose timestamps differ by seconds, and nothing in the metadata says which one fits a given audio file. */
+export async function lyricVersions(artist: string, title: string, duration?: number, album?: string): Promise<LyricVersion[]> {
+  const t = cleanTitle(title);
+  const a = firstArtist(artist);
+  const key = `${norm(a)}|${norm(t)}|${duration ?? ""}|${norm(album ?? "")}`;
+  const hit = versionsCache.get(key);
+  if (hit) return hit;
+  const rows = (await lrclib<Row[]>("api/search", { artist_name: a, track_name: t })) ?? [];
+  const wanted = norm(t);
+  const seen = new Set<string>();
+  const out: LyricVersion[] = [];
+  // The record the song's own album points at is the one lookup() picks, and /search does not always list it.
+  const exact = album ? await lrclib<Row>("api/get", { artist_name: artist, track_name: title, album_name: album, duration: duration ? String(duration) : undefined }).catch(() => null) : null;
+  const candidates = [...(exact && exact.syncedLyrics ? [exact] : []), ...(Array.isArray(rows) ? rows : [])];
+  for (const r of candidates) {
+    if (!r.syncedLyrics || norm(cleanTitle(r.trackName ?? "")) !== wanted) continue;
+    if (duration && r.duration && Math.abs(r.duration - duration) > 12) continue;
+    const lines = parseLrc(r.syncedLyrics);
+    const first = lines.find((l) => l.text);
+    if (lines.length < MIN_SYNCED_LINES || !first) continue;
+    // Same timings under another album name are one choice, not two.
+    const sig = `${Math.round(first.t * 2)}|${Math.round(r.duration ?? 0)}|${lines.length}`;
+    if (seen.has(sig)) continue;
+    seen.add(sig);
+    out.push({ id: r.id, album: r.albumName ?? "", duration: Math.round(r.duration ?? 0), start: Math.round(first.t * 10) / 10 });
+  }
+  out.sort((x, y) => Math.abs(x.duration - (duration ?? x.duration)) - Math.abs(y.duration - (duration ?? y.duration)));
+  const top = out.slice(0, 8);
+  versionsCache.set(key, top);
+  return top;
+}
+
+/** One specific record, for a version the listener picked. */
+export async function lyricsById(id: number): Promise<Lyrics | null> {
+  const key = String(id);
+  const hit = byIdCache.get(key);
+  if (hit) return hit;
+  const row = await lrclib<Row>(`api/get/${id}`, {});
+  const lyrics = row && hasLyrics(row) ? toLyrics(row, true) : null;
+  if (lyrics) byIdCache.set(key, lyrics);
+  return lyrics;
+}
+
+const versionsCache = new LruCache<LyricVersion[]>("lyricVersions", 1000, 60 * 60_000);
+const byIdCache = new LruCache<Lyrics>("lyricsById", 1000, 24 * 60 * 60_000);
 
 // Lyrics do not change: a day for a hit. A miss is retried sooner, since LRCLIB gains records all the time.
 const found = new LruCache<Lyrics>("lyrics", 5000, 24 * 60 * 60_000);

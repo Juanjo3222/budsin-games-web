@@ -315,6 +315,13 @@ input[type=range]:hover { --c: var(--accent); }
 .lyr-credit { position: relative; text-align: center; font-size: .72rem; color: #566; padding: 0 0 28px; }
 .lyr-credit a { color: #7f93c9; text-decoration: underline; }
 .lyr-pad.plain-pad { padding: 18px 0 24px; }
+.lyr-tools { display: flex; align-items: center; gap: 8px; flex: none; margin-left: auto; margin-right: 6px; }
+#lyrics:not(.has-sync) .lyr-tools { display: none; }
+.lyr-off { display: inline-flex; align-items: center; background: var(--panel2); border-radius: 999px; padding: 2px; }
+.lyr-off button { width: 30px; height: 30px; border-radius: 50%; font-size: 1.15rem; line-height: 1; color: var(--text); }
+.lyr-off button:hover { background: var(--hover); }
+.lyr-off span { min-width: 52px; text-align: center; font-size: .78rem; font-variant-numeric: tabular-nums; color: #cfd4df; cursor: pointer; }
+.lyr-tools .chip { padding: 7px 13px; font-size: .78rem; }
 
 /* ---------- tablet / mobile ---------- */
 @media (max-width: 960px) {
@@ -360,7 +367,9 @@ input[type=range]:hover { --c: var(--accent); }
   #queue { width: 100%; bottom: calc(var(--player) + var(--nav)); }
   #viz { bottom: calc(var(--player) + var(--nav)); }
   #lyrics { bottom: calc(var(--player) + var(--nav)); }
-  .lyr-top { padding: 12px 14px; }
+  .lyr-top { padding: 12px 14px; gap: 8px; }
+  .lyr-tools { gap: 4px; margin-right: 0; }
+  .lyr-off span { min-width: 44px; }
   #lyrBody { padding: 0 16px; }
   .viz-cap { top: 62px; }
   #viz:fullscreen { bottom: 0; }
@@ -462,6 +471,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="lyr-bg" id="lyrBg"></div>
   <div class="lyr-top">
     <div class="viz-info" id="lyrInfo"></div>
+    <div class="lyr-tools">
+      <div class="lyr-off" data-ti="lyrOffTitle">
+        <button data-lyroff="-0.5" aria-label="−0.5 s">−</button>
+        <span id="lyrOff" data-lyroff="reset">0.0s</span>
+        <button data-lyroff="0.5" aria-label="+0.5 s">+</button>
+      </div>
+      <button class="chip" id="lyrVer" data-t="lyrVersions"></button>
+    </div>
     <button class="iconbtn" id="lyrClose" data-ti="vizClose">✕</button>
   </div>
   <div id="lyrBody"></div>
@@ -486,6 +503,7 @@ var I18N = {
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espejo', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arcoíris', pal_neon: 'Neón', pal_fire: 'Fuego',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
+    lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
     lyr: 'Letra', lyrLoading: 'Buscando letra…', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
@@ -510,6 +528,7 @@ var I18N = {
     viz: 'Visualizer', viz_bars: 'Bars', viz_mirror: 'Mirror', viz_wave: 'Wave', viz_area: 'Spectrum', viz_circle: 'Circle', viz_particles: 'Particles',
     pal_mint: 'Budsin', pal_rainbow: 'Rainbow', pal_neon: 'Neon', pal_fire: 'Fire',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
+    lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
     lyr: 'Lyrics', lyrLoading: 'Looking for lyrics…', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
@@ -534,6 +553,7 @@ var I18N = {
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espelho', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arco-íris', pal_neon: 'Neon', pal_fire: 'Fogo',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
+    lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
     lyr: 'Letra', lyrLoading: 'Procurando a letra…', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
@@ -1516,27 +1536,46 @@ $('#bViz').addEventListener('click', function () { if (viz.on) vizClose(); else 
 $('#np').addEventListener('click', function (e) { if (cur() && (e.target.closest('[data-viz]') || e.target.tagName === 'IMG')) vizOpen(); });
 
 /* ================= lyrics ================= */
-var lyr = { on: false, key: null, status: 'idle', synced: [], plain: '', instr: false, idx: -1, raf: 0, holdUntil: 0, cache: {} };
+var lyr = { on: false, key: null, status: 'idle', synced: [], plain: '', instr: false, idx: -1, raf: 0, holdUntil: 0, cache: {}, off: 0, pick: null, id: null };
+// Per-song choices: how many seconds to shift the lyrics and which LRCLIB record to use. Kept in this browser.
+var lyrPrefs = store.get('bm_lyrprefs', {});
+function lyrSavePref(key, patch) {
+  var p = lyrPrefs[key] || {};
+  for (var k in patch) p[k] = patch[k];
+  delete lyrPrefs[key];
+  if (!p.off && !p.pick) { store.set('bm_lyrprefs', lyrPrefs); return; }    // nothing to remember
+  lyrPrefs[key] = p;
+  var keys = Object.keys(lyrPrefs);
+  if (keys.length > 300) delete lyrPrefs[keys[0]];
+  store.set('bm_lyrprefs', lyrPrefs);
+}
+function lyrToolsUpdate() {
+  var on = lyr.status === 'ok' && lyr.synced.length > 0;
+  $('#lyrics').classList.toggle('has-sync', on);
+  $('#lyrOff').textContent = (lyr.off > 0 ? '+' : '') + lyr.off.toFixed(1) + 's';
+}
 
 function lyrApplyResult(d) {
   if (d.none) lyr.status = 'none';
   else {
-    lyr.synced = d.synced || []; lyr.plain = d.plain || ''; lyr.instr = !!d.instrumental;
+    lyr.synced = d.synced || []; lyr.plain = d.plain || ''; lyr.instr = !!d.instrumental; lyr.id = d.id || null;
     lyr.status = (lyr.synced.length || lyr.plain || lyr.instr) ? 'ok' : 'none';
   }
-  lyrRender(); lyrSync(true);
+  lyrRender(); lyrToolsUpdate(); lyrSync(true);
 }
 function lyrLoad(tr, force) {
   if (!tr) return;
   var key = tid(tr);
   if (lyr.key === key && !force && lyr.status !== 'error') return;
-  lyr.key = key; lyr.synced = []; lyr.plain = ''; lyr.instr = false; lyr.idx = -1;
-  if (lyr.cache[key]) { lyrApplyResult(lyr.cache[key]); return; }
-  lyr.status = 'loading'; lyrRender(); vizCaption(-1);
+  if (lyr.key !== key) { var pf = lyrPrefs[key] || {}; lyr.off = pf.off || 0; lyr.pick = pf.pick || null; }
+  lyr.key = key; lyr.synced = []; lyr.plain = ''; lyr.instr = false; lyr.idx = -1; lyr.id = null;
+  var ck = key + '|' + (lyr.pick || '');
+  if (lyr.cache[ck]) { lyrApplyResult(lyr.cache[ck]); return; }
+  lyr.status = 'loading'; lyrRender(); lyrToolsUpdate(); vizCaption(-1);
   var q = new URLSearchParams({ title: tr.title, artist: tr.artist });
   if (tr.album) q.set('album', tr.album);
   if (tr.duration) q.set('duration', String(tr.duration));
-  fetch('/api/music/lyrics?' + q.toString()).then(function (r) {
+  fetch('/api/music/lyrics?' + (lyr.pick ? 'id=' + encodeURIComponent(lyr.pick) : q.toString())).then(function (r) {
     if (r.status === 404) {
       // "No lyrics found" is the server's answer for a song without lyrics; any other 404 means the server has
       // no lyrics route at all (backend not updated), which is an error, not "this song has none".
@@ -1549,10 +1588,10 @@ function lyrLoad(tr, force) {
     return r.json();
   }).then(function (d) {
     if (Object.keys(lyr.cache).length > 60) lyr.cache = {};
-    lyr.cache[key] = d;
+    lyr.cache[ck] = d;
     if (lyr.key === key) lyrApplyResult(d);
   }).catch(function () {
-    if (lyr.key === key) { lyr.status = 'error'; lyrRender(); vizCaption(-1); }
+    if (lyr.key === key) { lyr.status = 'error'; lyrRender(); lyrToolsUpdate(); vizCaption(-1); }
   });
 }
 
@@ -1576,7 +1615,7 @@ function lyrRender() {
 // Last line whose stamp has passed (a quarter second early, so the highlight lands on the word, not after it).
 function lyrIndexAt(time) {
   var a = lyr.synced, lo = 0, hi = a.length - 1, ans = -1, x = time + 0.25;
-  while (lo <= hi) { var mid = (lo + hi) >> 1; if (a[mid].t <= x) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
+  while (lo <= hi) { var mid = (lo + hi) >> 1; if (a[mid].t + lyr.off <= x) { ans = mid; lo = mid + 1; } else hi = mid - 1; }
   return ans;
 }
 function lyrSync(force) {
@@ -1635,11 +1674,50 @@ function lyrClose() {
 $('#bLyr').addEventListener('click', function () { if (lyr.on) lyrClose(); else lyrOpen(); });
 $('#vizLyr').addEventListener('click', lyrOpen);
 $('#lyrClose').addEventListener('click', lyrClose);
+function lyrPick(id) {
+  var tr = cur(); if (!tr) return;
+  lyrSavePref(tid(tr), { pick: id, off: 0 });
+  lyr.off = 0; lyr.pick = id;
+  lyrLoad(tr, true);
+}
+function lyrVersions(btn) {
+  var tr = cur(); if (!tr) return;
+  var q = new URLSearchParams({ title: tr.title, artist: tr.artist });
+  if (tr.album) q.set('album', tr.album);
+  if (tr.duration) q.set('duration', String(tr.duration));
+  fetch('/api/music/lyrics/versions?' + q.toString()).then(function (r) {
+    if (!r.ok) throw new Error('http ' + r.status);
+    return r.json();
+  }).then(function (d) {
+    var v = d.versions || [];
+    if (v.length < 2) { toast(t('lyrVerNone')); return; }
+    var items = [{ label: t('lyrVerTitle') }];
+    v.forEach(function (x) {
+      items.push({
+        label: (lyr.id === x.id ? '✓ ' : '') + (x.album || '—') + ' · ' + fmt(x.duration) + ' · ' + t('lyrVoice') + ' ' + x.start.toFixed(1) + 's',
+        fn: function () { lyrPick(x.id); }
+      });
+    });
+    items.push('-');
+    items.push({ label: (lyr.pick ? '' : '✓ ') + t('lyrVerAuto'), fn: function () { lyrPick(null); } });
+    openMenu(btn, items);
+  }).catch(function () { toast(t('lyrErr')); });
+}
 $('#lyrics').addEventListener('click', function (e) {
   if (e.target.closest('[data-lyrretry]')) { lyrLoad(cur(), true); return; }
+  var off = e.target.closest('[data-lyroff]');
+  if (off) {
+    var tr0 = cur(), dv = off.getAttribute('data-lyroff');
+    if (!tr0) return;
+    lyr.off = dv === 'reset' ? 0 : Math.max(-15, Math.min(15, Math.round((lyr.off + parseFloat(dv)) * 10) / 10));
+    lyrSavePref(tid(tr0), { off: lyr.off });
+    lyrToolsUpdate(); lyr.holdUntil = 0; lyrSync(true);
+    return;
+  }
+  if (e.target.closest('#lyrVer')) { lyrVersions($('#lyrVer')); return; }
   var line = e.target.closest('.lyr-line');
   if (line && lyr.synced[+line.getAttribute('data-i')]) {
-    audio.currentTime = lyr.synced[+line.getAttribute('data-i')].t;
+    audio.currentTime = Math.max(0, lyr.synced[+line.getAttribute('data-i')].t + lyr.off);
     lyr.holdUntil = 0; lyrSync(true);
   }
 });

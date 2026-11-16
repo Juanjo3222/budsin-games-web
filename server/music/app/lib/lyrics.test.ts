@@ -102,3 +102,33 @@ test("GET /api/music/lyrics: 400 without names, 404 when none, 200 with lines, n
   expect(bad.body).not.toContain("503");
   await server.close();
 });
+
+test("lyricVersions lists distinct timings of one song, closest length first, and skips other songs", async () => {
+  const rows = [
+    row(30, 216, { albumName: "Album A", syncedLyrics: "[00:01.00] a\n[00:02.00] b\n[00:03.00] c" }),
+    row(31, 216, { albumName: "Same timings, other album", syncedLyrics: "[00:01.00] a\n[00:02.00] b\n[00:03.00] c" }),
+    row(32, 217, { albumName: "Album B", syncedLyrics: "[00:04.10] a\n[00:05.00] b\n[00:06.00] c" }),
+    row(33, 253, { albumName: "Video", syncedLyrics: "[00:36.70] a\n[00:40.00] b\n[00:44.00] c" }),
+    row(34, 216, { trackName: "Another Song", syncedLyrics: "[00:01.00] a\n[00:02.00] b\n[00:03.00] c" }),
+  ];
+  mockLrclib((p) => (p === "/api/search" ? rows : undefined));
+  const { lyricVersions } = await import("./lyrics");
+  const v = await lyricVersions("Band", "Song", 217);
+  expect(v.map((x) => x.id)).toEqual([32, 30]);          // 253s video too far; duplicate timings and other song dropped
+  expect(v[0]).toMatchObject({ album: "Album B", duration: 217, start: 4.1 });
+});
+
+test("GET /api/music/lyrics?id= returns that record; bad ids are rejected; /versions lists choices", async () => {
+  const server = Fastify();
+  await server.register(musicRoutes);
+  expect((await server.inject({ url: "/api/music/lyrics?id=abc" })).statusCode).toBe(400);
+  mockLrclib((p) => (p === "/api/get/4242" ? row(4242, 216) : p === "/api/search" ? [row(4242, 216)] : undefined));
+  const one = await server.inject({ url: "/api/music/lyrics?id=4242" });
+  expect(one.statusCode).toBe(200);
+  expect(one.json()).toMatchObject({ id: 4242 });
+  const list = await server.inject({ url: "/api/music/lyrics/versions?artist=Band&title=Song&duration=216" });
+  expect(list.statusCode).toBe(200);
+  expect(list.json().versions[0]).toMatchObject({ id: 4242, duration: 216 });
+  expect((await server.inject({ url: "/api/music/lyrics/versions?title=x" })).statusCode).toBe(400);
+  await server.close();
+});
