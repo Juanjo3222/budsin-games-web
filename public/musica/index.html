@@ -232,6 +232,12 @@ input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px;
 input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: #fff; opacity: 0; }
 input[type=range]:hover::-webkit-slider-thumb, input[type=range]:focus-visible::-webkit-slider-thumb { opacity: 1; }
 input[type=range]:hover { --c: var(--accent); }
+.spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid rgba(0,0,0,.18); border-top-color: #0b0d10; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.np .ld { display: none; font-size: .78rem; color: var(--accent); font-weight: 600; }
+#player.loading .np .ld { display: block; }
+#player.loading .np .aa { display: none; }
+#player.loading .seek input[type=range]::-webkit-slider-runnable-track { background: linear-gradient(90deg, #353b49 0%, var(--accent) 50%, #353b49 100%); background-size: 200% 100%; animation: sh 1s linear infinite; }
 .right { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
 .right input[type=range] { max-width: 110px; flex: none; width: 110px; }
 .right .iconbtn { font-size: 20px; width: 36px; height: 36px; }
@@ -369,7 +375,7 @@ var I18N = {
     play: 'Reproducir', pause: 'Pausar', shuffle: 'Aleatorio', prev: 'Anterior', next: 'Siguiente', repeat: 'Repetir', mute: 'Silenciar',
     songs: 'Canciones', artists: 'Artistas', albums: 'Álbumes', eps: 'EPs y sencillos', popular: 'Populares', similar: 'Artistas similares', album: 'Álbum', single: 'Sencillo', ep: 'EP', artist: 'Artista', playlist: 'Playlist',
     tracks: 'canciones', track1: 'canción', min: 'min', noresults: 'Sin resultados para', searchhint: 'Busca lo que quieras escuchar',
-    failed: 'No se pudo cargar. Revisa tu conexión.', retry: 'Reintentar', loading: 'Cargando…',
+    failed: 'No se pudo cargar. Revisa tu conexión.', retry: 'Reintentar', loading: 'Cargando…', loadingTrack: 'Cargando canción…',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
     addQ: 'Añadir a la cola', addPl: 'Añadir a playlist', newPl: 'Nueva playlist…', goArtist: 'Ir al artista', goAlbum: 'Ir al álbum',
@@ -388,7 +394,7 @@ var I18N = {
     play: 'Play', pause: 'Pause', shuffle: 'Shuffle', prev: 'Previous', next: 'Next', repeat: 'Repeat', mute: 'Mute',
     songs: 'Songs', artists: 'Artists', albums: 'Albums', eps: 'EPs & singles', popular: 'Popular', similar: 'Similar artists', album: 'Album', single: 'Single', ep: 'EP', artist: 'Artist', playlist: 'Playlist',
     tracks: 'songs', track1: 'song', min: 'min', noresults: 'No results for', searchhint: 'Search for anything you want to hear',
-    failed: 'Could not load. Check your connection.', retry: 'Retry', loading: 'Loading…',
+    failed: 'Could not load. Check your connection.', retry: 'Retry', loading: 'Loading…', loadingTrack: 'Loading track…',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.',
     noPlay: 'Search works, but playback is not available right now.',
     addQ: 'Add to queue', addPl: 'Add to playlist', newPl: 'New playlist…', goArtist: 'Go to artist', goAlbum: 'Go to album',
@@ -407,7 +413,7 @@ var I18N = {
     play: 'Reproduzir', pause: 'Pausar', shuffle: 'Aleatório', prev: 'Anterior', next: 'Próxima', repeat: 'Repetir', mute: 'Silenciar',
     songs: 'Músicas', artists: 'Artistas', albums: 'Álbuns', eps: 'EPs e singles', popular: 'Populares', similar: 'Artistas semelhantes', album: 'Álbum', single: 'Single', ep: 'EP', artist: 'Artista', playlist: 'Playlist',
     tracks: 'músicas', track1: 'música', min: 'min', noresults: 'Sem resultados para', searchhint: 'Busque o que quiser ouvir',
-    failed: 'Não foi possível carregar. Verifique sua conexão.', retry: 'Tentar de novo', loading: 'Carregando…',
+    failed: 'Não foi possível carregar. Verifique sua conexão.', retry: 'Tentar de novo', loading: 'Carregando…', loadingTrack: 'Carregando música…',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
     addQ: 'Adicionar à fila', addPl: 'Adicionar à playlist', newPl: 'Nova playlist…', goArtist: 'Ir ao artista', goAlbum: 'Ir ao álbum',
@@ -490,6 +496,7 @@ var volume = store.get('bm_vol', 80);
 var muted = false;
 var lists = [];            // per-render registry of track arrays (for click handlers)
 var errStreak = 0;
+var loading = false;
 
 function tid(tr) { return String(tr.id); }
 function isLiked(tr) { return liked.some(function (x) { return tid(x) === tid(tr); }); }
@@ -508,9 +515,15 @@ function streamUrl(track) {
   if (track.duration) p.set('duration', String(track.duration));
   return '/api/music/stream?' + p.toString();
 }
+function setLoading(v) {
+  loading = v;
+  $('#player').classList.toggle('loading', v);
+  syncPlayBtn();
+}
 function playIndex(i) {
   if (i < 0 || i >= queue.length) return;
   qi = i;
+  setLoading(true);
   var tr = queue[qi];
   audio.src = streamUrl(tr);
   audio.play().catch(function () {});
@@ -547,16 +560,20 @@ function prev() {
 }
 function togglePlay() {
   if (!cur()) return;
-  if (audio.paused) audio.play().catch(function () {}); else audio.pause();
+  if (audio.paused) audio.play().catch(function () {}); else { audio.pause(); if (loading) setLoading(false); }
 }
 audio.addEventListener('ended', function () { next(true); });
 audio.addEventListener('error', function () {
   if (!cur()) return;
+  setLoading(false);
   errStreak++;
   if (errStreak < 3 && queue.length > 1) { toast(t('playErr')); next(false); }
   else { toast(t('playErr1')); errStreak = 0; }
 });
-audio.addEventListener('playing', function () { errStreak = 0; });
+audio.addEventListener('playing', function () { errStreak = 0; setLoading(false); });
+audio.addEventListener('canplay', function () { if (!audio.paused) setLoading(false); });
+audio.addEventListener('waiting', function () { if (cur() && !audio.paused) setLoading(true); });
+audio.addEventListener('stalled', function () { if (cur() && !audio.paused && audio.readyState < 3) setLoading(true); });
 audio.addEventListener('play', syncPlayBtn);
 audio.addEventListener('pause', syncPlayBtn);
 audio.addEventListener('timeupdate', updateSeek);
@@ -589,7 +606,7 @@ $('#bMute').addEventListener('click', function () { muted = !muted; applyVol(); 
 
 function syncPlayBtn() {
   var playing = !audio.paused;
-  $('#bPlay').innerHTML = playing ? ICON.pause : ICON.play;
+  $('#bPlay').innerHTML = loading ? '<span class="spinner"></span>' : (playing ? ICON.pause : ICON.play);
   $('#bPlay').setAttribute('aria-label', playing ? t('pause') : t('play'));
   $('#bPlay').title = playing ? t('pause') : t('play');
   document.body.classList.toggle('paused', !playing);
@@ -620,7 +637,7 @@ function updateNowPlaying() {
   }
   el.innerHTML = img(tr.artwork) +
     '<div class="m"><div class="tt">' + (tr.albumId ? '<a href="#/album/' + esc(tr.albumId) + '">' + esc(tr.title) + '</a>' : esc(tr.title)) + '</div>' +
-    '<div class="aa">' + artistLink(tr) + '</div></div>' +
+    '<div class="aa">' + artistLink(tr) + '</div><div class="ld">' + esc(t('loadingTrack')) + '</div></div>' +
     '<button class="iconbtn' + (isLiked(tr) ? ' on' : '') + '" id="npLike" aria-label="' + esc(t('like')) + '">' + (isLiked(tr) ? ICON.heart : ICON.heartO) + '</button>';
   $('#npLike').addEventListener('click', function () { toggleLike(tr); });
   document.title = tr.title + ' — ' + tr.artist + ' · Budsin Music';
