@@ -21,6 +21,7 @@ import { musicSourceBreaker, SourceParkedError } from "../lib/sourceBreaker";
 import { LruCache } from "../lib/lruCache";
 import { lyricsById, lyricsFor, lyricVersions } from "../lib/lyrics";
 import { resolveLink } from "../lib/resolveLink";
+import { cleanLines, TARGETS, translateLyrics } from "../lib/translate";
 
 /**
  * Release a response we're not going to read.
@@ -1142,6 +1143,22 @@ export async function musicRoutes(fastify: FastifyInstance) {
       return reply.send(out);
     } catch {
       return musicError(reply, 502, "Link lookup failed");
+    }
+  });
+
+  // Line-by-line translation of a song's lyrics (the lyrics panel's "Traducir"). One request per song, cached.
+  fastify.post("/api/music/lyrics/translate", { ...perMinute(12), bodyLimit: 32 * 1024 }, async (req, reply) => {
+    const body = (req.body ?? {}) as { lines?: unknown; to?: unknown };
+    const to = String(body.to ?? "");
+    const lines = cleanLines(body.lines);
+    if (!TARGETS.has(to) || !lines) return musicError(reply, 400, "Invalid translation request");
+    try {
+      const out = await translateLyrics(lines, to);
+      reply.header("cache-control", "no-store");
+      return reply.send(out);
+    } catch (err) {
+      console.warn("[music] translate failed:", err instanceof Error ? err.message : err);
+      return musicError(reply, 502, "Translation failed");
     }
   });
 

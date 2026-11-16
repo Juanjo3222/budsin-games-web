@@ -219,7 +219,7 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .np { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .np img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; background: #222; flex: none; }
 .np .m { min-width: 0; }
-.np .tt { font-weight: 600; font-size: .92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.np .tt { color: var(--accent); font-weight: 600; font-size: .92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .np .tt a:hover { text-decoration: underline; }
 .np .aa { font-size: .78rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .np .aa a:hover { text-decoration: underline; color: var(--text); }
@@ -232,9 +232,9 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .seek span { width: 38px; }
 .seek span:first-child { text-align: right; }
 input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; height: 16px; cursor: pointer; flex: 1; margin: 0; --p: 0%; min-width: 0; }
-input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(to right, var(--text) var(--p), #353b49 var(--p)); }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(to right, var(--accent) var(--p), #353b49 var(--p)); }
 input[type=range]::-moz-range-track { height: 4px; border-radius: 4px; background: #353b49; }
-input[type=range]::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--text); }
+input[type=range]::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--accent); }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; margin-top: -4px; opacity: 0; transition: opacity .1s; }
 input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: #fff; opacity: 0; }
 input[type=range]:hover::-webkit-slider-thumb, input[type=range]:focus-visible::-webkit-slider-thumb { opacity: 1; }
@@ -295,13 +295,16 @@ input[type=range]:hover { --c: var(--accent); }
 .viz-pop input[type=color] { width: 48px; height: 30px; padding: 0; border: 2px solid #2c3342; border-radius: 8px; background: none; cursor: pointer; }
 .viz-pop .prev { height: 10px; border-radius: 6px; }
 .viz-pop .chip { align-self: center; }
+.viz-sens { display: flex; align-items: center; gap: 8px; font-size: .74rem; color: var(--muted); } .viz-sens input { width: 96px; flex: none; }
+#lyrTr { flex: none; margin-left: auto; } #lyrTr[hidden] { display: none; } #lyrTr.on { background: var(--accent); color: #04201b; }
 .viz-tr { display: flex; align-items: center; gap: 4px; }
 .viz-tr .iconbtn { color: var(--text); }
 .viz-tr .main { width: 44px; height: 44px; background: var(--text); color: #0b0d10; }
 .viz-idle { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 1rem; pointer-events: none; text-align: center; padding: 0 30px; }
 .np img { cursor: pointer; }
 .viz-cap { position: absolute; left: 0; right: 0; top: 70px; height: 76px; display: flex; flex-direction: column; justify-content: center; text-align: center; padding: 0 5vw; z-index: 1; pointer-events: none; text-shadow: 0 2px 14px rgba(0,0,0,.85); overflow: hidden; }
-.viz-cap .cur { font-size: clamp(1.1rem, 2.4vw, 1.9rem); font-weight: 800; line-height: 1.2; }
+.viz-cap .cur { font-size: clamp(1.1rem, 2.4vw, 1.9rem); font-weight: 800; line-height: 1.2; color: color-mix(in srgb, var(--accent) 62%, #fff); }
+.viz-cap .trl { margin-top: 4px; font-size: clamp(.85rem, 1.6vw, 1.1rem); color: rgba(255,255,255,.8); font-weight: 600; }
 .viz-cap .nxt { margin-top: 6px; font-size: clamp(.82rem, 1.5vw, 1.05rem); color: rgba(255,255,255,.5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 /* ---------- recommendations & account ---------- */
@@ -407,7 +410,9 @@ input[type=range]:hover { --c: var(--accent); }
 .lyr-pad { max-width: 780px; margin: 0 auto; padding: 38vh 0 38vh; }
 .lyr-line { margin: 0; padding: 7px 0; font-size: clamp(1.35rem, 2.7vw, 2.3rem); font-weight: 800; line-height: 1.22; letter-spacing: -.4px; color: rgba(255,255,255,.34); transition: color .25s, transform .25s; transform-origin: left center; cursor: pointer; overflow-wrap: anywhere; }
 .lyr-line:hover { color: rgba(255,255,255,.7); }
-.lyr-line.cur { color: #fff; transform: scale(1.04); }
+.lyr-line.cur { color: color-mix(in srgb, var(--accent) 62%, #fff); transform: scale(1.04); }
+.lyr-line .trl { display: block; margin-top: 3px; font-size: .58em; font-weight: 600; letter-spacing: 0; color: rgba(255,255,255,.4); }
+.lyr-line.cur .trl { color: rgba(255,255,255,.78); }
 .lyr-plain { white-space: pre-wrap; font-size: 1.15rem; line-height: 1.85; color: #d5d9e2; padding-bottom: 20px; }
 .lyr-note { display: inline-block; margin-bottom: 16px; padding: 4px 12px; border-radius: 999px; background: var(--panel2); color: var(--muted); font-size: .78rem; }
 .lyr-msg { text-align: center; color: var(--muted); padding: 30px 0; font-size: 1.05rem; }
@@ -563,6 +568,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button class="iconbtn" id="vizNext" data-ti="next"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM5 5l9.5 7L5 19z"/></svg></button>
     </div>
     <div class="viz-colors" id="vizColors"></div>
+    <label class="viz-sens"><span data-t="vizSens"></span><input type="range" id="vizSens" min="40" max="160" value="100"></label>
   </div>
   <div class="viz-pop" id="vizPop">
     <label><span data-t="vizColor1"></span><input type="color" id="vizC1"></label>
@@ -593,6 +599,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="lyr-bg" id="lyrBg"></div>
   <div class="lyr-top">
     <div class="viz-info" id="lyrInfo"></div>
+    <button class="chip" id="lyrTr" hidden></button>
     <div class="lyr-tools">
       <div class="lyr-off" data-ti="lyrOffTitle">
         <button data-lyroff="-0.5" aria-label="−0.5 s">−</button>
@@ -632,7 +639,7 @@ var I18N = {
     acctTitle: 'Cuenta de Budsin', acctPitch: 'Inicia sesión con Google para que tus ♥, playlists y gustos te sigan a todos tus dispositivos y a Budsin Games.', acctIn: 'Iniciar sesión con Google', acctOut: 'Cerrar sesión', acctWipe: 'Borrar mis datos de la nube', acctWipeAsk: '¿Borrar de la nube tus ♥, playlists, gustos y preferencias? Lo guardado en este navegador se queda.', acctWiped: 'Datos de la nube borrados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'No se pudo sincronizar.', acctErrPerm: 'No se pudo sincronizar: faltan permisos en Firestore.', acctSignedOut: 'Sesión cerrada. Se quitaron de este navegador los datos de la cuenta.', acctFail: 'No se pudo iniciar sesión.', acctSdkFail: 'No se pudo cargar el inicio de sesión. Revisa tu conexión.',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
-    lyr: 'Letra', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
+    lyr: 'Letra', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
@@ -663,7 +670,7 @@ var I18N = {
     acctTitle: 'Budsin account', acctPitch: 'Sign in with Google so your ♥, playlists and taste follow you to all your devices and to Budsin Games.', acctIn: 'Sign in with Google', acctOut: 'Sign out', acctWipe: 'Delete my cloud data', acctWipeAsk: 'Delete your ♥, playlists, taste and preferences from the cloud? What is saved in this browser stays.', acctWiped: 'Cloud data deleted.', acctConnecting: 'Connecting…', acctSyncing: 'Syncing…', acctSynced: 'Synced ✓', acctErr: 'Could not sync.', acctErrPerm: 'Could not sync: Firestore permissions are missing.', acctSignedOut: 'Signed out. The account data was removed from this browser.', acctFail: 'Could not sign in.', acctSdkFail: 'Could not load sign-in. Check your connection.',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
-    lyr: 'Lyrics', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
+    lyr: 'Lyrics', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
     noPlay: 'Search works, but playback is not available right now.',
@@ -694,7 +701,7 @@ var I18N = {
     acctTitle: 'Conta Budsin', acctPitch: 'Entre com o Google para que seus ♥, playlists e gostos acompanhem você em todos os dispositivos e no Budsin Games.', acctIn: 'Entrar com o Google', acctOut: 'Sair', acctWipe: 'Apagar meus dados da nuvem', acctWipeAsk: 'Apagar da nuvem seus ♥, playlists, gostos e preferências? O que está salvo neste navegador permanece.', acctWiped: 'Dados da nuvem apagados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'Não foi possível sincronizar.', acctErrPerm: 'Não foi possível sincronizar: faltam permissões no Firestore.', acctSignedOut: 'Sessão encerrada. Os dados da conta foram removidos deste navegador.', acctFail: 'Não foi possível entrar.', acctSdkFail: 'Não foi possível carregar o login. Verifique sua conexão.',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
-    lyr: 'Letra', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
+    lyr: 'Letra', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
@@ -828,7 +835,7 @@ var pip = { win: null, timer: 0, ok: !!(window.documentPictureInPicture && windo
 var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#0b0d10;color:#eef0f4;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}' +
   '#pp{display:grid;grid-template-columns:76px 1fr;gap:4px 12px;align-items:center;align-content:center;padding:12px 14px;height:100vh;background:linear-gradient(180deg,rgba(var(--tint,37,208,180),.35),#0b0d10 70%)}' +
   '#pi{width:76px;height:76px;border-radius:10px;object-fit:cover;background:#1d222c;grid-row:1}.mm{min-width:0}#pt{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#pa{font-size:12px;color:#8d95a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
-  '#pl{grid-column:1/3;min-height:34px;text-align:center;font-size:13px;line-height:1.3;color:var(--accent,#25d0b4);font-weight:600;display:flex;align-items:center;justify-content:center;overflow:hidden}#pl:empty{display:none}' +
+  '#pl{grid-column:1/3;min-height:34px;text-align:center;font-size:13px;line-height:1.3;color:var(--accent,#25d0b4);font-weight:600;display:flex;align-items:center;justify-content:center;overflow:hidden}#pl:empty{display:none}#pl{flex-direction:column;gap:2px}#pl .t2{font-size:11px;color:#8d95a6;font-weight:500}' +
   '.bar{grid-column:1/3;display:flex;align-items:center;gap:8px;font-size:11px;color:#8d95a6;font-variant-numeric:tabular-nums}.bar input{flex:1;accent-color:var(--accent,#25d0b4);height:4px}' +
   '.ct{grid-column:1/3;display:flex;justify-content:center;align-items:center;gap:14px}.ct button{border:0;background:none;color:#eef0f4;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer}.ct button:hover{background:rgba(255,255,255,.1)}.ct svg{width:22px;height:22px;fill:currentColor}' +
   '.ct #pP{background:#fff;color:#0b0d10;width:44px;height:44px}.ct #pP:hover{background:#fff;opacity:.9}.spinner{width:18px;height:18px;border:2px solid #0b0d10;border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;display:block}@keyframes s{to{transform:rotate(360deg)}}';
@@ -843,8 +850,17 @@ function pipTick() {
   var ic = loading ? '<span class="spinner"></span>' : (audio.paused ? ICON.play : ICON.pause);
   if (el('pP').getAttribute('data-ic') !== ic) { el('pP').innerHTML = ic; el('pP').setAttribute('data-ic', ic); }
   var line = '';
-  if (tr && lyr.status === 'ok' && lyr.synced.length) { var i = lyrIndexAt(c); line = i >= 0 && lyr.synced[i] ? lyr.synced[i].text : ''; }
-  if (el('pl').textContent !== line) el('pl').textContent = line;
+  var line2 = '';
+  if (tr && lyr.status === 'ok' && lyr.synced.length) {
+    var i = lyrIndexAt(c); line = i >= 0 && lyr.synced[i] ? lyr.synced[i].text : '';
+    var tlp = lyrTrCur(); line2 = tlp && i >= 0 && tlp[i] ? tlp[i] : '';
+  }
+  var sig = line + '\u0001' + line2;
+  if (el('pl').getAttribute('data-sig') !== sig) {
+    el('pl').setAttribute('data-sig', sig); el('pl').innerHTML = '';
+    if (line) { var l1 = d.createElement('div'); l1.textContent = line; el('pl').appendChild(l1); }
+    if (line2) { var l2 = d.createElement('div'); l2.className = 't2'; l2.textContent = line2; el('pl').appendChild(l2); }
+  }
 }
 function pipRender() {
   var w = pip.win; if (!w) return;
@@ -1761,13 +1777,17 @@ function vizSetCustom(a, b) {
 }
 var viz = {
   on: false, ctx: null, an: null, freq: null, time: null, raf: 0, cv: null, g: null, w: 0, h: 0,
-  mode: store.get('bm_vizmode', 'bars'), pal: store.get('bm_vizpal', 'mint'), peaks: [], parts: [], bass: 0
+  gain: Math.max(.4, Math.min(1.6, (+store.get('bm_vizgain', 100) || 100) / 100)), mode: store.get('bm_vizmode', 'bars'), pal: store.get('bm_vizpal', 'mint'), peaks: [], parts: [], bass: 0
 };
 var savedCustom = store.get('bm_vizcustom', CUSTOM_DEFAULT);
 vizSetCustom(savedCustom && HEX_RE.test(savedCustom.a) ? savedCustom.a : CUSTOM_DEFAULT.a, savedCustom && HEX_RE.test(savedCustom.b) ? savedCustom.b : CUSTOM_DEFAULT.b);
 if (VIZ_MODES.indexOf(viz.mode) < 0) viz.mode = 'bars';
 if (!VIZ_PAL[viz.pal]) viz.pal = 'mint';
 var TAU = Math.PI * 2;
+(function () {      // sensitivity of the bars (all modes that read the spectrum)
+  var sl = $('#vizSens'); sl.value = Math.round(viz.gain * 100); setRange(sl, (sl.value - 40) / 1.2);
+  sl.addEventListener('input', function () { viz.gain = sl.value / 100; store.set('bm_vizgain', +sl.value); setRange(sl, (sl.value - 40) / 1.2); });
+})();
 
 function hsla(c, a) { return 'hsl(' + c[0].toFixed(0) + ' ' + Math.round(c[1]) + '% ' + c[2].toFixed(0) + '% / ' + a + ')'; }
 function pal(t, now) { return VIZ_PAL[viz.pal](Math.max(0, Math.min(1, t)), now || 0); }
@@ -1805,7 +1825,7 @@ function band(i, n) {
   if (b <= a) b = a + 1;
   var sum = 0;
   for (var k = a; k < b; k++) sum += viz.freq[k];
-  return Math.min(1, sum / (b - a) / 255 * (1 + 0.7 * i / n));
+  return Math.min(1, sum / (b - a) / 255 * (1 + 0.7 * i / n) * viz.gain);
 }
 
 function newParticle(m) { return { a: Math.random() * TAU, r: m * 0.08 + Math.random() * m * 0.1, sp: 0.4 + Math.random() * 1.6, s: 1 + Math.random() * 2.6, t: Math.random() }; }
@@ -1827,7 +1847,7 @@ var VIZ_DRAW = {
   mirror: function (g, W, H, now) {
     var n = W < 560 ? 24 : 44, gap = 4, cx = W / 2, cy = H / 2 - 10, step = (W * 0.46) / n, bw = Math.max(2, step - gap), maxH = H * 0.36;
     for (var i = 0; i < n; i++) {
-      var h = Math.max(3, band(i, n) * maxH), dx = i * step;
+      var h = Math.max(3, Math.pow(band(i, n), 1.8) * maxH), dx = i * step;   // curved: loud passages no longer pin every bar at full height
       g.fillStyle = hsla(pal(i / n, now), 0.95);
       rr(g, cx + dx, cy - h, bw, h * 2, bw / 2);
       rr(g, cx - dx - bw, cy - h, bw, h * 2, bw / 2);
@@ -2031,6 +2051,7 @@ function lyrToolsUpdate() {
   var on = lyr.status === 'ok' && lyr.synced.length > 0;
   $('#lyrics').classList.toggle('has-sync', on);
   $('#lyrOff').textContent = (lyr.off > 0 ? '+' : '') + lyr.off.toFixed(1) + 's';
+  if (lyr.tr) lyrTrUpdate();
 }
 
 function lyrApplyResult(d) {
@@ -2040,6 +2061,50 @@ function lyrApplyResult(d) {
     lyr.status = (lyr.synced.length || lyr.plain || lyr.instr) ? 'ok' : 'none';
   }
   lyrRender(); lyrToolsUpdate(); lyrSync(true);
+  lyrTrLoad();
+}
+/* ---- translation of the lyrics, line by line, in the app's language (server: /api/music/lyrics/translate) ---- */
+lyr.tr = { on: store.get('bm_lyrtr', 0) === 1, key: '', lines: null, status: '' };
+function lyrTrSource() {
+  var a = lyr.synced.length ? lyr.synced.map(function (l) { return l.text || ''; }) : (lyr.plain ? lyr.plain.split(/\r?\n/) : []);
+  return a.slice(0, 220);
+}
+function lyrTrKey() { return lyr.key + '|' + lyr.id + '|' + lang; }
+function lyrTrCur() { return lyr.tr.on && lyr.tr.status === 'ok' && lyr.tr.key === lyrTrKey() ? lyr.tr.lines : null; }
+function lyrTrUpdate() {
+  var b = $('#lyrTr'), tr = lyr.tr, show = lyr.status === 'ok' && !lyr.instr && lyrTrSource().some(Boolean);
+  b.hidden = !show;
+  b.classList.toggle('on', tr.on && tr.status === 'ok');
+  b.textContent = '🌐 ' + (tr.on && tr.status === 'loading' ? t('lyrTrLoading') : tr.on && tr.status === 'ok' ? t('lyrTrOn') : t('lyrTr'));
+}
+function lyrTrApply() {
+  lyrTrUpdate();
+  if (lyr.synced.length) {            // in place: the reader keeps their scroll position
+    var tl = lyrTrCur();
+    $$('#lyrBody .lyr-line').forEach(function (p) {
+      var prevEl = p.querySelector('.trl'); if (prevEl) p.removeChild(prevEl);
+      var x = tl && tl[+p.getAttribute('data-i')];
+      if (x) { var sp = document.createElement('span'); sp.className = 'trl'; sp.textContent = x; p.appendChild(sp); }
+    });
+  } else lyrRender();
+  lyrSync(true);
+}
+function lyrTrLoad(force) {
+  var tr = lyr.tr;
+  if (lyr.status === 'ok') lyrTrUpdate();
+  if (!tr.on || lyr.status !== 'ok' || lyr.instr) return;
+  var src = lyrTrSource(); if (!src.some(Boolean)) return;
+  var key = lyrTrKey();
+  if (tr.key === key && !force && tr.status !== 'error') { lyrTrApply(); return; }
+  tr.key = key; tr.lines = null; tr.status = 'loading'; lyrTrUpdate();
+  fetch('/api/music/lyrics/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lines: src, to: lang }) })
+    .then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); })
+    .then(function (d) {
+      if (tr.key !== key) return;
+      if (String(d.src || '').split('-')[0] === lang) { tr.status = 'same'; tr.on = false; store.set('bm_lyrtr', 0); toast(t('lyrTrSame')); lyrTrApply(); return; }
+      tr.lines = d.lines || []; tr.status = 'ok'; lyrTrApply();
+    })
+    .catch(function () { if (tr.key !== key) return; tr.status = 'error'; tr.on = false; toast(t('lyrTrFail')); lyrTrApply(); });
 }
 function lyrLoad(tr, force) {
   if (!tr) return;
@@ -2082,8 +2147,17 @@ function lyrRender() {
   else if (lyr.status === 'none') h = lyrMsg('🎤', t('lyrNone'));
   else if (lyr.instr) h = lyrMsg('🎵', t('lyrInstr'));
   else if (lyr.synced.length) {
-    h = lyr.synced.map(function (l, i) { return '<p class="lyr-line" data-i="' + i + '">' + (l.text ? esc(l.text) : '♪') + '</p>'; }).join('');
-  } else { plain = true; h = '<div class="lyr-note">' + esc(t('lyrPlainNote')) + '</div><div class="lyr-plain">' + esc(lyr.plain) + '</div>'; }
+    var tl0 = lyrTrCur();
+    h = lyr.synced.map(function (l, i) { return '<p class="lyr-line" data-i="' + i + '">' + (l.text ? esc(l.text) : '♪') + (tl0 && tl0[i] ? '<span class="trl">' + esc(tl0[i]) + '</span>' : '') + '</p>'; }).join('');
+  } else {
+    plain = true;
+    var tlp = lyrTrCur();
+    h = '<div class="lyr-note">' + esc(t('lyrPlainNote')) + '</div>';
+    if (tlp) {
+      var srcp = lyrTrSource();
+      h += '<div class="lyr-plain">' + srcp.map(function (l, i) { return l.trim() ? esc(l) + (tlp[i] ? '<br><span style="opacity:.6">' + esc(tlp[i]) + '</span>' : '') : '<br>'; }).join('<br>') + '</div>';
+    } else h += '<div class="lyr-plain">' + esc(lyr.plain) + '</div>';
+  }
   var body = $('#lyrBody');
   body.innerHTML = '<div class="lyr-pad' + (plain || !lyr.synced.length ? ' plain-pad' : '') + '">' + h + '</div>' +
     '<div class="lyr-credit">' + esc(t('lyrBy')) + ' <a href="https://lrclib.net" target="_blank" rel="noopener">LRCLIB</a></div>';
@@ -2117,7 +2191,8 @@ function vizCaption(i) {
   if (!on) { if (viz.cap || cap.innerHTML) { viz.cap = false; cap.innerHTML = ''; } return; }
   viz.cap = true;
   var now = i >= 0 && a[i] ? a[i].text : '', nxt = i >= 0 ? (a[i + 1] ? a[i + 1].text : '') : a[0].text;
-  cap.innerHTML = '<div class="cur">' + (now ? esc(now) : '♪') + '</div>' + (nxt ? '<div class="nxt">' + esc(nxt) + '</div>' : '');
+  var tl = lyrTrCur(), tnow = tl && i >= 0 && tl[i] ? tl[i] : '';
+  cap.innerHTML = '<div class="cur">' + (now ? esc(now) : '♪') + '</div>' + (tnow ? '<div class="trl">' + esc(tnow) + '</div>' : '') + (nxt && !tnow ? '<div class="nxt">' + esc(nxt) + '</div>' : '');
 }
 
 function lyrInfo() {
@@ -2193,6 +2268,11 @@ $('#lyrics').addEventListener('click', function (e) {
     return;
   }
   if (e.target.closest('#lyrVer')) { lyrVersions($('#lyrVer')); return; }
+  if (e.target.closest('#lyrTr')) {
+    lyr.tr.on = !lyr.tr.on; store.set('bm_lyrtr', lyr.tr.on ? 1 : 0);
+    if (lyr.tr.on) lyrTrLoad(true); else lyrTrApply();
+    return;
+  }
   var line = e.target.closest('.lyr-line');
   if (line && lyr.synced[+line.getAttribute('data-i')]) {
     audio.currentTime = Math.max(0, lyr.synced[+line.getAttribute('data-i')].t + lyr.off);
