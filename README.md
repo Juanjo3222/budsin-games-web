@@ -327,17 +327,31 @@ Los **gustos** son un resumen agregado por artista y género con decaimiento (vi
 
 Gana la escritura más reciente (`updatedAt`). Al iniciar sesión por primera vez en un navegador con datos locales se **unen** con los de la nube; si en el navegador había datos de **otra** cuenta, se reemplazan (nunca se mezclan). Al cerrar sesión (aquí o en Games) se borran del navegador los datos de la cuenta. «Borrar mis datos de la nube» elimina todo `music_profiles/{uid}`.
 
-### ⚠️ Reglas de Firestore (se aplican en la consola de Firebase, no en este repositorio)
+### ⚠️ Reglas de Firestore (se publican en la consola de Firebase, no desde este repositorio)
 
-Añadir **junto a** las reglas existentes (no reemplazarlas):
+**Las reglas que había eran `allow read, write: if true;` para toda la base de datos.** Con eso cualquiera que tenga la clave pública del proyecto (está en el JS del sitio) puede leer y escribir todo: darse de alta con `pro: true`, ponerse Pro, leer los correos de todos los usuarios, sobrescribir los guardados de otros o inflar el ranking. Con esas reglas abiertas, el apartado de Music también «funciona», pero sin ninguna protección.
 
-```
-match /music_profiles/{uid}/{document=**} {
-  allow read, write: if request.auth != null && request.auth.uid == uid;
-}
-```
+`firestore.rules.proposed` las sustituye por unas que cubren cada colección que usa el sitio (inventario hecho leyendo `app/src`, `public/site.js`, `public/save-system.js` y `public/musica/index.html`) y **deniegan todo lo demás**:
 
-Sin estas reglas, Music sigue funcionando en local y muestra «No se pudo sincronizar: faltan permisos en Firestore».
+| Colección | Quién puede |
+|---|---|
+| `users/{uid}` | leer: el dueño o un admin. Crear: solo el dueño y siempre con `pro:false`. Actualizar: un admin; el dueño solo para **quitarse un Pro vencido** o **activar la prueba de 7 días una única vez** |
+| `game_popularity/{id}` | leer: todos. Escribir: cualquiera, solo sumas de 1 a 5 y sin tocar nada más |
+| `game_leaderboards/{juego}` y `/scores` | leer: todos. Escribir: solo usuarios con `pro: true` en su documento |
+| `game_requests/{id}` | crear: cualquiera (siempre `pending`, y a su propio nombre o `anonymous`). Leer, aprobar o borrar: admin |
+| `gamesaves/{uid}_{juego}` y `/chunks` | solo su dueño (el id empieza por su uid) |
+| `music_profiles/{uid}/**` | solo su dueño |
+
+Admins (mismos correos que el panel): `juvaldiviam@gmail.com`, `juanjoseguravegamail@gmail.com`, con correo verificado. **Revisa que el segundo no tenga una errata.**
+
+**Pruebas**: `firestore.rules.test.mjs` (60 comprobaciones: lo que el sitio hace y los ataques que hoy se permiten) contra el emulador oficial. Con las reglas propuestas pasan 60/60; con las abiertas fallan 37 (los ataques). Cómo correrlas está en la cabecera del archivo.
+
+**Antes de publicar**
+1. Si **otra aplicación** usa este mismo proyecto de Firebase (p. ej. Budsin Hosting, que vive en otro repositorio), sus colecciones no están en este inventario y quedarían **denegadas**. Compruébalo antes, o añade sus reglas.
+2. Publica en Firestore › Reglas. La consola guarda un historial para revertir al instante.
+3. Prueba, con una cuenta Free y con la de admin: iniciar sesión, ver el estado Pro en Ajustes, activar la prueba, el panel `/admin`, un guardado en la nube, el ranking y Budsin Music (♥, playlist).
+
+**Lo que las reglas no pueden arreglar** (son límites del diseño actual, donde el navegador decide): el tope de 5 guardados para Free es solo del cliente; la prueba gratuita se puede repetir con otra cuenta de Google; cualquiera puede sumar clics a la popularidad (acotado a 5 por escritura). Las reglas de **Firebase Storage** (guardados grandes de Unity) son aparte y conviene revisarlas igual.
 
 ---
 
