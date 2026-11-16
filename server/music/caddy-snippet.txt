@@ -1,7 +1,10 @@
-
 	# Budsin Music: backend local (server/music). El audio se pide con Range, nunca se cachea en el borde.
 	handle /api/music/* {
-		header Cache-Control "no-store"
+		# no-store solo donde la respuesta no debe guardarse (audio y estado). El resto (portadas
+		# immutable, browse, search…) fija su propio Cache-Control en el backend. ">" lo pone al final
+		# y lo reemplaza: sin él, Caddy añade una segunda cabecera y gana no-store.
+		@nostore path /api/music/stream /api/music/ytm/* /api/music/track /api/music/manifest /api/music/source /api/music/ping
+		header @nostore >Cache-Control "no-store"
 		reverse_proxy 127.0.0.1:3103 {
 			flush_interval -1
 			transport http {

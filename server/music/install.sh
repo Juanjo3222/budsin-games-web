@@ -60,29 +60,46 @@ systemctl daemon-reload
 systemctl enable budsin-music >/dev/null
 systemctl restart budsin-music
 
-# --- Caddy: la ruta se añade justo después del bloque de PayPal ---
-if grep -q '/api/music/' "$caddyfile"; then
-  echo "Caddy ya tiene la ruta /api/music/*"
-else
-  backup="$caddyfile.bak.$(date +%Y%m%d%H%M%S)"
-  cp -a "$caddyfile" "$backup"
-  python3 - "$caddyfile" "$here/caddy-snippet.txt" <<'PY' || { cp -a "$backup" "$caddyfile"; echo "No encuentro el bloque de PayPal en $caddyfile; añade a mano caddy-snippet.txt. Nada cambió."; exit 1; }
-import sys
+# --- Caddy: la ruta se añade justo después del bloque de PayPal; si ya existe, se actualiza en el sitio ---
+backup="$caddyfile.bak.$(date +%Y%m%d%H%M%S)"
+cp -a "$caddyfile" "$backup"
+status=$(python3 - "$caddyfile" "$here/caddy-snippet.txt" <<'PY' || true
+import re, sys
 path, snippet = sys.argv[1], open(sys.argv[2]).read().rstrip("\n")
 t = open(path).read()
-a = "\t\treverse_proxy 127.0.0.1:3101\n\t}\n"
-assert t.count(a) == 1
-open(path, "w").write(t.replace(a, a + snippet + "\n"))
+# Bloque ya instalado: de su comentario "# Budsin Music" hasta el "\t}" que lo cierra (el interior va con 2+ tabs).
+block = re.compile(r"^\t# Budsin Music:[^\n]*\n\thandle /api/music/\*[ \t]*\{\n.*?^\t\}\n", re.S | re.M)
+if block.search(t):
+    new = block.sub(lambda m: snippet + "\n", t, count=1)
+else:
+    a = "\t\treverse_proxy 127.0.0.1:3101\n\t}\n"
+    if t.count(a) != 1:
+        print("NOANCHOR"); sys.exit(0)
+    new = t.replace(a, a + snippet + "\n")
+if new == t:
+    print("SAME")
+else:
+    open(path, "w").write(new)
+    print("CHANGED")
 PY
-  if caddy validate --config "$caddyfile" --adapter caddyfile >/dev/null 2>&1; then
-    systemctl reload caddy
-    echo "Caddy actualizado (copia de seguridad: $backup)"
-  else
+)
+case "$status" in
+  SAME)
+    echo "Caddy ya tiene la ruta /api/music/* al día"; rm -f "$backup" ;;
+  CHANGED)
+    if caddy validate --config "$caddyfile" --adapter caddyfile >/dev/null 2>&1; then
+      systemctl reload caddy
+      echo "Caddy actualizado (copia de seguridad: $backup)"
+    else
+      cp -a "$backup" "$caddyfile"
+      echo "El Caddyfile nuevo no valida; restaurado desde $backup. Nada cambió en Caddy."
+      exit 1
+    fi ;;
+  *)
     cp -a "$backup" "$caddyfile"
-    echo "El Caddyfile nuevo no valida; restaurado desde $backup. Nada cambió en Caddy."
-    exit 1
-  fi
-fi
+    echo "No encuentro el bloque de PayPal en $caddyfile; añade a mano caddy-snippet.txt. Nada cambió."
+    exit 1 ;;
+esac
 
 sleep 2
 curl -fsS "http://127.0.0.1:3103/api/music/source" && echo

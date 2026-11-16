@@ -7,6 +7,7 @@ import {
   isYtmVideoId,
   ytmAudioFile,
   ytmBase,
+  ytmCachedFile,
   ytmConfigured,
   ytmMimeType,
   ytmResolveVideoId,
@@ -58,6 +59,37 @@ const MUSIC_TIMEOUT_MS = 4000;
 // rather than at the public hostname: a loopback hop costs nothing and keeps
 // working when the deploy sits behind Caddy under a name we don't know here.
 const SELF_ORIGIN = `http://127.0.0.1:${Number(process.env.MUSIC_PORT) || 2010}`;
+
+/** Who is asking. The backend sits behind Caddy and, in production, Cloudflare,
+ * so the socket address is always loopback: without this every visitor would
+ * share one rate-limit bucket. Cloudflare's header first, then the
+ * X-Forwarded-For Caddy writes, then the socket. */
+export function clientKey(req: FastifyRequest): string {
+  const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v)?.split(",")[0].trim();
+  return one(req.headers["cf-connecting-ip"]) || one(req.headers["x-forwarded-for"]) || req.ip;
+}
+
+/** Per-minute cap for a route; applied by @fastify/rate-limit (registered in
+ * index.ts, off unless a route asks) with `clientKey` as the bucket. */
+export const perMinute = (max: number) => ({ config: { rateLimit: { max, timeWindow: "1 minute" } } });
+
+// What costs real work is a *cold* resolve: searching YouTube Music and
+// downloading a track with yt-dlp. Cached files and in-flight jobs are cheap,
+// so only a request that would start new work spends from this budget.
+const COLD_PER_MIN = Number(process.env.MUSIC_COLD_PER_MIN) || 20;
+const coldHits = new Map<string, { n: number; reset: number }>();
+export function coldAllowed(key: string, now = Date.now()): boolean {
+  if (coldHits.size > 5000) {
+    for (const [k, v] of coldHits) if (v.reset < now) coldHits.delete(k);
+    if (coldHits.size > 20000) coldHits.clear();
+  }
+  const hit = coldHits.get(key);
+  if (!hit || hit.reset < now) {
+    coldHits.set(key, { n: 1, reset: now + 60_000 });
+    return true;
+  }
+  return ++hit.n <= COLD_PER_MIN;
+}
 
 // Tidal only supplies search results and metadata: its own playback resolves
 // to 30-second previews, so every stream is resolved by ytm.
@@ -757,6 +789,21 @@ interface StreamResult {
   file?: string;
 }
 
+/** What /track and /manifest tell the outside world about a resolved stream.
+ * A local result carries the path of the file on this box's disk and a
+ * loopback URL; neither is anyone else's business, so the URL becomes the
+ * public /stream request that would play it. */
+export function publicStream(result: StreamResult, query: Record<string, unknown>) {
+  const { file, ...rest } = result;
+  if (!file && !result.url.startsWith(SELF_ORIGIN)) return rest;
+  const p = new URLSearchParams();
+  for (const k of ["id", "isrc", "source", "quality", "title", "artist", "duration"]) {
+    const v = query[k];
+    if (typeof v === "string" && v) p.set(k, v);
+  }
+  return { ...rest, url: `/api/music/stream?${p.toString()}` };
+}
+
 interface StreamMeta {
   title?: string;
   artist?: string;
@@ -991,7 +1038,7 @@ async function sendLocalAudio(
 }
 
 export async function musicRoutes(fastify: FastifyInstance) {
-  fastify.get("/api/music/source", async (req, reply) => {
+  fastify.get("/api/music/source", perMinute(60), async (req, reply) => {
     schedulePing();
     const latenciesObj: Record<string, number> = {};
     for (const [k, v] of sourceLatencies.entries()) {
@@ -1007,7 +1054,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     });
   });
 
-  fastify.post("/api/music/ping", async (req, reply) => {
+  fastify.post("/api/music/ping", perMinute(20), async (req, reply) => {
     schedulePing();
     return reply.send({
       current: currentSourcePriority,
@@ -1015,7 +1062,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     });
   });
 
-  fastify.get("/api/music/browse", async (_req, reply) => {
+  fastify.get("/api/music/browse", perMinute(60), async (_req, reply) => {
     const browse = await browseRows();
     // A partial answer (a row or the album feed failed) is not kept by the
     // browser for ten minutes.
@@ -1024,7 +1071,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     return reply.send(browse);
   });
 
-  fastify.get("/api/music/search", async (req, reply) => {
+  fastify.get("/api/music/search", perMinute(60), async (req, reply) => {
     const { q, limit, source } = req.query as {
       q?: string;
       limit?: string;
@@ -1040,7 +1087,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
 
   // A track from YouTube Music has no Tidal ids, so its
   // album and artist links find the Tidal page by name.
-  fastify.get("/api/music/lookup/album", async (req, reply) => {
+  fastify.get("/api/music/lookup/album", perMinute(60), async (req, reply) => {
     const q = req.query as { artist?: string; title?: string };
     const artist = String(q.artist ?? "").trim();
     const title = String(q.title ?? "").trim();
@@ -1056,7 +1103,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.get("/api/music/lookup/artist", async (req, reply) => {
+  fastify.get("/api/music/lookup/artist", perMinute(60), async (req, reply) => {
     const name = String((req.query as { name?: string }).name ?? "").trim();
     if (!name || name.length > LOOKUP_MAX_LENGTH) return musicError(reply, 400, "Artist name required");
     try {
@@ -1069,7 +1116,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.get("/api/music/album/:id", async (req, reply) => {
+  fastify.get("/api/music/album/:id", perMinute(120), async (req, reply) => {
     const { id } = req.params as { id: string };
     if (!TIDAL_ID_RE.test(id)) return musicError(reply, 400, "Invalid album id");
     try {
@@ -1120,7 +1167,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.get("/api/music/artist/:id", async (req, reply) => {
+  fastify.get("/api/music/artist/:id", perMinute(120), async (req, reply) => {
     const { id } = req.params as { id: string };
     if (!TIDAL_ID_RE.test(id)) return musicError(reply, 400, "Invalid artist id");
     try {
@@ -1194,7 +1241,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.get("/api/music/artist/:id/similar", async (req, reply) => {
+  fastify.get("/api/music/artist/:id/similar", perMinute(120), async (req, reply) => {
     const { id } = req.params as { id: string };
     if (!TIDAL_ID_RE.test(id)) return musicError(reply, 400, "Invalid artist id");
     try {
@@ -1222,7 +1269,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.get("/api/music/album/:id/similar", async (req, reply) => {
+  fastify.get("/api/music/album/:id/similar", perMinute(120), async (req, reply) => {
     const { id } = req.params as { id: string };
     if (!TIDAL_ID_RE.test(id)) return musicError(reply, 400, "Invalid album id");
     try {
@@ -1290,9 +1337,16 @@ export async function musicRoutes(fastify: FastifyInstance) {
   },
   );
 
-  fastify.get("/api/music/ytm/audio/:id", async (req, reply) => {
+  fastify.get("/api/music/ytm/audio/:id", perMinute(600), async (req, reply) => {
     const { id } = req.params as { id: string };
     if (!isYtmVideoId(id)) return musicError(reply, 400, "Invalid video id");
+
+    // Anyone can name a video id here, so a track that is not on disk yet (a
+    // new yt-dlp download) spends from the same budget as /stream.
+    if (!(await ytmCachedFile(id)) && !coldAllowed(clientKey(req))) {
+      reply.header("retry-after", "60");
+      return musicError(reply, 429, "Too many requests");
+    }
 
     let file: string;
     try {
@@ -1318,7 +1372,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
   const resolvedStreams = new LruCache<StreamResult>("resolvedStreams", 2000, STREAM_CACHE_TTL_MS);
   const resolving = new Map<string, Promise<StreamResult>>();
 
-  fastify.get("/api/music/stream", async (req, reply) => {
+  fastify.get("/api/music/stream", perMinute(600), async (req, reply) => {
     const { id, quality, isrc, source, title, artist, duration } = req.query as {
       id?: string;
       quality?: string;
@@ -1341,6 +1395,10 @@ export async function musicRoutes(fastify: FastifyInstance) {
       else {
         let job = resolving.get(cacheKey);
         if (!job) {
+          if (!coldAllowed(clientKey(req))) {
+            reply.header("retry-after", "60");
+            return musicError(reply, 429, "Too many requests");
+          }
           job = resolveStreamWithFallback(
             id,
             isrc,
@@ -1405,7 +1463,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.get("/api/music/track", async (req, reply) => {
+  fastify.get("/api/music/track", perMinute(20), async (req, reply) => {
     const { id, quality, isrc, source, title, artist, duration } = req.query as {
       id?: string;
       quality?: string;
@@ -1428,7 +1486,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
         sourceToUse,
         { title, artist, duration: duration ? Number(duration) : undefined },
       );
-      return reply.send(result);
+      return reply.send(publicStream(result, req.query as Record<string, unknown>));
     } catch (error) {
       return musicError(reply, 502, "All stream sources failed", {
         detail: error instanceof Error ? error.message : String(error),
@@ -1436,7 +1494,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     }
   });
 
-  fastify.get("/api/music/manifest", async (req, reply) => {
+  fastify.get("/api/music/manifest", perMinute(20), async (req, reply) => {
     const { id, quality, isrc, artist, title, source, duration } =
       req.query as {
         id?: string;
@@ -1468,7 +1526,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
 
       reply.header("cache-control", "private, max-age=300");
       reply.header("access-control-allow-origin", "*");
-      return reply.send(result);
+      return reply.send(publicStream(result, req.query as Record<string, unknown>));
     } catch (error) {
       return musicError(reply, 502, "All stream sources failed", {
         detail: error instanceof Error ? error.message : String(error),

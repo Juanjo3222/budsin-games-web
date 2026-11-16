@@ -4,7 +4,7 @@ import rateLimit from "@fastify/rate-limit";
 import staticPlugin from "@fastify/static";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { musicRoutes } from "./routes/music";
+import { clientKey, musicRoutes } from "./routes/music";
 import { startCacheSweep } from "./lib/cacheSweep";
 import { artCacheDir } from "./lib/artCache";
 import { r2 } from "./lib/r2";
@@ -16,7 +16,8 @@ const fastify = Fastify({ logger: { level: "info" } });
 async function startServer() {
   await fastify.register(cors, { origin: true });
   // Off unless a route asks for it (the artwork proxy does).
-  await fastify.register(rateLimit, { global: false });
+  // Per visitor, not per socket: behind Caddy every request comes from loopback.
+  await fastify.register(rateLimit, { global: false, keyGenerator: clientKey });
   await fastify.register(staticPlugin, {
     root: path.join(__dirname, "public"),
   });
