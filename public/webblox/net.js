@@ -1,7 +1,18 @@
 // Red de WebBlox: las peticiones del motor a *.roblox.com / *.rbxcdn.com salen por Wisp con epoxy (el TLS termina en el navegador).
 import { rewriteRequest, fixJoinResponse } from "./roblox.js";
 
-export const WISP = "wss://budsin-wisp.onrender.com/wisp/";
+// WebBlox vive en el mismo origen que InvisiProxy (proxy.budsin.dev) y usa SU servidor Wisp. InvisiProxy aleatoriza sus rutas al
+// construirse; proxy.json (lo genera app/scripts/invisiproxy-info.sh en el VPS tras cada build) dice cuál es: {"wisp": "/chromizing/"}.
+// Para pruebas, "wisp" puede ser una URL ws:// o wss:// completa.
+let wispCache = "";
+async function wispUrl() {
+  if (wispCache) return wispCache;
+  const r = await fetch(new URL("proxy.json", import.meta.url), { cache: "no-store" });
+  if (!r.ok) throw new Error("falta proxy.json (ruta del Wisp del proxy)");
+  const { wisp } = await r.json();
+  wispCache = /^wss?:\/\//.test(wisp) ? wisp : `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}${wisp}`;
+  return wispCache;
+}
 const JAR_KEY = "webblox-jar";
 let transport = null, ready = null, join = null, session = "";
 
@@ -12,7 +23,7 @@ function loadEpoxy() {
   if (globalThis.EpoxyTransport) return Promise.resolve(globalThis.EpoxyTransport.default || globalThis.EpoxyTransport);
   return new Promise((res, rej) => {
     const s = document.createElement("script");
-    s.src = "/epoxy/index.js";
+    s.src = new URL("epoxy.js", import.meta.url).href;
     s.onload = () => res(globalThis.EpoxyTransport.default || globalThis.EpoxyTransport);
     s.onerror = () => rej(new Error("no se pudo cargar epoxy"));
     document.head.appendChild(s);
@@ -21,7 +32,7 @@ function loadEpoxy() {
 export function connect() {
   ready ||= (async () => {
     const T = await loadEpoxy();
-    const t = new T({ wisp: WISP });
+    const t = new T({ wisp: await wispUrl() });
     await t.init();
     transport = t;
   })().catch((e) => { ready = null; throw e; });

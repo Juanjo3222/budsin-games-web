@@ -3,7 +3,7 @@
 //
 // Dónde guarda Scramjet su jar de cookies (volcado JSON con claves "dominio@ruta@nombre"):
 //   · Scramjet 1.x (el que usa /proxy/): base "$scramjet" (v1), almacén "cookies", clave "cookies"
-//   · Scramjet 2.x:                       base "__scramjet_controller", almacén "state", clave "cookies"
+//   · Scramjet 2.x (InvisiProxy):         base "__scramjet_controller", almacén "state", clave "cookies", valor {updatedAt, cookies: "<JSON>"}
 const LOCATIONS = [["$scramjet", "cookies", "cookies"], ["__scramjet_controller", "state", "cookies"]];
 
 // IMPORTANTE: nunca debe crearse la base de otro (Scramjet la abre luego en versión 1 y espera sus almacenes: una base vacía
@@ -33,19 +33,30 @@ function readStore(dbName, store, key) {
 }
 const valueOf = (v) => (typeof v === "string" ? v : v && typeof v === "object" ? v.value ?? v.val ?? v.cookie ?? "" : "");
 
+// Acepta los dos formatos: el jar directo (Scramjet 1) o {updatedAt, cookies: "<JSON del jar>"} (controlador de Scramjet 2).
+export function extractRoblosecurity(raw) {
+  let jar = raw;
+  if (typeof jar === "string") { try { jar = JSON.parse(jar); } catch { return ""; } }
+  if (jar && typeof jar === "object" && "cookies" in jar && typeof jar.updatedAt === "number") {
+    jar = jar.cookies;
+    if (typeof jar === "string") { try { jar = JSON.parse(jar); } catch { return ""; } }
+  }
+  if (!jar || typeof jar !== "object") return "";
+  for (const [k, v] of Object.entries(jar)) {
+    const [domain, , name] = k.split("@");
+    if (name === ".ROBLOSECURITY" && /(^|\.)roblox\.com$/.test((domain || "").replace(/^\./, ""))) {
+      let val = valueOf(v);
+      if (val.startsWith(".ROBLOSECURITY=")) val = val.slice(".ROBLOSECURITY=".length).split(";")[0];
+      if (val) return val;
+    }
+  }
+  return "";
+}
+
 export async function roblosecurity() {
   for (const [db, store, key] of LOCATIONS) {
-    let jar = await readStore(db, store, key);
-    if (typeof jar === "string") { try { jar = JSON.parse(jar); } catch { jar = null; } }
-    if (!jar || typeof jar !== "object") continue;
-    for (const [k, v] of Object.entries(jar)) {
-      const [domain, , name] = k.split("@");
-      if (name === ".ROBLOSECURITY" && /(^|\.)roblox\.com$/.test((domain || "").replace(/^\./, ""))) {
-        let val = valueOf(v);
-        if (val.startsWith(".ROBLOSECURITY=")) val = val.slice(".ROBLOSECURITY=".length).split(";")[0];
-        if (val) return val;
-      }
-    }
+    const found = extractRoblosecurity(await readStore(db, store, key));
+    if (found) return found;
   }
   return "";
 }

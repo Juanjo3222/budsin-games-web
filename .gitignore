@@ -74,3 +74,6 @@ __pycache__/
 
 # WebBlox: el motor de Roblox (~220 MB) se descarga con scripts/webblox-fetch.mjs, no se versiona
 public/webblox/engine/
+
+# WebBlox: ruta del Wisp de InvisiProxy (la genera app/scripts/invisiproxy-info.sh en el VPS)
+public/webblox/proxy.json

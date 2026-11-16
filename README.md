@@ -154,6 +154,24 @@ GTA V está disponible en `https://games.budsin.dev/gta-5/` mediante un proxy de
 
 ---
 
+## 🕶️ Budsin Proxy (InvisiProxy LTS)
+
+`proxy.budsin.dev` es [InvisiProxy LTS](https://github.com/InvisiProxy/InvisiProxyLTS) (AGPL-3.0, sin modificar, fijado en el commit `c075470`): Scramjet 2 + su propio servidor Wisp (`wispurr`), todo en un único proceso Node ≥ 26. Sustituye al antiguo proxy de Scramjet 1 + Wisp de Render. `/proxy.html` redirige a `https://proxy.budsin.dev/working`.
+
+| Pieza (en el VPS) | Detalle |
+|---|---|
+| `/opt/node/` | Node 26 (tarball oficial) + pnpm; no toca el Node del sistema. Requiere `libatomic1`. |
+| `/opt/invisiproxy/app/` | Clon del repo (usuario `invisiproxy`), `config.json` con `title` y `port: 8081`. Build: `pnpm install --frozen-lockfile && pnpm exec vite build --configLoader native`. |
+| `invisiproxy.service` | systemd: usuario sin privilegios, `ProtectSystem=strict`, `MemoryMax=1200M`, `TasksMax=512`. No hay Tor ni regiones. |
+| `/etc/invisiproxy.nft` | Tabla nftables cargada por el servicio: el puerto 8081 solo admite loopback (el servidor escucha en `0.0.0.0` y no es configurable) y el usuario `invisiproxy` no puede abrir conexiones nuevas a servicios locales (solo a sus 4 Wisp internos, 4432-4435) ni a la red local/rangos privados. Así ni el Wisp alcanza el servicio de Hosting, PayPal, Caddy o la LAN. |
+| Caddy `http://proxy.budsin.dev:8080` | `reverse_proxy 127.0.0.1:8081` (con `X-Forwarded-For`/`X-Real-IP` = `CF-Connecting-IP`) y `/webblox/*` estático. InvisiProxy recomienda NGINX; por eso las reglas de red de arriba. |
+
+**Actualizar**: `git pull` + build como `invisiproxy`, `systemctl restart invisiproxy` y `bash app/scripts/invisiproxy-info.sh` (cada build cambia las rutas aleatorias). Sin el cron de rebuild de pm2, las rutas solo cambian al reconstruir a mano.
+
+**Riesgo asumido**: el tráfico saliente del proxy sale por la IP de la casa. Se bloquean IPs privadas, IP directa, SMTP (25/465/587) y todo salvo los puertos 80/443 (config por defecto de InvisiProxy).
+
+---
+
 ## 🧱 WebBlox (Roblox en el navegador)
 
 `public/webblox/` ejecuta el **cliente web oficial de Roblox** (`WebClientApp`, una build de Emscripten/wasm con pthreads). No es un port nuestro: se descarga de la CDN de Roblox y se sirve desde este origen. No está afiliado ni respaldado por Roblox Corporation.
@@ -163,19 +181,20 @@ GTA V está disponible en `https://games.budsin.dev/gta-5/` mediante un proxy de
 | `index.html` + `launcher.js` | Lanzador: buscar juegos (`omni-search`), pegar un enlace de Roblox, unirse a un amigo (presencia) y ver si hay sesión. |
 | `player.html` + `player.js` | Página del reproductor (pestaña propia, nunca un iframe): comprueba el entorno, registra el service worker, abre el puente de red y carga `engine/WasmPlayer.js`. |
 | `sw.js` | Service worker (scope `/webblox/`): intercepta las peticiones del motor (página y workers) a `*.roblox.com`/`*.rbxcdn.com` y las pasa a la página. |
-| `net.js` + `roblox.js` | Puente: salen por **Wisp con epoxy** (el TLS termina en el navegador), jar de cookies en `localStorage`, reescrituras de Roblox (`rbx-user-agent`, `join-game` → `join-game-instance`, `gameFqdn`). |
+| `net.js` + `roblox.js` + `epoxy.js` | Puente: salen por el **Wisp de InvisiProxy con epoxy** (el TLS termina en el navegador), jar de cookies en `localStorage`, reescrituras de Roblox (`rbx-user-agent`, `join-game` → `join-game-instance`, `gameFqdn`). |
 | `session.js` | Lee `.ROBLOSECURITY` del jar de Scramjet (`$scramjet`/`cookies`, o `__scramjet_controller`/`state` en Scramjet 2). La sesión se queda en el navegador: Budsin no la recibe. |
 | `engine.json`, `flags.json` | Versión del motor fijada y sus flags (una actualización de flags de Roblox no rompe un motor antiguo). |
 | `engine/<versión>/` | El motor (~220 MB, **no está en git**). Se baja con `python3 app/scripts/webblox-fetch.py`. |
 
 **Despliegue**
-1. Tras el deploy normal, en el VPS: `python3 app/scripts/webblox-fetch.py --root /var/www/budsin-games-web/public/webblox` (y `chown -R github-runner:` de `engine/`). Solo hace falta al fijar una versión nueva (`--latest` consulta y fija la actual).
-2. Caddy debe servir `/webblox/*` con `Cross-Origin-Opener-Policy: same-origin` y `Cross-Origin-Embedder-Policy: credentialless` (el motor usa pthreads sobre `WebAssembly.Memory` compartida). Se usa `credentialless` y no `require-corp` para que sigan cargando AdSense y GTM (regla 5 de `AGENTS.md`). Safari no lo soporta y verá un aviso.
-3. El reproductor necesita WebTransport (el tráfico de juego va directo a `*.qdmux.roblox.com`, no por Wisp) y `?placeId=` en la URL.
+1. WebBlox se sirve desde **`proxy.budsin.dev/webblox/`** (mismo origen que Budsin Proxy, para poder leer su jar de cookies); `games.budsin.dev/webblox/*` redirige allí. Caddy sirve `public/webblox/` en ese host con `Cross-Origin-Opener-Policy: same-origin` y `Cross-Origin-Embedder-Policy: credentialless` (el motor usa pthreads sobre `WebAssembly.Memory` compartida; `credentialless` y no `require-corp` para que sigan cargando AdSense y GTM, regla 5 de `AGENTS.md`; Safari no lo soporta y verá un aviso).
+2. Tras el deploy normal, en el VPS: `python3 app/scripts/webblox-fetch.py --root /var/www/budsin-games-web/public/webblox` ejecutado como `github-runner` (solo hace falta al fijar una versión nueva; `--latest` consulta y fija la actual).
+3. `bash app/scripts/invisiproxy-info.sh` escribe `public/webblox/proxy.json` con la ruta del Wisp de InvisiProxy (se aleatoriza en cada build). No está en git.
+4. El reproductor necesita WebTransport (el tráfico de juego va directo a `*.qdmux.roblox.com`, no por Wisp) y `?placeId=` en la URL.
 
-**Inicio de sesión**: el usuario inicia sesión en roblox.com dentro del navegador integrado (`/proxy/?go=https://www.roblox.com/login`, código por correo) y vuelve a WebBlox. Sin sesión, el servidor de Roblox responde 524 «Not authorized», por eso el reproductor lo avisa antes de cargar el motor.
+**Inicio de sesión**: el usuario abre Budsin Proxy (`proxy.budsin.dev`), pasa su verificación inicial, escribe `roblox.com/login` en la barra, inicia sesión (código por correo) y vuelve a `/webblox/`. `session.js` lee `.ROBLOSECURITY` de `__scramjet_controller` → `state` → `cookies` (`{updatedAt, cookies: "<JSON>"}`, claves `.dominio@ruta@nombre`). Sin sesión, Roblox responde 524 «Not authorized»; el reproductor lo avisa antes de cargar el motor.
 
-**Pendiente / no verificado**: la unión real a un juego necesita una sesión de Roblox válida y no se ha podido probar sin una (el motor arranca, dibuja y completa las peticiones HTTP; con una cookie falsa responde 401 como se espera). La derivación de `gameFqdn` sigue el formato descrito por un despliegue funcional y debe confirmarse con un join real. La interceptación automática del botón «Jugar» de roblox.com dentro de Scramjet requiere un hook que Scramjet 1.1.0 (el de `public/scram/`) no tiene.
+**Pendiente / no verificado**: la unión real a un juego necesita una sesión de Roblox válida y no se ha podido probar sin una (el motor arranca, dibuja y completa las peticiones HTTP; con una cookie falsa responde 401 como se espera). La derivación de `gameFqdn` sigue el formato descrito por un despliegue funcional y debe confirmarse con un join real. La interceptación automática del botón «Jugar» de roblox.com dentro del proxy no está hecha (habría que escribir un plugin de frame de Scramjet 2).
 
 ---
 
@@ -298,6 +317,7 @@ Firebase se usa únicamente para el conteo de popularidad.
 * El Service Worker ya no cachea las rutas `/api/`.
 * **WebBlox** (`public/webblox/`): Roblox en el navegador con el cliente web oficial. Ver la sección «WebBlox».
 * **Budsin Music** (`public/musica/`): buscador y reproductor de música. Backend propio en el VPS (`server/music/`, basado en [x8rr/music](https://github.com/x8rr/music), AGPL-3.0, con un parche para escuchar solo en `127.0.0.1`), detrás de Caddy en `/api/music/*`. El audio sale de YouTube Music vía yt-dlp y la búsqueda de Tidal. Tarjeta nueva en el portal (ES/EN/PT) y enlace al código fuente en la propia página.
+* **Budsin Proxy** pasa a [InvisiProxy LTS](https://github.com/InvisiProxy/InvisiProxyLTS) autoalojado en `proxy.budsin.dev` (ver sección «Budsin Proxy»); WebBlox se sirve desde ese mismo origen.
 * **Proxy**: corregida la carrera de IndexedDB (`'config' is not a known object store name`: la base `$scramjet` se creaba vacía si el service worker llegaba antes que el controlador) y el transporte epoxy (`/epoxy/transport.js`, envoltorio ES que BareMux puede importar). `/proxy/?go=<url>` abre una URL al cargar. Además: `sw.js` carga la configuración de Scramjet desde IndexedDB antes de servir `/scramjet/…` (Scramjet 1.1.0 solo fija su configuración global en `loadConfig()`, y fallaba con «reading 'prefix'»), y `epoxy/transport.js` adapta las cabeceras entre BareMux 2.1.9 (objeto) y epoxy (lista de pares). El proxy crea la base `$scramjet` con sus 5 almacenes antes de registrar el service worker.
 * **Anuncio de vídeo** pequeño al pie de la portada (`public/promo/`): silenciado por defecto, con botón de sonido y de cerrar; se oculta a los usuarios Pro.
 * Botones **Pro** (solo para quien no es Pro) y **Donar** en el dock del menú principal.
