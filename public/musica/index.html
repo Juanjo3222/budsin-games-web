@@ -333,6 +333,8 @@ input[type=range]:hover { --c: var(--accent); }
 @media (max-width: 760px) { .card .cv .albsave { opacity: 1; } .grid-albums { grid-template-columns: repeat(auto-fill, minmax(138px, 1fr)); } }
 
 /* ---------- Tus gustos ---------- */
+.linkbar { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 9px 14px; border-radius: 10px; background: var(--surface, rgba(255,255,255,.06)); color: var(--muted); font-size: .88rem; }
+.linkbar b { color: var(--text, #fff); }
 .why-link { font-size: .78rem; font-weight: 600; color: var(--muted); margin-left: 8px; text-decoration: underline; }
 .why-link:hover { color: var(--text); }
 .tstat { display: grid; grid-template-columns: 28px minmax(0, 1.1fr) minmax(0, 2fr) 70px auto; gap: 12px; align-items: center; padding: 8px 10px; border-radius: 10px; }
@@ -610,7 +612,7 @@ var I18N = {
     feat: 'Destacado', newrel: 'Nuevos lanzamientos', top10: 'Top 10 del momento', recent: 'Escuchado recientemente', genres: 'Explorar por género',
     play: 'Reproducir', pause: 'Pausar', shuffle: 'Aleatorio', prev: 'Anterior', next: 'Siguiente', repeat: 'Repetir', mute: 'Silenciar',
     songs: 'Canciones', artists: 'Artistas', albums: 'Álbumes', eps: 'EPs y sencillos', popular: 'Populares', similar: 'Artistas similares', album: 'Álbum', single: 'Sencillo', ep: 'EP', artist: 'Artista', playlist: 'Playlist',
-    tracks: 'canciones', track1: 'canción', min: 'min', noresults: 'Sin resultados para', searchhint: 'Busca lo que quieras escuchar',
+    tracks: 'canciones', track1: 'canción', min: 'min', noresults: 'Sin resultados para', linkOk: 'Enlace de {p}: buscando «{q}»', linkFail: 'No pude leer ese enlace. Prueba con el nombre de la canción.', searchhint: 'Busca lo que quieras escuchar o pega un enlace de Spotify o YouTube',
     failed: 'No se pudo cargar. Revisa tu conexión.', retry: 'Reintentar', loading: 'Cargando…', loadingTrack: 'Cargando canción…',
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espejo', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arcoíris', pal_neon: 'Neón', pal_fire: 'Fuego',
@@ -641,7 +643,7 @@ var I18N = {
     feat: 'Featured', newrel: 'New releases', top10: 'Top 10 right now', recent: 'Recently played', genres: 'Browse by genre',
     play: 'Play', pause: 'Pause', shuffle: 'Shuffle', prev: 'Previous', next: 'Next', repeat: 'Repeat', mute: 'Mute',
     songs: 'Songs', artists: 'Artists', albums: 'Albums', eps: 'EPs & singles', popular: 'Popular', similar: 'Similar artists', album: 'Album', single: 'Single', ep: 'EP', artist: 'Artist', playlist: 'Playlist',
-    tracks: 'songs', track1: 'song', min: 'min', noresults: 'No results for', searchhint: 'Search for anything you want to hear',
+    tracks: 'songs', track1: 'song', min: 'min', noresults: 'No results for', linkOk: '{p} link: searching “{q}”', linkFail: 'I couldn\'t read that link. Try the song name instead.', searchhint: 'Search for anything you want to hear, or paste a Spotify or YouTube link',
     failed: 'Could not load. Check your connection.', retry: 'Retry', loading: 'Loading…', loadingTrack: 'Loading track…',
     viz: 'Visualizer', viz_bars: 'Bars', viz_mirror: 'Mirror', viz_wave: 'Wave', viz_area: 'Spectrum', viz_circle: 'Circle', viz_particles: 'Particles',
     pal_mint: 'Budsin', pal_rainbow: 'Rainbow', pal_neon: 'Neon', pal_fire: 'Fire',
@@ -672,7 +674,7 @@ var I18N = {
     feat: 'Destaque', newrel: 'Novos lançamentos', top10: 'Top 10 do momento', recent: 'Ouvido recentemente', genres: 'Explorar por gênero',
     play: 'Reproduzir', pause: 'Pausar', shuffle: 'Aleatório', prev: 'Anterior', next: 'Próxima', repeat: 'Repetir', mute: 'Silenciar',
     songs: 'Músicas', artists: 'Artistas', albums: 'Álbuns', eps: 'EPs e singles', popular: 'Populares', similar: 'Artistas semelhantes', album: 'Álbum', single: 'Single', ep: 'EP', artist: 'Artista', playlist: 'Playlist',
-    tracks: 'músicas', track1: 'música', min: 'min', noresults: 'Sem resultados para', searchhint: 'Busque o que quiser ouvir',
+    tracks: 'músicas', track1: 'música', min: 'min', noresults: 'Sem resultados para', linkOk: 'Link do {p}: buscando “{q}”', linkFail: 'Não consegui ler esse link. Tente o nome da música.', searchhint: 'Busque o que quiser ouvir ou cole um link do Spotify ou YouTube',
     failed: 'Não foi possível carregar. Verifique sua conexão.', retry: 'Tentar de novo', loading: 'Carregando…', loadingTrack: 'Carregando música…',
     viz: 'Visualizador', viz_bars: 'Barras', viz_mirror: 'Espelho', viz_wave: 'Onda', viz_area: 'Espectro', viz_circle: 'Círculo', viz_particles: 'Partículas',
     pal_mint: 'Budsin', pal_rainbow: 'Arco-íris', pal_neon: 'Neon', pal_fire: 'Fogo',
@@ -1253,18 +1255,29 @@ function vSearch(tok) {
     return;
   }
   view.innerHTML = '<div class="status">' + esc(t('loading')) + '</div>';
-  api('search?q=' + encodeURIComponent(q)).then(function (d) {
+  // A pasted Spotify / YouTube link: the server reads its title and artist, and we search for that.
+  var linkNote = '';
+  var step = /^https?:\/\//i.test(q)
+    ? api('resolve?url=' + encodeURIComponent(q)).then(function (r) {
+        linkNote = '<div class="linkbar">🔗 <span>' + esc(t('linkOk').replace('{p}', r.provider === 'spotify' ? 'Spotify' : 'YouTube').replace('{q}', r.query)) + '</span></div>';
+        return r.query;
+      })
+    : Promise.resolve(q);
+  step.then(function (sq) { return api('search?q=' + encodeURIComponent(sq)); }, function () { throw 'link'; }).then(function (d) {
     if (tok !== renderToken) return;
     var items = d.items || [], albums = d.albums || [], artists = d.artists || [];
     if (!items.length && !albums.length && !artists.length) {
-      view.innerHTML = '<div class="status"><div class="big">🔍</div>' + esc(t('noresults')) + ' “' + esc(q) + '”</div>'; return;
+      view.innerHTML = linkNote + '<div class="status"><div class="big">🔍</div>' + esc(t('noresults')) + ' “' + esc(q) + '”</div>'; return;
     }
-    var html = '';
+    var html = linkNote;
     if (artists.length) html += rowTitle(t('artists')) + artistCards(artists);
     if (items.length) html += rowTitle(t('songs')) + trackRows(items);
     if (albums.length) html += rowTitle(t('albums')) + albumCards(albums);
     view.innerHTML = html + legalBlock();
-  }).catch(function () { if (tok === renderToken) view.innerHTML = statusErr(); });
+  }).catch(function (e) {
+    if (tok !== renderToken) return;
+    view.innerHTML = e === 'link' ? '<div class="status"><div class="big">🔗</div>' + esc(t('linkFail')) + '</div>' : statusErr();
+  });
 }
 
 /* ---- album ---- */

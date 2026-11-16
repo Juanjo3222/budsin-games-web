@@ -20,6 +20,7 @@ import { r2 } from "../lib/r2";
 import { musicSourceBreaker, SourceParkedError } from "../lib/sourceBreaker";
 import { LruCache } from "../lib/lruCache";
 import { lyricsById, lyricsFor, lyricVersions } from "../lib/lyrics";
+import { resolveLink } from "../lib/resolveLink";
 
 /**
  * Release a response we're not going to read.
@@ -1127,6 +1128,20 @@ export async function musicRoutes(fastify: FastifyInstance) {
     } catch (err) {
       console.warn("[music] lyric versions failed:", err instanceof Error ? err.message : err);
       return musicError(reply, 502, "Lyrics lookup failed");
+    }
+  });
+
+  // A pasted Spotify / YouTube link -> what to search for. Only the title and artist are read; nothing is played from there.
+  fastify.get("/api/music/resolve", perMinute(30), async (req, reply) => {
+    const url = String((req.query as { url?: string }).url ?? "").trim();
+    if (!url || url.length > 300) return musicError(reply, 400, "Link required");
+    try {
+      const out = await resolveLink(url);
+      if (!out) return musicError(reply, 404, "Link not recognised");
+      reply.header("cache-control", "public, max-age=3600");
+      return reply.send(out);
+    } catch {
+      return musicError(reply, 502, "Link lookup failed");
     }
   });
 
