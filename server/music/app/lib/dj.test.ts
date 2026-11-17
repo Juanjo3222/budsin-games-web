@@ -181,3 +181,7 @@ test("too many calls in flight are refused at once instead of piling up", async 
 test("the default daily budget is 5000 units (~1250 selections)", () => {
   expect(budgetLeft()).toBe(5000);
 });
+
+test("the \"artist\" reason is accepted for the opening line", () => {
+  expect(cleanDjInput({ from: {}, to: { title: "Hopes And Dreams", artist: "Toby Fox" }, lang: "es", reason: "artist" })).not.toBeNull();
+});

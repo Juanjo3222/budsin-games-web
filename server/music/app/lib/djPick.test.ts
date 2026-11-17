@@ -145,3 +145,31 @@ test("a selection costs 4 units and a comment 1 of the daily budget", async () =
   await djComment(cleanDjInput({ from: {}, to: { title: "cost-b", artist: "x" }, lang: "es", reason: "first" })!);
   expect(budgetLeft()).toBe(5);
 });
+
+test("artist mode: the prompt asks for that artist's songs first and drops the no-repeat rule", () => {
+  const i = cleanPickInput({ ...good, request: "Toby Fox", mode: "artist" })!;
+  expect(i.mode).toBe("artist");
+  const p = buildPickPrompt(i);
+  expect(p.instructions).toContain("asked for ONE artist");
+  expect(p.instructions).toContain("several in a row is expected");
+  expect(p.instructions).not.toContain("no two songs by the same artist in a row");
+  const normal = buildPickPrompt(cleanPickInput(good)!);
+  expect(normal.instructions).toContain("no two songs by the same artist in a row");
+  expect(normal.instructions).not.toContain("asked for ONE artist");
+});
+
+test("only the exact word \"artist\" turns the mode on", () => {
+  expect(cleanPickInput({ ...good, mode: "artist" })!.mode).toBe("artist");
+  for (const m of ["ARTIST", "artists", "x", 1, null, {}, ["artist"]]) expect(cleanPickInput({ ...good, mode: m as never })!.mode).toBe("");
+});
+
+test("the artist mode is part of the cache key", async () => {
+  let calls = 0;
+  globalThis.fetch = (async () => {
+    calls++;
+    return reply('{"picks":[{"n":0}],"intro":""}');
+  }) as never;
+  await djPick(cleanPickInput({ ...good, request: "Same words" })!);
+  await djPick(cleanPickInput({ ...good, request: "Same words", mode: "artist" })!);
+  expect(calls).toBe(2);
+});

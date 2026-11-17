@@ -38,7 +38,8 @@
       favorite: ['Uno de tus favoritos, {toArtist}. Aquí va {to}.', 'Sé que te gusta {toArtist}. Ahora, {to}.', 'Para ti, de {toArtist}: {to}.'],
       similar: ['Después de {fromArtist}, algo en la misma onda: {to}, de {toArtist}.', 'Si te gustó {from}, esto te va a gustar: {to}, de {toArtist}.', 'Cambiamos un poco: {to}, de {toArtist}.'],
       discover: ['Algo nuevo para ti: {to}, de {toArtist}.', 'Te propongo descubrir a {toArtist} con {to}.', 'A ver qué te parece: {to}, de {toArtist}.'],
-      request: ['Va tu pedido. Empieza {to}, de {toArtist}.', 'Eso viene. Primero, {to}, de {toArtist}.', 'Lo que pediste, con {to}, de {toArtist}.']
+      request: ['Va tu pedido. Empieza {to}, de {toArtist}.', 'Eso viene. Primero, {to}, de {toArtist}.', 'Lo que pediste, con {to}, de {toArtist}.'],
+      artist: ['Pediste a {toArtist}. Arrancamos con {to}.', 'Todo {toArtist}, empezando con {to}.', 'Va {toArtist}: primero, {to}.']
     },
     en: {
       first: ["Hi, I'm DJ Juanjo. We start with {to}, by {toArtist}.", "DJ Juanjo here. Kicking off with {to}, by {toArtist}.", "Welcome in. I'm DJ Juanjo, and we begin with {to}, by {toArtist}."],
@@ -46,7 +47,8 @@
       favorite: ["One of your favorites, {toArtist}. Here's {to}.", "I know you like {toArtist}. Now, {to}.", "For you, from {toArtist}: {to}."],
       similar: ["After {fromArtist}, something in the same vein: {to}, by {toArtist}.", "If you liked {from}, you'll like this: {to}, by {toArtist}.", "Let's shift a little: {to}, by {toArtist}."],
       discover: ["Something new for you: {to}, by {toArtist}.", "Let me introduce you to {toArtist} with {to}.", "Let's see what you think: {to}, by {toArtist}."],
-      request: ["Coming right up. First, {to}, by {toArtist}.", "Your request: {to}, by {toArtist}.", "Here's what you asked for, starting with {to}, by {toArtist}."]
+      request: ["Coming right up. First, {to}, by {toArtist}.", "Your request: {to}, by {toArtist}.", "Here's what you asked for, starting with {to}, by {toArtist}."],
+      artist: ["You asked for {toArtist}. We start with {to}.", "All {toArtist}, beginning with {to}.", "Here comes {toArtist}: first, {to}."]
     },
     pt: {
       first: ['Oi, eu sou o DJ Juanjo. Começamos com {to}, de {toArtist}.', 'Aqui é o DJ Juanjo. Vamos de {to}, de {toArtist}.', 'Bem-vindo. Eu sou o DJ Juanjo e começamos com {to}, de {toArtist}.'],
@@ -54,7 +56,8 @@
       favorite: ['Um dos seus favoritos, {toArtist}. Aí vai {to}.', 'Eu sei que você gosta de {toArtist}. Agora, {to}.', 'Para você, de {toArtist}: {to}.'],
       similar: ['Depois de {fromArtist}, algo na mesma vibe: {to}, de {toArtist}.', 'Se você gostou de {from}, vai gostar disto: {to}, de {toArtist}.', 'Vamos mudar um pouco: {to}, de {toArtist}.'],
       discover: ['Algo novo para você: {to}, de {toArtist}.', 'Vou te apresentar {toArtist} com {to}.', 'Vamos ver o que você acha: {to}, de {toArtist}.'],
-      request: ['Aí vem o seu pedido. Começa {to}, de {toArtist}.', 'Já vai. Primeiro, {to}, de {toArtist}.', 'O que você pediu, com {to}, de {toArtist}.']
+      request: ['Aí vem o seu pedido. Começa {to}, de {toArtist}.', 'Já vai. Primeiro, {to}, de {toArtist}.', 'O que você pediu, com {to}, de {toArtist}.'],
+      artist: ['Você pediu {toArtist}. Começamos com {to}.', 'Tudo de {toArtist}, começando com {to}.', 'Lá vem {toArtist}: primeiro, {to}.']
     }
   };
   var last = '';
