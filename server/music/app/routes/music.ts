@@ -22,6 +22,7 @@ import { LruCache } from "../lib/lruCache";
 import { lyricsById, lyricsFor, lyricVersions } from "../lib/lyrics";
 import { resolveLink } from "../lib/resolveLink";
 import { cleanLines, TARGETS, translateLyrics } from "../lib/translate";
+import { cleanDjInput, DjBudgetError, djComment, djEnabled } from "../lib/dj";
 
 /**
  * Release a response we're not going to read.
@@ -1159,6 +1160,27 @@ export async function musicRoutes(fastify: FastifyInstance) {
     } catch (err) {
       console.warn("[music] translate failed:", err instanceof Error ? err.message : err);
       return musicError(reply, 502, "Translation failed");
+    }
+  });
+
+  // "DJ Juanjo": whether the AI commentary is available, and the line for one transition. The browser falls back to
+  // its own templates on any non-200 answer (503 = off, 429 = today's budget is spent, 502 = the gateway failed).
+  fastify.get("/api/music/dj/status", perMinute(60), async (_req, reply) => {
+    reply.header("cache-control", "public, max-age=60");
+    return reply.send({ ai: djEnabled() });
+  });
+  fastify.post("/api/music/dj", { ...perMinute(10), bodyLimit: 4 * 1024 }, async (req, reply) => {
+    if (!djEnabled()) return musicError(reply, 503, "DJ commentary is off");
+    const input = cleanDjInput(req.body);
+    if (!input) return musicError(reply, 400, "Invalid DJ request");
+    try {
+      const text = await djComment(input);
+      reply.header("cache-control", "no-store");
+      return reply.send({ text });
+    } catch (err) {
+      if (err instanceof DjBudgetError) return musicError(reply, 429, "DJ budget spent for today");
+      console.warn("[music] dj failed:", err instanceof Error ? err.message : err);
+      return musicError(reply, 502, "DJ failed");
     }
   });
 

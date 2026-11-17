@@ -213,6 +213,22 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .tr .like.on:hover { color: var(--accent); }
 .exp { font-size: .6rem; background: #3a404d; color: #ddd; padding: 1px 5px; border-radius: 3px; font-weight: 800; flex: none; }
 .iconbtn[hidden] { display: none; }
+/* DJ Juanjo */
+#djBubble { position: fixed; left: 50%; bottom: calc(var(--player) + var(--nav) + 18px); transform: translate(-50%, 20px); z-index: 90; max-width: min(560px, 92vw); display: flex; gap: 10px; align-items: center; padding: 10px 16px; border-radius: 14px; background: var(--panel); color: var(--text); border: 1px solid var(--accent); box-shadow: 0 10px 30px rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; font-size: .92rem; line-height: 1.35; }
+#djBubble.on { opacity: 1; transform: translate(-50%, 0); }
+#djBubble svg { width: 22px; height: 22px; flex: none; color: var(--accent); }
+#djBubble b { color: var(--accent); margin-right: 4px; }
+#fsv.on ~ #djBubble { bottom: 120px; z-index: 95; }
+.djcard { display: flex; align-items: center; gap: 14px 16px; flex-wrap: wrap; padding: 16px 18px; margin: 0 0 18px; border-radius: 14px; background: linear-gradient(135deg, rgba(var(--tint, 37,208,180), .26), var(--panel2)); border: 1px solid var(--line); }
+.djcard .djic { width: 44px; height: 44px; border-radius: 12px; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; font-size: 24px; flex: none; }
+.djcard .djt { flex: 1 1 220px; min-width: 0; }
+.djcard .djt b { display: block; font-size: 1.05rem; }
+.djcard .djt span { color: var(--muted); font-size: .86rem; line-height: 1.35; }
+.djcard .djq { flex: 2 1 280px; display: flex; gap: 8px; min-width: 0; }
+.djcard .djq input { flex: 1; min-width: 0; padding: 10px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-size: .9rem; }
+.djcard .djq input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+#bDj.on { color: var(--accent); }
+.setrow select { padding: 8px 10px; border-radius: 10px; background: var(--panel2); color: var(--text); border: 1px solid var(--line); font: inherit; font-size: .88rem; max-width: 100%; }
 /* Full-screen "now playing": big cover + big lyrics + controls; a gradient (no blur) so it stays light on the GPU */
 #fsv { position: fixed; inset: 0; z-index: 70; display: none; flex-direction: column; background: #07090c; color: #eef0f4; }
 #fsv.on { display: flex; }
@@ -649,6 +665,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="right">
       <button class="iconbtn" id="bLyr" data-ti="lyr"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></button>
       <button class="iconbtn" id="bViz" data-ti="viz"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>
+      <button class="iconbtn hide-m" id="bDj" data-ti="djTitle"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 00-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7a9 9 0 00-9-9z"/></svg></button>
       <button class="iconbtn hide-m" id="bFs" data-ti="fs"><svg viewBox="0 0 24 24"><path d="M5 5h5v2H7v3H5zm9 0h5v5h-2V7h-3zM5 14h2v3h3v2H5zm12 0h2v5h-5v-2h3z"/></svg></button>
       <button class="iconbtn" id="bNpv" data-ti="npv"><svg viewBox="0 0 24 24"><path d="M3 4h18a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm12 2v12h5V6h-5z"/></svg></button>
       <button class="iconbtn" id="bPip" data-ti="pip" hidden><svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg></button>
@@ -750,6 +767,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </div>
 </div>
+<div id="djBubble" role="status" aria-live="polite"></div>
 <div id="toast" role="status" aria-live="polite"></div>
 <audio id="audio" preload="auto"></audio>
 
@@ -777,7 +795,7 @@ var I18N = {
     acctTitle: 'Cuenta de Budsin', acctPitch: 'Inicia sesión con Google para que tus ♥, playlists y gustos te sigan a todos tus dispositivos y a Budsin Games.', acctIn: 'Iniciar sesión con Google', acctOut: 'Cerrar sesión', acctWipe: 'Borrar mis datos de la nube', acctWipeAsk: '¿Borrar de la nube tus ♥, playlists, gustos y preferencias? Lo guardado en este navegador se queda.', acctWiped: 'Datos de la nube borrados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'No se pudo sincronizar.', acctErrPerm: 'No se pudo sincronizar: faltan permisos en Firestore.', acctSignedOut: 'Sesión cerrada. Se quitaron de este navegador los datos de la cuenta.', acctFail: 'No se pudo iniciar sesión.', acctSdkFail: 'No se pudo cargar el inicio de sesión. Revisa tu conexión.',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
-    lyr: 'Letra', npv: 'Vista de reproducción', settings: 'Ajustes', setTheme: 'Tema', setThemeInfo: 'Elige cómo se ve Budsin Music.', thDark: 'Oscuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Colores y degradado', setColorsInfo: 'El color de la página y el brillo de arriba: sigue la portada de la canción, usa tu propia paleta o déjalo como viene.', lmCover: 'De la portada', lmPalette: 'Paleta', lmDefault: 'Predeterminado', setCustom1: 'Color inicial', setCustom2: 'Color final', setAccentToo: 'Usar también como color de acento', setStrength: 'Intensidad del degradado', setPreview: 'Así se ve el degradado de la página', setReset: 'Restablecer apariencia', setPanel: 'Panel lateral', setPanelInfo: 'Muestra portada y letra al lado de la página. Solo en pantallas anchas.', panOn: 'Activado ✓', panOff: 'Desactivado', noneTitle: 'Portadas sin color', fs: 'Pantalla completa', fsBrowser: 'Pantalla completa del navegador', setPip: 'Mini ventana (PiP)', setPipInfo: 'Cómo se ve la mini ventana flotante. También puedes cambiar el diseño con el botón de la esquina de la propia ventana.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Portada: sí', ppCoverOff: 'Portada: no', ppGradOn: 'Letra con degradado: sí', ppGradOff: 'Letra con degradado: no', pipLayout: 'Cambiar diseño', eggName: 'Asriel Dreemurr', eggDet: '* Estás lleno de determinación.', noneInfo: 'Si la portada es negra, gris o blanca, la página usa esto en vez de quedarse sin color.', nnRainbow: 'Arcoíris', nnBudsin: 'Color de Budsin', nnNeutral: 'Neutro', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
+    lyr: 'Letra', npv: 'Vista de reproducción', settings: 'Ajustes', setTheme: 'Tema', setThemeInfo: 'Elige cómo se ve Budsin Music.', thDark: 'Oscuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Colores y degradado', setColorsInfo: 'El color de la página y el brillo de arriba: sigue la portada de la canción, usa tu propia paleta o déjalo como viene.', lmCover: 'De la portada', lmPalette: 'Paleta', lmDefault: 'Predeterminado', setCustom1: 'Color inicial', setCustom2: 'Color final', setAccentToo: 'Usar también como color de acento', setStrength: 'Intensidad del degradado', setPreview: 'Así se ve el degradado de la página', setReset: 'Restablecer apariencia', setPanel: 'Panel lateral', setPanelInfo: 'Muestra portada y letra al lado de la página. Solo en pantallas anchas.', panOn: 'Activado ✓', panOff: 'Desactivado', noneTitle: 'Portadas sin color', djTitle: 'DJ Juanjo', djTag: 'Tu radio personal: música tuya y nueva, con comentarios entre canciones.', djStart: 'Iniciar DJ', djStopT: 'Apagar DJ', djAskPh: 'Pídele algo: tranquilo, rock, fiesta…', djOnToast: 'DJ Juanjo está al aire', djOffToast: 'DJ apagado', setDjInfo: 'Una radio infinita con lo que ya sabe el algoritmo. Entre canciones habla con la voz de tu navegador. Puedes ajustar cada cuánto habla, el idioma y la voz.', djFreqOften: 'Seguido', djFreqSome: 'De vez en cuando', djFreqOff: 'Sin voz (solo música)', djLangT: 'Idioma del DJ', djLangAuto: 'Automático', djVoiceT: 'Voz', djVoiceAuto: 'Automática', djNoVoice: 'Tu dispositivo no tiene una voz en este idioma: el DJ saldrá solo en texto.', djAiOn: 'Comentarios con IA: sí', djAiOff: 'Comentarios con IA: no', djAiNA: 'La IA no está disponible ahora: se usan plantillas.', djTest: 'Probar la voz', fs: 'Pantalla completa', fsBrowser: 'Pantalla completa del navegador', setPip: 'Mini ventana (PiP)', setPipInfo: 'Cómo se ve la mini ventana flotante. También puedes cambiar el diseño con el botón de la esquina de la propia ventana.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Portada: sí', ppCoverOff: 'Portada: no', ppGradOn: 'Letra con degradado: sí', ppGradOff: 'Letra con degradado: no', pipLayout: 'Cambiar diseño', eggName: 'Asriel Dreemurr', eggDet: '* Estás lleno de determinación.', noneInfo: 'Si la portada es negra, gris o blanca, la página usa esto en vez de quedarse sin color.', nnRainbow: 'Arcoíris', nnBudsin: 'Color de Budsin', nnNeutral: 'Neutro', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
@@ -808,7 +826,7 @@ var I18N = {
     acctTitle: 'Budsin account', acctPitch: 'Sign in with Google so your ♥, playlists and taste follow you to all your devices and to Budsin Games.', acctIn: 'Sign in with Google', acctOut: 'Sign out', acctWipe: 'Delete my cloud data', acctWipeAsk: 'Delete your ♥, playlists, taste and preferences from the cloud? What is saved in this browser stays.', acctWiped: 'Cloud data deleted.', acctConnecting: 'Connecting…', acctSyncing: 'Syncing…', acctSynced: 'Synced ✓', acctErr: 'Could not sync.', acctErrPerm: 'Could not sync: Firestore permissions are missing.', acctSignedOut: 'Signed out. The account data was removed from this browser.', acctFail: 'Could not sign in.', acctSdkFail: 'Could not load sign-in. Check your connection.',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
-    lyr: 'Lyrics', npv: 'Now playing view', settings: 'Settings', setTheme: 'Theme', setThemeInfo: 'Choose how Budsin Music looks.', thDark: 'Dark', thLight: 'Light', thAuto: 'Automatic', setColors: 'Colours and gradient', setColorsInfo: 'The page colour and the glow at the top: follow the song\'s cover, use your own palette or leave it as it comes.', lmCover: 'From the cover', lmPalette: 'Palette', lmDefault: 'Default', setCustom1: 'Start colour', setCustom2: 'End colour', setAccentToo: 'Also use it as the accent colour', setStrength: 'Gradient strength', setPreview: 'This is how the page gradient looks', setReset: 'Reset appearance', setPanel: 'Side panel', setPanelInfo: 'Shows the cover and lyrics beside the page. Wide screens only.', panOn: 'On ✓', panOff: 'Off', noneTitle: 'Covers without colour', fs: 'Full screen', fsBrowser: 'Browser full screen', setPip: 'Mini window (PiP)', setPipInfo: 'How the floating mini window looks. You can also change the layout with the button in the corner of the window itself.', ppFull: 'Full', ppLyrics: 'Lyrics', ppMini: 'Mini', ppCoverOn: 'Cover: on', ppCoverOff: 'Cover: off', ppGradOn: 'Gradient lyrics: on', ppGradOff: 'Gradient lyrics: off', pipLayout: 'Change layout', eggName: 'Asriel Dreemurr', eggDet: '* You\'re filled with determination.', noneInfo: 'If the cover is black, grey or white, the page uses this instead of going colourless.', nnRainbow: 'Rainbow', nnBudsin: 'Budsin colour', nnNeutral: 'Neutral', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
+    lyr: 'Lyrics', npv: 'Now playing view', settings: 'Settings', setTheme: 'Theme', setThemeInfo: 'Choose how Budsin Music looks.', thDark: 'Dark', thLight: 'Light', thAuto: 'Automatic', setColors: 'Colours and gradient', setColorsInfo: 'The page colour and the glow at the top: follow the song\'s cover, use your own palette or leave it as it comes.', lmCover: 'From the cover', lmPalette: 'Palette', lmDefault: 'Default', setCustom1: 'Start colour', setCustom2: 'End colour', setAccentToo: 'Also use it as the accent colour', setStrength: 'Gradient strength', setPreview: 'This is how the page gradient looks', setReset: 'Reset appearance', setPanel: 'Side panel', setPanelInfo: 'Shows the cover and lyrics beside the page. Wide screens only.', panOn: 'On ✓', panOff: 'Off', noneTitle: 'Covers without colour', djTitle: 'DJ Juanjo', djTag: 'Your personal radio: your music and new finds, with comments between songs.', djStart: 'Start DJ', djStopT: 'Stop DJ', djAskPh: 'Ask for something: chill, rock, party…', djOnToast: 'DJ Juanjo is on the air', djOffToast: 'DJ off', setDjInfo: 'An endless radio built from what the algorithm already knows. Between songs it talks with your browser\'s voice. You can adjust how often it talks, the language and the voice.', djFreqOften: 'Often', djFreqSome: 'Sometimes', djFreqOff: 'No voice (music only)', djLangT: 'DJ language', djLangAuto: 'Automatic', djVoiceT: 'Voice', djVoiceAuto: 'Automatic', djNoVoice: 'Your device has no voice for this language: the DJ will show text only.', djAiOn: 'AI comments: on', djAiOff: 'AI comments: off', djAiNA: 'AI is not available right now: templates are used.', djTest: 'Test the voice', fs: 'Full screen', fsBrowser: 'Browser full screen', setPip: 'Mini window (PiP)', setPipInfo: 'How the floating mini window looks. You can also change the layout with the button in the corner of the window itself.', ppFull: 'Full', ppLyrics: 'Lyrics', ppMini: 'Mini', ppCoverOn: 'Cover: on', ppCoverOff: 'Cover: off', ppGradOn: 'Gradient lyrics: on', ppGradOff: 'Gradient lyrics: off', pipLayout: 'Change layout', eggName: 'Asriel Dreemurr', eggDet: '* You\'re filled with determination.', noneInfo: 'If the cover is black, grey or white, the page uses this instead of going colourless.', nnRainbow: 'Rainbow', nnBudsin: 'Budsin colour', nnNeutral: 'Neutral', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
     noPlay: 'Search works, but playback is not available right now.',
@@ -839,7 +857,7 @@ var I18N = {
     acctTitle: 'Conta Budsin', acctPitch: 'Entre com o Google para que seus ♥, playlists e gostos acompanhem você em todos os dispositivos e no Budsin Games.', acctIn: 'Entrar com o Google', acctOut: 'Sair', acctWipe: 'Apagar meus dados da nuvem', acctWipeAsk: 'Apagar da nuvem seus ♥, playlists, gostos e preferências? O que está salvo neste navegador permanece.', acctWiped: 'Dados da nuvem apagados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'Não foi possível sincronizar.', acctErrPerm: 'Não foi possível sincronizar: faltam permissões no Firestore.', acctSignedOut: 'Sessão encerrada. Os dados da conta foram removidos deste navegador.', acctFail: 'Não foi possível entrar.', acctSdkFail: 'Não foi possível carregar o login. Verifique sua conexão.',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
-    lyr: 'Letra', npv: 'Vista de reprodução', settings: 'Configurações', setTheme: 'Tema', setThemeInfo: 'Escolha como o Budsin Music aparece.', thDark: 'Escuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Cores e degradê', setColorsInfo: 'A cor da página e o brilho no topo: seguem a capa da música, usam sua paleta ou ficam como vêm.', lmCover: 'Da capa', lmPalette: 'Paleta', lmDefault: 'Padrão', setCustom1: 'Cor inicial', setCustom2: 'Cor final', setAccentToo: 'Usar também como cor de destaque', setStrength: 'Intensidade do degradê', setPreview: 'Assim fica o degradê da página', setReset: 'Redefinir aparência', setPanel: 'Painel lateral', setPanelInfo: 'Mostra capa e letra ao lado da página. Só em telas largas.', panOn: 'Ativado ✓', panOff: 'Desativado', noneTitle: 'Capas sem cor', fs: 'Tela cheia', fsBrowser: 'Tela cheia do navegador', setPip: 'Mini janela (PiP)', setPipInfo: 'Como fica a mini janela flutuante. Você também pode mudar o layout com o botão no canto da própria janela.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Capa: sim', ppCoverOff: 'Capa: não', ppGradOn: 'Letra com degradê: sim', ppGradOff: 'Letra com degradê: não', pipLayout: 'Mudar layout', eggName: 'Asriel Dreemurr', eggDet: '* Você está cheio de determinação.', noneInfo: 'Se a capa for preta, cinza ou branca, a página usa isto em vez de ficar sem cor.', nnRainbow: 'Arco-íris', nnBudsin: 'Cor do Budsin', nnNeutral: 'Neutro', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
+    lyr: 'Letra', npv: 'Vista de reprodução', settings: 'Configurações', setTheme: 'Tema', setThemeInfo: 'Escolha como o Budsin Music aparece.', thDark: 'Escuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Cores e degradê', setColorsInfo: 'A cor da página e o brilho no topo: seguem a capa da música, usam sua paleta ou ficam como vêm.', lmCover: 'Da capa', lmPalette: 'Paleta', lmDefault: 'Padrão', setCustom1: 'Cor inicial', setCustom2: 'Cor final', setAccentToo: 'Usar também como cor de destaque', setStrength: 'Intensidade do degradê', setPreview: 'Assim fica o degradê da página', setReset: 'Redefinir aparência', setPanel: 'Painel lateral', setPanelInfo: 'Mostra capa e letra ao lado da página. Só em telas largas.', panOn: 'Ativado ✓', panOff: 'Desativado', noneTitle: 'Capas sem cor', djTitle: 'DJ Juanjo', djTag: 'Sua rádio pessoal: sua música e novidades, com comentários entre as músicas.', djStart: 'Iniciar DJ', djStopT: 'Desligar DJ', djAskPh: 'Peça algo: tranquilo, rock, festa…', djOnToast: 'DJ Juanjo está no ar', djOffToast: 'DJ desligado', setDjInfo: 'Uma rádio infinita com o que o algoritmo já sabe. Entre as músicas fala com a voz do seu navegador. Você pode ajustar a frequência, o idioma e a voz.', djFreqOften: 'Sempre', djFreqSome: 'De vez em quando', djFreqOff: 'Sem voz (só música)', djLangT: 'Idioma do DJ', djLangAuto: 'Automático', djVoiceT: 'Voz', djVoiceAuto: 'Automática', djNoVoice: 'Seu dispositivo não tem voz neste idioma: o DJ aparecerá só em texto.', djAiOn: 'Comentários com IA: sim', djAiOff: 'Comentários com IA: não', djAiNA: 'A IA não está disponível agora: são usados modelos.', djTest: 'Testar a voz', fs: 'Tela cheia', fsBrowser: 'Tela cheia do navegador', setPip: 'Mini janela (PiP)', setPipInfo: 'Como fica a mini janela flutuante. Você também pode mudar o layout com o botão no canto da própria janela.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Capa: sim', ppCoverOff: 'Capa: não', ppGradOn: 'Letra com degradê: sim', ppGradOff: 'Letra com degradê: não', pipLayout: 'Mudar layout', eggName: 'Asriel Dreemurr', eggDet: '* Você está cheio de determinação.', noneInfo: 'Se a capa for preta, cinza ou branca, a página usa isto em vez de ficar sem cor.', nnRainbow: 'Arco-íris', nnBudsin: 'Cor do Budsin', nnNeutral: 'Neutro', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
@@ -1261,6 +1279,10 @@ function vSettings() {
     '<div class="setrow" style="margin-top:16px"><span>' + esc(t('setStrength')) + '</span><input type="range" id="lstr" min="0" max="50" value="' + look.str + '"><b id="lstrv">' + look.str + '%</b></div>' +
     '<div class="lookprev"><i>♪</i><span>' + esc(t('setPreview')) + '</span></div>' +
     '<div class="btns" style="margin-top:14px"><button class="btn ghost" id="lookReset">' + esc(t('setReset')) + '</button></div></div>';
+  html += '<div class="box"><h3>🎧 DJ Juanjo</h3><p>' + esc(t('setDjInfo')) + '</p><div class="btns" id="djFreqSeg">' + seg([['often', t('djFreqOften')], ['sometimes', t('djFreqSome')], ['off', t('djFreqOff')]], 'data-djfreq', djcfg.freq) + '</div>' +
+    '<div class="setrow" style="margin-top:14px"><span>' + esc(t('djLangT')) + '</span><select id="djLangSel"><option value="auto">' + esc(t('djLangAuto')) + ' (' + esc(navigator.language || 'en') + ')</option>' + DJ_LANGS.map(function (l) { return '<option value="' + l[0] + '"' + (djcfg.lang === l[0] ? ' selected' : '') + '>' + esc(l[1]) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="setrow" style="margin-top:10px"><span>' + esc(t('djVoiceT')) + '</span><select id="djVoiceSel"></select></div><p id="djVoiceNote" style="margin:8px 0 0"></p>' +
+    '<div class="btns" style="margin-top:12px"><button class="chip' + (djcfg.ai ? ' on' : '') + '" id="djAiBtn">' + esc(t(djcfg.ai ? 'djAiOn' : 'djAiOff')) + '</button><button class="btn ghost" id="djTest">' + esc(t('djTest')) + '</button></div><p id="djAiNote" style="margin:8px 0 0"></p></div>';
   html += '<div class="box"><h3>🪟 ' + esc(t('setPip')) + '</h3><p>' + esc(t('setPipInfo')) + '</p><div class="btns" id="ppSeg">' + seg([['full', t('ppFull')], ['lyrics', t('ppLyrics')], ['mini', t('ppMini')]], 'data-pp', pipcfg.preset) + '</div><div class="btns" style="margin-top:12px"><button class="chip' + (pipcfg.cover ? ' on' : '') + '" id="ppCover">' + esc(t(pipcfg.cover ? 'ppCoverOn' : 'ppCoverOff')) + '</button><button class="chip' + (pipcfg.grad ? ' on' : '') + '" id="ppGrad">' + esc(t(pipcfg.grad ? 'ppGradOn' : 'ppGradOff')) + '</button></div></div>';
   html += '<div class="box"><h3>🪟 ' + esc(t('setPanel')) + '</h3><p>' + esc(t('setPanelInfo')) + '</p><div class="btns"><button class="chip' + (npv.on ? ' on' : '') + '" id="setNpv">' + esc(t(npv.on ? 'panOn' : 'panOff')) + '</button></div></div>';
   view.innerHTML = html + legalBlock();
@@ -1287,6 +1309,20 @@ function vSettings() {
   $('#lstr', view).addEventListener('input', function () { look.str = +this.value; change(); });
   $('#lookReset', view).addEventListener('click', function () { look.theme = 'dark'; look.mode = 'cover'; look.c1 = '#25d0b4'; look.c2 = '#1d4ed8'; look.str = 22; look.acc = false; look.none = 'rainbow'; change(); });
   $('#setNpv', view).addEventListener('click', function () { npv.on = !npv.on; store.set('bm_npv', npv.on ? 1 : 0); npvApply(); this.classList.toggle('on', npv.on); this.textContent = t(npv.on ? 'panOn' : 'panOff'); });
+  window.djFillVoices = function () {
+    var sel = $('#djVoiceSel'); if (!sel) return;
+    var list = djVoices();
+    sel.innerHTML = '<option value="">' + esc(t('djVoiceAuto')) + '</option>' + list.map(function (v) { return '<option value="' + esc(v.name) + '"' + (djcfg.voice === v.name ? ' selected' : '') + '>' + esc(v.name) + ' (' + esc(v.lang) + ')</option>'; }).join('');
+    sel.disabled = !list.length;
+    $('#djVoiceNote').textContent = list.length ? '' : t('djNoVoice');
+  };
+  djFillVoices();
+  djCheckAi().then(function () { var n = $('#djAiNote'); if (n) n.textContent = dj.aiOk ? '' : t('djAiNA'); });
+  $$('[data-djfreq]', view).forEach(function (b) { b.addEventListener('click', function () { djcfg.freq = b.getAttribute('data-djfreq'); djSave(); $$('[data-djfreq]', view).forEach(function (x) { x.classList.toggle('on', x === b); }); }); });
+  $('#djLangSel', view).addEventListener('change', function () { djcfg.lang = this.value; djcfg.voice = ''; djSave(); djFillVoices(); });
+  $('#djVoiceSel', view).addEventListener('change', function () { djcfg.voice = this.value; djSave(); });
+  $('#djAiBtn', view).addEventListener('click', function () { djcfg.ai = !djcfg.ai; djSave(); this.classList.toggle('on', djcfg.ai); this.textContent = t(djcfg.ai ? 'djAiOn' : 'djAiOff'); });
+  $('#djTest', view).addEventListener('click', function () { djSpeak(djTemplate('similar', { title: 'Your Love', artist: 'The Outfield' }, { title: 'Heaven Is A Place On Earth', artist: 'Belinda Carlisle' }), function () {}); });
   var markPp = function () {
     $$('[data-pp]', view).forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-pp') === pipcfg.preset); });
     $('#ppCover', view).classList.toggle('on', pipcfg.cover); $('#ppCover', view).textContent = t(pipcfg.cover ? 'ppCoverOn' : 'ppCoverOff');
@@ -1357,6 +1393,168 @@ function fsvSync() {
   $('#fsvShuf').classList.toggle('on', shuffle); $('#fsvRep').classList.toggle('on', repeat > 0); fsvIc($('#fsvRep'), repeat === 2 ? ICON.rep1 : ICON.rep);
   var vv = muted ? 0 : volume; $('#fsvVol').value = vv; setRange($('#fsvVol'), vv); $('#fsvVolP').textContent = vv + '%'; fsvIc($('#fsvMute'), (muted || volume === 0) ? ICON.mute : ICON.vol);
 }
+/* ---- DJ Juanjo: a personal radio that talks between songs ----
+ * A session (not a playlist): it fills the queue with what the recommender already knows and keeps extending it. Between
+ * two songs it says a short line, spoken with the browser's own voice. The line comes from the server (AI, optional: it
+ * needs a key there) or, whenever that is off, slow or failing, from local templates (ES/EN/PT; any other language
+ * falls back to English). If the device has no voice for the DJ's language the line is shown as text only. */
+var DJT = {
+  es: {
+    first: ['Hola, soy DJ Juanjo. Empezamos con {to}, de {toArtist}.', 'Aquí DJ Juanjo. Arrancamos con {to}, de {toArtist}.', 'Bienvenido. Soy DJ Juanjo y empezamos con {to}, de {toArtist}.'],
+    same_artist: ['Seguimos con {toArtist}: ahora, {to}.', 'Más de {toArtist}. Suena {to}.', '{toArtist} sigue en la cabina con {to}.'],
+    favorite: ['Uno de tus favoritos, {toArtist}. Aquí va {to}.', 'Sé que te gusta {toArtist}. Ahora, {to}.', 'Para ti, de {toArtist}: {to}.'],
+    similar: ['Después de {fromArtist}, algo en la misma onda: {to}, de {toArtist}.', 'Si te gustó {from}, esto te va a gustar: {to}, de {toArtist}.', 'Cambiamos un poco: {to}, de {toArtist}.'],
+    discover: ['Algo nuevo para ti: {to}, de {toArtist}.', 'Te propongo descubrir a {toArtist} con {to}.', 'A ver qué te parece: {to}, de {toArtist}.'],
+    request: ['Va tu pedido. Empieza {to}, de {toArtist}.', 'Eso viene. Primero, {to}, de {toArtist}.', 'Lo que pediste, con {to}, de {toArtist}.']
+  },
+  en: {
+    first: ["Hi, I'm DJ Juanjo. We start with {to}, by {toArtist}.", "DJ Juanjo here. Kicking off with {to}, by {toArtist}.", "Welcome in. I'm DJ Juanjo, and we begin with {to}, by {toArtist}."],
+    same_artist: ["Staying with {toArtist}: here's {to}.", "More {toArtist}. This is {to}.", "{toArtist} is still in the booth with {to}."],
+    favorite: ["One of your favorites, {toArtist}. Here's {to}.", "I know you like {toArtist}. Now, {to}.", "For you, from {toArtist}: {to}."],
+    similar: ["After {fromArtist}, something in the same vein: {to}, by {toArtist}.", "If you liked {from}, you'll like this: {to}, by {toArtist}.", "Let's shift a little: {to}, by {toArtist}."],
+    discover: ["Something new for you: {to}, by {toArtist}.", "Let me introduce you to {toArtist} with {to}.", "Let's see what you think: {to}, by {toArtist}."],
+    request: ["Coming right up. First, {to}, by {toArtist}.", "Your request: {to}, by {toArtist}.", "Here's what you asked for, starting with {to}, by {toArtist}."]
+  },
+  pt: {
+    first: ['Oi, eu sou o DJ Juanjo. Começamos com {to}, de {toArtist}.', 'Aqui é o DJ Juanjo. Vamos de {to}, de {toArtist}.', 'Bem-vindo. Eu sou o DJ Juanjo e começamos com {to}, de {toArtist}.'],
+    same_artist: ['Seguimos com {toArtist}: agora, {to}.', 'Mais de {toArtist}. Toca {to}.', '{toArtist} continua na cabine com {to}.'],
+    favorite: ['Um dos seus favoritos, {toArtist}. Aí vai {to}.', 'Eu sei que você gosta de {toArtist}. Agora, {to}.', 'Para você, de {toArtist}: {to}.'],
+    similar: ['Depois de {fromArtist}, algo na mesma vibe: {to}, de {toArtist}.', 'Se você gostou de {from}, vai gostar disto: {to}, de {toArtist}.', 'Vamos mudar um pouco: {to}, de {toArtist}.'],
+    discover: ['Algo novo para você: {to}, de {toArtist}.', 'Vou te apresentar {toArtist} com {to}.', 'Vamos ver o que você acha: {to}, de {toArtist}.'],
+    request: ['Aí vem o seu pedido. Começa {to}, de {toArtist}.', 'Já vai. Primeiro, {to}, de {toArtist}.', 'O que você pediu, com {to}, de {toArtist}.']
+  }
+};
+var DJ_LANGS = [['es', 'Español'], ['en', 'English'], ['pt', 'Português'], ['fr', 'Français'], ['de', 'Deutsch'], ['it', 'Italiano'], ['nl', 'Nederlands'], ['pl', 'Polski'], ['tr', 'Türkçe'], ['ru', 'Русский'], ['ar', 'العربية'], ['hi', 'हिन्दी'], ['id', 'Bahasa Indonesia'], ['ja', '日本語'], ['ko', '한국어'], ['zh', '中文']];
+var DJ_MOODS = [[/tranquil|relaj|calm|chill|relax|suave|soft|descans/i, 'chill'], [/fiesta|party|baila|danc|festa|reggaet/i, 'party hits'], [/triste|sad|llor|chor|cry/i, 'sad songs'], [/estudi|study|focus|concentr|foco/i, 'lofi study'], [/gym|ejerc|workout|entren|treino|correr|run/i, 'workout'], [/rom[aá]nt|amor|love|amour/i, 'love songs'], [/dorm|sleep|sono|sue[nñ]o/i, 'sleep']];
+var dj = { on: false, pending: null, aiOk: false, aiChecked: false, last: '', speaking: false, token: 0 };
+var djcfg = { freq: store.get('bm_djfreq', 'often'), lang: store.get('bm_djlang', 'auto'), voice: store.get('bm_djvoice', ''), ai: store.get('bm_djai', 1) !== 0 };
+if (['often', 'sometimes', 'off'].indexOf(djcfg.freq) < 0) djcfg.freq = 'often';
+function djSave() { store.set('bm_djfreq', djcfg.freq); store.set('bm_djlang', djcfg.lang); store.set('bm_djvoice', djcfg.voice); store.set('bm_djai', djcfg.ai ? 1 : 0); }
+function djLangTag() { var l = djcfg.lang === 'auto' ? (navigator.language || 'en') : djcfg.lang; return /^[a-z]{2,3}(-[A-Za-z]{2,4})?$/.test(l) ? l : 'en'; }
+function djBase() { return djLangTag().split('-')[0].toLowerCase(); }
+function djVoices() {
+  var v = []; try { v = (window.speechSynthesis && speechSynthesis.getVoices()) || []; } catch (e) {}
+  var b = djBase();
+  return v.filter(function (x) { return String(x.lang).toLowerCase().split(/[-_]/)[0] === b; });
+}
+function djVoice() {
+  var list = djVoices(); if (!list.length) return null;
+  if (djcfg.voice) { var m = list.filter(function (x) { return x.name === djcfg.voice; })[0]; if (m) return m; }
+  var tag = djLangTag().toLowerCase();
+  return list.filter(function (x) { return String(x.lang).toLowerCase().replace('_', '-') === tag; })[0] || list[0];
+}
+function djShort(title) { var x = String(title || '').replace(/\s*[\(\[][^)\]]*[\)\]]/g, '').replace(/\s+[-–—]\s+.*$/, '').trim(); return x || String(title || ''); }
+function djTemplate(reason, from, to) {
+  var tpl = DJT[djBase()] || DJT.en, arr = tpl[reason] || tpl.similar;
+  var pick = arr[Math.floor(Math.random() * arr.length)];
+  if (arr.length > 1 && pick === dj.last) pick = arr[(arr.indexOf(pick) + 1) % arr.length];
+  dj.last = pick;
+  return pick.replace(/\{toArtist\}/g, primaryArtist(to)).replace(/\{to\}/g, djShort(to.title)).replace(/\{fromArtist\}/g, from ? primaryArtist(from) : '').replace(/\{from\}/g, from ? djShort(from.title) : '');
+}
+function djReason(from, to) {
+  if (!from) return 'first';
+  var tk = nk(primaryArtist(to));
+  if (tk && tk === nk(primaryArtist(from))) return 'same_artist';
+  var top = tasteScores().artists.slice(0, 5).map(function (a) { return a.k; });
+  if (top.indexOf(tk) >= 0) return 'favorite';
+  if (to.auto || (taste.artists[tk] && taste.artists[tk].s > 0)) return 'similar';
+  return 'discover';
+}
+function djCheckAi() {
+  if (dj.aiChecked) return Promise.resolve(dj.aiOk);
+  return fetch('/api/music/dj/status').then(function (r) { return r.ok ? r.json() : { ai: false }; }).catch(function () { return { ai: false }; }).then(function (d) { dj.aiChecked = true; dj.aiOk = !!(d && d.ai); return dj.aiOk; });
+}
+function djAsk(from, to, reason) {
+  var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 9000);
+  var one = function (x) { return x ? { title: djShort(x.title), artist: primaryArtist(x) } : {}; };
+  return fetch('/api/music/dj', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: one(from), to: one(to), lang: djLangTag(), reason: reason }), signal: ctl ? ctl.signal : undefined })
+    .then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return d && typeof d.text === 'string' && d.text ? d.text : null; })
+    .catch(function () { return null; }).then(function (x) { clearTimeout(tm); return x; });
+}
+function djBubbleShow(text) {
+  var b = $('#djBubble'); if (!b) return;
+  b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 00-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7a9 9 0 00-9-9z"/></svg><span><b>DJ Juanjo</b>' + esc(text) + '</span>';
+  b.classList.add('on');
+}
+function djBubbleHide() { var b = $('#djBubble'); if (b) b.classList.remove('on'); }
+function djCancel() {
+  dj.token++; dj.speaking = false; djBubbleHide();
+  try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {}
+}
+function djSpeak(text, done) {
+  var my = ++dj.token, over = false;
+  var fin = function () { if (over || my !== dj.token) return; over = true; clearTimeout(tm); dj.speaking = false; setTimeout(function () { if (my === dj.token) djBubbleHide(); }, 600); done(); };
+  var tm = setTimeout(fin, 16000);
+  dj.speaking = true; djBubbleShow(text);
+  var voice = djVoice();
+  if (!('speechSynthesis' in window) || !voice || muted || volume === 0) { setTimeout(fin, Math.min(6000, 1500 + text.length * 45)); return; }   // no voice for this language: text only
+  try {
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = voice.lang; u.voice = voice; u.volume = Math.min(1, volume / 100); u.rate = 1.03;
+    u.onend = fin; u.onerror = fin;
+    speechSynthesis.cancel(); speechSynthesis.speak(u);
+  } catch (e) { fin(); }
+}
+// Look one song ahead as soon as a song starts, so the line is ready (the AI takes a few seconds) when it ends.
+function djOnTrack() {
+  if (!dj.on) return;
+  var c = cur(), nx = queue[qi + 1];
+  if (queue.length - qi <= 3) autoExtend();
+  if (!c || !nx) { dj.pending = null; return; }
+  var key = tid(c) + '>' + tid(nx);
+  if (dj.pending && dj.pending.key === key) return;
+  var reason = djReason(c, nx), pend = dj.pending = { key: key, text: djTemplate(reason, c, nx), ai: null };
+  if (djcfg.freq !== 'off' && djcfg.ai && dj.aiOk) djAsk(c, nx, reason).then(function (txt) { if (txt && dj.pending === pend) pend.ai = txt; });
+}
+// Called when a song ends, before the next one starts: speaks the prepared line (or not, by frequency) and then goes on.
+function djWrap(done) {
+  if (!dj.on || djcfg.freq === 'off' || repeat === 2) return done();
+  var pend = dj.pending, nx = queue[qi + 1];
+  if (!pend || !nx || pend.key !== tid(cur()) + '>' + tid(nx)) return done();
+  if (Math.random() > (djcfg.freq === 'often' ? 0.9 : 0.35)) return done();
+  djSpeak(pend.ai || pend.text, done);
+}
+function djQuery(q) { for (var i = 0; i < DJ_MOODS.length; i++) if (DJ_MOODS[i][0].test(q)) return DJ_MOODS[i][1]; return q; }
+function djStart(request) {
+  djCancel();
+  dj.on = true; dj.pending = null;
+  shuffle = false; store.set('bm_shuffle', false); syncModes();
+  autoplay = true; store.set('bm_autoplay', true); autoplaySync();
+  $('#bDj').classList.add('on');
+  toast(t('djOnToast'));
+  djCheckAi();
+  var run = function (list, reason) {
+    if (!list || !list.length) { dj.on = false; $('#bDj').classList.remove('on'); toast(t('radioNone')); return; }
+    var first = list[0], fallback = djTemplate(reason, null, first), go = function (txt) {
+      if (!dj.on) return;
+      var play = function () { if (dj.on) playList(list.slice(0, 24), 0); };
+      if (djcfg.freq === 'off') play(); else djSpeak(txt, play);
+    };
+    if (djcfg.freq !== 'off' && djcfg.ai) {
+      djCheckAi().then(function (ok) {
+        if (!ok) return go(fallback);
+        var done = false, tmr = setTimeout(function () { if (!done) { done = true; go(fallback); } }, 3500);
+        djAsk(null, first, reason).then(function (txt) { if (done) return; done = true; clearTimeout(tmr); go(txt || fallback); });
+      });
+    } else go(fallback);
+  };
+  if (request) {
+    api('search?q=' + encodeURIComponent(djQuery(request))).then(function (d) { run((d.items || []).slice(0, 24), 'request'); }).catch(function () { run(null); });
+  } else {
+    getRecs().then(function (r) { return r && r.mix && r.mix.length ? r.mix : null; }).catch(function () { return null; })
+      .then(function (mix) { return mix || api('browse').then(function (d) { return ((d.rows || {}).hits || []).slice(0, 24); }); })
+      .then(function (list) { run(list, 'first'); }).catch(function () { run(null); });
+  }
+}
+function djStop() {
+  dj.on = false; dj.pending = null; djCancel();
+  $('#bDj').classList.remove('on');
+  toast(t('djOffToast'));
+}
+function djCardHtml() {
+  return '<div class="djcard"><div class="djic"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 00-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7a9 9 0 00-9-9z"/></svg></div><div class="djt"><b>DJ Juanjo</b><span>' + esc(t('djTag')) + '</span></div>' +
+    '<div class="djq"><input id="djQ" type="text" maxlength="60" placeholder="' + esc(t('djAskPh')) + '" aria-label="' + esc(t('djAskPh')) + '"><button class="btn" id="djGo">' + esc(t(dj.on ? 'djStopT' : 'djStart')) + '</button></div></div>';
+}
 function year(d) { return d ? String(d).slice(0, 4) : ''; }
 
 var toastT;
@@ -1414,6 +1612,7 @@ function setLoading(v) {
   syncPlayBtn();
 }
 function playIndex(i, opts) {
+  if (typeof dj !== 'undefined' && dj.speaking) djCancel();   // the listener chose something while the DJ was talking
   if (i < 0 || i >= queue.length) return;
   tasteEnd(opts && opts.reason ? opts.reason : 'change');
   qi = i;
@@ -1473,7 +1672,7 @@ function togglePlay() {
   if (!audio.getAttribute('src')) { playIndex(qi, { seek: restoreT }); return; }   // sesión restaurada, aún sin cargar
   if (audio.paused) audio.play().catch(function () {}); else { audio.pause(); if (loading) setLoading(false); }
 }
-audio.addEventListener('ended', function () { tasteEnd('ended'); next(true); });
+audio.addEventListener('ended', function () { tasteEnd('ended'); djWrap(function () { next(true); }); });
 audio.addEventListener('error', function () {
   if (!cur()) return;
   setLoading(false);
@@ -1517,6 +1716,15 @@ function applyVol() {
 }
 vol.addEventListener('input', function () { volume = +vol.value; muted = false; store.set('bm_vol', volume); applyVol(); });
 if (pip.ok) $('#bPip').hidden = false;
+$('#bDj').addEventListener('click', function () { if (dj.on) djStop(); else djStart(); });
+document.addEventListener('click', function (e) {
+  if (!e.target.closest || !e.target.closest('#djGo')) return;
+  var q = ($('#djQ') && $('#djQ').value || '').trim();
+  if (dj.on && !q) { djStop(); $('#djGo').textContent = t('djStart'); return; }
+  djStart(q || null); $('#djGo').textContent = t('djStopT');
+});
+document.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target && e.target.id === 'djQ') { e.preventDefault(); var b = $('#djGo'); if (b) { djStart(e.target.value.trim() || null); b.textContent = t('djStopT'); } } });
+if (window.speechSynthesis) speechSynthesis.onvoiceschanged = function () { if (route.name === 'settings' && $('#djVoiceSel')) djFillVoices(); };
 $('#bFs').addEventListener('click', fsvOpen);
 $('#fsvClose').addEventListener('click', fsvClose);
 $('#fsvHome').addEventListener('click', function () { fsvClose(); location.hash = '#/'; });
@@ -1645,6 +1853,7 @@ function updateNowPlaying() {
   dynFor(tr.artwork, tr);
   eggToast(tr);
   fsvRender();
+  djOnTrack();
   if (pip.win) pipRender();
   npvRender();
   updateSeek();
@@ -1913,7 +2122,7 @@ function greeting() { var h = new Date().getHours(); return h < 12 ? t('good_m')
 function vHome(tok) {
   view.innerHTML = '<h1 class="page">' + esc(greeting()) + ' 👋</h1><div class="chips">' +
     GENRES.map(function (g) { return '<a class="chip" href="#/genre/' + g[0] + '">' + g[1] + ' ' + esc(t('g_' + g[0])) + '</a>'; }).join('') + '</div>' +
-    '<div id="homeBody">' + rowTitle(t('loading')) + skeletonRow() + '</div>' + legalBlock();
+    djCardHtml() + '<div id="homeBody">' + rowTitle(t('loading')) + skeletonRow() + '</div>' + legalBlock();
   api('browse').then(function (d) {
     if (tok !== renderToken) return;
     var rows = d.rows || {}, albums = d.albums || [];
