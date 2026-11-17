@@ -9,6 +9,8 @@
  * Las plantillas DJT son copia de las de public/musica/index.html (una prueba del backend avisa si se desincronizan). */
 (function () {
   'use strict';
+  var SRC = (document.currentScript && document.currentScript.src) || '';
+  var API = (/^https?:\/\//.test(SRC) ? SRC.replace(/^(https?:\/\/[^\/]+).*$/, '$1') : location.origin) + '/api/music/';   // absolute: game pages may carry a <base href>
   if (window.BmDj) return;
 
   function ls(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
@@ -78,16 +80,16 @@
   var aiOk = null, voices = null, cool = {};
   function checkAi() {
     if (aiOk !== null) return Promise.resolve(aiOk);
-    return fetch('/api/music/dj/status').then(function (r) { return r.ok ? r.json() : { ai: false }; }).catch(function () { return { ai: false }; }).then(function (d) { aiOk = !!(d && d.ai); return aiOk; });
+    return fetch(API + 'dj/status').then(function (r) { return r.ok ? r.json() : { ai: false }; }).catch(function () { return { ai: false }; }).then(function (d) { aiOk = !!(d && d.ai); return aiOk; });
   }
   function checkVoices() {
     if (voices) return Promise.resolve(voices);
-    return fetch('/api/music/dj/voices').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (d) { voices = { fish: !!(d && d.fish), eleven: !!(d && d.eleven) }; return voices; });
+    return fetch(API + 'dj/voices').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (d) { voices = { fish: !!(d && d.fish), eleven: !!(d && d.eleven) }; return voices; });
   }
   function ask(from, to, reason) {
     var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
     var one = function (x) { return x ? { title: short(x.title), artist: primary(x) } : {}; };
-    return fetch('/api/music/dj', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: one(from), to: one(to), lang: langTag(), reason: reason }), signal: ctl ? ctl.signal : undefined })
+    return fetch(API + 'dj', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: one(from), to: one(to), lang: langTag(), reason: reason }), signal: ctl ? ctl.signal : undefined })
       .then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return d && typeof d.text === 'string' && d.text ? d.text : null; })
       .catch(function () { return null; }).then(function (x) { clearTimeout(tm); return x; });
   }
@@ -99,7 +101,7 @@
     var key = engine + '|' + langBase() + '|' + text;
     if (ttsCache[key]) return ttsCache[key];
     var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 14000);
-    var p = ttsCache[key] = fetch('/api/music/dj/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ engine: engine, text: text, lang: langBase() }), signal: ctl ? ctl.signal : undefined })
+    var p = ttsCache[key] = fetch(API + 'dj/tts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ engine: engine, text: text, lang: langBase() }), signal: ctl ? ctl.signal : undefined })
       .then(function (r) { if (r.status === 429) cool[engine] = Date.now() + 15 * 60000; return r.ok ? r.blob() : null; })
       .then(function (b) { return b && b.size > 200 ? URL.createObjectURL(b) : null; })
       .catch(function () { return null; })
@@ -188,7 +190,7 @@
   var cache = {};
   function getJson(path) {
     if (cache[path]) return Promise.resolve(cache[path]);
-    return fetch('/api/music/' + path).then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); }).then(function (d) { cache[path] = d; return d; });
+    return fetch(API + '' + path).then(function (r) { if (!r.ok) throw new Error('http'); return r.json(); }).then(function (d) { cache[path] = d; return d; });
   }
   function slim(tr, auto) {
     return { id: tr.id, title: tr.title, artist: tr.artist, artistId: tr.artistId, album: tr.album, albumId: tr.albumId, artwork: tr.artwork, duration: tr.duration, explicit: tr.explicit, isrc: tr.isrc, source: tr.source, auto: auto ? 1 : undefined };

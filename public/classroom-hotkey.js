@@ -479,6 +479,26 @@
   }
 
   // ─────────────────────────────────────────────
+  //  Budsin Music menu inside games (floating button + panel, Picture-in-Picture interchangeable). Loaded from bm-mini.js
+  //  in "game" mode. Not in the music page itself, not inside iframes, and it can be turned off in Music settings.
+  // ─────────────────────────────────────────────
+  function ensureMusicMenu() {
+    try {
+      if (window.top !== window) return;
+      if (location.pathname.indexOf("/musica/") === 0) return;
+      if (!/(^|\.)budsin\.dev$/.test(location.hostname) && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") return;
+      if (/^\/(index\.html)?$/.test(location.pathname) || /\/(admin|settings)\.html$/.test(location.pathname)) return;   // the portal has its own card
+      if (localStorage.getItem("bm_gamemenu") === "0") return;
+      if (document.getElementById("bm-music-loader")) return;
+      var s = document.createElement("script");
+      s.id = "bm-music-loader";
+      s.src = "https://games.budsin.dev/bm-mini.js?game=1&v=3";
+      s.async = true;
+      document.head.appendChild(s);
+    } catch (e) {}
+  }
+
+  // ─────────────────────────────────────────────
   //  Focus trap (keeps hotkey responsive when iframe is focused)
   // ─────────────────────────────────────────────
   function ensureFocusTrap() {
@@ -628,6 +648,7 @@
   createOverlay();
   refreshDisguiseMetadata();
   ensureQuickToggleButton();
+  ensureMusicMenu();
   bindIframeHotkeys();
   startActivityListeners();
 
