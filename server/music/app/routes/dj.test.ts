@@ -81,3 +81,50 @@ test("an oversized body is refused", async () => {
   expect(r.statusCode).toBe(413);
   await server.close();
 });
+
+const songs = (n: number) => Array.from({ length: n }, (_, i) => ({ title: "Song " + i, artist: "Artist " + i, fav: i === 0 }));
+const pickBody = { request: "tranquilo", lang: "es", candidates: songs(8), count: 4 };
+const postPick = (server: Awaited<ReturnType<typeof app>>, payload: unknown, ip = "2.2.2.2") =>
+  server.inject({ method: "POST", url: "/api/music/dj/pick", payload: payload as never, headers: { "cf-connecting-ip": ip } });
+
+test("pick: 503 without a key, 400 for bad input", async () => {
+  const server = await app();
+  expect((await postPick(server, pickBody)).statusCode).toBe(503);
+  process.env.DJ_API_KEY = "k";
+  expect((await postPick(server, { ...pickBody, candidates: songs(1) })).statusCode).toBe(400);
+  expect((await postPick(server, { ...pickBody, lang: "no no" })).statusCode).toBe(400);
+  await server.close();
+});
+
+test("pick: returns only numbers that exist in the list, and never the key", async () => {
+  process.env.DJ_API_KEY = "super-secret-key";
+  globalThis.fetch = (async () => new Response(JSON.stringify({ output_text: '{"picks":[{"n":5,"why":"suave"},{"n":99,"why":"inventada"},{"n":2,"why":"sigue"}],"intro":"Vamos con Song 5."}' }), { status: 200 })) as never;
+  const server = await app();
+  const r = await postPick(server, pickBody);
+  expect(r.statusCode).toBe(200);
+  expect(r.json().picks.map((p: { n: number }) => p.n)).toEqual([5, 2]);
+  expect(r.json().intro).toBe("Vamos con Song 5.");
+  expect(r.body).not.toContain("super-secret-key");
+  await server.close();
+});
+
+test("pick: an unusable model answer is a 502, a spent budget a 429, and each visitor has 4 a minute", async () => {
+  process.env.DJ_API_KEY = "k";
+  globalThis.fetch = (async () => new Response(JSON.stringify({ output_text: "no puedo" }), { status: 200 })) as never;
+  const server = await app();
+  expect((await postPick(server, { ...pickBody, request: "uno" }, "3.3.3.3")).statusCode).toBe(502);
+  process.env.DJ_DAILY_MAX = "1";   // the call above already spent it
+  expect((await postPick(server, { ...pickBody, request: "dos" }, "3.3.3.4")).statusCode).toBe(429);
+  delete process.env.DJ_DAILY_MAX;
+  for (let i = 0; i < 4; i++) await postPick(server, { ...pickBody, request: "r" + i }, "4.4.4.4");
+  expect((await postPick(server, { ...pickBody, request: "otra" }, "4.4.4.4")).statusCode).toBe(429);
+  await server.close();
+});
+
+test("pick: an oversized body is refused", async () => {
+  process.env.DJ_API_KEY = "k";
+  const server = await app();
+  const r = await postPick(server, { ...pickBody, request: "x".repeat(20000) });
+  expect(r.statusCode).toBe(413);
+  await server.close();
+});

@@ -22,7 +22,7 @@ import { LruCache } from "../lib/lruCache";
 import { lyricsById, lyricsFor, lyricVersions } from "../lib/lyrics";
 import { resolveLink } from "../lib/resolveLink";
 import { cleanLines, TARGETS, translateLyrics } from "../lib/translate";
-import { cleanDjInput, DjBudgetError, djComment, djEnabled } from "../lib/dj";
+import { cleanDjInput, cleanPickInput, DjBudgetError, djComment, djEnabled, djPick } from "../lib/dj";
 
 /**
  * Release a response we're not going to read.
@@ -1180,6 +1180,23 @@ export async function musicRoutes(fastify: FastifyInstance) {
     } catch (err) {
       if (err instanceof DjBudgetError) return musicError(reply, 429, "DJ budget spent for today");
       console.warn("[music] dj failed:", err instanceof Error ? err.message : err);
+      return musicError(reply, 502, "DJ failed");
+    }
+  });
+
+  // Songs chosen by the AI from a numbered list the browser built (a request such as "something calm", or the next part of the
+  // session). It answers with numbers from that list; anything else is dropped in lib/dj.ts, so it cannot invent songs.
+  fastify.post("/api/music/dj/pick", { ...perMinute(4), bodyLimit: 16 * 1024 }, async (req, reply) => {
+    if (!djEnabled()) return musicError(reply, 503, "DJ commentary is off");
+    const input = cleanPickInput(req.body);
+    if (!input) return musicError(reply, 400, "Invalid DJ request");
+    try {
+      const out = await djPick(input);
+      reply.header("cache-control", "no-store");
+      return reply.send(out);
+    } catch (err) {
+      if (err instanceof DjBudgetError) return musicError(reply, 429, "DJ budget spent for today");
+      console.warn("[music] dj pick failed:", err instanceof Error ? err.message : err);
       return musicError(reply, 502, "DJ failed");
     }
   });
