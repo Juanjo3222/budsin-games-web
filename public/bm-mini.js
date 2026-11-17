@@ -29,12 +29,12 @@
     if (l === 'en' || l === 'pt') lang = l;
   } catch (e) {}
   var TX = {
-    es: { open: 'Abrir Budsin Music', close: 'Cerrar', play: 'Reproducir', pause: 'Pausar', prev: 'Anterior', next: 'Siguiente', tap: 'Toca ▶ para continuar', brand: 'Budsin Music' },
-    en: { open: 'Open Budsin Music', close: 'Close', play: 'Play', pause: 'Pause', prev: 'Previous', next: 'Next', tap: 'Tap ▶ to continue', brand: 'Budsin Music' },
-    pt: { open: 'Abrir Budsin Music', close: 'Fechar', play: 'Reproduzir', pause: 'Pausar', prev: 'Anterior', next: 'Próxima', tap: 'Toque em ▶ para continuar', brand: 'Budsin Music' }
+    es: { open: 'Abrir Budsin Music', close: 'Cerrar', play: 'Reproducir', pause: 'Pausar', prev: 'Anterior', next: 'Siguiente', tap: 'Toca ▶ para continuar', brand: 'Budsin Music', dj: 'DJ Juanjo: activar o desactivar' },
+    en: { open: 'Open Budsin Music', close: 'Close', play: 'Play', pause: 'Pause', prev: 'Previous', next: 'Next', tap: 'Tap ▶ to continue', brand: 'Budsin Music', dj: 'DJ Juanjo: turn on or off' },
+    pt: { open: 'Abrir Budsin Music', close: 'Fechar', play: 'Reproduzir', pause: 'Pausar', prev: 'Anterior', next: 'Próxima', tap: 'Toque em ▶ para continuar', brand: 'Budsin Music', dj: 'DJ Juanjo: ligar ou desligar' }
   }[lang];
 
-  var st = { mode: 'none', remote: null, seenPlaying: false, dismiss: null, q: [], qi: -1, blocked: false, errs: 0 };
+  var st = { mode: 'none', remote: null, seenPlaying: false, dismiss: null, q: [], qi: -1, blocked: false, errs: 0, dj: false, pend: null, say: '', extending: false };
   var a = null;     // <audio> propio, sólo cuando este script tiene la música
   var ui = null;
 
@@ -68,7 +68,65 @@
     };
   }
   function save(closed) {
-    writeSession({ v: 1, ts: Date.now(), owner: 'mini', closed: !!closed, playing: !!a && !a.paused, qi: st.qi, t: a ? (a.currentTime || 0) : 0, queue: st.q });
+    writeSession({ v: 1, ts: Date.now(), owner: 'mini', closed: !!closed, playing: !!a && !a.paused, qi: st.qi, t: a ? (a.currentTime || 0) : 0, queue: st.q, dj: st.dj ? 1 : 0 });
+  }
+
+  /* ---------- DJ Juanjo en el portal ----------
+   * Si el DJ estaba activo al salir de Budsin Music (bandera "dj" en la sesión), sigue aquí: comentarios entre canciones y
+   * la cola que se extiende sola. La lógica vive en bm-dj.js, que solo se descarga cuando hace falta. */
+  var djLoading = null;
+  function loadDj() {
+    if (window.BmDj) return Promise.resolve(window.BmDj);
+    if (djLoading) return djLoading;
+    djLoading = new Promise(function (res) {
+      var sc = document.createElement('script');
+      sc.src = '/bm-dj.js?v=1';
+      sc.onload = function () { if (window.BmDj) window.BmDj.onSay = function (t) { st.say = t || ''; render(); }; res(window.BmDj || null); };
+      sc.onerror = function () { djLoading = null; res(null); };
+      document.head.appendChild(sc);
+    });
+    return djLoading;
+  }
+  function djStop() { st.pend = null; st.say = ''; if (window.BmDj) window.BmDj.cancel(); }
+  // After a song starts: make sure there is a next one, and prepare what the DJ will say between the two.
+  function djPrepare() {
+    if (!st.dj || st.mode !== 'local') return;
+    var c = st.q[st.qi];
+    loadDj().then(function (D) {
+      if (!D || !st.dj || st.mode !== 'local' || st.q[st.qi] !== c || !c) return;
+      var step = function () {
+        if (st.q[st.qi] !== c) return;
+        var nx = st.q[st.qi + 1];
+        if (!nx) { st.pend = null; return; }
+        var key = String(c.id) + '>' + String(nx.id);
+        if (st.pend && st.pend.key === key) return;
+        st.pend = D.prepare(c, nx);
+      };
+      if (st.q.length - st.qi <= 3 && !st.extending) {
+        st.extending = true;
+        D.extend(c, st.q, 12).then(function (add) {
+          st.extending = false;
+          if (st.dj && st.mode === 'local' && add && add.length) { st.q = st.q.concat(add); save(false); }
+          step();
+        }, function () { st.extending = false; step(); });
+      } else step();
+    });
+  }
+  // The song ended: the DJ speaks the prepared line (if this transition was chosen to be spoken) and then the next one starts.
+  function onEnded() {
+    var c = st.q[st.qi], nx = st.q[st.qi + 1];
+    if (st.dj && window.BmDj && st.pend && c && nx && st.pend.key === String(c.id) + '>' + String(nx.id)) {
+      var p = st.pend; st.pend = null;
+      window.BmDj.wrap(p, function () { if (st.mode === 'local') go(1, true); });
+      return;
+    }
+    go(1, true);
+  }
+  function toggleDj() {
+    if (st.mode !== 'local') return;
+    st.dj = !st.dj;
+    if (st.dj) djPrepare(); else djStop();
+    save(false); render();
   }
 
   /* ---------- reproducción local ---------- */
@@ -76,7 +134,7 @@
     if (a) return;
     a = new Audio();
     a.preload = 'auto';
-    a.addEventListener('ended', function () { go(1, true); });
+    a.addEventListener('ended', onEnded);
     a.addEventListener('error', function () {
       if (++st.errs < 3 && st.qi + 1 < st.q.length) go(1, true); else { st.errs = 0; render(); }
     });
@@ -89,6 +147,8 @@
     var tr = st.q[i];
     if (!tr) { stopLocal(); return; }
     st.qi = i; st.blocked = false;
+    if (window.BmDj) window.BmDj.cancel();            // saltar de canción corta lo que el DJ estuviera diciendo
+    st.pend = null; st.say = '';
     a.src = streamUrl(tr);
     if (seekTo > 0) { try { a.currentTime = seekTo; } catch (e) {} }
     var p = a.play();
@@ -97,6 +157,7 @@
     render();
     save(false);
     post({ t: 'hb', from: 'mini', st: snap() });
+    djPrepare();
   }
   function go(d, auto) {
     var n = st.qi + d;
@@ -107,7 +168,8 @@
   function stopLocal() {
     if (a) { a.pause(); a.removeAttribute('src'); try { a.load(); } catch (e) {} }
     var s = readSession();
-    if (s && s.owner === 'mini') { s.playing = false; s.closed = true; s.ts = Date.now(); writeSession(s); }
+    if (s && s.owner === 'mini') { s.playing = false; s.closed = true; s.ts = Date.now(); s.dj = 0; writeSession(s); }
+    djStop(); st.dj = false;
     st.mode = 'none'; st.q = []; st.qi = -1; st.blocked = false;
     render();
   }
@@ -143,8 +205,8 @@
     if (Date.now() - s.ts > 20000) return;
     var cur = readSession();
     if (!cur || cur.ts !== s.ts || !cur.closed) return;           // otra página llegó antes
-    writeSession({ v: 1, ts: Date.now(), owner: 'mini', closed: false, playing: true, qi: s.qi, t: s.t, queue: s.queue });
-    st.mode = 'local'; st.remote = null; st.dismiss = null;
+    writeSession({ v: 1, ts: Date.now(), owner: 'mini', closed: false, playing: true, qi: s.qi, t: s.t, queue: s.queue, dj: s.dj ? 1 : 0 });
+    st.mode = 'local'; st.remote = null; st.dismiss = null; st.dj = !!s.dj; st.pend = null; st.say = '';
     st.q = s.queue.slice(); st.qi = Math.max(0, Math.min(s.qi, s.queue.length - 1));
     ensureAudio();
     post({ t: 'claim', from: 'mini' });
@@ -161,6 +223,7 @@
       render();
     } else if (m.t === 'claim' && st.mode === 'local') {
       if (a) a.pause();                                           // alguien más empezó a sonar
+      djStop(); st.dj = false;
       st.mode = 'none'; render();
     } else if (m.t === 'cmd' && st.mode === 'local' && m.to === id) {
       localCmd(m.a, m.v);
@@ -176,7 +239,8 @@
     prev: '<svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zm3.5 7L19 5v14z"/></svg>',
     next: '<svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM5 5l9.5 7L5 19z"/></svg>',
     close: '<svg viewBox="0 0 24 24"><path d="M6.4 5L5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg>',
-    open: '<svg viewBox="0 0 24 24"><path d="M14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3zM5 5h6v2H5v12h12v-6h2v8H3V5z"/></svg>'
+    open: '<svg viewBox="0 0 24 24"><path d="M14 3v2h3.6l-9.8 9.8 1.4 1.4L19 6.4V10h2V3zM5 5h6v2H5v12h12v-6h2v8H3V5z"/></svg>',
+    dj: '<svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 00-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7a9 9 0 00-9-9z"/></svg>'
   };
   function css() {
     var s = document.createElement('style');
@@ -195,6 +259,8 @@
       '#bm-mini .bmm-t{font-size:.9rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
       '#bm-mini .bmm-a{font-size:.76rem;color:#9aa3b5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
       '#bm-mini .bmm-a.warn{color:#25d0b4;font-weight:700}' +
+      '#bm-mini .bmm-a.say{color:#25d0b4;font-weight:600;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}' +
+      '#bm-mini button.bmm-dj.on{color:#25d0b4;background:rgba(37,208,180,.14)}' +
       '#bm-mini .bmm-ctl{display:flex;align-items:center;gap:2px;flex:none}' +
       '#bm-mini button,#bm-mini a.bmm-b{width:34px;height:34px;border-radius:50%;border:0;background:none;color:#cfd4df;display:grid;place-items:center;cursor:pointer;padding:0;text-decoration:none}' +
       '#bm-mini button:hover,#bm-mini a.bmm-b:hover{background:rgba(255,255,255,.1);color:#fff}' +
@@ -223,6 +289,7 @@
       '<button class="bmm-prev" data-c="prev" aria-label="' + TX.prev + '" title="' + TX.prev + '">' + ICON.prev + '</button>' +
       '<button class="bmm-play" data-c="toggle" aria-label="' + TX.play + '"></button>' +
       '<button data-c="next" aria-label="' + TX.next + '" title="' + TX.next + '">' + ICON.next + '</button>' +
+      '<button class="bmm-dj" data-c="dj" aria-label="' + TX.dj + '" title="' + TX.dj + '" style="display:none">' + ICON.dj + '</button>' +
       '<a class="bmm-b" href="/musica/" aria-label="' + TX.open + '" title="' + TX.open + '">' + ICON.open + '</a>' +
       '<button class="bmm-x" data-c="close" aria-label="' + TX.close + '" title="' + TX.close + '">' + ICON.close + '</button>' +
       '</div></div>';
@@ -234,11 +301,12 @@
         this.setAttribute('data-fb', '1'); this.src = '/api/music/art?u=' + encodeURIComponent(src);
       }
     });
-    ui = { root: root, img: root.querySelector('img'), t: root.querySelector('.bmm-t'), a: root.querySelector('.bmm-a'), play: root.querySelector('.bmm-play'), fill: root.querySelector('.bmm-fill'), bar: root.querySelector('.bmm-bar'), art: null, playing: null, last: {} };
+    ui = { dj: root.querySelector('.bmm-dj'), brand: root.querySelector('.bmm-brand'), root: root, img: root.querySelector('img'), t: root.querySelector('.bmm-t'), a: root.querySelector('.bmm-a'), play: root.querySelector('.bmm-play'), fill: root.querySelector('.bmm-fill'), bar: root.querySelector('.bmm-bar'), art: null, playing: null, last: {} };
     root.addEventListener('click', function (e) {
       var b = e.target.closest('[data-c]');
       if (!b) return;
       var c = b.getAttribute('data-c');
+      if (c === 'dj') { toggleDj(); return; }
       if (c === 'close') {
         if (st.mode === 'local') stopLocal();
         else { var v = view(); if (v) st.dismiss = { id: v.track.id, playing: v.playing }; render(); }
@@ -280,8 +348,12 @@
     document.body.classList.add('has-bmmini');
     if (L.art !== v.track.artwork) { L.art = v.track.artwork; ui.img.removeAttribute('data-fb'); ui.img.src = v.track.artwork || ''; }
     if (L.title !== v.track.title) { L.title = v.track.title; ui.t.textContent = v.track.title || ''; }
-    var sub = st.mode === 'local' && st.blocked && !v.playing ? '!' + TX.tap : (v.track.artist || '');
-    if (L.sub !== sub) { L.sub = sub; var warn = sub.charAt(0) === '!'; ui.a.textContent = warn ? sub.slice(1) : sub; ui.a.className = 'bmm-a' + (warn ? ' warn' : ''); }
+    var sub = st.mode === 'local' && st.say ? '~' + st.say : st.mode === 'local' && st.blocked && !v.playing ? '!' + TX.tap : (v.track.artist || '');
+    if (L.sub !== sub) { L.sub = sub; var warn = sub.charAt(0) === '!', talk = sub.charAt(0) === '~'; ui.a.textContent = warn || talk ? sub.slice(1) : sub; ui.a.className = 'bmm-a' + (warn ? ' warn' : talk ? ' say' : ''); }
+    var djOn = st.mode === 'local' && st.dj;
+    if (L.djOn !== djOn) { L.djOn = djOn; ui.dj.classList.toggle('on', djOn); ui.brand.textContent = TX.brand + (djOn ? ' · DJ' : ''); }
+    var djShow = st.mode === 'local' ? '' : 'none';
+    if (L.djShow !== djShow) { L.djShow = djShow; ui.dj.style.display = djShow; }
     if (L.playing !== v.playing) {
       L.playing = v.playing;
       ui.play.innerHTML = v.playing ? ICON.pause : ICON.play;

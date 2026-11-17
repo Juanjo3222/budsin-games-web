@@ -1492,9 +1492,12 @@ function djVoices() {
 function djVoice() {
   var list = djVoices(); if (!list.length) return null;
   if (djcfg.voice) { var m = list.filter(function (x) { return x.name === djcfg.voice; })[0]; if (m) return m; }
-  var tag = djLangTag().toLowerCase();
-  return list.filter(function (x) { return String(x.lang).toLowerCase().replace('_', '-') === tag; })[0] || list[0];
+  // DJ Juanjo is a man: with no voice chosen, prefer one whose name is a male name, then the exact locale, then any.
+  var tag = djLangTag().toLowerCase(), exact = list.filter(function (x) { return String(x.lang).toLowerCase().replace('_', '-') === tag; });
+  var male = function (x) { return DJ_MALE_VOICE.test(x.name); };
+  return exact.filter(male)[0] || list.filter(male)[0] || exact[0] || list[0];
 }
+var DJ_MALE_VOICE = /\b(jorge|diego|juan|pablo|carlos|raul|raúl|enrique|miguel|antonio|daniel|david|alvaro|álvaro|ricardo|andres|andrés|jose|josé|luis|felipe|paulo|male|hombre|masculin|mark|james|guy|george|ryan|thomas|alex)\b/i;
 function djShort(title) { var x = String(title || '').replace(/\s*[\(\[][^)\]]*[\)\]]/g, '').replace(/\s+[-–—]\s+.*$/, '').trim(); return x || String(title || ''); }
 function djTemplate(reason, from, to) {
   var tpl = DJT[djBase()] || DJT.en, arr = tpl[reason] || tpl.similar;
@@ -1535,6 +1538,14 @@ function djCancel() {
   if (dj.audio) { try { dj.audio.pause(); } catch (e) {} dj.audio = null; }
 }
 /* ---- cloud voices (Fish Audio, ElevenLabs): the server makes the MP3, keys never reach the browser ---- */
+// Coming back from the portal (or a reload) with the DJ on: switch it on without touching the queue that is already there.
+function djResume() {
+  if (dj.on) return;
+  dj.on = true; dj.pending = null;
+  autoplay = true; store.set('bm_autoplay', true); autoplaySync();
+  $('#bDj').classList.add('on'); djmSync();
+  djCheckAi().then(function () { djOnTrack(); }); djCheckVoices();
+}
 function djCheckVoices() {
   if (dj.voicesChecked) return Promise.resolve(dj.voices);
   return fetch('/api/music/dj/voices').then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }).then(function (d) {
@@ -1741,6 +1752,7 @@ function djStart(request) {
 }
 function djStop() {
   dj.on = false; dj.pending = null; djCancel();
+  sessionSave(false);
   $('#bDj').classList.remove('on'); djmSync();
   toast(t('djOffToast'));
 }
@@ -3257,7 +3269,7 @@ function sessionSave(closed) {
   var start = Math.max(0, qi - 3), end = Math.min(queue.length, start + 60);   // una ventana de la cola basta
   store.set(SESSION_KEY, {
     v: 1, ts: Date.now(), owner: 'bm', closed: !!closed, playing: !audio.paused && !!audio.getAttribute('src'),
-    qi: qi - start, t: audio.getAttribute('src') ? (audio.currentTime || 0) : restoreT, queue: queue.slice(start, end)
+    qi: qi - start, t: audio.getAttribute('src') ? (audio.currentTime || 0) : restoreT, queue: queue.slice(start, end), dj: dj.on ? 1 : 0   // dj: the portal's mini player carries the DJ on
   });
 }
 function becomeOwner() { owner = true; bcPost({ t: 'claim', from: 'bm', st: bmState() }); }
@@ -3369,6 +3381,7 @@ function sessionRestore() {
   queue = q; qi = Math.max(0, Math.min(s.qi | 0, q.length - 1)); restoreT = Math.max(0, Number(s.t) || 0);
   updateNowPlaying(); updateMediaSession(); renderQueue();
   var gap = (Date.now() - s.ts) / 1000;
+  if (s.dj) djResume();          // the DJ was on (here or in the portal's mini player): it goes on
   // Venía sonando y se fue hace un momento (Budsin Games, recarga): sigue por donde iba.
   if (s.closed && s.playing && gap < 20) playIndex(qi, { seek: restoreT + gap, auto: true });
 }

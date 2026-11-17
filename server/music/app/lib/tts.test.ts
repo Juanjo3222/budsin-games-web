@@ -47,7 +47,7 @@ test("Fish: sends the key as a bearer token, the free model header and a balance
   expect(seen!.url).toBe("https://api.fish.audio/v1/tts");
   expect(seen!.headers.Authorization).toBe("Bearer fish-secret");
   expect(seen!.headers.model).toBe("s2.1-pro-free");
-  expect(seen!.body).toEqual({ text: "Hola", format: "mp3", latency: "balanced" });
+  expect(seen!.body).toEqual({ text: "Hola", format: "mp3", latency: "balanced", reference_id: "9deec9a061894a93a133d2bf45d2e4c0" });
   process.env.FISH_VOICE_ID = "voice123";
   await speak({ engine: "fish", text: "Otra", lang: "es" });
   expect(seen!.body.reference_id).toBe("voice123");
@@ -61,7 +61,7 @@ test("ElevenLabs: key in xi-api-key, fixed voice in the path, language in the bo
     return mp3();
   }) as never;
   await speak({ engine: "eleven", text: "Hola", lang: "pt" });
-  expect(seen!.url).toContain("/v1/text-to-speech/FGY2WhTYpPnrIDTdsKH5?output_format=mp3_44100_64");
+  expect(seen!.url).toContain("/v1/text-to-speech/TX3LPaxmHKxFdv7VOQHJ?output_format=mp3_44100_64");
   expect(seen!.headers["xi-api-key"]).toBe("eleven-secret");
   expect(seen!.body).toEqual({ text: "Hola", model_id: "eleven_flash_v2_5", language_code: "pt" });
 });

@@ -70,7 +70,7 @@ export function cleanDjInput(body: unknown): DjInput | null {
 
 export function buildPrompt(i: DjInput): { instructions: string; input: string } {
   const instructions =
-    `You are DJ Juanjo, a friendly radio DJ inside the Budsin Music app. ` +
+    `You are DJ Juanjo, a friendly radio DJ inside the Budsin Music app. DJ Juanjo is a man: when the language marks gender (Spanish, Portuguese, French, Italian...), speak about yourself in the masculine. ` +
     `Write ONE or TWO short sentences (at most 40 words) introducing the next song, in the language with BCP-47 code "${i.lang}". ` +
     `Use only the facts given: the titles, the artists and the reason. Never invent facts about the songs, artists, albums, years or charts. ` +
     `No emojis, no hashtags, no quotation marks, no URLs. Keep the titles and artist names exactly as written. ` +
@@ -199,7 +199,7 @@ export function cleanPickInput(body: unknown): PickInput | null {
 
 export function buildPickPrompt(i: PickInput): { instructions: string; input: string } {
   const instructions =
-    `You are DJ Juanjo, a friendly radio DJ inside the Budsin Music app. You choose and order songs ONLY from the numbered list you are given. ` +
+    `You are DJ Juanjo, a friendly radio DJ inside the Budsin Music app. DJ Juanjo is a man: when the language marks gender, speak about yourself in the masculine. You choose and order songs ONLY from the numbered list you are given. ` +
     `Reply with ONLY one JSON object and nothing else: {"picks":[{"n":<number from the list>,"why":"<at most 12 words>"}],"intro":"<one or two short sentences introducing the first pick>"}. ` +
     `Pick up to ${i.count} songs, each number at most once, in an order that flows well (similar mood and energy next to each other, no two songs by the same artist in a row). ` +
     `Songs marked fav=true are by artists the listener likes: put several of them in, mixed with the others. ` +

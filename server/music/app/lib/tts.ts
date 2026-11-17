@@ -22,9 +22,11 @@ const fishUrl = () => (process.env.FISH_API_URL || "https://api.fish.audio").rep
 const elevenUrl = () => (process.env.ELEVENLABS_API_URL || "https://api.elevenlabs.io").replace(/\/+$/, "");
 const fishModel = () => process.env.FISH_MODEL || "s2.1-pro-free";
 const elevenModel = () => process.env.ELEVENLABS_MODEL || "eleven_flash_v2_5";
-// A fixed voice keeps the DJ sounding the same every time (Fish's default voice is not promised to be stable).
-const elevenVoice = () => process.env.ELEVENLABS_VOICE_ID || "FGY2WhTYpPnrIDTdsKH5";
-const fishVoice = () => process.env.FISH_VOICE_ID || "";
+// A fixed voice keeps the DJ sounding the same every time (Fish's no-voice default is not promised to be stable).
+// DJ Juanjo is a man, so the defaults are male voices: Liam (ElevenLabs premade, "energetic") and Adam (a generic male
+// announcer voice from Fish's public library). Both can be replaced from the environment file.
+const elevenVoice = () => process.env.ELEVENLABS_VOICE_ID || "TX3LPaxmHKxFdv7VOQHJ";
+const fishVoice = () => process.env.FISH_VOICE_ID || "9deec9a061894a93a133d2bf45d2e4c0";
 
 export function enginesAvailable(): Record<Engine, boolean> {
   return { fish: !!process.env.FISH_API_KEY, eleven: !!process.env.ELEVENLABS_API_KEY };
