@@ -33,10 +33,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   --bg-rgb: 11,13,16;
   --side-bg: #080a0c; --player-bg: #0a0c10; --queue-bg: #0e1116;
   --menu-bg: #1b1f29; --menu-line: #2c3342; --modal-bg: #12161d; --modal-line: #2a3140;
-  --soft: rgba(255,255,255,.1); --soft-h: rgba(255,255,255,.18); --track: var(--track);
-  --on-accent: var(--on-accent); --chip-text: #cfd4df; --toast-bg: #e8ebf2; --toast-text: #0b0d10;
+  --soft: rgba(255,255,255,.1); --soft-h: rgba(255,255,255,.18); --track: #353b49;
+  --on-accent: #04201b; --chip-text: #cfd4df; --toast-bg: #e8ebf2; --toast-text: #0b0d10;
   --ph1: #2c3342; --ph2: #1a1f29; --ring: rgba(255,255,255,.12);
   --ly: rgba(255,255,255,.34); --ly-h: rgba(255,255,255,.7); --ly-t: rgba(255,255,255,.4); --ly-tc: rgba(255,255,255,.78); --ly-p: rgba(255,255,255,.72); --cur-base: #fff;
+  --ly-prev: rgba(255,255,255,.26); --ly-past: rgba(255,255,255,.14);
+  --fill: linear-gradient(var(--accent), var(--accent));
   --danger: #ff5d6c;
   --side: 232px;
   --player: 84px;
@@ -54,13 +56,14 @@ html[data-theme="light"] {
   --on-accent: #ffffff; --chip-text: #374051; --toast-bg: #171a21; --toast-text: #ffffff;
   --ph1: #dfe3ea; --ph2: #cfd5df; --ring: rgba(0,0,0,.18);
   --ly: rgba(0,0,0,.35); --ly-h: rgba(0,0,0,.7); --ly-t: rgba(0,0,0,.45); --ly-tc: rgba(0,0,0,.75); --ly-p: rgba(0,0,0,.72); --cur-base: #000;
+  --ly-prev: rgba(0,0,0,.26); --ly-past: rgba(0,0,0,.14);
 }
 html[data-theme="light"] #viz, html[data-theme="light"] #lyrics, html[data-theme="light"] .hero {
   color-scheme: dark;
   --bg: #0b0d10; --panel: #12151a; --panel2: #181c23; --hover: #1f2430; --line: #232833;
   --text: #eef0f4; --muted: #8d95a6; --accent: var(--accent-bright, #25d0b4);
-  --soft: rgba(255,255,255,.1); --soft-h: rgba(255,255,255,.18); --track: var(--track);
-  --on-accent: var(--on-accent); --chip-text: #cfd4df; --ring: rgba(255,255,255,.12);
+  --soft: rgba(255,255,255,.1); --soft-h: rgba(255,255,255,.18); --track: #353b49;
+  --on-accent: #04201b; --chip-text: #cfd4df; --ring: rgba(255,255,255,.12);
   --ly: rgba(255,255,255,.34); --ly-h: rgba(255,255,255,.7); --ly-t: rgba(255,255,255,.4); --ly-tc: rgba(255,255,255,.78); --cur-base: #fff;
   color: var(--text);
 }
@@ -210,6 +213,11 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .tr .like.on:hover { color: var(--accent); }
 .exp { font-size: .6rem; background: #3a404d; color: #ddd; padding: 1px 5px; border-radius: 3px; font-weight: 800; flex: none; }
 .iconbtn[hidden] { display: none; }
+.ei { display: inline-block; width: 1em; height: 1em; vertical-align: -.14em; fill: currentColor; flex: none; }
+.box h3 .ei, h1.page .ei, .row-title .ei, .sect .ei { color: var(--accent); }
+.status .big .ei { width: 1.1em; height: 1.1em; color: var(--muted); }
+.volpct { font-size: .74rem; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 2.7em; text-align: right; }
+@media (max-width: 1150px) { .volpct { display: none; } }
 .setrow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: .9rem; color: var(--muted); }
 .setrow input[type=color] { width: 46px; height: 32px; border: 1px solid var(--line); border-radius: 8px; background: none; padding: 2px; cursor: pointer; }
 .setrow input[type=range] { max-width: 260px; }
@@ -222,13 +230,18 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 /* "Now playing" side panel (Spotify-style): cover, title, artist and the lyrics, off by default */
 #npvRs { grid-area: rs; display: none; cursor: col-resize; background: var(--line); touch-action: none; transition: background .15s; }
 #npvRs:hover, #npvRs.drag { background: var(--accent); }
-#npv { grid-area: npv; display: none; flex-direction: column; background: linear-gradient(180deg, rgba(var(--tint, 37,208,180), calc(var(--gs, .22) + .08)), var(--player-bg) 60%); overflow-y: auto; padding: 18px 18px 24px; }
-#npv .npv-art img { width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; background: #1d222c; box-shadow: 0 12px 30px rgba(0,0,0,.5); display: block; }
+#npv { grid-area: npv; display: none; flex-direction: column; background: linear-gradient(180deg, rgba(var(--tint, 37,208,180), calc(var(--gs, .22) + .08)), var(--player-bg) 60%); overflow: hidden; padding: 16px 18px 0; }
+#npv .npv-head { flex: none; }
+#npv .npv-art { display: flex; justify-content: center; }
+#npv .npv-art img { width: min(100%, 30vh); aspect-ratio: 1; border-radius: 12px; object-fit: cover; background: #1d222c; box-shadow: 0 12px 30px rgba(0,0,0,.5); display: block; }
 #npv .npv-t { margin-top: 14px; font-size: 1.25rem; font-weight: 800; color: var(--accent); letter-spacing: -.02em; line-height: 1.2; }
 #npv .npv-a { color: var(--muted); font-size: .92rem; margin-top: 2px; }
 #npv .npv-a a:hover { text-decoration: underline; color: var(--text); }
-#npv .npv-ly { margin-top: 18px; display: flex; flex-direction: column; gap: 12px; }
+#npv .npv-ly { position: relative; margin-top: 14px; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 6px 0 45vh; scrollbar-width: none; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 88%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 88%, transparent 100%); }
+#npv .npv-ly::-webkit-scrollbar { display: none; }
 #npv .npv-line { margin: 0; font-size: 1.05rem; font-weight: 700; line-height: 1.3; color: var(--ly); cursor: pointer; transition: color .25s; overflow-wrap: anywhere; }
+#npv .npv-line.prev { color: var(--ly-prev); }
+#npv .npv-line.past { color: var(--ly-past); }
 #npv .npv-line:hover { color: var(--ly-h); }
 #npv .npv-line.cur { color: color-mix(in srgb, var(--accent) 62%, var(--cur-base)); }
 #npv .npv-line .trl { display: block; margin-top: 2px; font-size: .8em; font-weight: 600; color: var(--ly-t); }
@@ -293,9 +306,9 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .seek span { width: 38px; }
 .seek span:first-child { text-align: right; }
 input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; height: 16px; cursor: pointer; flex: 1; margin: 0; --p: 0%; min-width: 0; }
-input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(to right, var(--accent) var(--p), var(--track) var(--p)); }
+input[type=range]::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(to right, transparent var(--p), var(--track) var(--p)), var(--fill); }
 input[type=range]::-moz-range-track { height: 4px; border-radius: 4px; background: var(--track); }
-input[type=range]::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--accent); }
+input[type=range]::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--fill); }
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; margin-top: -4px; opacity: 0; transition: opacity .1s; }
 input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: #fff; opacity: 0; }
 input[type=range]:hover::-webkit-slider-thumb, input[type=range]:focus-visible::-webkit-slider-thumb { opacity: 1; }
@@ -606,7 +619,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button class="iconbtn" id="bPip" data-ti="pip" hidden><svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg></button>
       <button class="iconbtn" id="bQueue" data-ti="queue"><svg viewBox="0 0 24 24"><path d="M3 6h14v2H3zm0 5h14v2H3zm0 5h9v2H3zm13 0l6-3.5v7z"/></svg></button>
       <button class="iconbtn" id="bMute" data-ti="mute"></button>
-      <input type="range" id="vol" min="0" max="100" value="80" aria-label="Volumen">
+      <input type="range" id="vol" min="0" max="100" value="80" aria-label="Volumen"><span class="volpct" id="volPct"></span>
     </div>
   </section>
 </div>
@@ -707,7 +720,7 @@ var I18N = {
     acctTitle: 'Cuenta de Budsin', acctPitch: 'Inicia sesión con Google para que tus ♥, playlists y gustos te sigan a todos tus dispositivos y a Budsin Games.', acctIn: 'Iniciar sesión con Google', acctOut: 'Cerrar sesión', acctWipe: 'Borrar mis datos de la nube', acctWipeAsk: '¿Borrar de la nube tus ♥, playlists, gustos y preferencias? Lo guardado en este navegador se queda.', acctWiped: 'Datos de la nube borrados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'No se pudo sincronizar.', acctErrPerm: 'No se pudo sincronizar: faltan permisos en Firestore.', acctSignedOut: 'Sesión cerrada. Se quitaron de este navegador los datos de la cuenta.', acctFail: 'No se pudo iniciar sesión.', acctSdkFail: 'No se pudo cargar el inicio de sesión. Revisa tu conexión.',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
-    lyr: 'Letra', npv: 'Vista de reproducción', settings: 'Ajustes', setTheme: 'Tema', setThemeInfo: 'Elige cómo se ve Budsin Music.', thDark: 'Oscuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Colores y degradado', setColorsInfo: 'El color de la página y el brillo de arriba: sigue la portada de la canción, usa tu propia paleta o déjalo como viene.', lmCover: 'De la portada', lmPalette: 'Paleta', lmDefault: 'Predeterminado', setCustom1: 'Color inicial', setCustom2: 'Color final', setAccentToo: 'Usar también como color de acento', setStrength: 'Intensidad del degradado', setPreview: 'Así se ve el degradado de la página', setReset: 'Restablecer apariencia', setPanel: 'Panel lateral', setPanelInfo: 'Muestra portada y letra al lado de la página. Solo en pantallas anchas.', panOn: 'Activado ✓', panOff: 'Desactivado', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
+    lyr: 'Letra', npv: 'Vista de reproducción', settings: 'Ajustes', setTheme: 'Tema', setThemeInfo: 'Elige cómo se ve Budsin Music.', thDark: 'Oscuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Colores y degradado', setColorsInfo: 'El color de la página y el brillo de arriba: sigue la portada de la canción, usa tu propia paleta o déjalo como viene.', lmCover: 'De la portada', lmPalette: 'Paleta', lmDefault: 'Predeterminado', setCustom1: 'Color inicial', setCustom2: 'Color final', setAccentToo: 'Usar también como color de acento', setStrength: 'Intensidad del degradado', setPreview: 'Así se ve el degradado de la página', setReset: 'Restablecer apariencia', setPanel: 'Panel lateral', setPanelInfo: 'Muestra portada y letra al lado de la página. Solo en pantallas anchas.', panOn: 'Activado ✓', panOff: 'Desactivado', noneTitle: 'Portadas sin color', noneInfo: 'Si la portada es negra, gris o blanca, la página usa esto en vez de quedarse sin color.', nnRainbow: 'Arcoíris', nnBudsin: 'Color de Budsin', nnNeutral: 'Neutro', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
@@ -738,7 +751,7 @@ var I18N = {
     acctTitle: 'Budsin account', acctPitch: 'Sign in with Google so your ♥, playlists and taste follow you to all your devices and to Budsin Games.', acctIn: 'Sign in with Google', acctOut: 'Sign out', acctWipe: 'Delete my cloud data', acctWipeAsk: 'Delete your ♥, playlists, taste and preferences from the cloud? What is saved in this browser stays.', acctWiped: 'Cloud data deleted.', acctConnecting: 'Connecting…', acctSyncing: 'Syncing…', acctSynced: 'Synced ✓', acctErr: 'Could not sync.', acctErrPerm: 'Could not sync: Firestore permissions are missing.', acctSignedOut: 'Signed out. The account data was removed from this browser.', acctFail: 'Could not sign in.', acctSdkFail: 'Could not load sign-in. Check your connection.',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
-    lyr: 'Lyrics', npv: 'Now playing view', settings: 'Settings', setTheme: 'Theme', setThemeInfo: 'Choose how Budsin Music looks.', thDark: 'Dark', thLight: 'Light', thAuto: 'Automatic', setColors: 'Colours and gradient', setColorsInfo: 'The page colour and the glow at the top: follow the song\'s cover, use your own palette or leave it as it comes.', lmCover: 'From the cover', lmPalette: 'Palette', lmDefault: 'Default', setCustom1: 'Start colour', setCustom2: 'End colour', setAccentToo: 'Also use it as the accent colour', setStrength: 'Gradient strength', setPreview: 'This is how the page gradient looks', setReset: 'Reset appearance', setPanel: 'Side panel', setPanelInfo: 'Shows the cover and lyrics beside the page. Wide screens only.', panOn: 'On ✓', panOff: 'Off', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
+    lyr: 'Lyrics', npv: 'Now playing view', settings: 'Settings', setTheme: 'Theme', setThemeInfo: 'Choose how Budsin Music looks.', thDark: 'Dark', thLight: 'Light', thAuto: 'Automatic', setColors: 'Colours and gradient', setColorsInfo: 'The page colour and the glow at the top: follow the song\'s cover, use your own palette or leave it as it comes.', lmCover: 'From the cover', lmPalette: 'Palette', lmDefault: 'Default', setCustom1: 'Start colour', setCustom2: 'End colour', setAccentToo: 'Also use it as the accent colour', setStrength: 'Gradient strength', setPreview: 'This is how the page gradient looks', setReset: 'Reset appearance', setPanel: 'Side panel', setPanelInfo: 'Shows the cover and lyrics beside the page. Wide screens only.', panOn: 'On ✓', panOff: 'Off', noneTitle: 'Covers without colour', noneInfo: 'If the cover is black, grey or white, the page uses this instead of going colourless.', nnRainbow: 'Rainbow', nnBudsin: 'Budsin colour', nnNeutral: 'Neutral', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
     noPlay: 'Search works, but playback is not available right now.',
@@ -769,7 +782,7 @@ var I18N = {
     acctTitle: 'Conta Budsin', acctPitch: 'Entre com o Google para que seus ♥, playlists e gostos acompanhem você em todos os dispositivos e no Budsin Games.', acctIn: 'Entrar com o Google', acctOut: 'Sair', acctWipe: 'Apagar meus dados da nuvem', acctWipeAsk: 'Apagar da nuvem seus ♥, playlists, gostos e preferências? O que está salvo neste navegador permanece.', acctWiped: 'Dados da nuvem apagados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'Não foi possível sincronizar.', acctErrPerm: 'Não foi possível sincronizar: faltam permissões no Firestore.', acctSignedOut: 'Sessão encerrada. Os dados da conta foram removidos deste navegador.', acctFail: 'Não foi possível entrar.', acctSdkFail: 'Não foi possível carregar o login. Verifique sua conexão.',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
-    lyr: 'Letra', npv: 'Vista de reprodução', settings: 'Configurações', setTheme: 'Tema', setThemeInfo: 'Escolha como o Budsin Music aparece.', thDark: 'Escuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Cores e degradê', setColorsInfo: 'A cor da página e o brilho no topo: seguem a capa da música, usam sua paleta ou ficam como vêm.', lmCover: 'Da capa', lmPalette: 'Paleta', lmDefault: 'Padrão', setCustom1: 'Cor inicial', setCustom2: 'Cor final', setAccentToo: 'Usar também como cor de destaque', setStrength: 'Intensidade do degradê', setPreview: 'Assim fica o degradê da página', setReset: 'Redefinir aparência', setPanel: 'Painel lateral', setPanelInfo: 'Mostra capa e letra ao lado da página. Só em telas largas.', panOn: 'Ativado ✓', panOff: 'Desativado', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
+    lyr: 'Letra', npv: 'Vista de reprodução', settings: 'Configurações', setTheme: 'Tema', setThemeInfo: 'Escolha como o Budsin Music aparece.', thDark: 'Escuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Cores e degradê', setColorsInfo: 'A cor da página e o brilho no topo: seguem a capa da música, usam sua paleta ou ficam como vêm.', lmCover: 'Da capa', lmPalette: 'Paleta', lmDefault: 'Padrão', setCustom1: 'Cor inicial', setCustom2: 'Cor final', setAccentToo: 'Usar também como cor de destaque', setStrength: 'Intensidade do degradê', setPreview: 'Assim fica o degradê da página', setReset: 'Redefinir aparência', setPanel: 'Painel lateral', setPanelInfo: 'Mostra capa e letra ao lado da página. Só em telas largas.', panOn: 'Ativado ✓', panOff: 'Desativado', noneTitle: 'Capas sem cor', noneInfo: 'Se a capa for preta, cinza ou branca, a página usa isto em vez de ficar sem cor.', nnRainbow: 'Arco-íris', nnBudsin: 'Cor do Budsin', nnNeutral: 'Neutro', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
@@ -842,7 +855,7 @@ document.addEventListener('error', function (e) {
 var dyn = { cache: {}, on: store.get('bm_dyn', 1) !== 0, seq: 0 };
 function dynReset() {
   var st = document.documentElement.style;
-  ['--accent', '--accent2', '--accent-bright', '--tint', '--tint2'].forEach(function (k) { st.removeProperty(k); });
+  ['--accent', '--accent2', '--accent-bright', '--tint', '--tint2', '--fill'].forEach(function (k) { st.removeProperty(k); });
   if (look && look.mode === 'palette') paletteApply();
 }
 function hsl2rgb(h, s, l) {
@@ -881,11 +894,28 @@ function coverColor(data) {      // data: RGBA of a small canvas -> {h, s} or nu
 function dynApply(c) {
   var st = document.documentElement.style, light = !!look && look.eff === 'light';
   if (!c) { dynReset(); return; }
-  if (c.neutral) {      // black / grey / white cover
-    st.setProperty('--accent', light ? 'rgb(64,70,84)' : 'rgb(226,229,236)');
-    st.setProperty('--accent2', light ? 'rgb(110,118,132)' : 'rgb(150,158,172)');
-    st.setProperty('--accent-bright', 'rgb(226,229,236)');
-    st.setProperty('--tint', '70,76,88');
+  st.removeProperty('--fill');
+  if (c.neutral) {      // black / grey / white cover: what the user chose in Settings (Budsin colour, rainbow or neutral)
+    var nm = look ? look.none : 'rainbow';
+    if (nm === 'neutral') {
+      st.setProperty('--accent', light ? 'rgb(64,70,84)' : 'rgb(226,229,236)');
+      st.setProperty('--accent2', light ? 'rgb(110,118,132)' : 'rgb(150,158,172)');
+      st.setProperty('--accent-bright', 'rgb(226,229,236)');
+      st.setProperty('--tint', '70,76,88');
+    } else if (nm === 'budsin') {
+      st.setProperty('--accent', light ? 'rgb(14,159,136)' : 'rgb(37,208,180)');
+      st.setProperty('--accent2', light ? 'rgb(27,127,196)' : 'rgb(31,167,216)');
+      st.setProperty('--accent-bright', 'rgb(37,208,180)');
+      st.setProperty('--tint', '37,208,180');
+      st.setProperty('--tint2', '29,78,216');
+    } else {
+      st.setProperty('--accent', light ? 'rgb(124,58,237)' : 'rgb(192,132,252)');
+      st.setProperty('--accent2', light ? 'rgb(219,39,119)' : 'rgb(244,114,182)');
+      st.setProperty('--accent-bright', 'rgb(192,132,252)');
+      st.setProperty('--tint', '168,85,247');
+      st.setProperty('--tint2', '236,72,153');
+      st.setProperty('--fill', 'linear-gradient(90deg,#ff4d6d,#ffb400,#3ddc84,#2bb0ff,#a855f7)');
+    }
     return;
   }
   var s = Math.min(.85, Math.max(.5, c.s)), a = hsl2rgb(c.h, s, light ? .38 : .6), a2 = hsl2rgb((c.h + 28) % 360, s, light ? .34 : .5), tint = hsl2rgb(c.h, s, .45), br = hsl2rgb(c.h, s, .6);
@@ -898,11 +928,12 @@ function dynApply(c) {
 var LOOK_PALETTES = [['Menta', '#25d0b4', '#1d4ed8'], ['Atardecer', '#ff6a3d', '#ec4899'], ['Océano', '#1fa7d8', '#6366f1'], ['Bosque', '#10b981', '#14532d'], ['Uva', '#8b5cf6', '#ec4899'], ['Fuego', '#ef4444', '#f59e0b'], ['Rosa', '#f472b6', '#8b5cf6'], ['Oro', '#eab308', '#f97316'], ['Medianoche', '#475569', '#1e1b4b'], ['Mono', '#9ca3af', '#374151']];
 var look = {
   theme: store.get('bm_theme', 'dark'), mode: store.get('bm_lookmode', dyn.on ? 'cover' : 'default'),
-  c1: store.get('bm_lc1', '#25d0b4'), c2: store.get('bm_lc2', '#1d4ed8'), str: +store.get('bm_lstr', 22), acc: store.get('bm_lacc', 0) === 1, eff: 'dark'
+  c1: store.get('bm_lc1', '#25d0b4'), c2: store.get('bm_lc2', '#1d4ed8'), str: +store.get('bm_lstr', 22), acc: store.get('bm_lacc', 0) === 1, none: store.get('bm_looknone', 'rainbow'), eff: 'dark'
 };
 if (['dark', 'light', 'auto'].indexOf(look.theme) < 0) look.theme = 'dark';
 if (['cover', 'palette', 'default'].indexOf(look.mode) < 0) look.mode = 'cover';
 if (!(look.str >= 0 && look.str <= 50)) look.str = 22;
+if (['budsin', 'rainbow', 'neutral'].indexOf(look.none) < 0) look.none = 'rainbow';
 dyn.on = look.mode === 'cover';
 function hexRgb(h) { var m = /^#?([0-9a-f]{6})$/i.exec(h || ''); if (!m) return [37, 208, 180]; var n = parseInt(m[1], 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
 function rgbHs(r, g, b) {
@@ -930,7 +961,7 @@ function lookApply() {
 }
 function lookSave() {
   store.set('bm_theme', look.theme); store.set('bm_lookmode', look.mode); store.set('bm_dyn', look.mode === 'cover' ? 1 : 0);
-  store.set('bm_lc1', look.c1); store.set('bm_lc2', look.c2); store.set('bm_lstr', look.str); store.set('bm_lacc', look.acc ? 1 : 0);
+  store.set('bm_lc1', look.c1); store.set('bm_lc2', look.c2); store.set('bm_lstr', look.str); store.set('bm_lacc', look.acc ? 1 : 0); store.set('bm_looknone', look.none);
 }
 function dynFor(src) {
   var my = ++dyn.seq;
@@ -1062,7 +1093,7 @@ function npvRender() {
   if (!npv.on) return;
   var tr = cur(), el = $('#npv');
   if (!tr) { el.innerHTML = '<div class="npv-msg">' + esc(t('lyrNothing')) + '</div>'; return; }
-  el.innerHTML = '<div class="npv-art">' + img(tr.artwork) + '</div><div class="npv-t">' + esc(tr.title) + '</div><div class="npv-a">' + artistLink(tr) + '</div><div class="npv-ly" id="npvLy"></div>';
+  el.innerHTML = '<div class="npv-head"><div class="npv-art">' + img(tr.artwork) + '</div><div class="npv-t">' + esc(tr.title) + '</div><div class="npv-a">' + artistLink(tr) + '</div></div><div class="npv-ly" id="npvLy"></div>';
   npvLyrics();
 }
 function npvLyrics() {
@@ -1090,12 +1121,14 @@ function npvTick(force) {
   var i = lyrIndexAt(audio.currentTime || 0);
   if (i === npv.idx && !force) return;
   npv.idx = i;
-  var old = box.querySelector('.npv-line.cur'); if (old) old.classList.remove('cur');
-  var el = i >= 0 ? box.querySelector('.npv-line[data-i="' + i + '"]') : null;
-  if (el) {
-    el.classList.add('cur');
-    if (force || Date.now() > npv.hold) el.scrollIntoView({ block: 'center', behavior: force ? 'auto' : 'smooth' });
+  // the line being sung is lit, the one just before it is a faint reminder, the rest fade away
+  var lines = box.querySelectorAll('.npv-line');
+  for (var k = 0; k < lines.length; k++) {
+    var cl = lines[k].classList;
+    cl.toggle('cur', k === i); cl.toggle('prev', k === i - 1); cl.toggle('past', k < i - 1);
   }
+  var el = i >= 0 ? box.querySelector('.npv-line[data-i="' + i + '"]') : null;
+  if (el && (force || Date.now() > npv.hold)) box.scrollTo({ top: Math.max(0, el.offsetTop - box.clientHeight * 0.3), behavior: force ? 'auto' : 'smooth' });
 }
 /* ---- Settings page ---- */
 function vSettings() {
@@ -1104,6 +1137,7 @@ function vSettings() {
   var html = '<h1 class="page">⚙ ' + esc(t('settings')) + '</h1>';
   html += '<div class="box"><h3>🌗 ' + esc(t('setTheme')) + '</h3><p>' + esc(t('setThemeInfo')) + '</p><div class="btns" id="thSeg">' + seg([['dark', t('thDark')], ['light', t('thLight')], ['auto', t('thAuto')]], 'data-theme-set', look.theme) + '</div></div>';
   html += '<div class="box"><h3>🎨 ' + esc(t('setColors')) + '</h3><p>' + esc(t('setColorsInfo')) + '</p><div class="btns" id="lmSeg">' + seg([['cover', t('lmCover')], ['palette', t('lmPalette')], ['default', t('lmDefault')]], 'data-lmode', look.mode) + '</div>' +
+    '<div id="nnBlock" style="margin-top:16px"' + (look.mode === 'cover' ? '' : ' hidden') + '><div class="setrow"><span>' + esc(t('noneTitle')) + '</span></div><div class="btns" id="nnSeg" style="margin-top:8px">' + seg([['rainbow', t('nnRainbow')], ['budsin', t('nnBudsin')], ['neutral', t('nnNeutral')]], 'data-none', look.none) + '</div><p style="margin:8px 0 0">' + esc(t('noneInfo')) + '</p></div>' +
     '<div id="palBlock" style="margin-top:16px"' + (look.mode === 'palette' ? '' : ' hidden') + '><div class="btns" id="palSw">' + sw + '</div>' +
     '<div class="setrow" style="margin-top:14px"><label class="setrow">' + esc(t('setCustom1')) + ' <input type="color" id="lc1" value="' + esc(look.c1) + '"></label><label class="setrow">' + esc(t('setCustom2')) + ' <input type="color" id="lc2" value="' + esc(look.c2) + '"></label></div>' +
     '<label class="setrow" style="margin-top:12px"><input type="checkbox" id="lacc"' + (look.acc ? ' checked' : '') + '> ' + esc(t('setAccentToo')) + '</label></div>' +
@@ -1117,6 +1151,8 @@ function vSettings() {
     $$('[data-theme-set]', view).forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-theme-set') === look.theme); });
     $$('[data-lmode]', view).forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-lmode') === look.mode); });
     $('#palBlock', view).hidden = look.mode !== 'palette';
+    $('#nnBlock', view).hidden = look.mode !== 'cover';
+    $$('[data-none]', view).forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-none') === look.none); });
     $$('.palsw', view).forEach(function (b) { var q = LOOK_PALETTES[+b.getAttribute('data-pal')]; b.classList.toggle('on', q[1] === look.c1 && q[2] === look.c2); });
     $('#lc1', view).value = look.c1; $('#lc2', view).value = look.c2; $('#lacc', view).checked = look.acc;
     $('#lstr', view).value = look.str; $('#lstrv', view).textContent = look.str + '%';
@@ -1125,12 +1161,13 @@ function vSettings() {
   var change = function () { lookSave(); lookApply(); mark(); };
   $$('[data-theme-set]', view).forEach(function (b) { b.addEventListener('click', function () { look.theme = b.getAttribute('data-theme-set'); change(); }); });
   $$('[data-lmode]', view).forEach(function (b) { b.addEventListener('click', function () { look.mode = b.getAttribute('data-lmode'); change(); }); });
+  $$('[data-none]', view).forEach(function (b) { b.addEventListener('click', function () { look.none = b.getAttribute('data-none'); change(); }); });
   $$('.palsw', view).forEach(function (b) { b.addEventListener('click', function () { var q = LOOK_PALETTES[+b.getAttribute('data-pal')]; look.c1 = q[1]; look.c2 = q[2]; look.mode = 'palette'; change(); }); });
   $('#lc1', view).addEventListener('input', function () { look.c1 = this.value; look.mode = 'palette'; change(); });
   $('#lc2', view).addEventListener('input', function () { look.c2 = this.value; look.mode = 'palette'; change(); });
   $('#lacc', view).addEventListener('change', function () { look.acc = this.checked; change(); });
   $('#lstr', view).addEventListener('input', function () { look.str = +this.value; change(); });
-  $('#lookReset', view).addEventListener('click', function () { look.theme = 'dark'; look.mode = 'cover'; look.c1 = '#25d0b4'; look.c2 = '#1d4ed8'; look.str = 22; look.acc = false; change(); });
+  $('#lookReset', view).addEventListener('click', function () { look.theme = 'dark'; look.mode = 'cover'; look.c1 = '#25d0b4'; look.c2 = '#1d4ed8'; look.str = 22; look.acc = false; look.none = 'rainbow'; change(); });
   $('#setNpv', view).addEventListener('click', function () { npv.on = !npv.on; store.set('bm_npv', npv.on ? 1 : 0); npvApply(); this.classList.toggle('on', npv.on); this.textContent = t(npv.on ? 'panOn' : 'panOff'); });
   mark();      // fills the strength slider the first time
 }
@@ -1288,6 +1325,7 @@ seek.addEventListener('change', function () { var d = audio.duration; if (isFini
 function applyVol() {
   audio.volume = volume / 100; audio.muted = muted;
   vol.value = muted ? 0 : volume; setRange(vol, muted ? 0 : volume);
+  $('#volPct').textContent = (muted ? 0 : volume) + '%';
   $('#bMute').innerHTML = (muted || volume === 0) ? ICON.mute : ICON.vol;
 }
 vol.addEventListener('input', function () { volume = +vol.value; muted = false; store.set('bm_vol', volume); applyVol(); });
@@ -2559,6 +2597,74 @@ function becomeOwner() { owner = true; bcPost({ t: 'claim', from: 'bm', st: bmSt
 
 audio.addEventListener('play', function () { if (!owner) becomeOwner(); bmBeat(); sessionSave(false); });
 audio.addEventListener('pause', function () { bmBeat(); sessionSave(false); });
+/* ---- emojis -> simple monochrome icons (they follow the text / accent colour) ---- */
+var NOTE = 'M12 3v10.55A4 4 0 1014 17V7h4V3h-6z', HEART = 'M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z';
+var EMOJI_ICONS = {
+  '🎤': 'M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z',
+  '🎶': NOTE, '🎵': NOTE, '🎸': NOTE, '🥁': NOTE, '🎹': NOTE, '💃': NOTE,
+  '▶': 'M8 5v14l11-7z',
+  '📡': 'M12 2a10 10 0 100 20 10 10 0 000-20zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z',
+  '💚': HEART, '💖': HEART,
+  '⏳': 'M6 2v6h.01L6 8.01 10 12l-4 4 .01.01H6V22h12v-5.99h-.01L18 16l-4-4 4-3.99-.01-.01H18V2H6zm10 14.5V20H8v-3.5l4-4 4 4zm-4-5l-4-4V4h8v3.5l-4 4z',
+  '⚙': 'M19.4 13a7.7 7.7 0 000-2l2.1-1.6-2-3.5-2.5 1a7.5 7.5 0 00-1.7-1L15 3.3h-4l-.4 2.6a7.5 7.5 0 00-1.7 1l-2.5-1-2 3.5L6.6 11a7.7 7.7 0 000 2l-2.1 1.6 2 3.5 2.5-1a7.5 7.5 0 001.7 1l.4 2.6h4l.4-2.6a7.5 7.5 0 001.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 110-7 3.5 3.5 0 010 7z',
+  '💿': 'M12 2a10 10 0 100 20 10 10 0 000-20zm0 14a4 4 0 110-8 4 4 0 010 8zm0-6a2 2 0 100 4 2 2 0 000-4z',
+  '🔥': 'M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z',
+  '🎧': 'M12 3a9 9 0 00-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7a9 9 0 00-9-9z',
+  '🌙': 'M12 3a9 9 0 109 9c0-.46-.04-.92-.1-1.36a5.39 5.39 0 01-4.4 2.26 5.4 5.4 0 01-5.4-5.4c0-1.81.89-3.42 2.26-4.4A9.1 9.1 0 0012 3z',
+  '⚡': 'M7 2v11h3v9l7-12h-4l4-8z',
+  '🌊': 'M2 9c2 0 2 2 4 2s2-2 4-2 2 2 4 2 2-2 4-2 2 2 4 2v3c-2 0-2-2-4-2s-2 2-4 2-2-2-4-2-2 2-4 2-2-2-4-2z',
+  '🔗': 'M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z',
+  '🧠': 'M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z',
+  '🌗': 'M12 2a10 10 0 100 20 10 10 0 000-20zm0 18V4a8 8 0 010 16z',
+  '🎨': 'M12 3a9 9 0 100 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zM6.5 12c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z',
+  '🪟': 'M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z',
+  '🌿': 'M4 20C4 10 10 4 20 4c0 10-6 16-16 16z',
+  '👋': '',
+  '🔍': 'M10 3a7 7 0 105.3 11.6l4.6 4.6 1.4-1.4-4.6-4.6A7 7 0 0010 3zm0 2a5 5 0 110 10 5 5 0 010-10z',
+  '📻': 'M3.24 6.15C2.51 6.43 2 7.17 2 8v12c0 1.1.89 2 2 2h16c1.11 0 2-.9 2-2V8c0-1.11-.89-2-2-2H8.3l8.26-3.34L15.88 1 3.24 6.15zM7 20c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-8h-2v-2h-2v2H4V8h16v4z',
+  '🖼': 'M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z',
+  '🌐': 'M12 2a10 10 0 100 20 10 10 0 000-20zm6.9 6h-2.95a15.7 15.7 0 00-1.38-3.56A8.03 8.03 0 0118.9 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14a8.2 8.2 0 010-4h3.38a16.5 16.5 0 000 4H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.99 7.99 0 015.08 16zM8.03 8H5.08a7.99 7.99 0 014.33-3.56A15.7 15.7 0 008.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66a14.7 14.7 0 010-4h4.68a14.7 14.7 0 010 4zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 01-4.33 3.56zM16.36 14a16.5 16.5 0 000-4h3.38a8.2 8.2 0 010 4h-3.38z',
+  '✨': 'M12 2l2.2 6.8L21 11l-6.8 2.2L12 20l-2.2-6.8L3 11l6.8-2.2z'
+};
+var EMOJI_SRC = '(?:' + Object.keys(EMOJI_ICONS).map(function (k) { return k + '\\uFE0F?'; }).join('|') + ')';
+var EMOJI_TEST = new RegExp(EMOJI_SRC, 'u'), EMOJI_SPLIT = new RegExp('(' + EMOJI_SRC + ')', 'u');
+function iconizeText(n) {
+  if (!n.parentNode || !EMOJI_TEST.test(n.nodeValue)) return;
+  var pn = n.parentNode.nodeName;
+  if (pn === 'SCRIPT' || pn === 'STYLE' || pn === 'TEXTAREA' || pn === 'TITLE' || pn === 'OPTION' || pn === 'svg' || pn === 'text') return;
+  var parts = n.nodeValue.split(EMOJI_SPLIT), frag = document.createDocumentFragment();
+  parts.forEach(function (part) {
+    if (!part) return;
+    var key = part.replace(/️/g, '');
+    if (key in EMOJI_ICONS) {
+      if (!EMOJI_ICONS[key]) return;
+      var sv = document.createElementNS('http://www.w3.org/2000/svg', 'svg'), pa = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      sv.setAttribute('viewBox', '0 0 24 24'); sv.setAttribute('class', 'ei'); sv.setAttribute('aria-hidden', 'true'); pa.setAttribute('d', EMOJI_ICONS[key]); sv.appendChild(pa); frag.appendChild(sv);
+    } else frag.appendChild(document.createTextNode(part));
+  });
+  n.parentNode.replaceChild(frag, n);
+}
+function iconize(root) {
+  if (root.nodeType === 3) { iconizeText(root); return; }
+  if (root.nodeType !== 1 || root.nodeName === 'SCRIPT' || root.nodeName === 'STYLE') return;
+  var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT), list = [], x;
+  while ((x = w.nextNode())) if (EMOJI_TEST.test(x.nodeValue)) list.push(x);
+  list.forEach(iconizeText);
+}
+(function () {
+  var q = [], t = 0, opts = { childList: true, subtree: true, characterData: true };
+  var obs = new MutationObserver(function (muts) {
+    muts.forEach(function (m) { if (m.type === 'characterData') q.push(m.target); else m.addedNodes.forEach(function (n) { q.push(n); }); });
+    if (t) return;
+    t = requestAnimationFrame(function () {
+      t = 0; obs.disconnect();
+      q.splice(0).forEach(function (n) { if (n.isConnected) iconize(n); });
+      obs.observe(document.body, opts);
+    });
+  });
+  iconize(document.body);
+  obs.observe(document.body, opts);
+})();
 lookApply();
 if (window.matchMedia) { var __mq = matchMedia('(prefers-color-scheme: light)'); var __on = function () { if (look.theme === 'auto') lookApply(); }; if (__mq.addEventListener) __mq.addEventListener('change', __on); }
 if (npv.on) npvApply();
