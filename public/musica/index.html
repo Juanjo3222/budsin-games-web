@@ -2532,9 +2532,13 @@ function aiplCreate(text) {
     if (!found.length) throw new Error('none');
     // Asking for one artist ("Toby Fox"): most results are theirs, so the usual cap of 3 per artist would leave almost nothing.
     var cnt = {}, topN = 0; found.forEach(function (tr) { var k = nk(primaryArtist(tr)); cnt[k] = (cnt[k] || 0) + 1; if (cnt[k] > topN) topN = cnt[k]; });
-    var cap = topN >= found.length * 0.4 ? 20 : 3;
-    return djPersonal(found, 40, cap).catch(function () { return found; }).then(function (mine) {
-      var pool = djPool([mine, found, r[1]]);
+    var solo = topN >= found.length * 0.4, topK = '';
+    Object.keys(cnt).forEach(function (k) { if (cnt[k] === topN) topK = k; });
+    // One artist asked for: only their songs (no personal mix, no recommendations from other artists).
+    if (solo) found = found.filter(function (tr) { return nk(String(tr.artist || '')).indexOf(topK) >= 0; });
+    var cap = solo ? 20 : 3;
+    return (solo ? Promise.resolve(djPool([found]).slice(0, 40)) : djPersonal(found, 40, cap)).catch(function () { return found; }).then(function (mine) {
+      var pool = solo ? mine : djPool([mine, found, r[1]]);
       var plain = function () { return { tracks: mine.slice(0, 20), intro: '' }; };
       if (!(r[2] && djcfg.ai) || pool.length < 5) return plain();
       aiplRender('busy', t('aiBusy2'));
