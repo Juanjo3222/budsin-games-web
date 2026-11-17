@@ -237,6 +237,7 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 #npv .npv-t { margin-top: 14px; font-size: 1.25rem; font-weight: 800; color: var(--accent); letter-spacing: -.02em; line-height: 1.2; }
 #npv .npv-a { color: var(--muted); font-size: .92rem; margin-top: 2px; }
 #npv .npv-a a:hover { text-decoration: underline; color: var(--text); }
+#npv .npv-egg { margin-top: 4px; font-size: .74rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; background: linear-gradient(90deg, #ff4d6d, #ffb400, #3ddc84, #2bb0ff, #a855f7); -webkit-background-clip: text; background-clip: text; color: transparent; }
 #npv .npv-ly { position: relative; margin-top: 14px; flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding: 6px 0 45vh; scrollbar-width: none; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 88%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 9%, #000 88%, transparent 100%); }
 #npv .npv-ly::-webkit-scrollbar { display: none; }
 #npv .npv-line { margin: 0; font-size: 1.05rem; font-weight: 700; line-height: 1.3; color: var(--ly); cursor: pointer; transition: color .25s; overflow-wrap: anywhere; }
@@ -720,7 +721,7 @@ var I18N = {
     acctTitle: 'Cuenta de Budsin', acctPitch: 'Inicia sesión con Google para que tus ♥, playlists y gustos te sigan a todos tus dispositivos y a Budsin Games.', acctIn: 'Iniciar sesión con Google', acctOut: 'Cerrar sesión', acctWipe: 'Borrar mis datos de la nube', acctWipeAsk: '¿Borrar de la nube tus ♥, playlists, gustos y preferencias? Lo guardado en este navegador se queda.', acctWiped: 'Datos de la nube borrados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'No se pudo sincronizar.', acctErrPerm: 'No se pudo sincronizar: faltan permisos en Firestore.', acctSignedOut: 'Sesión cerrada. Se quitaron de este navegador los datos de la cuenta.', acctFail: 'No se pudo iniciar sesión.', acctSdkFail: 'No se pudo cargar el inicio de sesión. Revisa tu conexión.',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
-    lyr: 'Letra', npv: 'Vista de reproducción', settings: 'Ajustes', setTheme: 'Tema', setThemeInfo: 'Elige cómo se ve Budsin Music.', thDark: 'Oscuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Colores y degradado', setColorsInfo: 'El color de la página y el brillo de arriba: sigue la portada de la canción, usa tu propia paleta o déjalo como viene.', lmCover: 'De la portada', lmPalette: 'Paleta', lmDefault: 'Predeterminado', setCustom1: 'Color inicial', setCustom2: 'Color final', setAccentToo: 'Usar también como color de acento', setStrength: 'Intensidad del degradado', setPreview: 'Así se ve el degradado de la página', setReset: 'Restablecer apariencia', setPanel: 'Panel lateral', setPanelInfo: 'Muestra portada y letra al lado de la página. Solo en pantallas anchas.', panOn: 'Activado ✓', panOff: 'Desactivado', noneTitle: 'Portadas sin color', noneInfo: 'Si la portada es negra, gris o blanca, la página usa esto en vez de quedarse sin color.', nnRainbow: 'Arcoíris', nnBudsin: 'Color de Budsin', nnNeutral: 'Neutro', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
+    lyr: 'Letra', npv: 'Vista de reproducción', settings: 'Ajustes', setTheme: 'Tema', setThemeInfo: 'Elige cómo se ve Budsin Music.', thDark: 'Oscuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Colores y degradado', setColorsInfo: 'El color de la página y el brillo de arriba: sigue la portada de la canción, usa tu propia paleta o déjalo como viene.', lmCover: 'De la portada', lmPalette: 'Paleta', lmDefault: 'Predeterminado', setCustom1: 'Color inicial', setCustom2: 'Color final', setAccentToo: 'Usar también como color de acento', setStrength: 'Intensidad del degradado', setPreview: 'Así se ve el degradado de la página', setReset: 'Restablecer apariencia', setPanel: 'Panel lateral', setPanelInfo: 'Muestra portada y letra al lado de la página. Solo en pantallas anchas.', panOn: 'Activado ✓', panOff: 'Desactivado', noneTitle: 'Portadas sin color', setPip: 'Mini ventana (PiP)', setPipInfo: 'Cómo se ve la mini ventana flotante. También puedes cambiar el diseño con el botón de la esquina de la propia ventana.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Portada: sí', ppCoverOff: 'Portada: no', ppGradOn: 'Letra con degradado: sí', ppGradOff: 'Letra con degradado: no', pipLayout: 'Cambiar diseño', eggName: 'Asriel Dreemurr', eggDet: '* Estás lleno de determinación.', noneInfo: 'Si la portada es negra, gris o blanca, la página usa esto en vez de quedarse sin color.', nnRainbow: 'Arcoíris', nnBudsin: 'Color de Budsin', nnNeutral: 'Neutro', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
@@ -751,7 +752,7 @@ var I18N = {
     acctTitle: 'Budsin account', acctPitch: 'Sign in with Google so your ♥, playlists and taste follow you to all your devices and to Budsin Games.', acctIn: 'Sign in with Google', acctOut: 'Sign out', acctWipe: 'Delete my cloud data', acctWipeAsk: 'Delete your ♥, playlists, taste and preferences from the cloud? What is saved in this browser stays.', acctWiped: 'Cloud data deleted.', acctConnecting: 'Connecting…', acctSyncing: 'Syncing…', acctSynced: 'Synced ✓', acctErr: 'Could not sync.', acctErrPerm: 'Could not sync: Firestore permissions are missing.', acctSignedOut: 'Signed out. The account data was removed from this browser.', acctFail: 'Could not sign in.', acctSdkFail: 'Could not load sign-in. Check your connection.',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
-    lyr: 'Lyrics', npv: 'Now playing view', settings: 'Settings', setTheme: 'Theme', setThemeInfo: 'Choose how Budsin Music looks.', thDark: 'Dark', thLight: 'Light', thAuto: 'Automatic', setColors: 'Colours and gradient', setColorsInfo: 'The page colour and the glow at the top: follow the song\'s cover, use your own palette or leave it as it comes.', lmCover: 'From the cover', lmPalette: 'Palette', lmDefault: 'Default', setCustom1: 'Start colour', setCustom2: 'End colour', setAccentToo: 'Also use it as the accent colour', setStrength: 'Gradient strength', setPreview: 'This is how the page gradient looks', setReset: 'Reset appearance', setPanel: 'Side panel', setPanelInfo: 'Shows the cover and lyrics beside the page. Wide screens only.', panOn: 'On ✓', panOff: 'Off', noneTitle: 'Covers without colour', noneInfo: 'If the cover is black, grey or white, the page uses this instead of going colourless.', nnRainbow: 'Rainbow', nnBudsin: 'Budsin colour', nnNeutral: 'Neutral', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
+    lyr: 'Lyrics', npv: 'Now playing view', settings: 'Settings', setTheme: 'Theme', setThemeInfo: 'Choose how Budsin Music looks.', thDark: 'Dark', thLight: 'Light', thAuto: 'Automatic', setColors: 'Colours and gradient', setColorsInfo: 'The page colour and the glow at the top: follow the song\'s cover, use your own palette or leave it as it comes.', lmCover: 'From the cover', lmPalette: 'Palette', lmDefault: 'Default', setCustom1: 'Start colour', setCustom2: 'End colour', setAccentToo: 'Also use it as the accent colour', setStrength: 'Gradient strength', setPreview: 'This is how the page gradient looks', setReset: 'Reset appearance', setPanel: 'Side panel', setPanelInfo: 'Shows the cover and lyrics beside the page. Wide screens only.', panOn: 'On ✓', panOff: 'Off', noneTitle: 'Covers without colour', setPip: 'Mini window (PiP)', setPipInfo: 'How the floating mini window looks. You can also change the layout with the button in the corner of the window itself.', ppFull: 'Full', ppLyrics: 'Lyrics', ppMini: 'Mini', ppCoverOn: 'Cover: on', ppCoverOff: 'Cover: off', ppGradOn: 'Gradient lyrics: on', ppGradOff: 'Gradient lyrics: off', pipLayout: 'Change layout', eggName: 'Asriel Dreemurr', eggDet: '* You\'re filled with determination.', noneInfo: 'If the cover is black, grey or white, the page uses this instead of going colourless.', nnRainbow: 'Rainbow', nnBudsin: 'Budsin colour', nnNeutral: 'Neutral', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
     noPlay: 'Search works, but playback is not available right now.',
@@ -782,7 +783,7 @@ var I18N = {
     acctTitle: 'Conta Budsin', acctPitch: 'Entre com o Google para que seus ♥, playlists e gostos acompanhem você em todos os dispositivos e no Budsin Games.', acctIn: 'Entrar com o Google', acctOut: 'Sair', acctWipe: 'Apagar meus dados da nuvem', acctWipeAsk: 'Apagar da nuvem seus ♥, playlists, gostos e preferências? O que está salvo neste navegador permanece.', acctWiped: 'Dados da nuvem apagados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'Não foi possível sincronizar.', acctErrPerm: 'Não foi possível sincronizar: faltam permissões no Firestore.', acctSignedOut: 'Sessão encerrada. Os dados da conta foram removidos deste navegador.', acctFail: 'Não foi possível entrar.', acctSdkFail: 'Não foi possível carregar o login. Verifique sua conexão.',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
-    lyr: 'Letra', npv: 'Vista de reprodução', settings: 'Configurações', setTheme: 'Tema', setThemeInfo: 'Escolha como o Budsin Music aparece.', thDark: 'Escuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Cores e degradê', setColorsInfo: 'A cor da página e o brilho no topo: seguem a capa da música, usam sua paleta ou ficam como vêm.', lmCover: 'Da capa', lmPalette: 'Paleta', lmDefault: 'Padrão', setCustom1: 'Cor inicial', setCustom2: 'Cor final', setAccentToo: 'Usar também como cor de destaque', setStrength: 'Intensidade do degradê', setPreview: 'Assim fica o degradê da página', setReset: 'Redefinir aparência', setPanel: 'Painel lateral', setPanelInfo: 'Mostra capa e letra ao lado da página. Só em telas largas.', panOn: 'Ativado ✓', panOff: 'Desativado', noneTitle: 'Capas sem cor', noneInfo: 'Se a capa for preta, cinza ou branca, a página usa isto em vez de ficar sem cor.', nnRainbow: 'Arco-íris', nnBudsin: 'Cor do Budsin', nnNeutral: 'Neutro', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
+    lyr: 'Letra', npv: 'Vista de reprodução', settings: 'Configurações', setTheme: 'Tema', setThemeInfo: 'Escolha como o Budsin Music aparece.', thDark: 'Escuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Cores e degradê', setColorsInfo: 'A cor da página e o brilho no topo: seguem a capa da música, usam sua paleta ou ficam como vêm.', lmCover: 'Da capa', lmPalette: 'Paleta', lmDefault: 'Padrão', setCustom1: 'Cor inicial', setCustom2: 'Cor final', setAccentToo: 'Usar também como cor de destaque', setStrength: 'Intensidade do degradê', setPreview: 'Assim fica o degradê da página', setReset: 'Redefinir aparência', setPanel: 'Painel lateral', setPanelInfo: 'Mostra capa e letra ao lado da página. Só em telas largas.', panOn: 'Ativado ✓', panOff: 'Desativado', noneTitle: 'Capas sem cor', setPip: 'Mini janela (PiP)', setPipInfo: 'Como fica a mini janela flutuante. Você também pode mudar o layout com o botão no canto da própria janela.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Capa: sim', ppCoverOff: 'Capa: não', ppGradOn: 'Letra com degradê: sim', ppGradOff: 'Letra com degradê: não', pipLayout: 'Mudar layout', eggName: 'Asriel Dreemurr', eggDet: '* Você está cheio de determinação.', noneInfo: 'Se a capa for preta, cinza ou branca, a página usa isto em vez de ficar sem cor.', nnRainbow: 'Arco-íris', nnBudsin: 'Cor do Budsin', nnNeutral: 'Neutro', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
@@ -896,7 +897,7 @@ function dynApply(c) {
   if (!c) { dynReset(); return; }
   st.removeProperty('--fill');
   if (c.neutral) {      // black / grey / white cover: what the user chose in Settings (Budsin colour, rainbow or neutral)
-    var nm = look ? look.none : 'rainbow';
+    var nm = c.rainbow ? 'rainbow' : (look ? look.none : 'rainbow');
     if (nm === 'neutral') {
       st.setProperty('--accent', light ? 'rgb(64,70,84)' : 'rgb(226,229,236)');
       st.setProperty('--accent2', light ? 'rgb(110,118,132)' : 'rgb(150,158,172)');
@@ -957,15 +958,27 @@ function lookApply() {
   var mt = document.querySelector('meta[name="theme-color"]'); if (mt) mt.setAttribute('content', look.eff === 'light' ? '#f4f6f9' : '#0b0d10');
   root.style.setProperty('--gs', String(look.str / 100));
   dyn.on = look.mode === 'cover';
-  if (dyn.on) { var c = cur(); dynFor(c && c.artwork); } else dynReset();
+  if (dyn.on) { var c = cur(); dynFor(c && c.artwork, c); } else dynReset();
 }
 function lookSave() {
   store.set('bm_theme', look.theme); store.set('bm_lookmode', look.mode); store.set('bm_dyn', look.mode === 'cover' ? 1 : 0);
   store.set('bm_lc1', look.c1); store.set('bm_lc2', look.c2); store.set('bm_lstr', look.str); store.set('bm_lacc', look.acc ? 1 : 0); store.set('bm_looknone', look.none);
 }
-function dynFor(src) {
+// Hopes and Dreams & co. (Asriel's songs, by Toby Fox): always rainbow, whatever the cover. Only in "from the cover" mode.
+function eggFor(tr) {
+  if (!tr || nk(tr.artist).indexOf('toby fox') < 0) return false;
+  var ti = nk(tr.title);
+  return ['hopes and dreams', 'save the world', 'his theme', 'final power', 'burn in despair'].some(function (x) { return ti.indexOf(x) === 0; });
+}
+function eggToast(tr) {
+  if (!eggFor(tr)) return;
+  try { if (sessionStorage.getItem('bm_egg')) return; sessionStorage.setItem('bm_egg', '1'); } catch (e) {}
+  toast(t('eggDet'));
+}
+function dynFor(src, tr) {
   var my = ++dyn.seq;
   if (!dyn.on) { dynReset(); return; }
+  if (eggFor(tr)) { dynApply({ neutral: true, rainbow: true }); return; }
   if (!src || !ART_HOSTS.test(src)) { dynReset(); return; }
   if (src in dyn.cache) { dynApply(dyn.cache[src]); return; }
   var im = new Image();
@@ -986,6 +999,16 @@ function dynFor(src) {
  * Optional: a small always-on-top window with cover, title, the current lyric line and the controls, so the music
  * can be driven from over any other app, not only inside Budsin. Where the browser has no such API the button stays
  * hidden. The window is plain DOM that this page fills and updates; closing it just stops the updates. */
+var pipcfg = { cover: store.get('bm_pipcover', 1) !== 0, preset: store.get('bm_pippreset', 'full'), grad: store.get('bm_pipgrad', 1) !== 0 };
+if (['full', 'lyrics', 'mini'].indexOf(pipcfg.preset) < 0) pipcfg.preset = 'full';
+function pipSave() { store.set('bm_pipcover', pipcfg.cover ? 1 : 0); store.set('bm_pippreset', pipcfg.preset); store.set('bm_pipgrad', pipcfg.grad ? 1 : 0); }
+function pipApplyCfg() {
+  var w = pip.win; if (!w) return;
+  var root = w.document.getElementById('pp'); if (!root) return;
+  ['full', 'lyrics', 'mini'].forEach(function (k) { root.classList.toggle('p-' + k, pipcfg.preset === k); });
+  root.classList.toggle('nocov', !pipcfg.cover);
+  root.classList.toggle('grad', pipcfg.grad);
+}
 var pip = { win: null, timer: 0, ok: !!(window.documentPictureInPicture && window.documentPictureInPicture.requestWindow) };
 var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:#0b0d10;color:#eef0f4;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden;container-type:size;container-name:pp}' +
   /* Spotify/Spicetify-like mini lyrics: the lyric is the star; sizes come from the window (container units), so it rescales smoothly */
@@ -1005,6 +1028,14 @@ var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}html,body{height:
   '.ct button{border:0;background:none;color:#eef0f4;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;cursor:pointer;padding:0}.ct button:hover{background:rgba(255,255,255,.1)}.ct svg{width:58%;height:58%;fill:currentColor}' +
   '.ct #pP{background:#fff;color:#0b0d10;width:38px;height:38px}.ct #pP:hover{background:#fff;opacity:.9}.spinner{width:45%;height:45%;border:2px solid #0b0d10;border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;display:block}@keyframes s{to{transform:rotate(360deg)}}' +
   '.vr{display:flex;align-items:center;gap:6px;font-size:10px;color:#9aa2b3;font-variant-numeric:tabular-nums}.vr input{width:clamp(60px,22cqw,110px);accent-color:var(--accent,#25d0b4);height:4px;margin:0}.vr button{border:0;background:none;color:#9aa2b3;width:22px;height:22px;display:grid;place-items:center;cursor:pointer;padding:0}.vr button:hover{color:#fff}.vr svg{width:100%;height:100%;fill:currentColor}.vr #pvp{min-width:3em;text-align:left}' +
+  '#pp{--g1:color-mix(in srgb,var(--accent,#25d0b4) 70%,#fff);--g2:color-mix(in srgb,var(--accent2,#1fa7d8) 65%,#fff)}' +
+  /* lyric colour: a horizontal gradient from the cover palette (the background fades vertically: the opposite pattern); static, so no cost */
+  '.grad #pl .l1{background-image:var(--lg,linear-gradient(90deg,var(--g1),var(--g2)));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}' +
+  '.nocov #pi{display:none!important}' +
+  '.p-lyrics .top{display:none}.p-lyrics.nolyr .top{display:flex}.p-lyrics #pl .l1{font-size:clamp(16px,13cqh,34px)}' +
+  '.p-mini #pl .l0,.p-mini #pl .l2,.p-mini #pl .t2,.p-mini .vr{display:none}.p-mini #pl .l1{font-size:clamp(13px,9cqh,20px)}' +
+  '.ct #pH{color:#9aa2b3;margin-right:4px}.ct #pH:hover{color:#fff}.ct #pH.on{color:var(--accent,#25d0b4)}' +
+  '#pS{position:absolute;top:6px;right:8px;width:22px;height:22px;border:0;background:none;color:#9aa2b3;opacity:.5;cursor:pointer;padding:0;display:grid;place-items:center}#pS:hover{opacity:1;color:#fff}#pS svg{width:100%;height:100%;fill:currentColor}' +
   /* as the window shrinks, the least important parts go first; the current lyric line is the last thing to go */
   '@container pp (max-height:195px){#pl .l0,#pl .l2{display:none}#pa{display:none}}' +
   '@container pp (max-height:165px){.top{display:none}}' +
@@ -1025,6 +1056,8 @@ function pipTick() {
   if (el('pvp')) el('pvp').textContent = vv + '%';
   var mic = (muted || volume === 0) ? ICON.mute : ICON.vol;
   if (el('pM') && el('pM').getAttribute('data-ic') !== mic) { el('pM').innerHTML = mic; el('pM').setAttribute('data-ic', mic); }
+  var lk = !!tr && isLiked(tr), hi = lk ? ICON.heart : ICON.heartO;
+  if (el('pH') && el('pH').getAttribute('data-ic') !== hi) { el('pH').innerHTML = hi; el('pH').setAttribute('data-ic', hi); el('pH').classList.toggle('on', lk); }
   var ic = loading ? '<span class="spinner"></span>' : (audio.paused ? ICON.play : ICON.pause);
   if (el('pP').getAttribute('data-ic') !== ic) { el('pP').innerHTML = ic; el('pP').setAttribute('data-ic', ic); }
   var hasLy = !!tr && lyr.status === 'ok' && lyr.synced.length > 0;
@@ -1055,6 +1088,10 @@ function pipRender() {
   g('pa').textContent = tr ? tr.artist : '';
   var cs = getComputedStyle(document.documentElement);
   d.documentElement.style.setProperty('--accent', cs.getPropertyValue('--accent').trim() || '#25d0b4');
+  d.documentElement.style.setProperty('--accent2', cs.getPropertyValue('--accent2').trim() || '#1fa7d8');
+  var fl = cs.getPropertyValue('--fill').trim();
+  if (fl && fl.indexOf('#ff4d6d') >= 0) d.documentElement.style.setProperty('--lg', fl); else d.documentElement.style.removeProperty('--lg');
+  pipApplyCfg();
   var tint = cs.getPropertyValue('--tint').trim(); if (tint) d.documentElement.style.setProperty('--tint', tint); else d.documentElement.style.removeProperty('--tint');
   pipTick();
 }
@@ -1068,11 +1105,13 @@ function pipToggle() {
     d.title = 'Budsin Music';
     d.body.innerHTML = '<div id="pp"><div class="top"><img id="pi" alt=""><div class="mm"><div id="pt"></div><div id="pa"></div></div></div><div id="pl"></div>' +
       '<div class="bar"><span id="pc">0:00</span><input type="range" id="ps" min="0" max="1000" value="0"><span id="pd">0:00</span></div>' +
-      '<div class="cv"><div class="ct"><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button></div>' +
-      '<div class="vr"><button id="pM"></button><input type="range" id="pv" min="0" max="100" value="80"><span id="pvp"></span></div></div></div>';
+      '<div class="cv"><div class="ct"><button id="pH"></button><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button></div>' +
+      '<div class="vr"><button id="pM"></button><input type="range" id="pv" min="0" max="100" value="80"><span id="pvp"></span></div></div><button id="pS" title="' + esc(t('pipLayout')) + '"><svg viewBox="0 0 24 24"><path d="M3 5h18v3H3zm0 5.5h18v3H3zM3 16h18v3H3z"/></svg></button></div>';
     d.getElementById('pV').addEventListener('click', function () { prev(); });
     d.getElementById('pP').addEventListener('click', togglePlay);
     d.getElementById('pN').addEventListener('click', function () { next(false); });
+    d.getElementById('pH').addEventListener('click', function () { var c0 = cur(); if (c0) toggleLike(c0); pipTick(); });
+    d.getElementById('pS').addEventListener('click', function () { var o = ['full', 'lyrics', 'mini']; pipcfg.preset = o[(o.indexOf(pipcfg.preset) + 1) % 3]; pipSave(); pipApplyCfg(); });
     d.getElementById('pM').addEventListener('click', function () { muted = !muted; applyVol(); pipTick(); });
     var pv = d.getElementById('pv');
     pv.addEventListener('input', function () { volume = +pv.value; muted = false; store.set('bm_vol', volume); applyVol(); pipTick(); });
@@ -1083,6 +1122,7 @@ function pipToggle() {
     $('#bPip').classList.add('on');
     pip.timer = setInterval(pipTick, 400);
     pipRender();
+    pipApplyCfg();
     lyrOnTrack();        // the lyric line needs the lyrics even if nothing else is showing them
   }).catch(function () { toast(t('pipFail')); });
 }
@@ -1103,7 +1143,7 @@ function npvRender() {
   if (!npv.on) return;
   var tr = cur(), el = $('#npv');
   if (!tr) { el.innerHTML = '<div class="npv-msg">' + esc(t('lyrNothing')) + '</div>'; return; }
-  el.innerHTML = '<div class="npv-head"><div class="npv-art">' + img(tr.artwork) + '</div><div class="npv-t">' + esc(tr.title) + '</div><div class="npv-a">' + artistLink(tr) + '</div></div><div class="npv-ly" id="npvLy"></div>';
+  el.innerHTML = '<div class="npv-head"><div class="npv-art">' + img(tr.artwork) + '</div><div class="npv-t">' + esc(tr.title) + '</div><div class="npv-a">' + artistLink(tr) + '</div>' + (eggFor(tr) ? '<div class="npv-egg">✦ ' + esc(t('eggName')) + '</div>' : '') + '</div><div class="npv-ly" id="npvLy"></div>';
   npvLyrics();
 }
 function npvLyrics() {
@@ -1154,6 +1194,7 @@ function vSettings() {
     '<div class="setrow" style="margin-top:16px"><span>' + esc(t('setStrength')) + '</span><input type="range" id="lstr" min="0" max="50" value="' + look.str + '"><b id="lstrv">' + look.str + '%</b></div>' +
     '<div class="lookprev"><i>♪</i><span>' + esc(t('setPreview')) + '</span></div>' +
     '<div class="btns" style="margin-top:14px"><button class="btn ghost" id="lookReset">' + esc(t('setReset')) + '</button></div></div>';
+  html += '<div class="box"><h3>🪟 ' + esc(t('setPip')) + '</h3><p>' + esc(t('setPipInfo')) + '</p><div class="btns" id="ppSeg">' + seg([['full', t('ppFull')], ['lyrics', t('ppLyrics')], ['mini', t('ppMini')]], 'data-pp', pipcfg.preset) + '</div><div class="btns" style="margin-top:12px"><button class="chip' + (pipcfg.cover ? ' on' : '') + '" id="ppCover">' + esc(t(pipcfg.cover ? 'ppCoverOn' : 'ppCoverOff')) + '</button><button class="chip' + (pipcfg.grad ? ' on' : '') + '" id="ppGrad">' + esc(t(pipcfg.grad ? 'ppGradOn' : 'ppGradOff')) + '</button></div></div>';
   html += '<div class="box"><h3>🪟 ' + esc(t('setPanel')) + '</h3><p>' + esc(t('setPanelInfo')) + '</p><div class="btns"><button class="chip' + (npv.on ? ' on' : '') + '" id="setNpv">' + esc(t(npv.on ? 'panOn' : 'panOff')) + '</button></div></div>';
   view.innerHTML = html + legalBlock();
   document.title = t('settings') + ' · Budsin Music';
@@ -1179,6 +1220,15 @@ function vSettings() {
   $('#lstr', view).addEventListener('input', function () { look.str = +this.value; change(); });
   $('#lookReset', view).addEventListener('click', function () { look.theme = 'dark'; look.mode = 'cover'; look.c1 = '#25d0b4'; look.c2 = '#1d4ed8'; look.str = 22; look.acc = false; look.none = 'rainbow'; change(); });
   $('#setNpv', view).addEventListener('click', function () { npv.on = !npv.on; store.set('bm_npv', npv.on ? 1 : 0); npvApply(); this.classList.toggle('on', npv.on); this.textContent = t(npv.on ? 'panOn' : 'panOff'); });
+  var markPp = function () {
+    $$('[data-pp]', view).forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-pp') === pipcfg.preset); });
+    $('#ppCover', view).classList.toggle('on', pipcfg.cover); $('#ppCover', view).textContent = t(pipcfg.cover ? 'ppCoverOn' : 'ppCoverOff');
+    $('#ppGrad', view).classList.toggle('on', pipcfg.grad); $('#ppGrad', view).textContent = t(pipcfg.grad ? 'ppGradOn' : 'ppGradOff');
+    pipSave(); pipApplyCfg();
+  };
+  $$('[data-pp]', view).forEach(function (b) { b.addEventListener('click', function () { pipcfg.preset = b.getAttribute('data-pp'); markPp(); }); });
+  $('#ppCover', view).addEventListener('click', function () { pipcfg.cover = !pipcfg.cover; markPp(); });
+  $('#ppGrad', view).addEventListener('click', function () { pipcfg.grad = !pipcfg.grad; markPp(); });
   mark();      // fills the strength slider the first time
 }
 function year(d) { return d ? String(d).slice(0, 4) : ''; }
@@ -1439,7 +1489,8 @@ function updateNowPlaying() {
     '<button class="iconbtn only-m" data-viz aria-label="' + esc(t('viz')) + '"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>';
   $('#npLike').addEventListener('click', function () { toggleLike(tr); });
   document.title = tr.title + ' — ' + tr.artist + ' · Budsin Music';
-  dynFor(tr.artwork);
+  dynFor(tr.artwork, tr);
+  eggToast(tr);
   if (pip.win) pipRender();
   npvRender();
   updateSeek();
