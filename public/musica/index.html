@@ -58,7 +58,7 @@ html[data-theme="light"] {
   --ly: rgba(0,0,0,.35); --ly-h: rgba(0,0,0,.7); --ly-t: rgba(0,0,0,.45); --ly-tc: rgba(0,0,0,.75); --ly-p: rgba(0,0,0,.72); --cur-base: #000;
   --ly-prev: rgba(0,0,0,.26); --ly-past: rgba(0,0,0,.14);
 }
-html[data-theme="light"] #viz, html[data-theme="light"] #lyrics, html[data-theme="light"] .hero {
+html[data-theme="light"] #viz, html[data-theme="light"] #lyrics, html[data-theme="light"] #fsv, html[data-theme="light"] .hero {
   color-scheme: dark;
   --bg: #0b0d10; --panel: #12151a; --panel2: #181c23; --hover: #1f2430; --line: #232833;
   --text: #eef0f4; --muted: #8d95a6; --accent: var(--accent-bright, #25d0b4);
@@ -213,6 +213,39 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .tr .like.on:hover { color: var(--accent); }
 .exp { font-size: .6rem; background: #3a404d; color: #ddd; padding: 1px 5px; border-radius: 3px; font-weight: 800; flex: none; }
 .iconbtn[hidden] { display: none; }
+/* Full-screen "now playing": big cover + big lyrics + controls; a gradient (no blur) so it stays light on the GPU */
+#fsv { position: fixed; inset: 0; z-index: 70; display: none; flex-direction: column; background: #07090c; color: #eef0f4; }
+#fsv.on { display: flex; }
+.fsv-bg { position: absolute; inset: 0; z-index: 0; background: linear-gradient(135deg, rgba(var(--tint, 37,208,180), .55), rgba(var(--tint2, var(--tint, 37,208,180)), .22) 55%, #07090c 100%); }
+.fsv-top { position: relative; z-index: 2; display: flex; align-items: center; gap: 6px; padding: 14px 18px; }
+.fsv-sp { flex: 1; }
+.fsv-main { position: relative; z-index: 1; flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); gap: 4vw; padding: 0 5vw; }
+.fsv-left { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 16px; min-height: 0; }
+.fsv-left img { width: min(100%, 60vh); aspect-ratio: 1; object-fit: cover; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,.55); background: #1d222c; }
+.fsv-t { font-size: clamp(1.3rem, 2.6vw, 2.2rem); font-weight: 800; color: var(--accent); letter-spacing: -.02em; text-align: center; line-height: 1.15; }
+.fsv-a { color: var(--muted); font-size: 1.05rem; text-align: center; margin-top: 2px; }
+.fsv-ly { position: relative; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; padding: 30vh 0; scrollbar-width: none; -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%); }
+.fsv-ly::-webkit-scrollbar { display: none; }
+.fsv-line { margin: 0; font-size: clamp(1.4rem, 3.2vw, 3rem); font-weight: 800; line-height: 1.2; letter-spacing: -.02em; color: var(--ly); cursor: pointer; transition: color .3s, transform .4s cubic-bezier(.2,.7,.2,1); transform-origin: left center; overflow-wrap: anywhere; }
+.fsv-line:hover { color: var(--ly-h); }
+.fsv-line.prev { color: var(--ly-prev); }
+.fsv-line.past { color: var(--ly-past); }
+.fsv-line.cur { color: color-mix(in srgb, var(--accent) 60%, #fff); transform: scale(1.05); }
+.fsv-line .trl { display: block; margin-top: 4px; font-size: .5em; font-weight: 600; letter-spacing: 0; color: var(--ly-t); }
+.fsv-line.cur .trl { color: var(--ly-tc); }
+.fsv-plain { white-space: pre-wrap; color: var(--ly-p); font-size: 1.3rem; line-height: 1.6; }
+.fsv-msg { color: var(--muted); font-size: 1.2rem; text-align: center; margin: auto; }
+.fsv-bottom { position: relative; z-index: 2; padding: 6px 5vw 20px; display: flex; flex-direction: column; gap: 6px; }
+.fsv-seek { display: flex; align-items: center; gap: 12px; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fsv-seek input { flex: 1; }
+.fsv-ctl { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.fsv-vol { display: flex; align-items: center; gap: 6px; margin-left: 16px; font-size: .78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fsv-vol input { width: 110px; flex: none; }
+@media (max-width: 820px) { .fsv-main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; gap: 10px; } .fsv-left img { width: min(46vw, 24vh); } .fsv-left { flex-direction: row; gap: 14px; } .fsv-left > div { text-align: left; } .fsv-t, .fsv-a { text-align: left; } .fsv-ly { padding: 12vh 0; } .fsv-vol { display: none; } }
+/* line change: a small slide for the side panel too */
+#npv .npv-line { transition: color .25s, transform .35s cubic-bezier(.2,.7,.2,1); transform-origin: left center; }
+#npv .npv-line.cur { transform: translateX(6px) scale(1.03); }
+@media (prefers-reduced-motion: reduce) { .fsv-line, #npv .npv-line { transition: color .2s; } .fsv-line.cur, #npv .npv-line.cur { transform: none; } }
 .ei { display: inline-block; width: 1em; height: 1em; vertical-align: -.14em; fill: currentColor; flex: none; }
 .box h3 .ei, h1.page .ei, .row-title .ei, .sect .ei { color: var(--accent); }
 .status .big .ei { width: 1.1em; height: 1.1em; color: var(--muted); }
@@ -616,6 +649,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="right">
       <button class="iconbtn" id="bLyr" data-ti="lyr"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></button>
       <button class="iconbtn" id="bViz" data-ti="viz"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>
+      <button class="iconbtn hide-m" id="bFs" data-ti="fs"><svg viewBox="0 0 24 24"><path d="M5 5h5v2H7v3H5zm9 0h5v5h-2V7h-3zM5 14h2v3h3v2H5zm12 0h2v5h-5v-2h3z"/></svg></button>
       <button class="iconbtn" id="bNpv" data-ti="npv"><svg viewBox="0 0 24 24"><path d="M3 4h18a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm12 2v12h5V6h-5z"/></svg></button>
       <button class="iconbtn" id="bPip" data-ti="pip" hidden><svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg></button>
       <button class="iconbtn" id="bQueue" data-ti="queue"><svg viewBox="0 0 24 24"><path d="M3 6h14v2H3zm0 5h14v2H3zm0 5h9v2H3zm13 0l6-3.5v7z"/></svg></button>
@@ -694,6 +728,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <div id="lyrBody"></div>
 </div>
+<div id="fsv" role="dialog" aria-label="Now playing">
+  <div class="fsv-bg"></div>
+  <div class="fsv-top">
+    <button class="iconbtn" id="fsvHome" data-ti="home"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg></button>
+    <span class="fsv-sp"></span>
+    <button class="iconbtn" id="fsvBrowser" data-ti="fsBrowser"><svg viewBox="0 0 24 24"><path d="M5 5h5v2H7v3H5zm9 0h5v5h-2V7h-3zM5 14h2v3h3v2H5zm12 0h2v5h-5v-2h3z"/></svg></button>
+    <button class="iconbtn" id="fsvClose" data-ti="vizClose">✕</button>
+  </div>
+  <div class="fsv-main"><div class="fsv-left" id="fsvLeft"></div><div class="fsv-ly" id="fsvLy"></div></div>
+  <div class="fsv-bottom">
+    <div class="fsv-seek"><span id="fsvCur">0:00</span><input type="range" id="fsvSeek" min="0" max="1000" value="0" aria-label="Seek"><span id="fsvDur">0:00</span></div>
+    <div class="fsv-ctl">
+      <button class="iconbtn" id="fsvLike"></button>
+      <button class="iconbtn" id="fsvShuf"></button>
+      <button class="iconbtn" id="fsvPrev"></button>
+      <button class="iconbtn main" id="fsvPlay"></button>
+      <button class="iconbtn" id="fsvNext"></button>
+      <button class="iconbtn" id="fsvRep"></button>
+      <span class="fsv-vol"><button class="iconbtn" id="fsvMute"></button><input type="range" id="fsvVol" min="0" max="100" value="80" aria-label="Volume"><span id="fsvVolP">80%</span></span>
+    </div>
+  </div>
+</div>
 <div id="toast" role="status" aria-live="polite"></div>
 <audio id="audio" preload="auto"></audio>
 
@@ -721,7 +777,7 @@ var I18N = {
     acctTitle: 'Cuenta de Budsin', acctPitch: 'Inicia sesión con Google para que tus ♥, playlists y gustos te sigan a todos tus dispositivos y a Budsin Games.', acctIn: 'Iniciar sesión con Google', acctOut: 'Cerrar sesión', acctWipe: 'Borrar mis datos de la nube', acctWipeAsk: '¿Borrar de la nube tus ♥, playlists, gustos y preferencias? Lo guardado en este navegador se queda.', acctWiped: 'Datos de la nube borrados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'No se pudo sincronizar.', acctErrPerm: 'No se pudo sincronizar: faltan permisos en Firestore.', acctSignedOut: 'Sesión cerrada. Se quitaron de este navegador los datos de la cuenta.', acctFail: 'No se pudo iniciar sesión.', acctSdkFail: 'No se pudo cargar el inicio de sesión. Revisa tu conexión.',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
-    lyr: 'Letra', npv: 'Vista de reproducción', settings: 'Ajustes', setTheme: 'Tema', setThemeInfo: 'Elige cómo se ve Budsin Music.', thDark: 'Oscuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Colores y degradado', setColorsInfo: 'El color de la página y el brillo de arriba: sigue la portada de la canción, usa tu propia paleta o déjalo como viene.', lmCover: 'De la portada', lmPalette: 'Paleta', lmDefault: 'Predeterminado', setCustom1: 'Color inicial', setCustom2: 'Color final', setAccentToo: 'Usar también como color de acento', setStrength: 'Intensidad del degradado', setPreview: 'Así se ve el degradado de la página', setReset: 'Restablecer apariencia', setPanel: 'Panel lateral', setPanelInfo: 'Muestra portada y letra al lado de la página. Solo en pantallas anchas.', panOn: 'Activado ✓', panOff: 'Desactivado', noneTitle: 'Portadas sin color', setPip: 'Mini ventana (PiP)', setPipInfo: 'Cómo se ve la mini ventana flotante. También puedes cambiar el diseño con el botón de la esquina de la propia ventana.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Portada: sí', ppCoverOff: 'Portada: no', ppGradOn: 'Letra con degradado: sí', ppGradOff: 'Letra con degradado: no', pipLayout: 'Cambiar diseño', eggName: 'Asriel Dreemurr', eggDet: '* Estás lleno de determinación.', noneInfo: 'Si la portada es negra, gris o blanca, la página usa esto en vez de quedarse sin color.', nnRainbow: 'Arcoíris', nnBudsin: 'Color de Budsin', nnNeutral: 'Neutro', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
+    lyr: 'Letra', npv: 'Vista de reproducción', settings: 'Ajustes', setTheme: 'Tema', setThemeInfo: 'Elige cómo se ve Budsin Music.', thDark: 'Oscuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Colores y degradado', setColorsInfo: 'El color de la página y el brillo de arriba: sigue la portada de la canción, usa tu propia paleta o déjalo como viene.', lmCover: 'De la portada', lmPalette: 'Paleta', lmDefault: 'Predeterminado', setCustom1: 'Color inicial', setCustom2: 'Color final', setAccentToo: 'Usar también como color de acento', setStrength: 'Intensidad del degradado', setPreview: 'Así se ve el degradado de la página', setReset: 'Restablecer apariencia', setPanel: 'Panel lateral', setPanelInfo: 'Muestra portada y letra al lado de la página. Solo en pantallas anchas.', panOn: 'Activado ✓', panOff: 'Desactivado', noneTitle: 'Portadas sin color', fs: 'Pantalla completa', fsBrowser: 'Pantalla completa del navegador', setPip: 'Mini ventana (PiP)', setPipInfo: 'Cómo se ve la mini ventana flotante. También puedes cambiar el diseño con el botón de la esquina de la propia ventana.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Portada: sí', ppCoverOff: 'Portada: no', ppGradOn: 'Letra con degradado: sí', ppGradOff: 'Letra con degradado: no', pipLayout: 'Cambiar diseño', eggName: 'Asriel Dreemurr', eggDet: '* Estás lleno de determinación.', noneInfo: 'Si la portada es negra, gris o blanca, la página usa esto en vez de quedarse sin color.', nnRainbow: 'Arcoíris', nnBudsin: 'Color de Budsin', nnNeutral: 'Neutro', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
@@ -752,7 +808,7 @@ var I18N = {
     acctTitle: 'Budsin account', acctPitch: 'Sign in with Google so your ♥, playlists and taste follow you to all your devices and to Budsin Games.', acctIn: 'Sign in with Google', acctOut: 'Sign out', acctWipe: 'Delete my cloud data', acctWipeAsk: 'Delete your ♥, playlists, taste and preferences from the cloud? What is saved in this browser stays.', acctWiped: 'Cloud data deleted.', acctConnecting: 'Connecting…', acctSyncing: 'Syncing…', acctSynced: 'Synced ✓', acctErr: 'Could not sync.', acctErrPerm: 'Could not sync: Firestore permissions are missing.', acctSignedOut: 'Signed out. The account data was removed from this browser.', acctFail: 'Could not sign in.', acctSdkFail: 'Could not load sign-in. Check your connection.',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
-    lyr: 'Lyrics', npv: 'Now playing view', settings: 'Settings', setTheme: 'Theme', setThemeInfo: 'Choose how Budsin Music looks.', thDark: 'Dark', thLight: 'Light', thAuto: 'Automatic', setColors: 'Colours and gradient', setColorsInfo: 'The page colour and the glow at the top: follow the song\'s cover, use your own palette or leave it as it comes.', lmCover: 'From the cover', lmPalette: 'Palette', lmDefault: 'Default', setCustom1: 'Start colour', setCustom2: 'End colour', setAccentToo: 'Also use it as the accent colour', setStrength: 'Gradient strength', setPreview: 'This is how the page gradient looks', setReset: 'Reset appearance', setPanel: 'Side panel', setPanelInfo: 'Shows the cover and lyrics beside the page. Wide screens only.', panOn: 'On ✓', panOff: 'Off', noneTitle: 'Covers without colour', setPip: 'Mini window (PiP)', setPipInfo: 'How the floating mini window looks. You can also change the layout with the button in the corner of the window itself.', ppFull: 'Full', ppLyrics: 'Lyrics', ppMini: 'Mini', ppCoverOn: 'Cover: on', ppCoverOff: 'Cover: off', ppGradOn: 'Gradient lyrics: on', ppGradOff: 'Gradient lyrics: off', pipLayout: 'Change layout', eggName: 'Asriel Dreemurr', eggDet: '* You\'re filled with determination.', noneInfo: 'If the cover is black, grey or white, the page uses this instead of going colourless.', nnRainbow: 'Rainbow', nnBudsin: 'Budsin colour', nnNeutral: 'Neutral', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
+    lyr: 'Lyrics', npv: 'Now playing view', settings: 'Settings', setTheme: 'Theme', setThemeInfo: 'Choose how Budsin Music looks.', thDark: 'Dark', thLight: 'Light', thAuto: 'Automatic', setColors: 'Colours and gradient', setColorsInfo: 'The page colour and the glow at the top: follow the song\'s cover, use your own palette or leave it as it comes.', lmCover: 'From the cover', lmPalette: 'Palette', lmDefault: 'Default', setCustom1: 'Start colour', setCustom2: 'End colour', setAccentToo: 'Also use it as the accent colour', setStrength: 'Gradient strength', setPreview: 'This is how the page gradient looks', setReset: 'Reset appearance', setPanel: 'Side panel', setPanelInfo: 'Shows the cover and lyrics beside the page. Wide screens only.', panOn: 'On ✓', panOff: 'Off', noneTitle: 'Covers without colour', fs: 'Full screen', fsBrowser: 'Browser full screen', setPip: 'Mini window (PiP)', setPipInfo: 'How the floating mini window looks. You can also change the layout with the button in the corner of the window itself.', ppFull: 'Full', ppLyrics: 'Lyrics', ppMini: 'Mini', ppCoverOn: 'Cover: on', ppCoverOff: 'Cover: off', ppGradOn: 'Gradient lyrics: on', ppGradOff: 'Gradient lyrics: off', pipLayout: 'Change layout', eggName: 'Asriel Dreemurr', eggDet: '* You\'re filled with determination.', noneInfo: 'If the cover is black, grey or white, the page uses this instead of going colourless.', nnRainbow: 'Rainbow', nnBudsin: 'Budsin colour', nnNeutral: 'Neutral', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
     noPlay: 'Search works, but playback is not available right now.',
@@ -783,7 +839,7 @@ var I18N = {
     acctTitle: 'Conta Budsin', acctPitch: 'Entre com o Google para que seus ♥, playlists e gostos acompanhem você em todos os dispositivos e no Budsin Games.', acctIn: 'Entrar com o Google', acctOut: 'Sair', acctWipe: 'Apagar meus dados da nuvem', acctWipeAsk: 'Apagar da nuvem seus ♥, playlists, gostos e preferências? O que está salvo neste navegador permanece.', acctWiped: 'Dados da nuvem apagados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'Não foi possível sincronizar.', acctErrPerm: 'Não foi possível sincronizar: faltam permissões no Firestore.', acctSignedOut: 'Sessão encerrada. Os dados da conta foram removidos deste navegador.', acctFail: 'Não foi possível entrar.', acctSdkFail: 'Não foi possível carregar o login. Verifique sua conexão.',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
-    lyr: 'Letra', npv: 'Vista de reprodução', settings: 'Configurações', setTheme: 'Tema', setThemeInfo: 'Escolha como o Budsin Music aparece.', thDark: 'Escuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Cores e degradê', setColorsInfo: 'A cor da página e o brilho no topo: seguem a capa da música, usam sua paleta ou ficam como vêm.', lmCover: 'Da capa', lmPalette: 'Paleta', lmDefault: 'Padrão', setCustom1: 'Cor inicial', setCustom2: 'Cor final', setAccentToo: 'Usar também como cor de destaque', setStrength: 'Intensidade do degradê', setPreview: 'Assim fica o degradê da página', setReset: 'Redefinir aparência', setPanel: 'Painel lateral', setPanelInfo: 'Mostra capa e letra ao lado da página. Só em telas largas.', panOn: 'Ativado ✓', panOff: 'Desativado', noneTitle: 'Capas sem cor', setPip: 'Mini janela (PiP)', setPipInfo: 'Como fica a mini janela flutuante. Você também pode mudar o layout com o botão no canto da própria janela.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Capa: sim', ppCoverOff: 'Capa: não', ppGradOn: 'Letra com degradê: sim', ppGradOff: 'Letra com degradê: não', pipLayout: 'Mudar layout', eggName: 'Asriel Dreemurr', eggDet: '* Você está cheio de determinação.', noneInfo: 'Se a capa for preta, cinza ou branca, a página usa isto em vez de ficar sem cor.', nnRainbow: 'Arco-íris', nnBudsin: 'Cor do Budsin', nnNeutral: 'Neutro', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
+    lyr: 'Letra', npv: 'Vista de reprodução', settings: 'Configurações', setTheme: 'Tema', setThemeInfo: 'Escolha como o Budsin Music aparece.', thDark: 'Escuro', thLight: 'Claro', thAuto: 'Automático', setColors: 'Cores e degradê', setColorsInfo: 'A cor da página e o brilho no topo: seguem a capa da música, usam sua paleta ou ficam como vêm.', lmCover: 'Da capa', lmPalette: 'Paleta', lmDefault: 'Padrão', setCustom1: 'Cor inicial', setCustom2: 'Cor final', setAccentToo: 'Usar também como cor de destaque', setStrength: 'Intensidade do degradê', setPreview: 'Assim fica o degradê da página', setReset: 'Redefinir aparência', setPanel: 'Painel lateral', setPanelInfo: 'Mostra capa e letra ao lado da página. Só em telas largas.', panOn: 'Ativado ✓', panOff: 'Desativado', noneTitle: 'Capas sem cor', fs: 'Tela cheia', fsBrowser: 'Tela cheia do navegador', setPip: 'Mini janela (PiP)', setPipInfo: 'Como fica a mini janela flutuante. Você também pode mudar o layout com o botão no canto da própria janela.', ppFull: 'Completa', ppLyrics: 'Letra', ppMini: 'Mini', ppCoverOn: 'Capa: sim', ppCoverOff: 'Capa: não', ppGradOn: 'Letra com degradê: sim', ppGradOff: 'Letra com degradê: não', pipLayout: 'Mudar layout', eggName: 'Asriel Dreemurr', eggDet: '* Você está cheio de determinação.', noneInfo: 'Se a capa for preta, cinza ou branca, a página usa isto em vez de ficar sem cor.', nnRainbow: 'Arco-íris', nnBudsin: 'Cor do Budsin', nnNeutral: 'Neutro', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
@@ -1035,6 +1091,11 @@ var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}html,body{height:
   '.p-lyrics .top{display:none}.p-lyrics.nolyr .top{display:flex}.p-lyrics #pl .l1{font-size:clamp(16px,13cqh,34px)}' +
   '.p-mini #pl .l0,.p-mini #pl .l2,.p-mini #pl .t2,.p-mini .vr{display:none}.p-mini #pl .l1{font-size:clamp(13px,9cqh,20px)}' +
   '.ct #pH{color:#9aa2b3;margin-right:4px}.ct #pH:hover{color:#fff}.ct #pH.on{color:var(--accent,#25d0b4)}' +
+  '.ct #pR{color:#9aa2b3}.ct #pR:hover{color:#fff}.ct #pR.on{color:var(--accent,#25d0b4)}' +
+  '#pHome{position:absolute;top:6px;right:34px;width:22px;height:22px;border:0;background:none;color:#9aa2b3;opacity:.5;cursor:pointer;padding:0;display:grid;place-items:center}#pHome:hover{opacity:1;color:#fff}#pHome svg{width:100%;height:100%;fill:currentColor}' +
+  '@keyframes pl-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}@keyframes pl-up{from{transform:translateY(16px)}to{transform:none}}' +
+  '#pl .l1{animation:pl-in .34s cubic-bezier(.2,.7,.2,1)}#pl .l0{animation:pl-up .34s cubic-bezier(.2,.7,.2,1)}#pl .l2{animation:pl-in .34s .06s cubic-bezier(.2,.7,.2,1) both}' +
+  '@media (prefers-reduced-motion:reduce){#pl .l0,#pl .l1,#pl .l2{animation:none}}' +
   '#pS{position:absolute;top:6px;right:8px;width:22px;height:22px;border:0;background:none;color:#9aa2b3;opacity:.5;cursor:pointer;padding:0;display:grid;place-items:center}#pS:hover{opacity:1;color:#fff}#pS svg{width:100%;height:100%;fill:currentColor}' +
   /* as the window shrinks, the least important parts go first; the current lyric line is the last thing to go */
   '@container pp (max-height:195px){#pl .l0,#pl .l2{display:none}#pa{display:none}}' +
@@ -1042,6 +1103,7 @@ var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}html,body{height:
   '@container pp (max-height:150px){#pp{padding:6px 10px 5px;gap:3px}.ct button{width:26px;height:26px}.ct #pP{width:32px;height:32px}.cv{gap:0 12px}}' +
   '@container pp (max-height:100px){.vr{display:none}#pl .t2{display:none}}' +
   '@container pp (max-height:80px){.bar{display:none}}' +
+  '@container pp (max-width:270px){.ct{gap:4px}.ct #pH{margin-right:0}}' +
   '@container pp (max-width:250px){#pi{display:none}.bar span{display:none}.vr input{width:clamp(44px,30cqw,90px)}}';
 function pipTick() {
   var w = pip.win; if (!w) return;
@@ -1058,6 +1120,9 @@ function pipTick() {
   if (el('pM') && el('pM').getAttribute('data-ic') !== mic) { el('pM').innerHTML = mic; el('pM').setAttribute('data-ic', mic); }
   var lk = !!tr && isLiked(tr), hi = lk ? ICON.heart : ICON.heartO;
   if (el('pH') && el('pH').getAttribute('data-ic') !== hi) { el('pH').innerHTML = hi; el('pH').setAttribute('data-ic', hi); el('pH').classList.toggle('on', lk); }
+  var rpi = repeat === 2 ? ICON.rep1 : ICON.rep;
+  if (el('pR') && el('pR').getAttribute('data-ic') !== rpi) { el('pR').innerHTML = rpi; el('pR').setAttribute('data-ic', rpi); }
+  if (el('pR')) el('pR').classList.toggle('on', repeat > 0);
   var ic = loading ? '<span class="spinner"></span>' : (audio.paused ? ICON.play : ICON.pause);
   if (el('pP').getAttribute('data-ic') !== ic) { el('pP').innerHTML = ic; el('pP').setAttribute('data-ic', ic); }
   var hasLy = !!tr && lyr.status === 'ok' && lyr.synced.length > 0;
@@ -1105,12 +1170,14 @@ function pipToggle() {
     d.title = 'Budsin Music';
     d.body.innerHTML = '<div id="pp"><div class="top"><img id="pi" alt=""><div class="mm"><div id="pt"></div><div id="pa"></div></div></div><div id="pl"></div>' +
       '<div class="bar"><span id="pc">0:00</span><input type="range" id="ps" min="0" max="1000" value="0"><span id="pd">0:00</span></div>' +
-      '<div class="cv"><div class="ct"><button id="pH"></button><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button></div>' +
-      '<div class="vr"><button id="pM"></button><input type="range" id="pv" min="0" max="100" value="80"><span id="pvp"></span></div></div><button id="pS" title="' + esc(t('pipLayout')) + '"><svg viewBox="0 0 24 24"><path d="M3 5h18v3H3zm0 5.5h18v3H3zM3 16h18v3H3z"/></svg></button></div>';
+      '<div class="cv"><div class="ct"><button id="pH"></button><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button><button id="pR"></button></div>' +
+      '<div class="vr"><button id="pM"></button><input type="range" id="pv" min="0" max="100" value="80"><span id="pvp"></span></div></div><button id="pHome" title="' + esc(t('home')) + '"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg></button><button id="pS" title="' + esc(t('pipLayout')) + '"><svg viewBox="0 0 24 24"><path d="M3 5h18v3H3zm0 5.5h18v3H3zM3 16h18v3H3z"/></svg></button></div>';
     d.getElementById('pV').addEventListener('click', function () { prev(); });
     d.getElementById('pP').addEventListener('click', togglePlay);
     d.getElementById('pN').addEventListener('click', function () { next(false); });
     d.getElementById('pH').addEventListener('click', function () { var c0 = cur(); if (c0) toggleLike(c0); pipTick(); });
+    d.getElementById('pR').addEventListener('click', function () { repeat = (repeat + 1) % 3; store.set('bm_repeat', repeat); syncModes(); pipTick(); });
+    d.getElementById('pHome').addEventListener('click', function () { try { window.focus(); } catch (e) {} location.hash = '#/'; });
     d.getElementById('pS').addEventListener('click', function () { var o = ['full', 'lyrics', 'mini']; pipcfg.preset = o[(o.indexOf(pipcfg.preset) + 1) % 3]; pipSave(); pipApplyCfg(); });
     d.getElementById('pM').addEventListener('click', function () { muted = !muted; applyVol(); pipTick(); });
     var pv = d.getElementById('pv');
@@ -1230,6 +1297,65 @@ function vSettings() {
   $('#ppCover', view).addEventListener('click', function () { pipcfg.cover = !pipcfg.cover; markPp(); });
   $('#ppGrad', view).addEventListener('click', function () { pipcfg.grad = !pipcfg.grad; markPp(); });
   mark();      // fills the strength slider the first time
+}
+/* ---- Full-screen "now playing": big cover + big lyrics + controls (inside the site; the button at the top also asks the browser for real full screen) ---- */
+var fsv = { on: false, idx: -2, hold: 0, drag: false };
+function fsvIc(el, html) { if (el.__ic !== html) { el.__ic = html; el.innerHTML = html; } }
+function fsvOpen() {
+  if (fsv.on) return;
+  fsv.on = true; $('#fsv').classList.add('on');
+  $('#fsvShuf').innerHTML = $('#bShuf').innerHTML; $('#fsvPrev').innerHTML = $('#bPrev').innerHTML; $('#fsvNext').innerHTML = $('#bNext').innerHTML;
+  fsvRender(); lyrOnTrack();
+}
+function fsvClose() {
+  if (!fsv.on) return;
+  fsv.on = false; $('#fsv').classList.remove('on');
+  if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(function () {});
+}
+function fsvRender() {
+  if (!fsv.on) return;
+  var tr = cur(), left = $('#fsvLeft');
+  left.innerHTML = tr ? img(tr.artwork) + '<div><div class="fsv-t">' + esc(tr.title) + '</div><div class="fsv-a">' + artistLink(tr) + '</div></div>' : '<div class="fsv-msg">' + esc(t('lyrNothing')) + '</div>';
+  fsvLyrics(); fsvSync();
+}
+function fsvLyrics() {
+  var box = $('#fsvLy'); if (!box || !fsv.on) return;
+  fsv.idx = -2;
+  var msg = function (ic, k) { box.innerHTML = '<div class="fsv-msg">' + ic + ' ' + esc(t(k)) + '</div>'; };
+  if (!cur()) { box.innerHTML = ''; return; }
+  if (lyr.status === 'loading' || lyr.status === 'idle') return msg('⏳', 'lyrLoading');
+  if (lyr.status === 'error') return msg('📡', 'lyrErr');
+  if (lyr.status === 'none') return msg('🎤', 'lyrNone');
+  if (lyr.instr) return msg('🎵', 'lyrInstr');
+  var tl = lyrTrCur();
+  if (lyr.synced.length) {
+    box.innerHTML = lyr.synced.map(function (l, i) { return '<p class="fsv-line" data-i="' + i + '">' + (l.text ? esc(l.text) : '♪') + (tl && tl[i] ? '<span class="trl">' + esc(tl[i]) + '</span>' : '') + '</p>'; }).join('');
+    fsvTick(true);
+  } else {
+    var src = lyrTrSource();
+    box.innerHTML = '<div class="fsv-plain">' + (tl ? src.map(function (l, i) { return l.trim() ? esc(l) + (tl[i] ? '\n' + esc(tl[i]) : '') : ''; }).join('\n') : esc(lyr.plain)) + '</div>';
+  }
+}
+function fsvTick(force) {
+  if (!fsv.on || lyr.status !== 'ok' || !lyr.synced.length) return;
+  var box = $('#fsvLy'); if (!box) return;
+  var i = lyrIndexAt(audio.currentTime || 0);
+  if (i === fsv.idx && !force) return;
+  fsv.idx = i;
+  var lines = box.querySelectorAll('.fsv-line');
+  for (var k = 0; k < lines.length; k++) { var cl = lines[k].classList; cl.toggle('cur', k === i); cl.toggle('prev', k === i - 1); cl.toggle('past', k < i - 1); }
+  var el = i >= 0 ? box.querySelector('.fsv-line[data-i="' + i + '"]') : null;
+  if (el && (force || Date.now() > fsv.hold)) box.scrollTo({ top: Math.max(0, el.offsetTop - box.clientHeight / 2 + el.offsetHeight / 2), behavior: force ? 'auto' : 'smooth' });
+}
+function fsvSync() {
+  if (!fsv.on) return;
+  var tr = cur(), d = isFinite(audio.duration) && audio.duration > 0 ? audio.duration : (tr && tr.duration) || 0, c = audio.getAttribute('src') ? (audio.currentTime || 0) : 0;
+  if (!fsv.drag) { var v = d ? Math.min(1000, Math.round(c / d * 1000)) : 0; $('#fsvSeek').value = v; setRange($('#fsvSeek'), v / 10); $('#fsvCur').textContent = fmt(c); }
+  $('#fsvDur').textContent = fmt(d);
+  fsvIc($('#fsvPlay'), loading ? '<span class="spinner"></span>' : (audio.paused ? ICON.play : ICON.pause));
+  var lk = !!tr && isLiked(tr); fsvIc($('#fsvLike'), lk ? ICON.heart : ICON.heartO); $('#fsvLike').classList.toggle('on', lk);
+  $('#fsvShuf').classList.toggle('on', shuffle); $('#fsvRep').classList.toggle('on', repeat > 0); fsvIc($('#fsvRep'), repeat === 2 ? ICON.rep1 : ICON.rep);
+  var vv = muted ? 0 : volume; $('#fsvVol').value = vv; setRange($('#fsvVol'), vv); $('#fsvVolP').textContent = vv + '%'; fsvIc($('#fsvMute'), (muted || volume === 0) ? ICON.mute : ICON.vol);
 }
 function year(d) { return d ? String(d).slice(0, 4) : ''; }
 
@@ -1362,7 +1488,7 @@ audio.addEventListener('stalled', function () { if (cur() && !audio.paused && au
 audio.addEventListener('play', syncPlayBtn);
 audio.addEventListener('pause', syncPlayBtn);
 audio.addEventListener('timeupdate', updateSeek);
-audio.addEventListener('timeupdate', function () { npvTick(false); });
+audio.addEventListener('timeupdate', function () { npvTick(false); fsvTick(false); fsvSync(); });
 audio.addEventListener('durationchange', updateSeek);
 
 /* ================= player UI ================= */
@@ -1387,9 +1513,33 @@ function applyVol() {
   vol.value = muted ? 0 : volume; setRange(vol, muted ? 0 : volume);
   $('#volPct').textContent = (muted ? 0 : volume) + '%';
   $('#bMute').innerHTML = (muted || volume === 0) ? ICON.mute : ICON.vol;
+  if (typeof fsv !== 'undefined') fsvSync();
 }
 vol.addEventListener('input', function () { volume = +vol.value; muted = false; store.set('bm_vol', volume); applyVol(); });
 if (pip.ok) $('#bPip').hidden = false;
+$('#bFs').addEventListener('click', fsvOpen);
+$('#fsvClose').addEventListener('click', fsvClose);
+$('#fsvHome').addEventListener('click', function () { fsvClose(); location.hash = '#/'; });
+$('#fsvBrowser').addEventListener('click', function () {
+  if (document.fullscreenElement) { document.exitFullscreen().catch(function () {}); return; }
+  var el = document.documentElement; if (el.requestFullscreen) el.requestFullscreen().catch(function () {});
+});
+$('#fsvLike').addEventListener('click', function () { var c0 = cur(); if (c0) toggleLike(c0); });
+$('#fsvShuf').addEventListener('click', function () { shuffle = !shuffle; store.set('bm_shuffle', shuffle); syncModes(); });
+$('#fsvPrev').addEventListener('click', prev);
+$('#fsvPlay').addEventListener('click', togglePlay);
+$('#fsvNext').addEventListener('click', function () { next(false); });
+$('#fsvRep').addEventListener('click', function () { repeat = (repeat + 1) % 3; store.set('bm_repeat', repeat); syncModes(); });
+$('#fsvMute').addEventListener('click', function () { muted = !muted; applyVol(); });
+$('#fsvVol').addEventListener('input', function () { volume = +this.value; muted = false; store.set('bm_vol', volume); applyVol(); });
+$('#fsvSeek').addEventListener('input', function () { fsv.drag = true; setRange(this, this.value / 10); var d0 = audio.duration || (cur() && cur().duration) || 0; $('#fsvCur').textContent = fmt(d0 * this.value / 1000); });
+$('#fsvSeek').addEventListener('change', function () { var d0 = audio.duration; if (isFinite(d0) && d0 > 0) audio.currentTime = d0 * this.value / 1000; fsv.drag = false; });
+$('#fsvLy').addEventListener('click', function (e) {
+  var ln = e.target.closest('.fsv-line');
+  if (ln && lyr.synced[+ln.getAttribute('data-i')]) { audio.currentTime = Math.max(0, lyr.synced[+ln.getAttribute('data-i')].t + lyr.off); fsv.hold = 0; fsvTick(true); }
+});
+['wheel', 'touchmove'].forEach(function (ev) { $('#fsvLy').addEventListener(ev, function () { fsv.hold = Date.now() + 4000; }, { passive: true }); });
+document.addEventListener('fullscreenchange', function () { $('#fsvBrowser').classList.toggle('on', !!document.fullscreenElement); });
 $('#bNpv').addEventListener('click', function () { npv.on = !npv.on; store.set('bm_npv', npv.on ? 1 : 0); npvApply(); });
 (function () {      // drag the edge to resize the panel
   var rs = $('#npvRs'), w = 0;
@@ -1416,12 +1566,14 @@ function syncPlayBtn() {
   document.body.classList.toggle('paused', !playing);
   if ('mediaSession' in navigator) navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
   refreshPlayingMarks();
+  if (typeof fsv !== 'undefined') fsvSync();
 }
 function syncModes() {
   var bs = $('#bShuf'), br = $('#bRep');
   bs.classList.toggle('on', shuffle);
   br.classList.toggle('on', repeat > 0);
   br.innerHTML = repeat === 2 ? ICON.rep1 : ICON.rep;
+  if (typeof fsv !== 'undefined') fsvSync();
 }
 $('#bShuf').addEventListener('click', function () { shuffle = !shuffle; store.set('bm_shuffle', shuffle); syncModes(); });
 $('#bRep').addEventListener('click', function () { repeat = (repeat + 1) % 3; store.set('bm_repeat', repeat); syncModes(); });
@@ -1480,6 +1632,7 @@ function updateNowPlaying() {
     dynReset();
     if (pip.win) pipRender();
     npvRender();
+    fsvRender();
     return;
   }
   el.innerHTML = img(tr.artwork) +
@@ -1491,6 +1644,7 @@ function updateNowPlaying() {
   document.title = tr.title + ' — ' + tr.artist + ' · Budsin Music';
   dynFor(tr.artwork, tr);
   eggToast(tr);
+  fsvRender();
   if (pip.win) pipRender();
   npvRender();
   updateSeek();
@@ -2076,12 +2230,13 @@ document.addEventListener('keydown', function (e) {
   else if (e.key === '/') { e.preventDefault(); qEl.focus(); }
   else if (e.key.toLowerCase() === 'l') { if (lyr.on) lyrClose(); else lyrOpen(); }
   else if (e.key.toLowerCase() === 'v') { if (viz.on) vizClose(); else vizOpen(); }
+  else if (e.key.toLowerCase() === 'f') { if (fsv.on) fsvClose(); else fsvOpen(); }
   else if (e.key === 'ArrowRight' && !e.shiftKey && viz.on) vizStep(1);
   else if (e.key === 'ArrowLeft' && !e.shiftKey && viz.on) vizStep(-1);
   else if (e.key === 'ArrowRight' && e.shiftKey) next(false);
   else if (e.key === 'ArrowLeft' && e.shiftKey) prev();
   else if (e.key.toLowerCase() === 'm') { muted = !muted; applyVol(); }
-  else if (e.key === 'Escape') { closeMenu(); $('#queue').classList.remove('on'); if ($('#plmodal').classList.contains('on')) plmClose(); else if (lyr.on) lyrClose(); else if ($('#vizPop').classList.contains('on')) vizPopClose(); else vizClose(); }
+  else if (e.key === 'Escape') { closeMenu(); $('#queue').classList.remove('on'); if ($('#plmodal').classList.contains('on')) plmClose(); else if (fsv.on) fsvClose(); else if (lyr.on) lyrClose(); else if ($('#vizPop').classList.contains('on')) vizPopClose(); else vizClose(); }
 });
 
 /* ================= visualizer ================= */
@@ -2430,6 +2585,7 @@ function lyrTrApply() {
     });
   } else lyrRender();
   npvLyrics();
+  fsvLyrics();
   lyrSync(true);
 }
 function lyrTrLoad(force) {
@@ -2506,6 +2662,7 @@ function lyrRender() {
     '<div class="lyr-credit">' + esc(t('lyrBy')) + ' <a href="https://lrclib.net" target="_blank" rel="noopener">LRCLIB</a></div>';
   body.scrollTop = 0; lyr.idx = -1;
   npvLyrics();
+  fsvLyrics();
 }
 
 // Last line whose stamp has passed (a quarter second early, so the highlight lands on the word, not after it).
@@ -2547,7 +2704,7 @@ function lyrInfo() {
 // A new track: load its lyrics only if something is showing them.
 function lyrOnTrack() {
   if (lyr.on) lyrInfo();
-  if (!(lyr.on || viz.on || pip.win || npv.on)) return;
+  if (!(lyr.on || viz.on || pip.win || npv.on || fsv.on)) return;
   var tr = cur();
   if (tr) lyrLoad(tr); else { lyr.key = null; lyr.status = 'idle'; lyrRender(); vizCaption(-1); }
 }
