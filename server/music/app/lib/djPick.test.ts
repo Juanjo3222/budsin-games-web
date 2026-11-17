@@ -105,6 +105,7 @@ test("djPick asks the gateway once, maps the answer and caches it", async () => 
   expect(a.picks.map((p) => p.n)).toEqual([7, 2]);
   expect(body.max_output_tokens).toBe(900);
   expect(body.model).toBe("gpt-6-luna");
+  expect(body.reasoning).toEqual({ effort: "low" });
 });
 
 test("an unusable answer rejects, is not cached, and the next try can work", async () => {

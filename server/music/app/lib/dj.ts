@@ -17,7 +17,9 @@ import { LruCache } from "./lruCache";
 
 const apiUrl = () => (process.env.DJ_API_URL || "https://api.dawvq.com").replace(/\/+$/, "");
 const model = () => process.env.DJ_MODEL || "gpt-6-luna";
-const TIMEOUT_MS = Number(process.env.DJ_TIMEOUT_MS) || 20_000;
+const TIMEOUT_MS = Number(process.env.DJ_TIMEOUT_MS) || 25_000;
+// "low" answers in ~5 s with the same picks; the default effort took 9-20 s for these short, structured jobs.
+const effort = () => process.env.DJ_EFFORT || "low";
 const DAILY_MAX = () => Number(process.env.DJ_DAILY_MAX) || 2000;
 const MAX_FIELD = 120;
 const MAX_OUT = 240;
@@ -119,7 +121,7 @@ async function callGateway(instructions: string, input: string, maxTokens: numbe
   const res = await fetch(`${apiUrl()}/v1/responses`, {
     method: "POST",
     headers: { Authorization: `Bearer ${process.env.DJ_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: model(), instructions, input, max_output_tokens: maxTokens }),
+    body: JSON.stringify({ model: model(), instructions, input, max_output_tokens: maxTokens, reasoning: { effort: effort() } }),
     signal: AbortSignal.timeout(TIMEOUT_MS),
   });
   if (!res.ok) {
