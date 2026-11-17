@@ -180,6 +180,25 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .tr .like.on:hover { color: var(--accent); }
 .exp { font-size: .6rem; background: #3a404d; color: #ddd; padding: 1px 5px; border-radius: 3px; font-weight: 800; flex: none; }
 .iconbtn[hidden] { display: none; }
+/* "Now playing" side panel (Spotify-style): cover, title, artist and the lyrics, off by default */
+#npv { grid-area: npv; display: none; flex-direction: column; background: linear-gradient(180deg, rgba(var(--tint, 37,208,180), .28), #0a0c10 60%); border-left: 1px solid var(--line); overflow-y: auto; padding: 18px 18px 24px; }
+#npv .npv-art img { width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; background: #1d222c; box-shadow: 0 12px 30px rgba(0,0,0,.5); display: block; }
+#npv .npv-t { margin-top: 14px; font-size: 1.25rem; font-weight: 800; color: var(--accent); letter-spacing: -.02em; line-height: 1.2; }
+#npv .npv-a { color: var(--muted); font-size: .92rem; margin-top: 2px; }
+#npv .npv-a a:hover { text-decoration: underline; color: var(--text); }
+#npv .npv-ly { margin-top: 18px; display: flex; flex-direction: column; gap: 12px; }
+#npv .npv-line { margin: 0; font-size: 1.05rem; font-weight: 700; line-height: 1.3; color: rgba(255,255,255,.34); cursor: pointer; transition: color .25s; overflow-wrap: anywhere; }
+#npv .npv-line:hover { color: rgba(255,255,255,.7); }
+#npv .npv-line.cur { color: color-mix(in srgb, var(--accent) 62%, #fff); }
+#npv .npv-line .trl { display: block; margin-top: 2px; font-size: .8em; font-weight: 600; color: rgba(255,255,255,.4); }
+#npv .npv-line.cur .trl { color: rgba(255,255,255,.78); }
+#npv .npv-plain { white-space: pre-wrap; color: rgba(255,255,255,.72); font-size: .95rem; line-height: 1.5; }
+#npv .npv-msg { color: var(--muted); text-align: center; padding: 22px 0; font-size: .9rem; }
+@media (min-width: 1000px) {
+  #app.npv-on { grid-template-columns: var(--side) 1fr 340px; grid-template-areas: "side main npv" "player player player"; }
+  #app.npv-on #npv { display: flex; }
+}
+@media (max-width: 999px) { #bNpv { display: none; } }
 .eq { display: inline-flex; gap: 2px; align-items: flex-end; height: 14px; }
 .eq i { width: 3px; background: var(--accent); animation: eq 1s infinite ease-in-out; border-radius: 1px; }
 .eq i:nth-child(1) { height: 60%; animation-delay: -.2s; } .eq i:nth-child(2) { height: 100%; animation-delay: -.5s; } .eq i:nth-child(3) { height: 40%; animation-delay: -.8s; }
@@ -238,6 +257,8 @@ input[type=range]::-moz-range-progress { height: 4px; border-radius: 4px; backgr
 input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #fff; margin-top: -4px; opacity: 0; transition: opacity .1s; }
 input[type=range]::-moz-range-thumb { width: 12px; height: 12px; border: 0; border-radius: 50%; background: #fff; opacity: 0; }
 input[type=range]:hover::-webkit-slider-thumb, input[type=range]:focus-visible::-webkit-slider-thumb { opacity: 1; }
+#seek::-webkit-slider-thumb { opacity: 1; background: var(--accent); }
+#seek::-moz-range-thumb { opacity: 1; background: var(--accent); }
 input[type=range]:hover { --c: var(--accent); }
 .spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid rgba(0,0,0,.18); border-top-color: #0b0d10; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -520,6 +541,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="view" id="view"></div>
   </main>
 
+  <aside id="npv" aria-label="Now playing"></aside>
+
   <section id="player" aria-label="Reproductor">
     <div class="np" id="np"></div>
     <div class="ctrl">
@@ -535,6 +558,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="right">
       <button class="iconbtn" id="bLyr" data-ti="lyr"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></button>
       <button class="iconbtn" id="bViz" data-ti="viz"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>
+      <button class="iconbtn" id="bNpv" data-ti="npv"><svg viewBox="0 0 24 24"><path d="M3 4h18a1 1 0 011 1v14a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1zm12 2v12h5V6h-5z"/></svg></button>
       <button class="iconbtn" id="bPip" data-ti="pip" hidden><svg viewBox="0 0 24 24"><path d="M19 11h-8v6h8v-6zm4 8V4.98C23 3.88 22.1 3 21 3H3c-1.1 0-2 .88-2 1.98V19c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2zm-2 .02H3V4.97h18v14.05z"/></svg></button>
       <button class="iconbtn" id="bQueue" data-ti="queue"><svg viewBox="0 0 24 24"><path d="M3 6h14v2H3zm0 5h14v2H3zm0 5h9v2H3zm13 0l6-3.5v7z"/></svg></button>
       <button class="iconbtn" id="bMute" data-ti="mute"></button>
@@ -639,7 +663,7 @@ var I18N = {
     acctTitle: 'Cuenta de Budsin', acctPitch: 'Inicia sesión con Google para que tus ♥, playlists y gustos te sigan a todos tus dispositivos y a Budsin Games.', acctIn: 'Iniciar sesión con Google', acctOut: 'Cerrar sesión', acctWipe: 'Borrar mis datos de la nube', acctWipeAsk: '¿Borrar de la nube tus ♥, playlists, gustos y preferencias? Lo guardado en este navegador se queda.', acctWiped: 'Datos de la nube borrados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'No se pudo sincronizar.', acctErrPerm: 'No se pudo sincronizar: faltan permisos en Firestore.', acctSignedOut: 'Sesión cerrada. Se quitaron de este navegador los datos de la cuenta.', acctFail: 'No se pudo iniciar sesión.', acctSdkFail: 'No se pudo cargar el inicio de sesión. Revisa tu conexión.',
     pal_custom: 'Personalizado', vizColor1: 'Color inicial', vizColor2: 'Color final', vizReset: 'Restablecer',
     lyrVersions: 'Versión', lyrOffTitle: 'Sincronía: si la letra sale antes que la voz, pulsa +; si sale después, pulsa −. Toca el número para restablecer.', lyrVerTitle: 'Versiones de la letra', lyrVerNone: 'No hay otras versiones de esta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz desde',
-    lyr: 'Letra', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
+    lyr: 'Letra', npv: 'Vista de reproducción', lyrTr: 'Traducir', lyrTrLoading: 'Traduciendo…', lyrTrOn: 'Traducida', lyrTrSame: 'Esta letra ya está en tu idioma.', lyrTrFail: 'No se pudo traducir la letra.', vizSens: 'Sensibilidad', lyrLoading: 'Buscando letra…', pip: 'Mini ventana flotante', pipFail: 'No se pudo abrir la mini ventana.', lyrNone: 'No encontramos la letra de esta canción.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra sin sincronizar', lyrErr: 'No se pudo cargar la letra.', lyrBy: 'Letras de', lyrNothing: 'Reproduce una canción para ver su letra',
     vizFail: 'El visualizador no está disponible en este navegador.', vizFs: 'Pantalla completa', vizClose: 'Cerrar', vizIdle: 'Reproduce una canción para ver el visualizador',
     playErr: 'No se pudo reproducir esta canción. Pasando a la siguiente…', playErr1: 'No se pudo reproducir esta canción.', tapResume: 'Toca ▶ para continuar la música.',
     noPlay: 'La búsqueda funciona, pero la reproducción no está disponible ahora mismo.',
@@ -670,7 +694,7 @@ var I18N = {
     acctTitle: 'Budsin account', acctPitch: 'Sign in with Google so your ♥, playlists and taste follow you to all your devices and to Budsin Games.', acctIn: 'Sign in with Google', acctOut: 'Sign out', acctWipe: 'Delete my cloud data', acctWipeAsk: 'Delete your ♥, playlists, taste and preferences from the cloud? What is saved in this browser stays.', acctWiped: 'Cloud data deleted.', acctConnecting: 'Connecting…', acctSyncing: 'Syncing…', acctSynced: 'Synced ✓', acctErr: 'Could not sync.', acctErrPerm: 'Could not sync: Firestore permissions are missing.', acctSignedOut: 'Signed out. The account data was removed from this browser.', acctFail: 'Could not sign in.', acctSdkFail: 'Could not load sign-in. Check your connection.',
     pal_custom: 'Custom', vizColor1: 'Start color', vizColor2: 'End color', vizReset: 'Reset',
     lyrVersions: 'Version', lyrOffTitle: 'Sync: if the lyrics show up before the voice, press +; if after, press −. Tap the number to reset.', lyrVerTitle: 'Lyrics versions', lyrVerNone: 'No other versions of these lyrics.', lyrVerAuto: 'Automatic', lyrVoice: 'vocals from',
-    lyr: 'Lyrics', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
+    lyr: 'Lyrics', npv: 'Now playing view', lyrTr: 'Translate', lyrTrLoading: 'Translating…', lyrTrOn: 'Translated', lyrTrSame: 'These lyrics are already in your language.', lyrTrFail: 'Could not translate the lyrics.', vizSens: 'Sensitivity', lyrLoading: 'Looking for lyrics…', pip: 'Floating mini window', pipFail: 'Could not open the mini window.', lyrNone: 'We could not find the lyrics for this song.', lyrInstr: 'Instrumental', lyrPlainNote: 'Unsynced lyrics', lyrErr: 'Could not load the lyrics.', lyrBy: 'Lyrics from', lyrNothing: 'Play a song to see its lyrics',
     vizFail: 'The visualizer is not available in this browser.', vizFs: 'Fullscreen', vizClose: 'Close', vizIdle: 'Play a song to see the visualizer',
     playErr: 'Could not play this track. Skipping to the next one…', playErr1: 'Could not play this track.', tapResume: 'Tap ▶ to keep the music going.',
     noPlay: 'Search works, but playback is not available right now.',
@@ -701,7 +725,7 @@ var I18N = {
     acctTitle: 'Conta Budsin', acctPitch: 'Entre com o Google para que seus ♥, playlists e gostos acompanhem você em todos os dispositivos e no Budsin Games.', acctIn: 'Entrar com o Google', acctOut: 'Sair', acctWipe: 'Apagar meus dados da nuvem', acctWipeAsk: 'Apagar da nuvem seus ♥, playlists, gostos e preferências? O que está salvo neste navegador permanece.', acctWiped: 'Dados da nuvem apagados.', acctConnecting: 'Conectando…', acctSyncing: 'Sincronizando…', acctSynced: 'Sincronizado ✓', acctErr: 'Não foi possível sincronizar.', acctErrPerm: 'Não foi possível sincronizar: faltam permissões no Firestore.', acctSignedOut: 'Sessão encerrada. Os dados da conta foram removidos deste navegador.', acctFail: 'Não foi possível entrar.', acctSdkFail: 'Não foi possível carregar o login. Verifique sua conexão.',
     pal_custom: 'Personalizado', vizColor1: 'Cor inicial', vizColor2: 'Cor final', vizReset: 'Redefinir',
     lyrVersions: 'Versão', lyrOffTitle: 'Sincronia: se a letra aparece antes da voz, toque em +; se depois, em −. Toque no número para redefinir.', lyrVerTitle: 'Versões da letra', lyrVerNone: 'Não há outras versões desta letra.', lyrVerAuto: 'Automática', lyrVoice: 'voz a partir de',
-    lyr: 'Letra', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
+    lyr: 'Letra', npv: 'Vista de reprodução', lyrTr: 'Traduzir', lyrTrLoading: 'Traduzindo…', lyrTrOn: 'Traduzida', lyrTrSame: 'Esta letra já está no seu idioma.', lyrTrFail: 'Não foi possível traduzir a letra.', vizSens: 'Sensibilidade', lyrLoading: 'Procurando a letra…', pip: 'Mini janela flutuante', pipFail: 'Não foi possível abrir a mini janela.', lyrNone: 'Não encontramos a letra desta música.', lyrInstr: 'Instrumental', lyrPlainNote: 'Letra não sincronizada', lyrErr: 'Não foi possível carregar a letra.', lyrBy: 'Letras de', lyrNothing: 'Toque uma música para ver a letra',
     vizFail: 'O visualizador não está disponível neste navegador.', vizFs: 'Tela cheia', vizClose: 'Fechar', vizIdle: 'Toque uma música para ver o visualizador',
     playErr: 'Não foi possível reproduzir esta música. Pulando para a próxima…', playErr1: 'Não foi possível reproduzir esta música.', tapResume: 'Toque em ▶ para continuar a música.',
     noPlay: 'A busca funciona, mas a reprodução não está disponível agora.',
@@ -783,22 +807,31 @@ function hsl2rgb(h, s, l) {
   return [Math.round((r + m) * 255), Math.round((g + m) * 255), Math.round((b + m) * 255)];
 }
 function coverColor(data) {      // data: RGBA of a small canvas -> {h, s} or null for grey / near-black / near-white covers
-  var bins = [], i, n = 24;
+  // The colour that covers the most of the picture wins (area first; vividness only breaks near-ties), so a small
+  // bright detail no longer beats the big coloured field. Neighbouring hue bins are pooled so one colour is not
+  // split in two at a bin edge.
+  var bins = [], i, n = 36, px = data.length / 4, used = 0;
   for (i = 0; i < n; i++) bins.push({ w: 0, hs: 0, hc: 0, s: 0 });
   for (i = 0; i < data.length; i += 4) {
     if (data[i + 3] < 200) continue;
     var r = data[i] / 255, g = data[i + 1] / 255, b = data[i + 2] / 255;
     var mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
-    if (mx < .2 || d < .12) continue;
+    if (mx < .18 || d < .1) continue;          // near black, grey or white: not a colour
     var sat = d / mx, h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4;
     h = (h * 60 + 360) % 360;
-    var w = sat * sat * mx, bin = bins[Math.floor(h / (360 / n)) % n], rad = h * Math.PI / 180;
-    bin.w += w; bin.hs += Math.sin(rad) * w; bin.hc += Math.cos(rad) * w; bin.s += sat * w;
+    var w = (.8 + .4 * sat) * (.7 + .3 * mx), bin = bins[Math.floor(h / (360 / n)) % n], rad = h * Math.PI / 180;
+    bin.w += w; bin.hs += Math.sin(rad) * w; bin.hc += Math.cos(rad) * w; bin.s += sat * w; used++;
   }
-  var best = bins[0], tot = 0;
-  bins.forEach(function (b) { tot += b.w; if (b.w > best.w) best = b; });
-  if (!best.w || tot < 1.2) return null;
-  return { h: (Math.atan2(best.hs, best.hc) * 180 / Math.PI + 360) % 360, s: best.s / best.w };
+  if (used < px * .05) return null;            // almost no colour at all
+  var bestI = 0, bestScore = -1;
+  for (i = 0; i < n; i++) {
+    var sc = bins[i].w + .6 * (bins[(i + n - 1) % n].w + bins[(i + 1) % n].w);
+    if (sc > bestScore) { bestScore = sc; bestI = i; }
+  }
+  var hs = 0, hc = 0, sw = 0, ss = 0;
+  [-1, 0, 1].forEach(function (o) { var bb = bins[(bestI + n + o) % n]; hs += bb.hs; hc += bb.hc; sw += bb.w; ss += bb.s; });
+  if (!sw) return null;
+  return { h: (Math.atan2(hs, hc) * 180 / Math.PI + 360) % 360, s: ss / sw };
 }
 function dynApply(c) {
   var st = document.documentElement.style;
@@ -817,9 +850,9 @@ function dynFor(src) {
   im.onload = function () {
     var c = null;
     try {
-      var cv = document.createElement('canvas'); cv.width = cv.height = 32;
-      var cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(im, 0, 0, 32, 32);
-      c = coverColor(cx.getImageData(0, 0, 32, 32).data);
+      var cv = document.createElement('canvas'); cv.width = cv.height = 48;
+      var cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(im, 0, 0, 48, 48);
+      c = coverColor(cx.getImageData(0, 0, 48, 48).data);
     } catch (e) { c = null; }
     dyn.cache[src] = c;
     if (my === dyn.seq && dyn.on) dynApply(c);
@@ -832,13 +865,21 @@ function dynFor(src) {
  * can be driven from over any other app, not only inside Budsin. Where the browser has no such API the button stays
  * hidden. The window is plain DOM that this page fills and updates; closing it just stops the updates. */
 var pip = { win: null, timer: 0, ok: !!(window.documentPictureInPicture && window.documentPictureInPicture.requestWindow) };
-var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#0b0d10;color:#eef0f4;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}' +
-  '#pp{display:grid;grid-template-columns:76px 1fr;gap:4px 12px;align-items:center;align-content:center;padding:12px 14px;height:100vh;background:linear-gradient(180deg,rgba(var(--tint,37,208,180),.35),#0b0d10 70%)}' +
-  '#pi{width:76px;height:76px;border-radius:10px;object-fit:cover;background:#1d222c;grid-row:1}.mm{min-width:0}#pt{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#pa{font-size:12px;color:#8d95a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
-  '#pl{grid-column:1/3;min-height:34px;text-align:center;font-size:13px;line-height:1.3;color:var(--accent,#25d0b4);font-weight:600;display:flex;align-items:center;justify-content:center;overflow:hidden}#pl:empty{display:none}#pl{flex-direction:column;gap:2px}#pl .t2{font-size:11px;color:#8d95a6;font-weight:500}' +
-  '.bar{grid-column:1/3;display:flex;align-items:center;gap:8px;font-size:11px;color:#8d95a6;font-variant-numeric:tabular-nums}.bar input{flex:1;accent-color:var(--accent,#25d0b4);height:4px}' +
-  '.ct{grid-column:1/3;display:flex;justify-content:center;align-items:center;gap:14px}.ct button{border:0;background:none;color:#eef0f4;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;cursor:pointer}.ct button:hover{background:rgba(255,255,255,.1)}.ct svg{width:22px;height:22px;fill:currentColor}' +
-  '.ct #pP{background:#fff;color:#0b0d10;width:44px;height:44px}.ct #pP:hover{background:#fff;opacity:.9}.spinner{width:18px;height:18px;border:2px solid #0b0d10;border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;display:block}@keyframes s{to{transform:rotate(360deg)}}';
+var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:#0b0d10;color:#eef0f4;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}' +
+  /* everything is sized from the window itself (vmin / vh / clamp), so it rescales smoothly instead of breaking when the window is made small */
+  '#pp{display:flex;flex-direction:column;height:100%;padding:clamp(6px,2.6vmin,14px);gap:clamp(2px,1.6vmin,8px);background:linear-gradient(180deg,rgba(var(--tint,37,208,180),.38),#0b0d10 75%)}' +
+  '.top{display:flex;align-items:center;gap:clamp(8px,3vmin,14px);min-height:0;flex:0 1 auto}' +
+  '#pi{height:clamp(34px,28vh,100px);width:clamp(34px,28vh,100px);border-radius:clamp(6px,1.8vmin,12px);object-fit:cover;background:#1d222c;flex:none}' +
+  '.mm{min-width:0;flex:1}#pt{font-weight:700;font-size:clamp(12px,4.4vmin,18px);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#pa{font-size:clamp(10px,3.2vmin,13px);color:#9aa2b3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+  '#pl{flex:1 1 0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;font-size:clamp(11px,4vmin,17px);line-height:1.25;color:var(--accent,#25d0b4);font-weight:600}' +
+  '#pl>div{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}#pl .t2{font-size:.78em;color:#9aa2b3;font-weight:500;margin-top:2px}' +
+  '.bar{flex:none;display:flex;align-items:center;gap:clamp(5px,2vmin,9px);font-size:clamp(9px,2.8vmin,11px);color:#9aa2b3;font-variant-numeric:tabular-nums}.bar input{flex:1;min-width:0;accent-color:var(--accent,#25d0b4);height:4px;margin:0}' +
+  '.ct{flex:none;display:flex;justify-content:center;align-items:center;gap:clamp(8px,4vmin,18px)}' +
+  '.vr{flex:none;display:flex;align-items:center;justify-content:center;gap:clamp(5px,2vmin,9px);font-size:clamp(9px,2.8vmin,11px);color:#9aa2b3;font-variant-numeric:tabular-nums}.vr input{width:clamp(70px,38vw,150px);accent-color:var(--accent,#25d0b4);height:4px;margin:0}.vr button{border:0;background:none;color:#9aa2b3;width:clamp(20px,6vmin,26px);height:clamp(20px,6vmin,26px);display:grid;place-items:center;cursor:pointer;padding:0}.vr button:hover{color:#fff}.vr svg{width:100%;height:100%;fill:currentColor}.vr #pvp{min-width:3.2em;text-align:left}' +
+  '.ct button{border:0;background:none;color:#eef0f4;width:clamp(26px,9vmin,38px);height:clamp(26px,9vmin,38px);border-radius:50%;display:grid;place-items:center;cursor:pointer;padding:0}.ct button:hover{background:rgba(255,255,255,.1)}.ct svg{width:58%;height:58%;fill:currentColor}' +
+  '.ct #pP{background:#fff;color:#0b0d10;width:clamp(32px,12vmin,46px);height:clamp(32px,12vmin,46px)}.ct #pP:hover{background:#fff;opacity:.9}.spinner{width:45%;height:45%;border:2px solid #0b0d10;border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;display:block}@keyframes s{to{transform:rotate(360deg)}}' +
+  /* as the window shrinks, the least important parts go first: lyrics, then the time, then the cover */
+  '@media (max-height:215px){.vr{display:none}}@media (max-height:190px){#pl{display:none}}@media (max-height:130px){.bar span{display:none}.top{flex:1}}@media (max-height:95px){.bar{display:none}}@media (max-width:240px){#pi{display:none}.bar span{display:none}}';
 function pipTick() {
   var w = pip.win; if (!w) return;
   var d = w.document, tr = cur();
@@ -847,6 +888,11 @@ function pipTick() {
   if (!el('pc')) return;
   el('pc').textContent = fmt(c); el('pd').textContent = fmt(dur);
   if (!el('ps').dataset.drag) el('ps').value = dur ? Math.min(1000, Math.round(c / dur * 1000)) : 0;
+  var vv = muted ? 0 : volume;
+  if (el('pv') && d.activeElement !== el('pv')) el('pv').value = vv;
+  if (el('pvp')) el('pvp').textContent = vv + '%';
+  var mic = (muted || volume === 0) ? ICON.mute : ICON.vol;
+  if (el('pM') && el('pM').getAttribute('data-ic') !== mic) { el('pM').innerHTML = mic; el('pM').setAttribute('data-ic', mic); }
   var ic = loading ? '<span class="spinner"></span>' : (audio.paused ? ICON.play : ICON.pause);
   if (el('pP').getAttribute('data-ic') !== ic) { el('pP').innerHTML = ic; el('pP').setAttribute('data-ic', ic); }
   var line = '';
@@ -887,12 +933,16 @@ function pipToggle() {
     pip.win = w;
     var d = w.document, st = d.createElement('style'); st.textContent = PIP_CSS; d.head.appendChild(st);
     d.title = 'Budsin Music';
-    d.body.innerHTML = '<div id="pp"><img id="pi" alt=""><div class="mm"><div id="pt"></div><div id="pa"></div></div><div id="pl"></div>' +
+    d.body.innerHTML = '<div id="pp"><div class="top"><img id="pi" alt=""><div class="mm"><div id="pt"></div><div id="pa"></div></div></div><div id="pl"></div>' +
       '<div class="bar"><span id="pc">0:00</span><input type="range" id="ps" min="0" max="1000" value="0"><span id="pd">0:00</span></div>' +
-      '<div class="ct"><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button></div></div>';
+      '<div class="ct"><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button></div>' +
+      '<div class="vr"><button id="pM"></button><input type="range" id="pv" min="0" max="100" value="80"><span id="pvp"></span></div></div>';
     d.getElementById('pV').addEventListener('click', function () { prev(); });
     d.getElementById('pP').addEventListener('click', togglePlay);
     d.getElementById('pN').addEventListener('click', function () { next(false); });
+    d.getElementById('pM').addEventListener('click', function () { muted = !muted; applyVol(); pipTick(); });
+    var pv = d.getElementById('pv');
+    pv.addEventListener('input', function () { volume = +pv.value; muted = false; store.set('bm_vol', volume); applyVol(); pipTick(); });
     var ps = d.getElementById('ps');
     ps.addEventListener('input', function () { ps.dataset.drag = '1'; });
     ps.addEventListener('change', function () { var du = audio.duration; if (isFinite(du) && du > 0) audio.currentTime = du * ps.value / 1000; delete ps.dataset.drag; });
@@ -902,6 +952,52 @@ function pipToggle() {
     pipRender();
     lyrOnTrack();        // the lyric line needs the lyrics even if nothing else is showing them
   }).catch(function () { toast(t('pipFail')); });
+}
+/* ---- "Now playing" side panel: cover, title, artist and lyrics beside the page; off by default (wide screens only) ---- */
+var npv = { on: store.get('bm_npv', 0) === 1, hold: 0, idx: -2 };
+function npvApply() {
+  $('#app').classList.toggle('npv-on', npv.on);
+  $('#bNpv').classList.toggle('on', npv.on);
+  if (npv.on) { npvRender(); lyrOnTrack(); }
+}
+function npvRender() {
+  if (!npv.on) return;
+  var tr = cur(), el = $('#npv');
+  if (!tr) { el.innerHTML = '<div class="npv-msg">' + esc(t('lyrNothing')) + '</div>'; return; }
+  el.innerHTML = '<div class="npv-art">' + img(tr.artwork) + '</div><div class="npv-t">' + esc(tr.title) + '</div><div class="npv-a">' + artistLink(tr) + '</div><div class="npv-ly" id="npvLy"></div>';
+  npvLyrics();
+}
+function npvLyrics() {
+  var box = $('#npvLy'); if (!box || !npv.on) return;
+  npv.idx = -2;
+  if (!cur()) { box.innerHTML = ''; return; }
+  if (lyr.status === 'loading' || lyr.status === 'idle') { box.innerHTML = '<div class="npv-msg">⏳ ' + esc(t('lyrLoading')) + '</div>'; return; }
+  if (lyr.status === 'error') { box.innerHTML = '<div class="npv-msg">📡 ' + esc(t('lyrErr')) + '</div>'; return; }
+  if (lyr.status === 'none') { box.innerHTML = '<div class="npv-msg">🎤 ' + esc(t('lyrNone')) + '</div>'; return; }
+  if (lyr.instr) { box.innerHTML = '<div class="npv-msg">🎵 ' + esc(t('lyrInstr')) + '</div>'; return; }
+  var tl = lyrTrCur();
+  if (lyr.synced.length) {
+    box.innerHTML = lyr.synced.map(function (l, i) {
+      return '<p class="npv-line" data-i="' + i + '">' + (l.text ? esc(l.text) : '♪') + (tl && tl[i] ? '<span class="trl">' + esc(tl[i]) + '</span>' : '') + '</p>';
+    }).join('');
+    npvTick(true);
+  } else {
+    var src = lyrTrSource();
+    box.innerHTML = '<div class="npv-plain">' + (tl ? src.map(function (l, i) { return l.trim() ? esc(l) + (tl[i] ? '\n' + esc(tl[i]) : '') : ''; }).join('\n') : esc(lyr.plain)) + '</div>';
+  }
+}
+function npvTick(force) {
+  if (!npv.on || lyr.status !== 'ok' || !lyr.synced.length) return;
+  var box = $('#npvLy'); if (!box) return;
+  var i = lyrIndexAt(audio.currentTime || 0);
+  if (i === npv.idx && !force) return;
+  npv.idx = i;
+  var old = box.querySelector('.npv-line.cur'); if (old) old.classList.remove('cur');
+  var el = i >= 0 ? box.querySelector('.npv-line[data-i="' + i + '"]') : null;
+  if (el) {
+    el.classList.add('cur');
+    if (force || Date.now() > npv.hold) el.scrollIntoView({ block: 'center', behavior: force ? 'auto' : 'smooth' });
+  }
 }
 function year(d) { return d ? String(d).slice(0, 4) : ''; }
 
@@ -1034,6 +1130,7 @@ audio.addEventListener('stalled', function () { if (cur() && !audio.paused && au
 audio.addEventListener('play', syncPlayBtn);
 audio.addEventListener('pause', syncPlayBtn);
 audio.addEventListener('timeupdate', updateSeek);
+audio.addEventListener('timeupdate', function () { npvTick(false); });
 audio.addEventListener('durationchange', updateSeek);
 
 /* ================= player UI ================= */
@@ -1060,6 +1157,12 @@ function applyVol() {
 }
 vol.addEventListener('input', function () { volume = +vol.value; muted = false; store.set('bm_vol', volume); applyVol(); });
 if (pip.ok) $('#bPip').hidden = false;
+$('#bNpv').addEventListener('click', function () { npv.on = !npv.on; store.set('bm_npv', npv.on ? 1 : 0); npvApply(); });
+$('#npv').addEventListener('click', function (e) {
+  var ln = e.target.closest('.npv-line');
+  if (ln && lyr.synced[+ln.getAttribute('data-i')]) { audio.currentTime = Math.max(0, lyr.synced[+ln.getAttribute('data-i')].t + lyr.off); npv.hold = 0; npvTick(true); }
+});
+['wheel', 'touchmove'].forEach(function (ev) { $('#npv').addEventListener(ev, function () { npv.hold = Date.now() + 4000; }, { passive: true }); });
 $('#bPip').addEventListener('click', pipToggle);
 $('#bMute').addEventListener('click', function () { muted = !muted; applyVol(); });
 
@@ -1135,6 +1238,7 @@ function updateNowPlaying() {
     document.title = 'Budsin Music';
     dynReset();
     if (pip.win) pipRender();
+    npvRender();
     return;
   }
   el.innerHTML = img(tr.artwork) +
@@ -1146,6 +1250,7 @@ function updateNowPlaying() {
   document.title = tr.title + ' — ' + tr.artist + ' · Budsin Music';
   dynFor(tr.artwork);
   if (pip.win) pipRender();
+  npvRender();
   updateSeek();
   vizSyncInfo();
   lyrOnTrack();
@@ -2087,6 +2192,7 @@ function lyrTrApply() {
       if (x) { var sp = document.createElement('span'); sp.className = 'trl'; sp.textContent = x; p.appendChild(sp); }
     });
   } else lyrRender();
+  npvLyrics();
   lyrSync(true);
 }
 function lyrTrLoad(force) {
@@ -2162,6 +2268,7 @@ function lyrRender() {
   body.innerHTML = '<div class="lyr-pad' + (plain || !lyr.synced.length ? ' plain-pad' : '') + '">' + h + '</div>' +
     '<div class="lyr-credit">' + esc(t('lyrBy')) + ' <a href="https://lrclib.net" target="_blank" rel="noopener">LRCLIB</a></div>';
   body.scrollTop = 0; lyr.idx = -1;
+  npvLyrics();
 }
 
 // Last line whose stamp has passed (a quarter second early, so the highlight lands on the word, not after it).
@@ -2203,7 +2310,7 @@ function lyrInfo() {
 // A new track: load its lyrics only if something is showing them.
 function lyrOnTrack() {
   if (lyr.on) lyrInfo();
-  if (!(lyr.on || viz.on || pip.win)) return;
+  if (!(lyr.on || viz.on || pip.win || npv.on)) return;
   var tr = cur();
   if (tr) lyrLoad(tr); else { lyr.key = null; lyr.status = 'idle'; lyrRender(); vizCaption(-1); }
 }
@@ -2314,6 +2421,7 @@ function becomeOwner() { owner = true; bcPost({ t: 'claim', from: 'bm', st: bmSt
 
 audio.addEventListener('play', function () { if (!owner) becomeOwner(); bmBeat(); sessionSave(false); });
 audio.addEventListener('pause', function () { bmBeat(); sessionSave(false); });
+if (npv.on) npvApply();
 setInterval(bmBeat, 1000);
 setInterval(function () { if (owner) sessionSave(false); }, 5000);
 
