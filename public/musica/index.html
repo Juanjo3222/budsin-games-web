@@ -2530,6 +2530,9 @@ function aiplCreate(text) {
   ]).then(function (r) {
     var found = [].concat.apply([], r[0]);
     if (!found.length) throw new Error('none');
+    // Soundtracks are full of 10-second jingles: prefer songs of a minute or more, when enough of them exist.
+    var longer = found.filter(function (tr) { return !(+tr.duration) || +tr.duration >= 60; });
+    if (longer.length >= 12) found = longer;
     // Asking for one artist ("Toby Fox"): most results are theirs, so the usual cap of 3 per artist would leave almost nothing.
     var cnt = {}, topN = 0; found.forEach(function (tr) { var k = nk(primaryArtist(tr)); cnt[k] = (cnt[k] || 0) + 1; if (cnt[k] > topN) topN = cnt[k]; });
     var solo = topN >= found.length * 0.4, topK = '';
