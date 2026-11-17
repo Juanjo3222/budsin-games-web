@@ -12,7 +12,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b0d10">
+<meta name="theme-color" content="#121212">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
@@ -21,21 +21,21 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <style>
 :root {
   color-scheme: dark;
-  --bg: #0b0d10;
-  --panel: #12151a;
-  --panel2: #181c23;
-  --hover: #1f2430;
-  --line: #232833;
-  --text: #eef0f4;
-  --muted: #8d95a6;
+  --bg: #121212;
+  --panel: #181818;
+  --panel2: #1f1f1f;
+  --hover: #2a2a2a;
+  --line: rgba(255,255,255,.07);
+  --text: #ffffff;
+  --muted: #b3b3b3;
   --accent: #25d0b4;
   --accent2: #1fa7d8;
-  --bg-rgb: 11,13,16;
-  --side-bg: #080a0c; --player-bg: #0a0c10; --queue-bg: #0e1116;
-  --menu-bg: #1b1f29; --menu-line: #2c3342; --modal-bg: #12161d; --modal-line: #2a3140;
-  --soft: rgba(255,255,255,.1); --soft-h: rgba(255,255,255,.18); --track: #353b49;
-  --on-accent: #04201b; --chip-text: #cfd4df; --toast-bg: #e8ebf2; --toast-text: #0b0d10;
-  --ph1: #2c3342; --ph2: #1a1f29; --ring: rgba(255,255,255,.12);
+  --bg-rgb: 18,18,18;
+  --side-bg: #121212; --player-bg: #181818; --queue-bg: #181818;
+  --menu-bg: #252525; --menu-line: transparent; --modal-bg: #181818; --modal-line: rgba(255,255,255,.08);
+  --soft: rgba(255,255,255,.1); --soft-h: rgba(255,255,255,.18); --track: #4d4d4d;
+  --on-accent: #000000; --chip-text: #ffffff; --toast-bg: #ffffff; --toast-text: #121212;
+  --ph1: #2a2a2a; --ph2: #1f1f1f; --ring: rgba(255,255,255,.12);
   --ly: rgba(255,255,255,.34); --ly-h: rgba(255,255,255,.7); --ly-t: rgba(255,255,255,.4); --ly-tc: rgba(255,255,255,.78); --ly-p: rgba(255,255,255,.72); --cur-base: #fff;
   --ly-prev: rgba(255,255,255,.26); --ly-past: rgba(255,255,255,.14);
   --fill: linear-gradient(var(--accent), var(--accent));
@@ -60,10 +60,10 @@ html[data-theme="light"] {
 }
 html[data-theme="light"] #viz, html[data-theme="light"] #lyrics, html[data-theme="light"] #fsv, html[data-theme="light"] .hero {
   color-scheme: dark;
-  --bg: #0b0d10; --panel: #12151a; --panel2: #181c23; --hover: #1f2430; --line: #232833;
-  --text: #eef0f4; --muted: #8d95a6; --accent: var(--accent-bright, #25d0b4);
-  --soft: rgba(255,255,255,.1); --soft-h: rgba(255,255,255,.18); --track: #353b49;
-  --on-accent: #04201b; --chip-text: #cfd4df; --ring: rgba(255,255,255,.12);
+  --bg: #121212; --panel: #181818; --panel2: #1f1f1f; --hover: #2a2a2a; --line: rgba(255,255,255,.07);
+  --text: #ffffff; --muted: #b3b3b3; --accent: var(--accent-bright, #25d0b4);
+  --soft: rgba(255,255,255,.1); --soft-h: rgba(255,255,255,.18); --track: #4d4d4d;
+  --on-accent: #000000; --chip-text: #ffffff; --ring: rgba(255,255,255,.12);
   --ly: rgba(255,255,255,.34); --ly-h: rgba(255,255,255,.7); --ly-t: rgba(255,255,255,.4); --ly-tc: rgba(255,255,255,.78); --cur-base: #fff;
   color: var(--text);
 }
@@ -644,6 +644,56 @@ input[type=range]:hover { --c: var(--accent); }
   #toast { bottom: calc(var(--player) + var(--nav) + 12px); }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+/* ---------- Design system inspired by Spotify (DESIGN.md) ----------
+ * Near-black surfaces, pill buttons with uppercase labels, heavy shadows on what floats, compact type, and album art as
+ * the colour. Inter stands in for Spotify's proprietary font and the accent stays Budsin's. The light theme keeps its own
+ * values (these rules use the variables); borders become shadows. */
+h1.page { font-size: 1.75rem; font-weight: 700; letter-spacing: -.02em; }
+h2.row-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -.02em; }
+.brand b { color: inherit; }
+.hero small, .phead small { color: var(--muted); }
+.top10 .tr .idx { color: var(--muted); }
+.sect { color: #7c7c7c; }
+.side-foot, .legal { color: #7c7c7c; }
+.side-foot a, .legal a { color: var(--muted); }
+/* buttons: pills, uppercase label with wide tracking */
+.btn { padding: 12px 28px; font-size: .78rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.btn:hover { transform: scale(1.04); }
+.btn.ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px #7c7c7c; }
+.btn.ghost:hover { background: transparent; box-shadow: inset 0 0 0 1px var(--text); }
+.chip { font-weight: 700; }
+.navlink { font-weight: 700; }
+.plist .navlink { font-weight: 400; }
+.navlink.active { background: var(--panel2); }
+/* surfaces: #181818 cards, lighter on hover with a medium shadow; radii 6-8px */
+.card { border-radius: 8px; }
+.card:hover { background: var(--hover); box-shadow: rgba(0,0,0,.3) 0 8px 8px; }
+.card .cv { border-radius: 6px; }
+.card.round .cv { border-radius: 50%; }
+.tile { border-radius: 8px; }
+.tr { border-radius: 6px; }
+.box, .acct { border-radius: 8px; }
+.hero { border-radius: 16px; }
+/* search: pill with the guide's inset border-shadow */
+.searchbox input { border: 0; background: var(--panel2); box-shadow: rgb(18,18,18) 0 1px 0, #7c7c7c 0 0 0 1px inset; }
+.searchbox input:hover { box-shadow: rgb(18,18,18) 0 1px 0, #fff 0 0 0 1px inset; }
+.searchbox input:focus { background: var(--panel2); box-shadow: var(--accent) 0 0 0 2px inset; }
+html[data-theme="light"] .searchbox input { box-shadow: #cfd4de 0 0 0 1px inset; }
+html[data-theme="light"] .searchbox input:hover { box-shadow: #12151a 0 0 0 1px inset; }
+html[data-theme="light"] .searchbox input:focus { box-shadow: var(--accent) 0 0 0 2px inset; }
+/* floating things: heavy shadow, no hairline border */
+.menu { border: 0; border-radius: 8px; box-shadow: rgba(0,0,0,.5) 0 8px 24px; }
+.menu button { border-radius: 4px; }
+.djm-box, .plm-card { border: 0; border-radius: 8px; box-shadow: rgba(0,0,0,.5) 0 8px 24px; }
+#toast { box-shadow: rgba(0,0,0,.5) 0 8px 24px; }
+/* bars: separated by shadow, not by a line */
+#side { border-right: 0; box-shadow: 1px 0 0 rgba(255,255,255,.05); }
+#player { border-top: 0; box-shadow: 0 -8px 24px rgba(0,0,0,.35); }
+#queue { border-left: 0; box-shadow: -8px 0 24px rgba(0,0,0,.4); }
+html[data-theme="light"] #side { box-shadow: 1px 0 0 rgba(0,0,0,.08); }
+html[data-theme="light"] #player { box-shadow: 0 -8px 24px rgba(0,0,0,.12); }
+html[data-theme="light"] #queue { box-shadow: -8px 0 24px rgba(0,0,0,.12); }
 </style>
 </head>
 <body>
