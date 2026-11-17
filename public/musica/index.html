@@ -687,6 +687,19 @@ html[data-theme="light"] .searchbox input:focus { box-shadow: var(--accent) 0 0 
 .menu button { border-radius: 4px; }
 .djm-box, .plm-card { border: 0; border-radius: 8px; box-shadow: rgba(0,0,0,.5) 0 8px 24px; }
 #toast { box-shadow: rgba(0,0,0,.5) 0 8px 24px; }
+/* "Budsin Games" link: a chevron next to the text on wide screens; on phones (text hidden) a gamepad, so it does not
+ * look like a second "back" next to the history buttons. */
+.back .b-gm { display: none; font-size: 20px; }
+@media (max-width: 760px) {
+  .back .b-ch { display: none; } .back .b-gm { display: block; }
+  .back { padding: 8px 10px; }
+}
+/* phones: no "forward" (the system gesture covers it) so the search box keeps room; tighter buttons so labels do not wrap */
+@media (max-width: 560px) {
+  #nFwd { display: none; }
+  .btn { padding: 11px 18px; letter-spacing: .08em; }
+  .topbar { padding-left: 14px; padding-right: 14px; gap: 8px; }
+}
 /* bars: separated by shadow, not by a line */
 #side { border-right: 0; box-shadow: 1px 0 0 rgba(255,255,255,.05); }
 #player { border-top: 0; box-shadow: 0 -8px 24px rgba(0,0,0,.35); }
@@ -719,7 +732,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <main id="main">
     <div class="topbar">
-      <a class="back" href="https://games.budsin.dev/" aria-label="Budsin Games"><svg viewBox="0 0 24 24" style="font-size:18px"><path d="M15.4 5.4L14 4l-8 8 8 8 1.4-1.4L8.8 12z"/></svg><span>Budsin Games</span></a>
+      <a class="back" href="https://games.budsin.dev/" aria-label="Budsin Games" title="Budsin Games"><svg class="b-ch" viewBox="0 0 24 24" style="font-size:18px"><path d="M15.4 5.4L14 4l-8 8 8 8 1.4-1.4L8.8 12z"/></svg><svg class="b-gm" viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 1.99-.9 1.99-2L23 8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4-3c-.83 0-1.5-.67-1.5-1.5S18.67 9 19.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg><span>Budsin Games</span></a>
       <div class="navb">
         <button id="nBack" data-ti="navBack"><svg viewBox="0 0 24 24"><path d="M15.4 5.4L14 4l-8 8 8 8 1.4-1.4L8.8 12z"/></svg></button>
         <button id="nFwd" data-ti="navFwd"><svg viewBox="0 0 24 24"><path d="M8.6 5.4L10 4l8 8-8 8-1.4-1.4L15.2 12z"/></svg></button>
