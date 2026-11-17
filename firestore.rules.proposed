@@ -136,6 +136,27 @@ service cloud.firestore {
       allow read, write: if own(uid);
     }
 
+    // ---------------------------------------------------------------- Budsin Music · Jam (escuchar juntos)
+    // Una sala = un documento con lo que suena (lo escribe solo quien la creó) y una subcolección de oyentes.
+    // El código de 6 caracteres es el "secreto" para entrar: se puede LEER la sala si se conoce, pero no listarlas.
+    function jamKeys(d) { return d.keys().hasOnly(['host', 'hostName', 'createdAt', 'updatedAt', 'track', 'queue', 'qi', 'pos', 'playing']); }
+    function jamHost(jid) { return signedIn() && get(/databases/$(database)/documents/music_jams/$(jid)).data.host == request.auth.uid; }
+    match /music_jams/{jid} {
+      allow get: if signedIn();
+      allow create: if signedIn() && jid.size() == 6 && jamKeys(request.resource.data)
+        && request.resource.data.host == request.auth.uid && request.resource.data.queue.size() <= 30;
+      allow update: if signedIn() && resource.data.host == request.auth.uid && jamKeys(request.resource.data)
+        && request.resource.data.host == resource.data.host && request.resource.data.queue.size() <= 30;
+      allow delete: if signedIn() && resource.data.host == request.auth.uid;
+
+      match /members/{uid} {
+        allow get: if own(uid);
+        allow list: if jamHost(jid);
+        allow create, update: if own(uid) && request.resource.data.keys().hasOnly(['name', 'seen']);
+        allow delete: if own(uid) || jamHost(jid);
+      }
+    }
+
     // Todo lo demás queda denegado.
   }
 }

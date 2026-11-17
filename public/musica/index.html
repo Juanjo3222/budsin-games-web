@@ -827,6 +827,13 @@ body:has(#np:hover) #juanjo-classroom-quick-toggle, #juanjo-classroom-quick-togg
 html[data-theme="light"] #side { box-shadow: 1px 0 0 rgba(0,0,0,.08); }
 html[data-theme="light"] #player { box-shadow: 0 -8px 24px rgba(0,0,0,.12); }
 html[data-theme="light"] #queue { box-shadow: -8px 0 24px rgba(0,0,0,.12); }
+#jamBar{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);z-index:60;display:flex;gap:6px;align-items:center;padding:5px 6px 5px 5px;background:rgba(24,24,24,.94);backdrop-filter:blur(10px);border-radius:999px;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:calc(100vw - 20px);font-size:.82rem}
+#jamBar[hidden]{display:none}#jamBar button{border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:7px 12px;cursor:pointer;font:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#jamBar button:hover{background:rgba(255,255,255,.2)}#jamBar .jb-t{background:none;padding-left:10px;min-width:0}#jamBar .jb-x{background:var(--accent,#25d0b4);color:#000;font-weight:700}
+.jamcard{max-width:560px;display:flex;flex-direction:column;gap:12px}.jamcard p{margin:0;color:var(--muted);line-height:1.5}.jamcode{font-size:2.4rem;font-weight:800;letter-spacing:.3em;color:var(--accent,#25d0b4)}
+.jamlink{word-break:break-all;font-size:.82rem}.jamrow{display:flex;gap:10px;flex-wrap:wrap}.jamsub{margin-top:10px!important;font-weight:700;color:var(--text)!important}
+.jamcard input{background:var(--card,#242424);border:1px solid rgba(255,255,255,.2);border-radius:999px;color:inherit;padding:10px 16px;font:inherit;letter-spacing:.2em;text-transform:uppercase;width:150px}.jamnote{font-size:.8rem}
+@media(max-width:700px){#jamBar{bottom:calc(var(--bnav-h,60px) + 130px)}}
 </style>
 </head>
 <body>
@@ -3024,6 +3031,7 @@ function parseRoute() {
   var arg = decodeURIComponent(parts.slice(1).join('/') || '');
   if (name === 'search') return { name: 'search', q: arg };
   if (['album', 'artist', 'playlist', 'genre'].indexOf(name) >= 0) return { name: name, id: arg };
+  if (name === 'jam') return { name: 'jam', id: arg.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6) };
   if (name === 'liked' || name === 'library' || name === 'albums' || name === 'taste' || name === 'settings') return { name: name };
   return { name: 'home' };
 }
@@ -3039,7 +3047,7 @@ function render() {
   var q = $('#q');
   if (route.name === 'search') { if (document.activeElement !== q) q.value = route.q; }
   $('#clearQ').classList.toggle('on', !!q.value);
-  ({ home: vHome, search: vSearch, album: vAlbum, artist: vArtist, playlist: vPlaylist, genre: vGenre, liked: vLiked, library: vLibrary, albums: vAlbums, taste: vTaste, settings: vSettings })[route.name](tok);
+  ({ home: vHome, search: vSearch, album: vAlbum, artist: vArtist, playlist: vPlaylist, genre: vGenre, liked: vLiked, library: vLibrary, albums: vAlbums, taste: vTaste, settings: vSettings, jam: vJam })[route.name](tok);
 }
 function top() { $('#main').scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' }); }
 window.addEventListener('hashchange', function () { render(); top(); });
@@ -4466,6 +4474,7 @@ $('#profBtn').addEventListener('click', function (e) {
     items.push('-');
     items.push({ label: t('profAcct'), fn: function () { location.hash = '#/settings'; setTimeout(function () { var el = $('#acctSet'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 450); } });
   } else items.push({ label: t('acctIn'), fn: cloudSignIn });
+  items.push({ label: '🎧 Jam · ' + J('menu'), fn: function () { location.hash = '#/jam'; } });
   items.push({ label: t('settings'), fn: function () { location.hash = '#/settings'; } });
   if (typeof instCan === 'function' && instCan()) items.push({ label: t('instBtn'), fn: instAsk });      // also the way to install on a phone
   var gmOn = true; try { gmOn = localStorage.getItem('bm_gamemenu') !== '0'; } catch (e) {}
@@ -4495,6 +4504,169 @@ document.addEventListener('click', function (e) {
   var a = b.getAttribute('data-acct');
   if (a === 'in') cloudSignIn(); else if (a === 'out') cloudSignOut(); else if (a === 'wipe') cloudWipe();
 });
+
+/* ================= Jam: escuchar juntos ================= */
+// Una persona (anfitriona) crea una sala con un código de 6 caracteres; quien tenga el enlace entra y oye lo mismo, a la
+// vez. Es lo único de Budsin Music que escribe datos "de otras personas" en Firestore (`music_jams/{código}`; ver
+// AGENTS.md, excepción de Jam, y las reglas en firestore.rules.proposed). La sala la escribe solo su anfitriona: pista,
+// cola (hasta 30), posición y si suena; las oyentes solo la leen y dejan una fila con su nombre (`members/{uid}`) para
+// que se cuente cuántas hay. Todo desaparece al terminar la sala. Requiere iniciar sesión con Google.
+var JT = {
+  es: { menu: 'Escuchar juntos', head: 'Jam · escuchar juntos', lead: 'Crea una sala y comparte el enlace: quien entre oye lo mismo que tú, a la vez. Hace falta iniciar sesión con Google.', create: 'Crear un Jam', joinCode: 'Entrar con un código', join: 'Unirme', code: 'Código', joinTitle: 'Te invitaron a un Jam', signIn: 'Inicia sesión para continuar', notFound: 'No encontré ese Jam. ¿El código está bien o ya terminó?', ended: 'El Jam terminó', joined: 'Estás en el Jam de ', copy: 'Copiar enlace', copied: 'Enlace copiado', end: 'Terminar', leave: 'Salir', listeners: ' oyentes', one: '1 oyente', hostBar: 'Tu Jam', guestBar: 'Jam de ', fail: 'No se pudo conectar con el Jam', youHost: 'Eres la anfitriona de este Jam: lo que reproduzcas lo oyen todas.', nowHost: 'Ya estás en un Jam. Termínalo o sal para crear otro.', waiting: 'Esperando a que la anfitriona ponga música…', note: 'Las oyentes siguen a la anfitriona; si pausas o cambias de canción por tu cuenta, se vuelve a sincronizar en unos segundos.' },
+  en: { menu: 'Listen together', head: 'Jam · listen together', lead: 'Create a room and share the link: whoever joins hears the same thing as you, at the same time. Signing in with Google is required.', create: 'Create a Jam', joinCode: 'Join with a code', join: 'Join', code: 'Code', joinTitle: 'You were invited to a Jam', signIn: 'Sign in to continue', notFound: 'I could not find that Jam. Is the code right, or has it ended?', ended: 'The Jam has ended', joined: 'You are in the Jam of ', copy: 'Copy link', copied: 'Link copied', end: 'End', leave: 'Leave', listeners: ' listeners', one: '1 listener', hostBar: 'Your Jam', guestBar: 'Jam of ', fail: 'Could not connect to the Jam', youHost: 'You are hosting this Jam: whatever you play, everyone hears.', nowHost: 'You are already in a Jam. End it or leave to start another.', waiting: 'Waiting for the host to play something…', note: 'Listeners follow the host; if you pause or change song on your own, it syncs back in a few seconds.' },
+  pt: { menu: 'Ouvir juntos', head: 'Jam · ouvir juntos', lead: 'Crie uma sala e compartilhe o link: quem entrar ouve o mesmo que você, ao mesmo tempo. É preciso entrar com o Google.', create: 'Criar um Jam', joinCode: 'Entrar com um código', join: 'Entrar', code: 'Código', joinTitle: 'Você foi convidado para um Jam', signIn: 'Entre para continuar', notFound: 'Não encontrei esse Jam. O código está certo ou já acabou?', ended: 'O Jam terminou', joined: 'Você está no Jam de ', copy: 'Copiar link', copied: 'Link copiado', end: 'Encerrar', leave: 'Sair', listeners: ' ouvintes', one: '1 ouvinte', hostBar: 'Seu Jam', guestBar: 'Jam de ', fail: 'Não foi possível conectar ao Jam', youHost: 'Você é o anfitrião deste Jam: o que tocar, todos ouvem.', nowHost: 'Você já está em um Jam. Encerre ou saia para criar outro.', waiting: 'Esperando o anfitrião tocar algo…', note: 'Os ouvintes seguem o anfitrião; se você pausar ou trocar de música por conta própria, volta a sincronizar em alguns segundos.' }
+};
+function J(k) { return (JT[lang] && JT[lang][k]) || JT.es[k] || k; }
+var jam = { role: null, id: null, host: '', unsub: null, memUnsub: null, off: null, listeners: 0, timer: null, push: 0, pushT: null, last: null };
+var JAM_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function jamNewId() { var a = new Uint8Array(6), o = ''; (window.crypto || window.msCrypto).getRandomValues(a); for (var i = 0; i < 6; i++) o += JAM_ABC.charAt(a[i] % JAM_ABC.length); return o; }
+function jamCopy() { try { navigator.clipboard.writeText(jamLink()).then(function () { toast(J('copied')); }, function () {}); } catch (e) {} }
+function jamLink() { return location.origin + '/musica/#/jam/' + jam.id; }
+function jamRef(id) { return cloud.db.collection('music_jams').doc(id || jam.id); }
+function jamUser() {
+  return cloudInit().then(function () {
+    return new Promise(function (res) {
+      if (cloud.auth.currentUser) return res(cloud.auth.currentUser);
+      var done = false, off = cloud.auth.onAuthStateChanged(function (u) { if (done) return; done = true; off(); res(u || null); });
+      setTimeout(function () { if (!done) { done = true; off(); res(cloud.auth.currentUser || null); } }, 4000);
+    });
+  });
+}
+function jamName(u) { return String(u.displayName || (u.email || '').split('@')[0] || 'Budsin').slice(0, 40); }
+function jamClean(o) { return JSON.parse(JSON.stringify(o)); }
+// What the host is playing, as it goes to the room: a window of up to 30 songs around the current one.
+function jamState() {
+  var c = cur(), start = Math.max(0, qi - 2), q = queue.slice(start, start + 30).map(slim);
+  return jamClean({ track: c ? slim(c) : null, queue: q, qi: c ? qi - start : 0, pos: Math.round((audio.currentTime || 0) * 10) / 10, playing: !audio.paused && !!c });
+}
+function jamPush(now) {
+  if (jam.role !== 'host') return;
+  var wait = now ? 0 : Math.max(0, 1500 - (Date.now() - jam.push));
+  clearTimeout(jam.pushT);
+  jam.pushT = setTimeout(function () {
+    if (jam.role !== 'host') return;
+    jam.push = Date.now();
+    var d = jamState(); d.updatedAt = window.firebase.firestore.FieldValue.serverTimestamp();
+    jamRef().update(d).catch(function () {});
+  }, wait);
+}
+['play', 'pause', 'seeked', 'loadedmetadata'].forEach(function (ev) { audio.addEventListener(ev, function () { jamPush(false); }); });
+function jamStop(silent) {
+  var was = jam.role, id = jam.id;
+  clearInterval(jam.timer); clearTimeout(jam.pushT);
+  if (jam.unsub) { try { jam.unsub(); } catch (e) {} }
+  if (jam.memUnsub) { try { jam.memUnsub(); } catch (e) {} }
+  if (was === 'guest' && cloud.db && cloud.auth.currentUser) jamRef(id).collection('members').doc(cloud.auth.currentUser.uid).delete().catch(function () {});
+  jam = { role: null, id: null, host: '', unsub: null, memUnsub: null, off: null, listeners: 0, timer: null, push: 0, pushT: null, last: null };
+  jamBar(); if (route.name === 'jam') render();
+  if (!silent && was === 'guest') toast(J('ended'));
+}
+function jamEnd() {
+  if (jam.role !== 'host') return jamStop(true);
+  var id = jam.id, ref = jamRef(id);
+  ref.collection('members').get().then(function (qs) { return Promise.all(qs.docs.map(function (d) { return d.ref.delete(); })); })
+    .catch(function () {}).then(function () { return ref.delete(); }).catch(function () {});
+  jamStop(true);
+}
+function jamStart() {
+  if (jam.role) { toast(J('nowHost')); return; }
+  jamUser().then(function (u) {
+    if (!u) { toast(J('signIn')); cloudSignIn(); return; }
+    var id = jamNewId(), d = jamState(), FV = window.firebase.firestore.FieldValue;
+    d.host = u.uid; d.hostName = jamName(u); d.createdAt = FV.serverTimestamp(); d.updatedAt = FV.serverTimestamp();
+    return jamRef(id).set(d).then(function () {
+      jam.role = 'host'; jam.id = id; jam.host = d.hostName; jam.off = 0;
+      jam.memUnsub = jamRef(id).collection('members').onSnapshot(function (qs) {
+        var lim = Date.now() - 90000, n = 0; qs.forEach(function (m) { if ((m.data().seen || 0) > lim) n++; });
+        jam.listeners = n; jamBar();
+      }, function () {});
+      jam.timer = setInterval(function () { jamPush(true); }, 8000);
+      jamBar(); location.hash = '#/jam/' + id; render();
+      jamCopy();
+    });
+  }).catch(function () { toast(J('fail')); });
+}
+function jamJoin(id) {
+  if (jam.role) { toast(J('nowHost')); return; }
+  jamUser().then(function (u) {
+    if (!u) { toast(J('signIn')); cloudSignIn(); return; }
+    return jamRef(id).get().then(function (snap) {
+      if (!snap.exists) { toast(J('notFound')); return; }
+      jam.role = 'guest'; jam.id = id; jam.host = snap.data().hostName || ''; jam.off = null;
+      var me = jamRef(id).collection('members').doc(u.uid), beat = function () { me.set({ name: jamName(u), seen: Date.now() }).catch(function () {}); };
+      beat(); jam.timer = setInterval(beat, 30000);
+      jam.unsub = jamRef(id).onSnapshot(jamApply, function () { jamStop(false); });
+      jamBar(); toast(J('joined') + jam.host);
+      if (route.name === 'jam') render();
+      jamApply(snap);
+    });
+  }).catch(function () { toast(J('fail')); });
+}
+// A host's state arrives: load the song if it changed, follow play/pause and correct drift.
+function jamApply(snap) {
+  if (jam.role !== 'guest') return;
+  if (!snap.exists) { jamStop(false); return; }
+  var d = snap.data(); if (!d.updatedAt) return;                       // our own pending write has no server time yet
+  var up = d.updatedAt.toMillis(), o = Date.now() - up;
+  if (jam.off === null || o < jam.off) jam.off = o;                    // the smallest gap seen = clock skew + least latency
+  var pos = Math.max(0, (d.pos || 0) + (d.playing ? (Date.now() - jam.off - up) / 1000 : 0));
+  jam.last = d;
+  if (!d.track) { jamBar(); return; }
+  var have = cur(), hid = String(d.track.id);
+  if (!have || tid(have) !== hid) {
+    queue = (d.queue || []).map(slim); jam.applying = true;
+    playIndex(Math.max(0, Math.min(d.qi | 0, queue.length - 1)), { seek: pos, reason: 'jam' });
+    if (!d.playing) setTimeout(function () { audio.pause(); }, 50);
+    return;
+  }
+  if (d.playing && audio.paused) audio.play().catch(function () {});
+  else if (!d.playing && !audio.paused) audio.pause();
+  var drift = Math.abs((audio.currentTime || 0) - (d.playing ? pos : (d.pos || 0)));
+  if (drift > (d.playing ? 4 : 1.5) && audio.getAttribute('src')) { try { audio.currentTime = d.playing ? pos : (d.pos || 0); } catch (e) {} }
+}
+function jamBar() {
+  var el = $('#jamBar');
+  if (!jam.role) { if (el) el.hidden = true; return; }
+  if (!el) {
+    el = document.createElement('div'); el.id = 'jamBar'; el.setAttribute('role', 'status');
+    document.body.appendChild(el);
+    el.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-jam]'); if (!b) return;
+      var a = b.getAttribute('data-jam');
+      if (a === 'copy') { jamCopy(); }
+      else if (a === 'end') jamEnd(); else if (a === 'leave') jamStop(true); else if (a === 'open') location.hash = '#/jam/' + jam.id;
+    });
+  }
+  el.hidden = false;
+  var n = jam.listeners, who = jam.role === 'host' ? J('hostBar') : J('guestBar') + jam.host;
+  el.innerHTML = '<button class="jb-t" data-jam="open">🎧 <b>' + esc(who) + '</b> · ' + esc(jam.id) + (jam.role === 'host' ? ' · ' + esc(n === 1 ? J('one') : n + J('listeners')) : '') + '</button>' +
+    (jam.role === 'host' ? '<button data-jam="copy">' + esc(J('copy')) + '</button><button class="jb-x" data-jam="end">' + esc(J('end')) + '</button>' : '<button class="jb-x" data-jam="leave">' + esc(J('leave')) + '</button>');
+}
+function vJam() {
+  var h = '<h1 class="page">🎧 ' + esc(J('head')) + '</h1><div class="jamcard">';
+  if (jam.role === 'host') {
+    h += '<p>' + esc(J('youHost')) + '</p><div class="jamcode">' + esc(jam.id) + '</div><p class="jamlink">' + esc(jamLink()) + '</p>' +
+      '<div class="jamrow"><button class="btn" data-jam="copy">' + esc(J('copy')) + '</button><button class="btn ghost" data-jam="end">' + esc(J('end')) + '</button></div><p class="jamnote">' + esc(J('note')) + '</p>';
+  } else if (jam.role === 'guest') {
+    h += '<p>' + esc(J('joined')) + '<b>' + esc(jam.host) + '</b></p><div class="jamcode">' + esc(jam.id) + '</div>' +
+      (jam.last && jam.last.track ? '<p>▶ ' + esc(jam.last.track.title) + ' — ' + esc(jam.last.track.artist) + '</p>' : '<p>' + esc(J('waiting')) + '</p>') +
+      '<div class="jamrow"><button class="btn ghost" data-jam="leave">' + esc(J('leave')) + '</button></div><p class="jamnote">' + esc(J('note')) + '</p>';
+  } else if (route.id) {
+    h += '<p>' + esc(J('joinTitle')) + '</p><div class="jamcode">' + esc(route.id) + '</div><div class="jamrow"><button class="btn" id="jamJoinGo" data-code="' + esc(route.id) + '">' + esc(J('join')) + '</button></div>';
+  } else {
+    h += '<p>' + esc(J('lead')) + '</p><div class="jamrow"><button class="btn" id="jamCreate">' + esc(J('create')) + '</button></div>' +
+      '<p class="jamsub">' + esc(J('joinCode')) + '</p><div class="jamrow"><input id="jamCode" maxlength="6" placeholder="' + esc(J('code')) + '" autocomplete="off" spellcheck="false"><button class="btn" id="jamJoinGo2">' + esc(J('join')) + '</button></div>';
+  }
+  view.innerHTML = h + '</div>';
+}
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('#jamCreate, #jamJoinGo, #jamJoinGo2, .jamcard [data-jam]'); if (!b) return;
+  if (b.id === 'jamCreate') jamStart();
+  else if (b.id === 'jamJoinGo') jamJoin(b.getAttribute('data-code'));
+  else if (b.id === 'jamJoinGo2') { var c = ($('#jamCode').value || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); if (c.length === 6) location.hash = '#/jam/' + c; }
+  else { var a = b.getAttribute('data-jam'); if (a === 'copy') { jamCopy(); } else if (a === 'end') jamEnd(); else if (a === 'leave') jamStop(true); }
+});
+window.addEventListener('pagehide', function () { if (jam.role === 'guest' && cloud.db && cloud.auth && cloud.auth.currentUser) { try { jamRef().collection('members').doc(cloud.auth.currentUser.uid).delete(); } catch (e) {} } });
 
 /* ================= gustos, recomendaciones y autoplay ================= */
 // El gusto se guarda AGREGADO (puntaje por artista y por género, con decaimiento), no como historial: sube menos

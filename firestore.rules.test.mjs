@@ -120,6 +120,30 @@ await t('ATAQUE: leer el perfil de música de otra persona', 'fail', () => getDo
 await t('ATAQUE: escribir en el perfil de otra persona', 'fail', () => setDoc(doc(as('eve', 'eve@x.com'), 'music_profiles/ana/kv/likes'), { items: [], updatedAt: 9 }));
 await t('ATAQUE: anónimo lee perfiles', 'fail', () => getDocs(collection(anon(), 'music_profiles/ana/playlists')));
 
+console.log('\n— music_jams (Jam)');
+await reset();
+const jam0 = { host: 'ana', hostName: 'Ana', createdAt: serverTimestamp(), updatedAt: serverTimestamp(), track: { id: '1' }, queue: [{ id: '1' }], qi: 0, pos: 3, playing: true };
+const bob = () => as('bob', 'bob@x.com');
+await t('Ana crea una sala (host = ella)', 'ok', () => setDoc(doc(ana(), 'music_jams/ABC234'), jam0));
+await t('Ana actualiza lo que suena', 'ok', () => updateDoc(doc(ana(), 'music_jams/ABC234'), { pos: 9, updatedAt: serverTimestamp() }));
+await t('Bob (con el código) lee la sala', 'ok', () => getDoc(doc(bob(), 'music_jams/ABC234')));
+await t('Bob se une como oyente', 'ok', () => setDoc(doc(bob(), 'music_jams/ABC234/members/bob'), { name: 'Bob', seen: Date.now() }));
+await t('Ana (host) cuenta oyentes', 'ok', () => getDocs(collection(ana(), 'music_jams/ABC234/members')));
+await t('Bob sale (borra su fila)', 'ok', () => deleteDoc(doc(bob(), 'music_jams/ABC234/members/bob')));
+await t('Ana termina la sala', 'ok', () => deleteDoc(doc(ana(), 'music_jams/ABC234')));
+await seed((db) => setDoc(doc(db, 'music_jams/ABC234'), { ...jam0, createdAt: Timestamp.now(), updatedAt: Timestamp.now() }));   // la sala sigue viva para los ataques
+await t('ATAQUE: Bob escribe en la sala de Ana', 'fail', () => updateDoc(doc(bob(), 'music_jams/ABC234'), { pos: 1 }));
+await t('ATAQUE: Bob se pone de host', 'fail', () => updateDoc(doc(bob(), 'music_jams/ABC234'), { host: 'bob' }));
+await t('ATAQUE: Bob borra la sala de Ana', 'fail', () => deleteDoc(doc(bob(), 'music_jams/ABC234')));
+await t('ATAQUE: crear sala a nombre de otra persona', 'fail', () => setDoc(doc(bob(), 'music_jams/ZZZ222'), { ...jam0, host: 'ana' }));
+await t('ATAQUE: sala con campos de más', 'fail', () => setDoc(doc(bob(), 'music_jams/ZZZ223'), { ...jam0, host: 'bob', extra: 1 }));
+await t('ATAQUE: sala con código que no es de 6 caracteres', 'fail', () => setDoc(doc(bob(), 'music_jams/ab'), { ...jam0, host: 'bob' }));
+await t('ATAQUE: cola de 31 canciones', 'fail', () => setDoc(doc(bob(), 'music_jams/ZZZ224'), { ...jam0, host: 'bob', queue: Array.from({ length: 31 }, (_, i) => ({ id: String(i) })) }));
+await t('ATAQUE: listar todas las salas', 'fail', () => getDocs(collection(bob(), 'music_jams')));
+await t('ATAQUE: anónimo lee una sala', 'fail', () => getDoc(doc(anon(), 'music_jams/ABC234')));
+await t('ATAQUE: Bob lista los oyentes de la sala de Ana', 'fail', () => getDocs(collection(bob(), 'music_jams/ABC234/members')));
+await t('ATAQUE: Bob escribe la fila de otro oyente', 'fail', () => setDoc(doc(bob(), 'music_jams/ABC234/members/eve'), { name: 'Eve', seen: 1 }));
+
 console.log('\n— todo lo demás denegado');
 await t('ATAQUE: escribir en una colección cualquiera', 'fail', () => setDoc(doc(as('ana', 'ana@x.com'), 'cualquier_cosa/x'), { a: 1 }));
 await t('ATAQUE: leer una colección no listada', 'fail', () => getDocs(collection(as('adm', ADMIN), 'secretos')));
