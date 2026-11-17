@@ -1934,7 +1934,7 @@ function djWrap(done) {
 // artists belong to that genre; the ones the listener already plays (and artists similar to those) lead the list, and
 // their own top songs are added: someone who plays Duki asking for trap argentino gets Duki and what sits next to him
 // before the rest of the genre.
-function djPersonal(items, n) {
+function djPersonal(items, n, cap) {
   var sc = tasteScores(), top = (sc.artists[0] && sc.artists[0].s) || 1, aff = {};
   sc.artists.forEach(function (a) { aff[a.k] = a.s / top; });
   var inGenre = {}; items.forEach(function (tr) { inGenre[nk(primaryArtist(tr))] = 1; });
@@ -1948,7 +1948,7 @@ function djPersonal(items, n) {
     pages.forEach(function (pg, ai) {
       if (pg) (pg.tracks || []).slice(0, 5).forEach(function (tr, i) { pool.push({ tr: tr, sc: 1.2 - ai * 0.1 - i * 0.05 }); });
     });
-    return pickDiverse(pool, n, {}, 3);
+    return pickDiverse(pool, n, {}, cap || 3);
   };
   if (!anchors.length) return Promise.resolve(base({}, []));
   return Promise.all(anchors.map(function (a) {
@@ -2530,7 +2530,10 @@ function aiplCreate(text) {
   ]).then(function (r) {
     var found = [].concat.apply([], r[0]);
     if (!found.length) throw new Error('none');
-    return djPersonal(found, 40).catch(function () { return found; }).then(function (mine) {
+    // Asking for one artist ("Toby Fox"): most results are theirs, so the usual cap of 3 per artist would leave almost nothing.
+    var cnt = {}, topN = 0; found.forEach(function (tr) { var k = nk(primaryArtist(tr)); cnt[k] = (cnt[k] || 0) + 1; if (cnt[k] > topN) topN = cnt[k]; });
+    var cap = topN >= found.length * 0.4 ? 20 : 3;
+    return djPersonal(found, 40, cap).catch(function () { return found; }).then(function (mine) {
       var pool = djPool([mine, found, r[1]]);
       var plain = function () { return { tracks: mine.slice(0, 20), intro: '' }; };
       if (!(r[2] && djcfg.ai) || pool.length < 5) return plain();
