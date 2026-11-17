@@ -21,7 +21,7 @@ const TIMEOUT_MS = Number(process.env.DJ_TIMEOUT_MS) || 25_000;
 // "low" answers in ~5 s with the same picks; the default effort took 9-20 s for these short, structured jobs.
 const effort = () => process.env.DJ_EFFORT || "low";
 // The budget is in units, not calls: a comment costs 1 and a song selection 4 (its prompt and answer are ~5x bigger).
-const DAILY_MAX = () => Number(process.env.DJ_DAILY_MAX) || 600;
+const DAILY_MAX = () => Number(process.env.DJ_DAILY_MAX) || 5000;
 const MAX_ACTIVE = () => Number(process.env.DJ_MAX_CONCURRENT) || 4;
 const MAX_FIELD = 120;
 const MAX_OUT = 240;

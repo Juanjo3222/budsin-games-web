@@ -175,9 +175,9 @@ test("too many calls in flight are refused at once instead of piling up", async 
   expect(await a).toBe("tarde");
   expect(await b).toBe("tarde");
   expect(await djComment(line(403))).toBe("tarde");   // free again
-  expect(budgetLeft()).toBe(600 - 3);                 // the refused one cost nothing
+  expect(budgetLeft()).toBe(5000 - 3);                 // the refused one cost nothing
 });
 
-test("the default daily budget is 600 units", () => {
-  expect(budgetLeft()).toBe(600);
+test("the default daily budget is 5000 units (~1250 selections)", () => {
+  expect(budgetLeft()).toBe(5000);
 });
