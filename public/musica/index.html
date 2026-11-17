@@ -181,7 +181,9 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .exp { font-size: .6rem; background: #3a404d; color: #ddd; padding: 1px 5px; border-radius: 3px; font-weight: 800; flex: none; }
 .iconbtn[hidden] { display: none; }
 /* "Now playing" side panel (Spotify-style): cover, title, artist and the lyrics, off by default */
-#npv { grid-area: npv; display: none; flex-direction: column; background: linear-gradient(180deg, rgba(var(--tint, 37,208,180), .28), #0a0c10 60%); border-left: 1px solid var(--line); overflow-y: auto; padding: 18px 18px 24px; }
+#npvRs { grid-area: rs; display: none; cursor: col-resize; background: var(--line); touch-action: none; transition: background .15s; }
+#npvRs:hover, #npvRs.drag { background: var(--accent); }
+#npv { grid-area: npv; display: none; flex-direction: column; background: linear-gradient(180deg, rgba(var(--tint, 37,208,180), .28), #0a0c10 60%); overflow-y: auto; padding: 18px 18px 24px; }
 #npv .npv-art img { width: 100%; aspect-ratio: 1; border-radius: 12px; object-fit: cover; background: #1d222c; box-shadow: 0 12px 30px rgba(0,0,0,.5); display: block; }
 #npv .npv-t { margin-top: 14px; font-size: 1.25rem; font-weight: 800; color: var(--accent); letter-spacing: -.02em; line-height: 1.2; }
 #npv .npv-a { color: var(--muted); font-size: .92rem; margin-top: 2px; }
@@ -195,8 +197,9 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 #npv .npv-plain { white-space: pre-wrap; color: rgba(255,255,255,.72); font-size: .95rem; line-height: 1.5; }
 #npv .npv-msg { color: var(--muted); text-align: center; padding: 22px 0; font-size: .9rem; }
 @media (min-width: 1000px) {
-  #app.npv-on { grid-template-columns: var(--side) 1fr 340px; grid-template-areas: "side main npv" "player player player"; }
+  #app.npv-on { grid-template-columns: var(--side) 1fr 6px var(--npvw, 340px); grid-template-areas: "side main rs npv" "player player player player"; }
   #app.npv-on #npv { display: flex; }
+  #app.npv-on #npvRs { display: block; }
 }
 @media (max-width: 999px) { #bNpv { display: none; } }
 .eq { display: inline-flex; gap: 2px; align-items: flex-end; height: 14px; }
@@ -541,6 +544,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="view" id="view"></div>
   </main>
 
+  <div id="npvRs" role="separator" aria-orientation="vertical" aria-label="Resize"></div>
   <aside id="npv" aria-label="Now playing"></aside>
 
   <section id="player" aria-label="Reproductor">
@@ -836,6 +840,12 @@ function coverColor(data) {      // data: RGBA of a small canvas -> {h, s} or nu
 function dynApply(c) {
   var st = document.documentElement.style;
   if (!c) { dynReset(); return; }
+  if (c.neutral) {
+    st.setProperty('--accent', 'rgb(226,229,236)');
+    st.setProperty('--accent2', 'rgb(150,158,172)');
+    st.setProperty('--tint', '70,76,88');
+    return;
+  }
   var s = Math.min(.85, Math.max(.5, c.s)), a = hsl2rgb(c.h, s, .6), a2 = hsl2rgb((c.h + 28) % 360, s, .5), tint = hsl2rgb(c.h, s, .45);
   st.setProperty('--accent', 'rgb(' + a.join(',') + ')');
   st.setProperty('--accent2', 'rgb(' + a2.join(',') + ')');
@@ -852,7 +862,7 @@ function dynFor(src) {
     try {
       var cv = document.createElement('canvas'); cv.width = cv.height = 48;
       var cx = cv.getContext('2d', { willReadFrequently: true }); cx.drawImage(im, 0, 0, 48, 48);
-      c = coverColor(cx.getImageData(0, 0, 48, 48).data);
+      c = coverColor(cx.getImageData(0, 0, 48, 48).data) || { neutral: true };   // black / grey / white cover: a neutral look, not the default green
     } catch (e) { c = null; }
     dyn.cache[src] = c;
     if (my === dyn.seq && dyn.on) dynApply(c);
@@ -874,12 +884,13 @@ var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}html,body{height:
   '#pl{flex:1 1 0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;font-size:clamp(11px,4vmin,17px);line-height:1.25;color:var(--accent,#25d0b4);font-weight:600}' +
   '#pl>div{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}#pl .t2{font-size:.78em;color:#9aa2b3;font-weight:500;margin-top:2px}' +
   '.bar{flex:none;display:flex;align-items:center;gap:clamp(5px,2vmin,9px);font-size:clamp(9px,2.8vmin,11px);color:#9aa2b3;font-variant-numeric:tabular-nums}.bar input{flex:1;min-width:0;accent-color:var(--accent,#25d0b4);height:4px;margin:0}' +
+  '.cv{flex:none;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:clamp(3px,1.4vmin,8px) clamp(10px,4vmin,18px)}' +
   '.ct{flex:none;display:flex;justify-content:center;align-items:center;gap:clamp(8px,4vmin,18px)}' +
   '.vr{flex:none;display:flex;align-items:center;justify-content:center;gap:clamp(5px,2vmin,9px);font-size:clamp(9px,2.8vmin,11px);color:#9aa2b3;font-variant-numeric:tabular-nums}.vr input{width:clamp(70px,38vw,150px);accent-color:var(--accent,#25d0b4);height:4px;margin:0}.vr button{border:0;background:none;color:#9aa2b3;width:clamp(20px,6vmin,26px);height:clamp(20px,6vmin,26px);display:grid;place-items:center;cursor:pointer;padding:0}.vr button:hover{color:#fff}.vr svg{width:100%;height:100%;fill:currentColor}.vr #pvp{min-width:3.2em;text-align:left}' +
   '.ct button{border:0;background:none;color:#eef0f4;width:clamp(26px,9vmin,38px);height:clamp(26px,9vmin,38px);border-radius:50%;display:grid;place-items:center;cursor:pointer;padding:0}.ct button:hover{background:rgba(255,255,255,.1)}.ct svg{width:58%;height:58%;fill:currentColor}' +
   '.ct #pP{background:#fff;color:#0b0d10;width:clamp(32px,12vmin,46px);height:clamp(32px,12vmin,46px)}.ct #pP:hover{background:#fff;opacity:.9}.spinner{width:45%;height:45%;border:2px solid #0b0d10;border-top-color:transparent;border-radius:50%;animation:s .7s linear infinite;display:block}@keyframes s{to{transform:rotate(360deg)}}' +
   /* as the window shrinks, the least important parts go first: lyrics, then the time, then the cover */
-  '@media (max-height:215px){.vr{display:none}}@media (max-height:190px){#pl{display:none}}@media (max-height:130px){.bar span{display:none}.top{flex:1}}@media (max-height:95px){.bar{display:none}}@media (max-width:240px){#pi{display:none}.bar span{display:none}}';
+  '@media (max-height:190px){#pl{display:none}}@media (max-height:130px){.bar span{display:none}.top{flex:1}}@media (max-height:105px){.vr{display:none}}@media (max-height:95px){.bar{display:none}}@media (max-width:240px){#pi{display:none}.bar span{display:none}}';
 function pipTick() {
   var w = pip.win; if (!w) return;
   var d = w.document, tr = cur();
@@ -935,8 +946,8 @@ function pipToggle() {
     d.title = 'Budsin Music';
     d.body.innerHTML = '<div id="pp"><div class="top"><img id="pi" alt=""><div class="mm"><div id="pt"></div><div id="pa"></div></div></div><div id="pl"></div>' +
       '<div class="bar"><span id="pc">0:00</span><input type="range" id="ps" min="0" max="1000" value="0"><span id="pd">0:00</span></div>' +
-      '<div class="ct"><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button></div>' +
-      '<div class="vr"><button id="pM"></button><input type="range" id="pv" min="0" max="100" value="80"><span id="pvp"></span></div></div>';
+      '<div class="cv"><div class="ct"><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button></div>' +
+      '<div class="vr"><button id="pM"></button><input type="range" id="pv" min="0" max="100" value="80"><span id="pvp"></span></div></div></div>';
     d.getElementById('pV').addEventListener('click', function () { prev(); });
     d.getElementById('pP').addEventListener('click', togglePlay);
     d.getElementById('pN').addEventListener('click', function () { next(false); });
@@ -955,7 +966,13 @@ function pipToggle() {
 }
 /* ---- "Now playing" side panel: cover, title, artist and lyrics beside the page; off by default (wide screens only) ---- */
 var npv = { on: store.get('bm_npv', 0) === 1, hold: 0, idx: -2 };
+function npvWidth(w) {
+  w = Math.max(260, Math.min(560, Math.round(w)));
+  $('#app').style.setProperty('--npvw', w + 'px');
+  return w;
+}
 function npvApply() {
+  npvWidth(+store.get('bm_npv_w', 340) || 340);
   $('#app').classList.toggle('npv-on', npv.on);
   $('#bNpv').classList.toggle('on', npv.on);
   if (npv.on) { npvRender(); lyrOnTrack(); }
@@ -1158,6 +1175,14 @@ function applyVol() {
 vol.addEventListener('input', function () { volume = +vol.value; muted = false; store.set('bm_vol', volume); applyVol(); });
 if (pip.ok) $('#bPip').hidden = false;
 $('#bNpv').addEventListener('click', function () { npv.on = !npv.on; store.set('bm_npv', npv.on ? 1 : 0); npvApply(); });
+(function () {      // drag the edge to resize the panel
+  var rs = $('#npvRs'), w = 0;
+  rs.addEventListener('pointerdown', function (e) { rs.setPointerCapture(e.pointerId); rs.classList.add('drag'); document.body.style.userSelect = 'none'; e.preventDefault(); });
+  rs.addEventListener('pointermove', function (e) { if (rs.classList.contains('drag')) w = npvWidth(window.innerWidth - e.clientX - 3); });
+  var done = function () { if (!rs.classList.contains('drag')) return; rs.classList.remove('drag'); document.body.style.userSelect = ''; if (w) store.set('bm_npv_w', w); };
+  rs.addEventListener('pointerup', done); rs.addEventListener('pointercancel', done);
+  rs.addEventListener('dblclick', function () { store.set('bm_npv_w', 340); npvWidth(340); });
+})();
 $('#npv').addEventListener('click', function (e) {
   var ln = e.target.closest('.npv-line');
   if (ln && lyr.synced[+ln.getAttribute('data-i')]) { audio.currentTime = Math.max(0, lyr.synced[+ln.getAttribute('data-i')].t + lyr.off); npv.hold = 0; npvTick(true); }
