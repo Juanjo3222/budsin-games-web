@@ -23,7 +23,7 @@ import { lyricsById, lyricsFor, lyricVersions } from "../lib/lyrics";
 import { resolveLink } from "../lib/resolveLink";
 import { cleanLines, TARGETS, translateLyrics } from "../lib/translate";
 import { cleanTtsInput, enginesAvailable, speak, TtsBudgetError } from "../lib/tts";
-import { cleanDjInput, cleanPickInput, DjBudgetError, djComment, djEnabled, djPick } from "../lib/dj";
+import { cleanDjInput, cleanPickInput, DjBudgetError, DjBusyError, djAvailable, djComment, djEnabled, DjPausedError, djPick } from "../lib/dj";
 
 /**
  * Release a response we're not going to read.
@@ -1168,7 +1168,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
   // its own templates on any non-200 answer (503 = off, 429 = today's budget is spent, 502 = the gateway failed).
   fastify.get("/api/music/dj/status", perMinute(60), async (_req, reply) => {
     reply.header("cache-control", "public, max-age=60");
-    return reply.send({ ai: djEnabled() });
+    return reply.send({ ai: djAvailable() });
   });
   // Which cloud voices are configured (the page only offers those) and a line spoken by one of them, as MP3.
   fastify.get("/api/music/dj/voices", perMinute(60), async (_req, reply) => {
@@ -1199,6 +1199,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
       return reply.send({ text });
     } catch (err) {
       if (err instanceof DjBudgetError) return musicError(reply, 429, "DJ budget spent for today");
+      if (err instanceof DjPausedError || err instanceof DjBusyError) return musicError(reply, 503, "DJ is resting");
       console.warn("[music] dj failed:", err instanceof Error ? err.message : err);
       return musicError(reply, 502, "DJ failed");
     }
@@ -1216,6 +1217,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
       return reply.send(out);
     } catch (err) {
       if (err instanceof DjBudgetError) return musicError(reply, 429, "DJ budget spent for today");
+      if (err instanceof DjPausedError || err instanceof DjBusyError) return musicError(reply, 503, "DJ is resting");
       console.warn("[music] dj pick failed:", err instanceof Error ? err.message : err);
       return musicError(reply, 502, "DJ failed");
     }

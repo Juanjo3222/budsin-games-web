@@ -70,8 +70,8 @@ test("parsePicks keeps valid unique numbers in order and cleans the texts", () =
 });
 
 test("parsePicks drops numbers outside the list, repeats and non-integers: the model cannot invent songs", () => {
-  const out = parsePicks('{"picks":[{"n":99},{"n":-1},{"n":2.5},{"n":"3"},{"n":4},{"n":4},{"n":0},{"x":1},null,7]}', 10, 20)!;
-  expect(out.picks.map((p) => p.n)).toEqual([4, 0]);
+  const out = parsePicks('{"picks":[{"n":99},{"n":-1},{"n":2.5},{"n":"3"},{"n":4},{"n":4},{"n":0},{"x":1},null,7,12,-2,1.5]}', 10, 20)!;
+  expect(out.picks.map((p) => p.n)).toEqual([4, 0, 7]);   // plain numbers are valid too; 12, -2 and 1.5 are not
 });
 
 test("parsePicks caps the number of picks", () => {
@@ -103,7 +103,7 @@ test("djPick asks the gateway once, maps the answer and caches it", async () => 
   await djPick(i);
   expect(calls).toBe(1);
   expect(a.picks.map((p) => p.n)).toEqual([7, 2]);
-  expect(body.max_output_tokens).toBe(900);
+  expect(body.max_output_tokens).toBe(400);
   expect(body.model).toBe("gpt-6-luna");
   expect(body.reasoning).toEqual({ effort: "low" });
 });
@@ -117,8 +117,31 @@ test("an unusable answer rejects, is not cached, and the next try can work", asy
 });
 
 test("a pick spends the shared daily budget", async () => {
-  process.env.DJ_DAILY_MAX = "1";
+  process.env.DJ_DAILY_MAX = "4";   // a selection costs 4 units
   globalThis.fetch = (async () => reply('{"picks":[{"n":0}],"intro":""}')) as never;
   await djPick(cleanPickInput({ ...good, request: "uno" })!);
   await expect(djPick(cleanPickInput({ ...good, request: "dos" })!)).rejects.toBeInstanceOf(DjBudgetError);
+});
+
+test("the prompt no longer asks for a reason per song (the page never shows it) and the answer can be plain numbers", async () => {
+  const p = buildPickPrompt(cleanPickInput(good)!);
+  expect(p.instructions).not.toContain('"why"');
+  expect(p.instructions).toContain('"picks":[<number from the list>');
+  const out = parsePicks('{"picks":[3,1,3,99,0],"intro":"Hola"}', 10, 5)!;
+  expect(out.picks).toEqual([{ n: 3, why: "" }, { n: 1, why: "" }, { n: 0, why: "" }]);
+});
+
+test("at most 30 candidates are accepted (smaller prompts, faster answers)", () => {
+  expect(cleanPickInput({ ...good, candidates: songs(30) })).not.toBeNull();
+  expect(cleanPickInput({ ...good, candidates: songs(31) })).toBeNull();
+});
+
+test("a selection costs 4 units and a comment 1 of the daily budget", async () => {
+  const { djComment, cleanDjInput, budgetLeft } = await import("./dj");
+  process.env.DJ_DAILY_MAX = "10";
+  globalThis.fetch = (async (_u: string, init: { body: string }) => reply(init.body.includes("numbered list") ? '{"picks":[0],"intro":""}' : "hola")) as never;
+  await djPick(cleanPickInput({ ...good, request: "cost-a" })!);
+  expect(budgetLeft()).toBe(6);
+  await djComment(cleanDjInput({ from: {}, to: { title: "cost-b", artist: "x" }, lang: "es", reason: "first" })!);
+  expect(budgetLeft()).toBe(5);
 });

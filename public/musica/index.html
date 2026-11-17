@@ -1815,11 +1815,13 @@ function djCheckAi() {
   if (dj.aiChecked) return Promise.resolve(dj.aiOk);
   return fetch('/api/music/dj/status').then(function (r) { return r.ok ? r.json() : { ai: false }; }).catch(function () { return { ai: false }; }).then(function (d) { dj.aiChecked = true; dj.aiOk = !!(d && d.ai); return dj.aiOk; });
 }
+// The server answers 503 when the AI is off or resting after failures: do not ask again for two minutes.
+function djRest() { dj.aiOk = false; setTimeout(function () { dj.aiChecked = false; }, 120000); }
 function djAsk(from, to, reason) {
   var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
   var one = function (x) { return x ? { title: djShort(x.title), artist: primaryArtist(x) } : {}; };
   return fetch('/api/music/dj', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: one(from), to: one(to), lang: djLangTag(), reason: reason }), signal: ctl ? ctl.signal : undefined })
-    .then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return d && typeof d.text === 'string' && d.text ? d.text : null; })
+    .then(function (r) { if (r.status === 503) djRest(); return r.ok ? r.json() : null; }).then(function (d) { return d && typeof d.text === 'string' && d.text ? d.text : null; })
     .catch(function () { return null; }).then(function (x) { clearTimeout(tm); return x; });
 }
 function djBubbleShow(text) {
@@ -1967,14 +1969,14 @@ function djPersonal(items, n, cap) {
 function djPool(lists) {
   var seen = {}, out = [];
   lists.forEach(function (l) { (l || []).forEach(function (tr) { if (!tr || !tr.title) return; var k = tid(tr), tk = 't:' + titleKey(tr); if (seen[k] || seen[tk]) return; seen[k] = seen[tk] = 1; out.push(tr); }); });
-  return out.slice(0, 40);
+  return out.slice(0, 30);
 }
 function djAiPick(pool, request, count) {
   var fav = {}; tasteScores().artists.slice(0, 8).forEach(function (a) { fav[a.k] = 1; });
-  var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 30000);
+  var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 24000);
   var body = { request: request || '', lang: djLangTag(), count: count || 12, candidates: pool.map(function (tr) { return { title: djShort(tr.title), artist: primaryArtist(tr), fav: !!fav[nk(primaryArtist(tr))] }; }) };
   return fetch('/api/music/dj/pick', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined })
-    .then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (r) { if (r.status === 503) djRest(); return r.ok ? r.json() : null; })
     .then(function (d) {
       if (!d || !Array.isArray(d.picks)) return null;
       var seen = {}, tracks = [];
@@ -1991,7 +1993,7 @@ function djCurate() {
   radioTracks(c, 12).catch(function () { return []; }).then(function (rad) {
     var pool = djPool([upcoming, rad]);
     if (pool.length < 3) return null;
-    return djAiPick(pool, '', 12).then(function (res) {
+    return djAiPick(pool, '', 8).then(function (res) {
       if (!res || !dj.on || !cur() || tid(cur()) !== tid(c)) return;                  // the session moved on meanwhile
       if (queue.slice(qi + 1).map(tid).join('|') !== sig) return;                       // the listener edited the queue: leave it alone
       var picked = {}; res.tracks.forEach(function (tr) { picked[tid(tr)] = 1; });

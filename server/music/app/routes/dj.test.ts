@@ -152,3 +152,20 @@ test("voices: lists configured engines; tts validates, hides the keys and falls 
   expect((await tts({ engine: "fish", text: "una más" })).statusCode).toBe(429);
   await server.close();
 });
+
+test("after repeated gateway failures the DJ rests: status says ai=false and the routes answer 503 without calling the gateway", async () => {
+  process.env.DJ_API_KEY = "k";
+  let calls = 0;
+  globalThis.fetch = (async () => {
+    calls++;
+    return new Response("boom", { status: 500 });
+  }) as never;
+  const server = await app();
+  for (let n = 0; n < 3; n++) expect((await post(server, { ...body, to: { title: "rest-" + n, artist: "x" } }, "9.9.9." + n)).statusCode).toBe(502);
+  expect(calls).toBe(3);
+  expect((await server.inject({ method: "GET", url: "/api/music/dj/status" })).json()).toEqual({ ai: false });
+  expect((await post(server, { ...body, to: { title: "rest-x", artist: "x" } }, "9.9.9.9")).statusCode).toBe(503);
+  expect((await postPick(server, { ...pickBody, request: "rest" }, "9.9.9.8")).statusCode).toBe(503);
+  expect(calls).toBe(3);
+  await server.close();
+});
