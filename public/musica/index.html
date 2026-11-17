@@ -121,6 +121,12 @@ svg { width: 1em; height: 1em; fill: currentColor; display: block; }
 }
 .back { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: .85rem; padding: 8px 12px; border-radius: 999px; background: var(--panel); white-space: nowrap; }
 .back:hover { color: var(--text); background: var(--panel2); }
+.navb { display: flex; gap: 6px; flex: none; }
+.navb button, .navb a { width: 36px; height: 36px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; background: var(--panel); color: var(--muted); cursor: pointer; }
+.navb svg { width: 20px; height: 20px; fill: currentColor; }
+.navb button:hover:not(:disabled), .navb a:hover { color: var(--text); background: var(--panel2); }
+.navb button:disabled { opacity: .35; cursor: default; }
+@media (max-width: 760px) { .navb { gap: 4px; } .navb button, .navb a { width: 32px; height: 32px; } }
 .searchbox { flex: 1; max-width: 520px; position: relative; }
 .searchbox svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); font-size: 18px; pointer-events: none; }
 .searchbox input {
@@ -150,6 +156,9 @@ h2.row-title a:hover { color: var(--text); text-decoration: underline; }
 .hero { position: relative; border-radius: 20px; overflow: hidden; margin: 10px 0 6px; min-height: 250px; display: flex; align-items: flex-end; background: var(--panel); isolation: isolate; }
 .hero .bgimg { position: absolute; inset: -40px; background-size: cover; background-position: center; filter: blur(46px) saturate(1.4); opacity: .55; z-index: -2; transform: scale(1.2); }
 .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(8,10,12,.85), rgba(8,10,12,.25)); z-index: -1; }
+/* With cover colours on (--tint set), the featured panel follows the page colour instead of keeping its own cover's hue */
+html[style*="--tint"] .hero .bgimg { opacity: .16; filter: blur(46px) saturate(.6); }
+html[style*="--tint"] .hero::after { background: linear-gradient(90deg, color-mix(in srgb, rgb(var(--tint)) 46%, #080a0c), color-mix(in srgb, rgb(var(--tint)) 34%, rgba(8,10,12,.2))); }
 .hero-in { display: flex; gap: 24px; align-items: flex-end; padding: 26px; width: 100%; }
 .hero img { width: 200px; height: 200px; border-radius: 14px; object-fit: cover; box-shadow: 0 14px 40px rgba(0,0,0,.55); flex: none; background: #222; }
 .hero small { text-transform: uppercase; letter-spacing: .12em; font-size: .72rem; color: var(--accent); font-weight: 800; }
@@ -638,6 +647,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <main id="main">
     <div class="topbar">
       <a class="back" href="https://games.budsin.dev/" aria-label="Budsin Games"><svg viewBox="0 0 24 24" style="font-size:18px"><path d="M15.4 5.4L14 4l-8 8 8 8 1.4-1.4L8.8 12z"/></svg><span>Budsin Games</span></a>
+      <div class="navb">
+        <button id="nBack" data-ti="navBack"><svg viewBox="0 0 24 24"><path d="M15.4 5.4L14 4l-8 8 8 8 1.4-1.4L8.8 12z"/></svg></button>
+        <button id="nFwd" data-ti="navFwd"><svg viewBox="0 0 24 24"><path d="M8.6 5.4L10 4l8 8-8 8-1.4-1.4L15.2 12z"/></svg></button>
+        <a id="nHome" href="#/" data-ti="home"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg></a>
+      </div>
       <div class="searchbox">
         <svg viewBox="0 0 24 24"><path d="M10 3a7 7 0 105.3 11.6l4.6 4.6 1.4-1.4-4.6-4.6A7 7 0 0010 3zm0 2a5 5 0 110 10 5 5 0 010-10z"/></svg>
         <input id="q" type="search" autocomplete="off" enterkeyhint="search" spellcheck="false">
@@ -778,7 +792,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 /* ================= i18n ================= */
 var I18N = {
   es: {
-    home: 'Inicio', explore: 'Explorar', library: 'Biblioteca', liked: 'Me gusta', playlists: 'Playlists', queue: 'Cola',
+    navBack: 'Atrás', navFwd: 'Adelante', home: 'Inicio', explore: 'Explorar', library: 'Biblioteca', liked: 'Me gusta', playlists: 'Playlists', queue: 'Cola',
     ph: 'Artistas, canciones, álbumes…', good_m: 'Buenos días', good_a: 'Buenas tardes', good_n: 'Buenas noches',
     feat: 'Destacado', newrel: 'Nuevos lanzamientos', top10: 'Top 10 del momento', recent: 'Escuchado recientemente', genres: 'Explorar por género',
     play: 'Reproducir', pause: 'Pausar', shuffle: 'Aleatorio', prev: 'Anterior', next: 'Siguiente', repeat: 'Repetir', mute: 'Silenciar',
@@ -809,7 +823,7 @@ var I18N = {
     legal: 'Servicio de terceros: el audio proviene de YouTube Music y puede no estar disponible. Código fuente (AGPL-3.0): '
   },
   en: {
-    home: 'Home', explore: 'Explore', library: 'Library', liked: 'Liked songs', playlists: 'Playlists', queue: 'Queue',
+    navBack: 'Back', navFwd: 'Forward', home: 'Home', explore: 'Explore', library: 'Library', liked: 'Liked songs', playlists: 'Playlists', queue: 'Queue',
     ph: 'Artists, songs, albums…', good_m: 'Good morning', good_a: 'Good afternoon', good_n: 'Good evening',
     feat: 'Featured', newrel: 'New releases', top10: 'Top 10 right now', recent: 'Recently played', genres: 'Browse by genre',
     play: 'Play', pause: 'Pause', shuffle: 'Shuffle', prev: 'Previous', next: 'Next', repeat: 'Repeat', mute: 'Mute',
@@ -840,7 +854,7 @@ var I18N = {
     legal: 'Third-party service: audio comes from YouTube Music and may be unavailable. Source code (AGPL-3.0): '
   },
   pt: {
-    home: 'Início', explore: 'Explorar', library: 'Biblioteca', liked: 'Curtidas', playlists: 'Playlists', queue: 'Fila',
+    navBack: 'Voltar', navFwd: 'Avançar', home: 'Início', explore: 'Explorar', library: 'Biblioteca', liked: 'Curtidas', playlists: 'Playlists', queue: 'Fila',
     ph: 'Artistas, músicas, álbuns…', good_m: 'Bom dia', good_a: 'Boa tarde', good_n: 'Boa noite',
     feat: 'Destaque', newrel: 'Novos lançamentos', top10: 'Top 10 do momento', recent: 'Ouvido recentemente', genres: 'Explorar por gênero',
     play: 'Reproduzir', pause: 'Pausar', shuffle: 'Aleatório', prev: 'Anterior', next: 'Próxima', repeat: 'Repetir', mute: 'Silenciar',
@@ -1091,7 +1105,10 @@ var PIP_CSS = ':root{color-scheme:dark}*{box-sizing:border-box}html,body{height:
   '#pi{width:36px;height:36px;border-radius:8px;object-fit:cover;background:#1d222c;flex:none}' +
   '.mm{min-width:0;flex:1}#pt{font-weight:700;font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#pa{font-size:11px;color:#9aa2b3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
   '#pl{flex:1 1 0;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden;gap:.4em;font-weight:700;letter-spacing:-.01em}' +
-  '#pl>div{max-width:100%;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;line-height:1.22}' +
+  /* plain blocks, not -webkit-box + line-clamp: that combination with a gradient (background-clip:text) made two-verse lines vanish */
+  '#pl>div{max-width:100%;display:block;overflow:hidden;line-height:1.22;max-height:2.5em;padding-bottom:.08em}#pl .l1{max-height:3.8em}' +
+  '#pl .l0[data-t],#pl .l2[data-t]{cursor:pointer;transition:color .15s}#pl .l0[data-t]:hover,#pl .l2[data-t]:hover{color:rgba(255,255,255,.8)}' +
+  '#pl.long .l1{font-size:clamp(12px,8cqh,21px)}#pl.xlong .l1{font-size:clamp(11px,6.6cqh,17px)}.p-lyrics #pl.long .l1{font-size:clamp(13px,10cqh,26px)}.p-lyrics #pl.xlong .l1{font-size:clamp(12px,8cqh,21px)}' +
   '#pl .l0,#pl .l2{font-size:clamp(10px,6.5cqh,16px);color:rgba(255,255,255,.34)}' +
   '#pl .l1{font-size:clamp(14px,10cqh,26px);color:color-mix(in srgb,var(--accent,#25d0b4) 55%,#fff)}' +
   '#pl .t2{font-size:clamp(10px,5.6cqh,14px);font-weight:500;color:rgba(255,255,255,.7)}' +
@@ -1151,9 +1168,14 @@ function pipTick() {
   var sig = [L0, L1, L2, T2].join('\u0001');
   if (el('pl').getAttribute('data-sig') !== sig) {
     var box = el('pl'); box.setAttribute('data-sig', sig); box.innerHTML = '';
+    // two verses in one line (long) get a smaller size so they fit; the neighbours seek when clicked
+    box.classList.toggle('long', L1.length > 34 && L1.length <= 64); box.classList.toggle('xlong', L1.length > 64);
     [['l0', L0], ['l1', L1], ['t2', T2], ['l2', L2]].forEach(function (x) {
       if (!x[1]) return;
-      var dv = d.createElement('div'); dv.className = x[0]; dv.textContent = x[1]; box.appendChild(dv);
+      var dv = d.createElement('div'); dv.className = x[0]; dv.textContent = x[1];
+      if (x[0] === 'l0' && i > 0) dv.setAttribute('data-t', String(Math.max(0, A[i - 1].t + lyr.off)));
+      if (x[0] === 'l2' && A[i + 1]) dv.setAttribute('data-t', String(Math.max(0, A[i + 1].t + lyr.off)));
+      box.appendChild(dv);
     });
   }
 }
@@ -1190,6 +1212,10 @@ function pipToggle() {
       '<div class="bar"><span id="pc">0:00</span><input type="range" id="ps" min="0" max="1000" value="0"><span id="pd">0:00</span></div>' +
       '<div class="cv"><div class="ct"><button id="pH"></button><button id="pV">' + $('#bPrev').innerHTML + '</button><button id="pP"></button><button id="pN">' + $('#bNext').innerHTML + '</button><button id="pR"></button></div>' +
       '<div class="vr"><button id="pM"></button><input type="range" id="pv" min="0" max="100" value="80"><span id="pvp"></span></div></div><button id="pHome" title="' + esc(t('home')) + '"><svg viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3z"/></svg></button><button id="pS" title="' + esc(t('pipLayout')) + '"><svg viewBox="0 0 24 24"><path d="M3 5h18v3H3zm0 5.5h18v3H3zM3 16h18v3H3z"/></svg></button></div>';
+    d.getElementById('pl').addEventListener('click', function (e) {      // click the next (or previous) line to jump to it
+      var ln = e.target.closest && e.target.closest('[data-t]');
+      if (ln && isFinite(+ln.getAttribute('data-t'))) { audio.currentTime = +ln.getAttribute('data-t'); lyr.holdUntil = 0; pipTick(); }
+    });
     d.getElementById('pV').addEventListener('click', function () { prev(); });
     d.getElementById('pP').addEventListener('click', togglePlay);
     d.getElementById('pN').addEventListener('click', function () { next(false); });
@@ -1514,6 +1540,37 @@ function djWrap(done) {
   if (Math.random() > (djcfg.freq === 'often' ? 0.9 : 0.35)) return done();
   djSpeak(pend.ai || pend.text, done);
 }
+// A request for a genre or mood ("trap argentino") should come out in YOUR corner of it. The search results say which
+// artists belong to that genre; the ones the listener already plays (and artists similar to those) lead the list, and
+// their own top songs are added: someone who plays Duki asking for trap argentino gets Duki and what sits next to him
+// before the rest of the genre.
+function djPersonal(items, n) {
+  var sc = tasteScores(), top = (sc.artists[0] && sc.artists[0].s) || 1, aff = {};
+  sc.artists.forEach(function (a) { aff[a.k] = a.s / top; });
+  var inGenre = {}; items.forEach(function (tr) { inGenre[nk(primaryArtist(tr))] = 1; });
+  var anchors = sc.artists.filter(function (a) { return inGenre[a.k]; }).slice(0, 2);
+  var base = function (sims, pages) {
+    var pool = [];
+    items.forEach(function (tr, i) {
+      var k = nk(primaryArtist(tr));
+      pool.push({ tr: tr, sc: 0.55 - i * 0.008 + (aff[k] || 0) * 0.7 + (sims[k] ? 0.35 : 0) });
+    });
+    pages.forEach(function (pg, ai) {
+      if (pg) (pg.tracks || []).slice(0, 5).forEach(function (tr, i) { pool.push({ tr: tr, sc: 1.2 - ai * 0.1 - i * 0.05 }); });
+    });
+    return pickDiverse(pool, n, {}, 3);
+  };
+  if (!anchors.length) return Promise.resolve(base({}, []));
+  return Promise.all(anchors.map(function (a) {
+    return resolveArtistId(a).then(function (id) {
+      if (!id) return { page: null, sims: [] };
+      return Promise.all([artistPage(id).catch(function () { return null; }), similarOf(id)]).then(function (r) { return { page: r[0], sims: r[1] }; });
+    }).catch(function () { return { page: null, sims: [] }; });
+  })).then(function (rs) {
+    var sims = {}; rs.forEach(function (r) { r.sims.forEach(function (x) { sims[nk(x.name)] = 1; }); });
+    return base(sims, rs.map(function (r) { return r.page; }));
+  }).catch(function () { return base({}, []); });
+}
 function djQuery(q) { for (var i = 0; i < DJ_MOODS.length; i++) if (DJ_MOODS[i][0].test(q)) return DJ_MOODS[i][1]; return q; }
 function djStart(request) {
   djCancel();
@@ -1531,7 +1588,8 @@ function djStart(request) {
     if (djcfg.freq === 'off') play(); else djSpeak(txt, play);
   };
   if (request) {
-    api('search?q=' + encodeURIComponent(djQuery(request))).then(function (d) { run((d.items || []).slice(0, 24), 'request'); }).catch(function () { run(null); });
+    api('search?limit=40&q=' + encodeURIComponent(djQuery(request))).then(function (d) { return djPersonal(d.items || [], 24); })
+      .then(function (list) { run(list, 'request'); }).catch(function () { run(null); });
   } else {
     getRecs().then(function (r) { return r && r.mix && r.mix.length ? r.mix : null; }).catch(function () { return null; })
       .then(function (mix) { return mix || api('browse').then(function (d) { return ((d.rows || {}).hits || []).slice(0, 24); }); })
@@ -2102,6 +2160,20 @@ function render() {
 }
 function top() { $('#main').scrollTo({ top: 0, behavior: 'instant' in window ? 'instant' : 'auto' }); }
 window.addEventListener('hashchange', function () { render(); top(); });
+// Back / forward next to the search box (they follow the browser history). Chrome's Navigation API says whether
+// there is somewhere to go, so the buttons grey out; elsewhere they stay enabled.
+(function () {
+  var nav = window.navigation;
+  function sync() {
+    $('#nBack').disabled = !!(nav && 'canGoBack' in nav) && !nav.canGoBack;
+    $('#nFwd').disabled = !!(nav && 'canGoForward' in nav) && !nav.canGoForward;
+  }
+  $('#nBack').addEventListener('click', function () { history.back(); });
+  $('#nFwd').addEventListener('click', function () { history.forward(); });
+  window.addEventListener('hashchange', sync); window.addEventListener('popstate', sync);
+  if (nav && nav.addEventListener) nav.addEventListener('currententrychange', sync);
+  sync();
+})();
 
 function legalBlock() {
   return '<div class="legal">' + esc(t('legal')) +
