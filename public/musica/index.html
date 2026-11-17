@@ -1973,7 +1973,7 @@ function djPool(lists) {
 }
 function djAiPick(pool, request, count) {
   var fav = {}; tasteScores().artists.slice(0, 8).forEach(function (a) { fav[a.k] = 1; });
-  var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 24000);
+  var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 34000);
   var body = { request: request || '', lang: djLangTag(), count: count || 12, candidates: pool.map(function (tr) { return { title: djShort(tr.title), artist: primaryArtist(tr), fav: !!fav[nk(primaryArtist(tr))] }; }) };
   return fetch('/api/music/dj/pick', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctl ? ctl.signal : undefined })
     .then(function (r) { if (r.status === 503) djRest(); return r.ok ? r.json() : null; })
@@ -1984,16 +1984,19 @@ function djAiPick(pool, request, count) {
       return tracks.length ? { tracks: tracks, intro: typeof d.intro === 'string' ? d.intro : '' } : null;
     }).catch(function () { return null; }).then(function (x) { clearTimeout(tm); return x; });
 }
-// A session that started instantly with the recommender's songs: in the background, let the AI choose and order what comes next.
-function djCurate() {
+// A session starts at once with the algorithm's songs (or the search results for a request); in the background the AI chooses
+// and orders what comes next, and its answer replaces the upcoming part of the queue when it arrives (5-20 s later: the
+// listener never waits for it). With a request, `base` is the pool the request was built from.
+function djCurate(request, base) {
   if (!dj.on || !djcfg.ai || !dj.aiOk) return;
   var c = cur(); if (!c) return;
   var upcoming = queue.slice(qi + 1), sig = upcoming.map(tid).join('|'), mine = {};
   upcoming.forEach(function (tr) { mine[tid(tr)] = 1; });
-  radioTracks(c, 12).catch(function () { return []; }).then(function (rad) {
-    var pool = djPool([upcoming, rad]);
+  var extra = request ? Promise.resolve(base || []) : radioTracks(c, 12).catch(function () { return []; });
+  extra.then(function (more) {
+    var pool = djPool([upcoming, more]).filter(function (tr) { return tid(tr) !== tid(c); });
     if (pool.length < 3) return null;
-    return djAiPick(pool, '', 8).then(function (res) {
+    return djAiPick(pool, request || '', request ? 12 : 8).then(function (res) {
       if (!res || !dj.on || !cur() || tid(cur()) !== tid(c)) return;                  // the session moved on meanwhile
       if (queue.slice(qi + 1).map(tid).join('|') !== sig) return;                       // the listener edited the queue: leave it alone
       var picked = {}; res.tracks.forEach(function (tr) { picked[tid(tr)] = 1; });
@@ -2013,17 +2016,22 @@ function djStart(request) {
   $('#bDj').classList.add('on'); djmSync();
   toast(t('djOnToast'));
   djCheckAi(); djCheckVoices();
+  var curatePool = [];
   var run = function (list, reason, introText) {
     if (!list || !list.length) { dj.on = false; $('#bDj').classList.remove('on'); djmSync(); djBubbleHide(); toast(t('radioNone')); return; }
     // The opening line is spoken at once (a template, or the AI's when it picked the songs); the AI's lines for the
     // transitions are asked for while each song plays.
     var first = list[0], txt = introText || djTemplate(reason, null, first);
-    var play = function () { if (!dj.on) return; playList(list.slice(0, 24), 0); if (reason === 'first') setTimeout(djCurate, 2500); };
+    var play = function () {
+      if (!dj.on) return;
+      playList(list.slice(0, 24), 0);
+      if (reason === 'first') setTimeout(function () { djCurate(); }, 2500);
+      else if (reason === 'request') setTimeout(function () { djCurate(request, curatePool); }, 2500);
+    };
     djBubbleHide();
     if (djcfg.freq === 'off') play(); else djSpeak(txt, play, { maxWait: 3000 });
   };
   if (request) {
-    djBubbleShow(t('djPicking'));
     var q = djQuery(request);
     Promise.all([
       api('search?limit=40&q=' + encodeURIComponent(q)).then(function (d) { return d.items || []; }).catch(function () { return []; }),
@@ -2035,13 +2043,9 @@ function djStart(request) {
       return djPersonal(found, 24).catch(function () { return found; }).then(function (mine) {
         var pool = djPool([mine, found, r[1]]);
         if (!pool.length) return run(null);
-        var plain = function () { run((mine.length ? mine : found.length ? found : pool).slice(0, 24), 'request'); };
-        if (!(r[2] && djcfg.ai)) return plain();
-        return djAiPick(pool, request, 12).then(function (res) {
-          if (!res) return plain();
-          var have = {}; res.tracks.forEach(function (tr) { have[tid(tr)] = 1; });
-          run(res.tracks.concat(mine.filter(function (tr) { return !have[tid(tr)]; }).slice(0, 12)), 'request', res.intro);
-        });
+        // Music first: the order of your corner of the genre starts playing now; the AI refines what follows in the background.
+        curatePool = pool;
+        run((mine.length ? mine : found.length ? found : pool).slice(0, 24), 'request');
       });
     }).catch(function () { run(null); });
   } else {

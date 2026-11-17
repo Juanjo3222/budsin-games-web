@@ -124,7 +124,7 @@ export class DjBusyError extends Error {}
 
 const COMMENT_COST = 1;
 const PICK_COST = 4;
-const PICK_TIMEOUT_MS = 20_000;
+const PICK_TIMEOUT_MS = 30_000;   // nobody waits for it any more: the page refines the queue in the background
 // A gateway call that times out is still billed by the provider, so repeated failures must stop the spending: 3 failures
 // within 5 minutes pause every call for 10 minutes (the page falls back to its templates and the recommender's order).
 const FAIL_LIMIT = 3;
