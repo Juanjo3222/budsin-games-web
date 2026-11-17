@@ -492,7 +492,7 @@
       if (document.getElementById("bm-music-loader")) return;
       var s = document.createElement("script");
       s.id = "bm-music-loader";
-      s.src = "https://games.budsin.dev/bm-mini.js?game=1&v=3";
+      s.src = "https://games.budsin.dev/bm-mini.js?game=1&v=4";
       s.async = true;
       document.head.appendChild(s);
     } catch (e) {}
