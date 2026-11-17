@@ -22,6 +22,7 @@ import { LruCache } from "../lib/lruCache";
 import { lyricsById, lyricsFor, lyricVersions } from "../lib/lyrics";
 import { resolveLink } from "../lib/resolveLink";
 import { cleanLines, TARGETS, translateLyrics } from "../lib/translate";
+import { cleanTtsInput, enginesAvailable, speak, TtsBudgetError } from "../lib/tts";
 import { cleanDjInput, cleanPickInput, DjBudgetError, djComment, djEnabled, djPick } from "../lib/dj";
 
 /**
@@ -1168,6 +1169,25 @@ export async function musicRoutes(fastify: FastifyInstance) {
   fastify.get("/api/music/dj/status", perMinute(60), async (_req, reply) => {
     reply.header("cache-control", "public, max-age=60");
     return reply.send({ ai: djEnabled() });
+  });
+  // Which cloud voices are configured (the page only offers those) and a line spoken by one of them, as MP3.
+  fastify.get("/api/music/dj/voices", perMinute(60), async (_req, reply) => {
+    reply.header("cache-control", "public, max-age=60");
+    return reply.send(enginesAvailable());
+  });
+  fastify.post("/api/music/dj/tts", { ...perMinute(20), bodyLimit: 2 * 1024 }, async (req, reply) => {
+    const input = cleanTtsInput(req.body);
+    if (!input) return musicError(reply, 400, "Invalid voice request");
+    if (!enginesAvailable()[input.engine]) return musicError(reply, 503, "That voice is not available");
+    try {
+      const audio = await speak(input);
+      reply.header("cache-control", "no-store");
+      return reply.type("audio/mpeg").send(audio);
+    } catch (err) {
+      if (err instanceof TtsBudgetError) return musicError(reply, 429, "Voice budget for today is spent");
+      console.warn("[music] tts failed:", err instanceof Error ? err.message : err);
+      return musicError(reply, 502, "Voice service failed");
+    }
   });
   fastify.post("/api/music/dj", { ...perMinute(10), bodyLimit: 4 * 1024 }, async (req, reply) => {
     if (!djEnabled()) return musicError(reply, 503, "DJ commentary is off");

@@ -3,6 +3,7 @@ import Fastify from "fastify";
 import rateLimit from "@fastify/rate-limit";
 import { clientKey, musicRoutes } from "./music";
 import { resetDjForTests } from "../lib/dj";
+import { resetTtsForTests } from "../lib/tts";
 
 const realFetch = globalThis.fetch;
 const env = { ...process.env };
@@ -126,5 +127,28 @@ test("pick: an oversized body is refused", async () => {
   const server = await app();
   const r = await postPick(server, { ...pickBody, request: "x".repeat(20000) });
   expect(r.statusCode).toBe(413);
+  await server.close();
+});
+
+test("voices: lists configured engines; tts validates, hides the keys and falls back with the right status codes", async () => {
+  resetTtsForTests();
+  delete process.env.FISH_API_KEY;
+  delete process.env.ELEVENLABS_API_KEY;
+  const server = await app();
+  const tts = (payload: unknown) => server.inject({ method: "POST", url: "/api/music/dj/tts", payload: payload as never, headers: { "cf-connecting-ip": "9.9.9.9" } });
+  expect((await server.inject({ method: "GET", url: "/api/music/dj/voices" })).json()).toEqual({ fish: false, eleven: false });
+  expect((await tts({ engine: "fish", text: "hola" })).statusCode).toBe(503);
+  expect((await tts({ engine: "nope", text: "hola" })).statusCode).toBe(400);
+  process.env.FISH_API_KEY = "fish-super-secret";
+  globalThis.fetch = (async () => new Response(new Uint8Array(400).fill(1), { status: 200 })) as never;
+  const ok = await tts({ engine: "fish", text: "hola" });
+  expect(ok.statusCode).toBe(200);
+  expect(ok.headers["content-type"]).toContain("audio/mpeg");
+  expect(ok.rawPayload.length).toBe(400);
+  expect(JSON.stringify(ok.headers)).not.toContain("fish-super-secret");
+  globalThis.fetch = (async () => new Response("down", { status: 500 })) as never;
+  expect((await tts({ engine: "fish", text: "otra distinta" })).statusCode).toBe(502);
+  process.env.FISH_DAILY_BYTES = "1";
+  expect((await tts({ engine: "fish", text: "una más" })).statusCode).toBe(429);
   await server.close();
 });
