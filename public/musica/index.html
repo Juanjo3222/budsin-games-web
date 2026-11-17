@@ -1465,7 +1465,7 @@ function djCheckAi() {
   return fetch('/api/music/dj/status').then(function (r) { return r.ok ? r.json() : { ai: false }; }).catch(function () { return { ai: false }; }).then(function (d) { dj.aiChecked = true; dj.aiOk = !!(d && d.ai); return dj.aiOk; });
 }
 function djAsk(from, to, reason) {
-  var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 9000);
+  var ctl = typeof AbortController !== 'undefined' ? new AbortController() : null, tm = setTimeout(function () { if (ctl) ctl.abort(); }, 15000);
   var one = function (x) { return x ? { title: djShort(x.title), artist: primaryArtist(x) } : {}; };
   return fetch('/api/music/dj', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ from: one(from), to: one(to), lang: djLangTag(), reason: reason }), signal: ctl ? ctl.signal : undefined })
     .then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { return d && typeof d.text === 'string' && d.text ? d.text : null; })
@@ -1525,18 +1525,10 @@ function djStart(request) {
   djCheckAi();
   var run = function (list, reason) {
     if (!list || !list.length) { dj.on = false; $('#bDj').classList.remove('on'); toast(t('radioNone')); return; }
-    var first = list[0], fallback = djTemplate(reason, null, first), go = function (txt) {
-      if (!dj.on) return;
-      var play = function () { if (dj.on) playList(list.slice(0, 24), 0); };
-      if (djcfg.freq === 'off') play(); else djSpeak(txt, play);
-    };
-    if (djcfg.freq !== 'off' && djcfg.ai) {
-      djCheckAi().then(function (ok) {
-        if (!ok) return go(fallback);
-        var done = false, tmr = setTimeout(function () { if (!done) { done = true; go(fallback); } }, 3500);
-        djAsk(null, first, reason).then(function (txt) { if (done) return; done = true; clearTimeout(tmr); go(txt || fallback); });
-      });
-    } else go(fallback);
+    // The opening line uses a template (the music starts at once); the AI, which takes 5-10 s, is for the transitions,
+    // which are prepared while a song plays.
+    var first = list[0], txt = djTemplate(reason, null, first), play = function () { if (dj.on) playList(list.slice(0, 24), 0); };
+    if (djcfg.freq === 'off') play(); else djSpeak(txt, play);
   };
   if (request) {
     api('search?q=' + encodeURIComponent(djQuery(request))).then(function (d) { run((d.items || []).slice(0, 24), 'request'); }).catch(function () { run(null); });
