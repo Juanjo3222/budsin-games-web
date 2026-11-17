@@ -13,6 +13,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#121212">
+<link rel="manifest" href="/musica/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/musica/icon-512.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Budsin Music">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); window.__bip = e; });</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
@@ -255,6 +262,9 @@ html[style*="--tint"] .hero::after { background: linear-gradient(90deg, color-mi
 .djm-ask input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 .djm-moods { display: flex; flex-wrap: wrap; gap: 8px; } .djm-moods .chip { cursor: pointer; border: 0; font: inherit; }
 .djm-seg { display: flex; flex-wrap: wrap; gap: 8px; } .djm-seg .chip { cursor: pointer; border: 0; font: inherit; } .djm-seg .chip.on { background: var(--accent); color: var(--on-accent, #04201b); }
+.instbtn { width: calc(100% - 24px); margin: 10px 12px 0; justify-content: center; align-items: center; gap: 8px; background: var(--panel2); cursor: pointer; }
+.instbtn[hidden] { display: none !important; }
+.instbtn { display: flex; }
 .djeng { display: inline-flex; } .djeng .chip:first-child { border-radius: 999px 0 0 999px; } .djeng .chip.try { border-radius: 0 999px 999px 0; padding-left: 10px; padding-right: 12px; margin-left: 1px; }
 .djm-seg .chip:disabled { opacity: .4; cursor: not-allowed; }
 .djm-note { margin: 8px 0 0; color: var(--muted); font-size: .76rem; line-height: 1.4; }
@@ -726,6 +736,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a class="navlink" data-nav="settings" href="#/settings"><svg viewBox="0 0 24 24"><path d="M19.4 13a7.7 7.7 0 000-2l2.1-1.6-2-3.5-2.5 1a7.5 7.5 0 00-1.7-1L15 3.3h-4l-.4 2.6a7.5 7.5 0 00-1.7 1l-2.5-1-2 3.5L6.6 11a7.7 7.7 0 000 2l-2.1 1.6 2 3.5 2.5-1a7.5 7.5 0 001.7 1l.4 2.6h4l.4-2.6a7.5 7.5 0 001.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 110-7 3.5 3.5 0 010 7z"/></svg><span data-t="settings"></span></a>
     <div class="sect"><span data-t="playlists"></span><button id="newPl" aria-label="+" title="+">+</button></div>
     <div class="plist" id="plist"></div>
+    <button class="chip instbtn" id="installBtn" hidden></button>
     <div class="acct" id="acct"></div>
     <div class="side-foot" id="sideFoot"></div>
   </nav>
@@ -879,7 +890,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 /* ================= i18n ================= */
 var I18N = {
   es: {
-    navBack: 'Atrás', navFwd: 'Adelante', home: 'Inicio', explore: 'Explorar', library: 'Biblioteca', liked: 'Me gusta', playlists: 'Playlists', queue: 'Cola',
+    instBtn: '📲 Instalar app', instTitle: 'Instalar Budsin Music', instInfo: 'Instálala como app: se abre en su propia ventana, sin la barra del navegador, y la tienes en el escritorio o la pantalla de inicio. Funciona aunque Google Play no te deje instalar apps.', instDone: '¡Instalada!', instIos: 'En iPhone o iPad: toca Compartir y luego «Añadir a pantalla de inicio».', instHave: 'Ya la tienes instalada en este dispositivo.', instNone: 'Este navegador no la ofrece desde aquí. En Chrome o Edge, busca «Instalar Budsin Music» en el menú ⋮ (o el icono de instalar en la barra de direcciones).', navBack: 'Atrás', navFwd: 'Adelante', home: 'Inicio', explore: 'Explorar', library: 'Biblioteca', liked: 'Me gusta', playlists: 'Playlists', queue: 'Cola',
     ph: 'Artistas, canciones, álbumes…', good_m: 'Buenos días', good_a: 'Buenas tardes', good_n: 'Buenas noches',
     feat: 'Destacado', newrel: 'Nuevos lanzamientos', top10: 'Top 10 del momento', recent: 'Escuchado recientemente', genres: 'Explorar por género',
     play: 'Reproducir', pause: 'Pausar', shuffle: 'Aleatorio', prev: 'Anterior', next: 'Siguiente', repeat: 'Repetir', mute: 'Silenciar',
@@ -910,7 +921,7 @@ var I18N = {
     legal: 'Servicio de terceros: el audio proviene de YouTube Music y puede no estar disponible. Código fuente (AGPL-3.0): '
   },
   en: {
-    navBack: 'Back', navFwd: 'Forward', home: 'Home', explore: 'Explore', library: 'Library', liked: 'Liked songs', playlists: 'Playlists', queue: 'Queue',
+    instBtn: '📲 Install app', instTitle: 'Install Budsin Music', instInfo: 'Install it as an app: it opens in its own window, without the browser bar, and sits on your desktop or home screen. It works even if Google Play will not let you install apps.', instDone: 'Installed!', instIos: 'On iPhone or iPad: tap Share, then “Add to Home Screen”.', instHave: 'Already installed on this device.', instNone: 'This browser does not offer it from here. In Chrome or Edge, look for “Install Budsin Music” in the ⋮ menu (or the install icon in the address bar).', navBack: 'Back', navFwd: 'Forward', home: 'Home', explore: 'Explore', library: 'Library', liked: 'Liked songs', playlists: 'Playlists', queue: 'Queue',
     ph: 'Artists, songs, albums…', good_m: 'Good morning', good_a: 'Good afternoon', good_n: 'Good evening',
     feat: 'Featured', newrel: 'New releases', top10: 'Top 10 right now', recent: 'Recently played', genres: 'Browse by genre',
     play: 'Play', pause: 'Pause', shuffle: 'Shuffle', prev: 'Previous', next: 'Next', repeat: 'Repeat', mute: 'Mute',
@@ -941,7 +952,7 @@ var I18N = {
     legal: 'Third-party service: audio comes from YouTube Music and may be unavailable. Source code (AGPL-3.0): '
   },
   pt: {
-    navBack: 'Voltar', navFwd: 'Avançar', home: 'Início', explore: 'Explorar', library: 'Biblioteca', liked: 'Curtidas', playlists: 'Playlists', queue: 'Fila',
+    instBtn: '📲 Instalar app', instTitle: 'Instalar o Budsin Music', instInfo: 'Instale como app: abre em janela própria, sem a barra do navegador, e fica na área de trabalho ou na tela inicial. Funciona mesmo que o Google Play não deixe instalar apps.', instDone: 'Instalado!', instIos: 'No iPhone ou iPad: toque em Compartilhar e depois em “Adicionar à Tela de Início”.', instHave: 'Já instalado neste dispositivo.', instNone: 'Este navegador não oferece daqui. No Chrome ou Edge, procure “Instalar Budsin Music” no menu ⋮ (ou o ícone de instalar na barra de endereço).', navBack: 'Voltar', navFwd: 'Avançar', home: 'Início', explore: 'Explorar', library: 'Biblioteca', liked: 'Curtidas', playlists: 'Playlists', queue: 'Fila',
     ph: 'Artistas, músicas, álbuns…', good_m: 'Bom dia', good_a: 'Boa tarde', good_n: 'Boa noite',
     feat: 'Destaque', newrel: 'Novos lançamentos', top10: 'Top 10 do momento', recent: 'Ouvido recentemente', genres: 'Explorar por gênero',
     play: 'Reproduzir', pause: 'Pausar', shuffle: 'Aleatório', prev: 'Anterior', next: 'Próxima', repeat: 'Repetir', mute: 'Silenciar',
@@ -1397,6 +1408,7 @@ function vSettings() {
     '<div class="setrow" style="margin-top:10px"><span>' + esc(t('djVoiceT')) + '</span><select id="djVoiceSel"></select></div><p id="djVoiceNote" style="margin:8px 0 0"></p>' +
     '<div class="btns" style="margin-top:12px"><button class="chip' + (djcfg.ai ? ' on' : '') + '" id="djAiBtn">' + esc(t(djcfg.ai ? 'djAiOn' : 'djAiOff')) + '</button><button class="btn ghost" id="djTest">' + esc(t('djTest')) + '</button></div><p id="djAiNote" style="margin:8px 0 0"></p></div>';
   html += '<div class="box"><h3>🪟 ' + esc(t('setPip')) + '</h3><p>' + esc(t('setPipInfo')) + '</p><div class="btns" id="ppSeg">' + seg([['full', t('ppFull')], ['lyrics', t('ppLyrics')], ['mini', t('ppMini')]], 'data-pp', pipcfg.preset) + '</div><div class="btns" style="margin-top:12px"><button class="chip' + (pipcfg.cover ? ' on' : '') + '" id="ppCover">' + esc(t(pipcfg.cover ? 'ppCoverOn' : 'ppCoverOff')) + '</button><button class="chip' + (pipcfg.grad ? ' on' : '') + '" id="ppGrad">' + esc(t(pipcfg.grad ? 'ppGradOn' : 'ppGradOff')) + '</button></div></div>';
+  html += instBoxHtml();
   html += '<div class="box"><h3>🪟 ' + esc(t('setPanel')) + '</h3><p>' + esc(t('setPanelInfo')) + '</p><div class="btns"><button class="chip' + (npv.on ? ' on' : '') + '" id="setNpv">' + esc(t(npv.on ? 'panOn' : 'panOff')) + '</button></div></div>';
   view.innerHTML = html + legalBlock();
   document.title = t('settings') + ' · Budsin Music';
@@ -4049,9 +4061,34 @@ function applyStatic() {
   $$('[data-t]').forEach(function (el) { el.textContent = t(el.getAttribute('data-t')); });
   $$('[data-ti]').forEach(function (el) { var k = el.getAttribute('data-ti'); var txt = t(k === 'clearQ' ? 'clearQ' : k === 'queue' ? 'queue' : k); el.title = txt; el.setAttribute('aria-label', txt); if (k === 'clearQ') el.textContent = txt; });
   qEl.placeholder = t('ph');
+  if (typeof inst !== 'undefined' && inst) instSync();      // the install button's label follows the language
   $('#sideFoot').innerHTML = esc(t('legal')) + '<a href="https://github.com/Juanjo3222/budsin-games-web/tree/main/server/music/app" target="_blank" rel="noopener">Budsin</a> · <a href="https://github.com/x8rr/music" target="_blank" rel="noopener">x8rr/music</a>';
 }
 applyStatic(); vizBuildUI(); autoplaySync(); renderAccount(); syncModes(); applyVol(); syncPlayBtn(); updateNowPlaying(); renderSidebar(); renderQueue();
+/* ---- installable app (PWA): the browser's own install, no store needed ---- */
+var inst = { ev: window.__bip || null, ios: /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream,
+  standalone: (window.matchMedia && matchMedia('(display-mode: standalone)').matches) || navigator.standalone === true };
+function instCan() { return !inst.standalone && !!(inst.ev || inst.ios); }
+function instBoxHtml() {
+  var body = inst.standalone ? '<p>' + esc(t('instHave')) + '</p>'
+    : instCan() ? '<p>' + esc(t('instInfo')) + '</p><div class="btns"><button class="btn" id="setInstall">' + esc(t('instBtn')) + '</button></div>'
+    : '<p>' + esc(t('instInfo')) + '</p><p style="color:var(--muted)">' + esc(t('instNone')) + '</p>';
+  return '<div class="box" id="instBox"><h3>📲 ' + esc(t('instTitle')) + '</h3>' + body + '</div>';
+}
+function instSync() {
+  var b = $('#installBtn'); if (b) { b.hidden = !instCan(); b.textContent = t('instBtn'); }
+  var box = $('#instBox'); if (box) box.outerHTML = instBoxHtml();
+}
+function instAsk() {
+  if (inst.ev) { var e = inst.ev; inst.ev = null; e.prompt(); (e.userChoice || Promise.resolve()).then(function () { instSync(); }); }
+  else if (inst.ios) toast(t('instIos'));
+}
+window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); inst.ev = e; instSync(); });
+window.addEventListener('appinstalled', function () { inst.ev = null; inst.standalone = true; toast(t('instDone')); instSync(); });
+document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('#installBtn, #setInstall')) instAsk(); });
+if ('serviceWorker' in navigator) window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js').catch(function () {}); });
+instSync();
+
 sessionRestore();
 render();
 cloudMaybeInit();
