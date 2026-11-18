@@ -4678,6 +4678,7 @@ function vidCheck() {
 function vidOpen() {
   if (!vid.cur || vid.open) return;
   vid.open = true; vid.was = { playing: !audio.paused };
+  var from = audio.getAttribute('src') ? (audio.currentTime || 0) : 0;      // where the song was: the video starts there
   audio.pause();
   if (typeof lyrClose === 'function') lyrClose();
   if (npv.tab === 'lyrics') { npv.tab = 'queue'; if (typeof npvRender === 'function') npvRender(); }
@@ -4685,6 +4686,11 @@ function vidOpen() {
   // The video is served by this site (the backend downloads it), not by YouTube's embed: school and office filters block youtube.com.
   $('#vidFrame').innerHTML = '<video id="vidEl" controls autoplay playsinline preload="auto" src="' + ORIGIN_API + 'video/file/' + encodeURIComponent(vid.cur.id) + '"></video><div class="vidload" id="vidLoad">' + esc(VL('loading')) + '</div>';
   var ve = $('#vidEl');
+  ve.addEventListener('loadedmetadata', function () {
+    if (from < 1) return;
+    var c = cur(), td = (c && +c.duration) || 0, vd = isFinite(ve.duration) ? ve.duration : 0, off = td && vd > td ? Math.min(vd - td, 90) : 0;   // the video's intro is not in the audio
+    try { ve.currentTime = Math.min(Math.max(0, vd - 1), from + off); } catch (e) {}
+  });
   ve.addEventListener('playing', function () { var l = $('#vidLoad'); if (l) l.hidden = true; });
   ve.addEventListener('error', function () { var l = $('#vidLoad'); if (l) { l.hidden = false; l.textContent = VL('failed'); } });
   $('#vidTitle').textContent = '🎬 ' + (cur() ? cur().title + ' — ' + cur().artist : '');
