@@ -274,3 +274,21 @@ test("a search is not held up by a Tidal catalog that doesn't answer", async () 
   expect(Date.now() - t).toBeLessThan(3500);
   expect(res.json()).toMatchObject({ items: [{ id: 1 }], albums: [], artists: [] });
 });
+
+test("the official-video file route refuses ids the video lookup never vouched for", async () => {
+  const app = Fastify();
+  await app.register(musicRoutes);
+  const res = await app.inject({ method: "GET", url: "/api/music/video/file/dQw4w9WgXcQ" });
+  expect(res.statusCode).toBe(404);
+  const bad = await app.inject({ method: "GET", url: "/api/music/video/file/not-an-id" });
+  expect(bad.statusCode).toBe(404);
+  await app.close();
+});
+
+test("the video lookup needs a title and an artist", async () => {
+  const app = Fastify();
+  await app.register(musicRoutes);
+  const res = await app.inject({ method: "GET", url: "/api/music/video?title=Song" });
+  expect(res.statusCode).toBe(400);
+  await app.close();
+});

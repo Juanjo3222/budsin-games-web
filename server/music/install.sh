@@ -38,6 +38,16 @@ got=$(sha256sum "$tmp/yt-dlp_linux" | awk '{print $1}')
 install -m 0755 "$tmp/yt-dlp_linux" /usr/local/bin/yt-dlp
 echo "yt-dlp $(/usr/local/bin/yt-dlp --version)"
 
+# --- ffmpeg (solo para «Ver video oficial»: une la imagen y el audio en un mp4) ---
+if ! command -v ffmpeg >/dev/null 2>&1; then
+  if command -v apt-get >/dev/null 2>&1; then
+    DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg >/dev/null 2>&1 || echo "AVISO: no se pudo instalar ffmpeg; el video oficial puede no funcionar"
+  else
+    echo "AVISO: instala ffmpeg a mano para que funcione el video oficial"
+  fi
+fi
+command -v ffmpeg >/dev/null 2>&1 && echo "ffmpeg listo"
+
 # --- usuario, carpetas y código ---
 id budsin-music >/dev/null 2>&1 || useradd --system --home-dir /var/lib/budsin-music --shell /usr/sbin/nologin budsin-music
 install -d -o budsin-music -g budsin-music -m 0750 /var/lib/budsin-music /var/lib/budsin-music/cache

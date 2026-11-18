@@ -834,6 +834,10 @@ html[data-theme="light"] #queue { box-shadow: -8px 0 24px rgba(0,0,0,.12); }
 .jamlink{word-break:break-all;font-size:.82rem}.jamrow{display:flex;gap:10px;flex-wrap:wrap}.jamsub{margin-top:10px!important;font-weight:700;color:var(--text)!important}
 .jamcard input{background:var(--card,#242424);border:1px solid rgba(255,255,255,.2);border-radius:999px;color:inherit;padding:10px 16px;font:inherit;letter-spacing:.2em;text-transform:uppercase;width:150px}.jamnote{font-size:.8rem}
 @media(max-width:700px){#jamBar{bottom:calc(var(--bnav-h,60px) + 130px)}}
+#vidm{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.86);padding:16px}#vidm.on{display:flex}
+.vidbox{width:min(1000px,100%);display:flex;flex-direction:column;gap:10px}.vidframe{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}.vidframe video{position:absolute;inset:0;width:100%;height:100%;background:#000}.vidload{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:.95rem;text-align:center;padding:20px;pointer-events:none;background:rgba(0,0,0,.35)}.vidload[hidden]{display:none}
+.vidbar{display:flex;gap:12px;align-items:center;color:#fff;font-size:.9rem}.vidbar span{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.vidbar a{color:#b3b3b3;text-decoration:underline;white-space:nowrap}
+body.vidmode #lyrics,body.vidmode #bLyr,body.vidmode [data-npvtab="lyrics"]{display:none!important}
 </style>
 </head>
 <body>
@@ -892,6 +896,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="seek"><span id="tCur">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Progreso"><span id="tDur">0:00</span></div>
     </div>
     <div class="right">
+      <button class="iconbtn" id="bVid" hidden><svg viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg></button>
       <button class="iconbtn" id="bLyr" data-ti="lyr"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></button>
       <button class="iconbtn" id="bViz" data-ti="viz"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>
       <button class="iconbtn hide-m" id="bDj" data-ti="djTitle"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 00-9 9v7c0 1.1.9 2 2 2h4v-8H5v-1c0-3.87 3.13-7 7-7s7 3.13 7 7v1h-4v8h4c1.1 0 2-.9 2-2v-7a9 9 0 00-9-9z"/></svg></button>
@@ -958,6 +963,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="plm-emojis" id="plmEmojis" style="margin-top:10px"></div>
   </div>
 </div>
+<div id="vidm" role="dialog" aria-modal="true"><div class="vidbox"><div class="vidframe" id="vidFrame"></div><div class="vidbar"><span id="vidTitle"></span><a id="vidYt" target="_blank" rel="noopener"></a><button class="chip" id="vidClose"></button></div></div></div>
 <div id="lyrics" role="dialog" aria-label="Lyrics">
   <div class="lyr-bg" id="lyrBg"></div>
   <div class="lyr-top">
@@ -1381,7 +1387,7 @@ function pipTick() {
   if (el('pR')) el('pR').classList.toggle('on', repeat > 0);
   var ic = loading ? '<span class="spinner"></span>' : (audio.paused ? ICON.play : ICON.pause);
   if (el('pP').getAttribute('data-ic') !== ic) { el('pP').innerHTML = ic; el('pP').setAttribute('data-ic', ic); }
-  var hasLy = !!tr && lyr.status === 'ok' && lyr.synced.length > 0;
+  var hasLy = !!tr && lyr.status === 'ok' && lyr.synced.length > 0 && !(typeof vid !== 'undefined' && vid.open);   // watching the video: no lyrics
   var root = el('pp'); if (root.classList.contains('nolyr') === hasLy) root.classList.toggle('nolyr', !hasLy);
   var A = lyr.synced, i = hasLy ? lyrIndexAt(c) : -1;
   var L0 = hasLy && i > 0 ? (A[i - 1].text || '') : '', L1 = hasLy ? (i >= 0 ? (A[i].text || '♪') : '♪') : '', L2 = hasLy ? (A[i + 1] ? (A[i + 1].text || '') : '') : '';
@@ -4625,6 +4631,68 @@ document.addEventListener('click', function (e) {
   var a = b.getAttribute('data-acct');
   if (a === 'in') cloudSignIn(); else if (a === 'out') cloudSignOut(); else if (a === 'wipe') cloudWipe();
 });
+
+/* ================= Video oficial ================= */
+// Si la canción tiene video musical oficial en YouTube Music (lo busca el backend: /api/music/video), aparece el botón 🎬
+// y la entrada «Ver video oficial» del menú ⋮. El video se ve con el reproductor incrustado de YouTube; mientras se ve,
+// la música de Budsin se pausa y NO hay letras (ni panel, ni pantalla completa, ni pestaña). Al cerrarlo, sigue donde iba.
+var VT = {
+  es: { btn: 'Ver video oficial', close: 'Cerrar', yt: 'Abrir en YouTube', mode: 'Mirando el video: la música está en pausa y no hay letras.', loading: 'Preparando el video… la primera vez tarda unos segundos.', failed: 'No se pudo cargar el video.' },
+  en: { btn: 'Watch the official video', close: 'Close', yt: 'Open on YouTube', mode: 'Watching the video: the music is paused and lyrics are off.', loading: 'Getting the video ready… the first time takes a few seconds.', failed: 'The video could not be loaded.' },
+  pt: { btn: 'Ver o vídeo oficial', close: 'Fechar', yt: 'Abrir no YouTube', mode: 'Assistindo ao vídeo: a música está em pausa e a letra fica desligada.', loading: 'Preparando o vídeo… na primeira vez demora alguns segundos.', failed: 'Não foi possível carregar o vídeo.' }
+};
+function VL(k) { return (VT[lang] && VT[lang][k]) || VT.es[k]; }
+var ORIGIN_API = '/api/music/';
+var vid = { found: {}, cur: null, open: false, was: null, key: null };
+function vidBtnSync() {
+  var b = $('#bVid'); if (!b) return;
+  b.hidden = !vid.cur; b.title = b.ariaLabel = VL('btn'); b.classList.toggle('on', vid.open);
+}
+function vidCheck() {
+  var c = cur(), k = c ? tid(c) : null;
+  if (k === vid.key) return;
+  vid.key = k; vid.cur = null;
+  if (vid.open) vidClose(false);                     // another song started: the video of the old one goes away
+  vidBtnSync();
+  if (!c || !c.title || !c.artist) return;
+  var done = function (v) { if (vid.key === k) { vid.cur = v && v.id ? v : null; vidBtnSync(); } };
+  if (k in vid.found) { done(vid.found[k]); return; }
+  fetch('/api/music/video?title=' + encodeURIComponent(c.title) + '&artist=' + encodeURIComponent(c.artist) + (c.duration ? '&duration=' + Math.round(c.duration) : ''))
+    .then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; })
+    .then(function (v) { if (v) vid.found[k] = v; done(v); });
+}
+function vidOpen() {
+  if (!vid.cur || vid.open) return;
+  vid.open = true; vid.was = { playing: !audio.paused };
+  audio.pause();
+  if (typeof lyrClose === 'function') lyrClose();
+  if (npv.tab === 'lyrics') { npv.tab = 'queue'; if (typeof npvRender === 'function') npvRender(); }
+  document.body.classList.add('vidmode');
+  // The video is served by this site (the backend downloads it), not by YouTube's embed: school and office filters block youtube.com.
+  $('#vidFrame').innerHTML = '<video id="vidEl" controls autoplay playsinline preload="auto" src="' + ORIGIN_API + 'video/file/' + encodeURIComponent(vid.cur.id) + '"></video><div class="vidload" id="vidLoad">' + esc(VL('loading')) + '</div>';
+  var ve = $('#vidEl');
+  ve.addEventListener('playing', function () { var l = $('#vidLoad'); if (l) l.hidden = true; });
+  ve.addEventListener('error', function () { var l = $('#vidLoad'); if (l) { l.hidden = false; l.textContent = VL('failed'); } });
+  $('#vidTitle').textContent = '🎬 ' + (cur() ? cur().title + ' — ' + cur().artist : '');
+  var yt = $('#vidYt'); yt.href = 'https://www.youtube.com/watch?v=' + encodeURIComponent(vid.cur.id); yt.textContent = VL('yt');
+  $('#vidClose').textContent = VL('close');
+  $('#vidm').classList.add('on'); vidBtnSync();
+}
+function vidClose(resume) {
+  if (!vid.open) return;
+  vid.open = false;
+  $('#vidm').classList.remove('on'); $('#vidFrame').innerHTML = '';
+  document.body.classList.remove('vidmode');
+  var was = vid.was; vid.was = null; vidBtnSync();
+  if (resume !== false && was && was.playing && cur()) audio.play().catch(function () {});
+}
+audio.addEventListener('loadedmetadata', vidCheck);
+audio.addEventListener('play', function () { if (vid.open) vidClose(false); });          // pressing play anywhere ends the video
+$('#bVid').addEventListener('click', function () { if (vid.open) vidClose(); else vidOpen(); });
+$('#vidClose').addEventListener('click', function () { vidClose(); });
+$('#vidm').addEventListener('click', function (e) { if (e.target === this) vidClose(); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && vid.open) vidClose(); });
+MORE_EXTRA.push(function () { return vid.cur ? { label: '🎬 ' + VL('btn'), fn: vidOpen } : null; });
 
 /* ================= Jam: escuchar juntos ================= */
 // Una persona (anfitriona) crea una sala con un código de 6 caracteres; quien tenga el enlace entra y oye lo mismo, a la

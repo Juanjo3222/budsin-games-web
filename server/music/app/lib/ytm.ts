@@ -976,3 +976,131 @@ export function ytmCachedFile(id: string): Promise<string | null> {
 export function ytmCacheDir(): string {
   return CACHE_DIR;
 }
+
+// --- official music videos (the "Ver video oficial" player) ---------------------
+//
+// Many networks (schools, offices: Fortinet and the like) block youtube.com and its embed, so the page cannot rely on
+// YouTube's own player. The video is fetched here like the audio is, as ONE muxed mp4 (itag 18, 360p, ~10-15 MB for a
+// song) and served from this site with Range support. They live in their own folder with a small size cap: a video is
+// ten times a song, and only ids that came out of the official-video lookup are accepted (see routes/music.ts).
+const VIDEO_DIR = path.join(CACHE_DIR, "video");
+const VIDEO_CACHE_MAX_BYTES = (Number(process.env.YTM_VIDEO_CACHE_MB) || 500) * 1_000_000;
+// With ffmpeg the video (360p, else 480p, h264) and the audio are joined into one mp4; without it only an already muxed
+// format can be used (itag 18, which YouTube no longer offers on most clients).
+const VIDEO_FORMAT_MERGED =
+  "bv*[height<=360][vcodec^=avc1]+ba[ext=m4a]/bv*[height<=480][vcodec^=avc1]+ba[ext=m4a]/18/b[height<=480]";
+const VIDEO_FORMAT_MUXED = "18/b[ext=mp4][height<=480]/b[height<=480]";
+const hasFfmpeg = () => !!Bun.which("ffmpeg");
+const videoPending = new Map<string, Promise<string>>();
+
+export function ytmVideoMimeType(file: string): string {
+  return path.extname(file) === ".webm" ? "video/webm" : "video/mp4";
+}
+
+async function cachedVideo(id: string): Promise<string | null> {
+  try {
+    const name = (await fsp.readdir(VIDEO_DIR)).find((x) => x.startsWith(`${id}.`) && !x.includes(".tmp."));
+    if (!name) return null;
+    const file = path.join(VIDEO_DIR, name);
+    const now = new Date();
+    await fsp.utimes(file, now, now).catch(() => {});   // recently watched = last to be evicted
+    return file;
+  } catch {
+    return null;
+  }
+}
+
+/** Oldest-watched videos go first when the folder passes its cap. */
+async function sweepVideos(keep: string): Promise<void> {
+  try {
+    const rows = await Promise.all(
+      (await fsp.readdir(VIDEO_DIR))
+        .filter((n) => !n.includes(".tmp."))
+        .map(async (n) => {
+          const f = path.join(VIDEO_DIR, n);
+          const st = await fsp.stat(f);
+          return { f, size: st.size, at: st.mtimeMs };
+        }),
+    );
+    let total = rows.reduce((a, r) => a + r.size, 0);
+    for (const r of rows.sort((a, b) => a.at - b.at)) {
+      if (total <= VIDEO_CACHE_MAX_BYTES) break;
+      if (r.f === keep) continue;
+      await fsp.rm(r.f, { force: true });
+      total -= r.size;
+    }
+  } catch {
+    // best effort: a full folder only costs disk until the next sweep
+  }
+}
+
+function videoAttempts(id: string): [string, string[]][] {
+  const base = requireYtmBase();
+  const instance = process.env.YTM_INVIDIOUS_INSTANCE;
+  if (!instance)
+    return clientsByLuck().map((client) => [client, ["--extractor-args", `youtube:player_client=${client}`, `${base}/watch?v=${id}`]]);
+  const chunked = ["--http-chunk-size", "10M"];
+  return [
+    ["latest_version 18", [...chunked, `https://${instance}/latest_version?id=${id}&itag=18&local=true`]],
+    ["invidious", [...chunked, "--extractor-args", `invidious:preferred_instance=${instance};max_retries=1`, `invidious:${id}`]],
+  ];
+}
+
+function downloadVideo(id: string): Promise<string> {
+  if (Date.now() < parkedUntil) return Promise.reject(new Error("YouTube is refusing downloads, retrying later"));
+  return downloadGate.run(async () => {
+    const binary = await resolveYtDlpPath();
+    if (!binary) throw new Error("yt-dlp not found. Install it, or set YT_DLP_PATH to its location.");
+    await fsp.mkdir(VIDEO_DIR, { recursive: true });
+    const failures: string[] = [];
+    for (const [label, extra] of videoAttempts(id)) {
+      const tag = crypto.randomBytes(4).toString("hex");
+      const target = path.join(VIDEO_DIR, `${id}.${tag}.tmp.%(ext)s`);
+      try {
+        await runYtDlp(binary, [
+          "-f", hasFfmpeg() ? VIDEO_FORMAT_MERGED : VIDEO_FORMAT_MUXED,
+          "--merge-output-format", "mp4",
+          "--max-filesize", "60M",
+          "--match-filter", "duration<=900",
+          "-o", target,
+          "--cache-dir", YT_DLP_CACHE_DIR,
+          "--no-warnings", "--quiet",
+          ...extra,
+        ]);
+      } catch (e) {
+        failures.push(`${label}: ${e instanceof Error ? e.message : e}`);
+        for (const n of (await fsp.readdir(VIDEO_DIR).catch(() => [])).filter((x) => x.startsWith(`${id}.${tag}.tmp.`)))
+          await fsp.rm(path.join(VIDEO_DIR, n), { force: true });
+        continue;
+      }
+      const name = (await fsp.readdir(VIDEO_DIR)).find((x) => x.startsWith(`${id}.${tag}.tmp.`));
+      if (!name) {
+        failures.push(`${label}: exited 0 but produced no file`);
+        continue;
+      }
+      const final = path.join(VIDEO_DIR, `${id}${path.extname(name)}`);
+      await fsp.rename(path.join(VIDEO_DIR, name), final);
+      void sweepVideos(final);
+      return final;
+    }
+    throw new Error(`all yt-dlp clients failed for the video — ${failures.join(" | ")}`);
+  });
+}
+
+/** Local path of the muxed mp4 for `id`, downloading it on first use (one download per id, shared). */
+export async function ytmVideoFile(id: string): Promise<string> {
+  if (!isYtmVideoId(id)) throw new Error("invalid YouTube Music video id");
+  requireYtmBase();
+  const hit = await cachedVideo(id);
+  if (hit) return hit;
+  const running = videoPending.get(id);
+  if (running) return running;
+  const job = downloadVideo(id);
+  videoPending.set(id, job);
+  job.catch(() => {}).finally(() => videoPending.delete(id));
+  return job;
+}
+
+export function ytmVideoCached(id: string): Promise<string | null> {
+  return isYtmVideoId(id) ? cachedVideo(id) : Promise.resolve(null);
+}

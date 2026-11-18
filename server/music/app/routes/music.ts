@@ -11,6 +11,9 @@ import {
   ytmConfigured,
   ytmMimeType,
   ytmResolveVideoId,
+  ytmVideoCached,
+  ytmVideoFile,
+  ytmVideoMimeType,
   ytmSearch,
   type YtmTrack,
 } from "../lib/ytm";
@@ -21,6 +24,7 @@ import { musicSourceBreaker, SourceParkedError } from "../lib/sourceBreaker";
 import { LruCache } from "../lib/lruCache";
 import { lyricsById, lyricsFor, lyricVersions } from "../lib/lyrics";
 import { resolveLink } from "../lib/resolveLink";
+import { isKnownOfficialVideo, officialVideo } from "../lib/ytmVideo";
 import { cleanLines, TARGETS, translateLyrics } from "../lib/translate";
 import { cleanTtsInput, enginesAvailable, speak, TtsBudgetError } from "../lib/tts";
 import { cleanDjInput, cleanPickInput, DjBudgetError, DjBusyError, djAvailable, djComment, djEnabled, DjPausedError, djPick } from "../lib/dj";
@@ -1146,6 +1150,42 @@ export async function musicRoutes(fastify: FastifyInstance) {
     } catch {
       return musicError(reply, 502, "Link lookup failed");
     }
+  });
+
+  // The song's official music video on YouTube Music, if there is one: only an id, the page plays it with YouTube's embed.
+  fastify.get("/api/music/video", perMinute(40), async (req, reply) => {
+    const q = req.query as Record<string, unknown>;
+    const title = String(q.title ?? "").trim();
+    const artist = String(q.artist ?? "").trim();
+    if (!title || !artist || title.length > 200 || artist.length > 200)
+      return musicError(reply, 400, "title and artist are required (200 characters at most)");
+    const secs = Number(q.duration);
+    const duration = Number.isFinite(secs) && secs > 0 && secs < 3600 ? Math.round(secs) : undefined;
+    try {
+      const v = await officialVideo(title, artist, duration);
+      reply.header("cache-control", "public, max-age=3600");
+      return reply.send(v);
+    } catch (err) {
+      console.warn("[music] video lookup failed:", err instanceof Error ? err.message : err);
+      return musicError(reply, 502, "Video lookup failed");
+    }
+  });
+
+  // The official video itself, served from this site (networks that block youtube.com cannot use its embed).
+  fastify.get("/api/music/video/file/:id", perMinute(120), async (req, reply) => {
+    const { id } = req.params as { id: string };
+    if (!isYtmVideoId(id) || !isKnownOfficialVideo(id)) return musicError(reply, 404, "Unknown video");
+    if (!(await ytmVideoCached(id)) && !coldAllowed(clientKey(req))) {
+      reply.header("retry-after", "60");
+      return musicError(reply, 429, "Too many requests");
+    }
+    let file: string;
+    try {
+      file = await ytmVideoFile(id);
+    } catch (e) {
+      return musicError(reply, 502, "Video fetch failed", { detail: e instanceof Error ? e.message : String(e) });
+    }
+    return sendLocalAudio(req, reply, file, ytmVideoMimeType(file), "public, max-age=86400");
   });
 
   // Line-by-line translation of a song's lyrics (the lyrics panel's "Traducir"). One request per song, cached.
