@@ -2166,6 +2166,8 @@ var repeat = store.get('bm_repeat', 0);   // 0 off, 1 all, 2 one
 var savedAlbums = store.get('bm_albums', []);   // álbumes guardados en la biblioteca
 var albReg = {};                               // álbumes vistos en esta pantalla, por id, para guardarlos desde la portada
 var liked = store.get('bm_liked', []);     // array of tracks
+var likedDel = store.get('bm_liked_del', {});      // id -> cuando se quitó (tumbas: así un ♥ quitado en un dispositivo se quita en todos)
+var albumsDel = store.get('bm_albums_del', {});
 var playlists = store.get('bm_playlists', []); // [{id,name,tracks:[]}]
 var recent = store.get('bm_recent', []);
 var volume = store.get('bm_vol', 80);
@@ -2862,9 +2864,9 @@ $('#qClear').addEventListener('click', function () {
 
 /* ================= likes & playlists ================= */
 function toggleLike(tr) {
-  if (isLiked(tr)) { liked = liked.filter(function (x) { return tid(x) !== tid(tr); }); toast(t('unliked_t')); }
-  else { liked.unshift(slim(tr)); toast(t('liked_t')); }
-  store.set('bm_liked', liked); cloudMark('likes');
+  if (isLiked(tr)) { liked = liked.filter(function (x) { return tid(x) !== tid(tr); }); likedDel[tid(tr)] = Date.now(); toast(t('unliked_t')); }
+  else { var sl = slim(tr); sl.at = Date.now(); liked.unshift(sl); delete likedDel[tid(tr)]; toast(t('liked_t')); }
+  store.set('bm_liked', liked); store.set('bm_liked_del', likedDel); cloudMark('likes');
   tasteAdd(tr, isLiked(tr) ? 3 : -2, isLiked(tr) ? 'like' : 'unlike');
   if (cur() && tid(cur()) === tid(tr)) updateNowPlaying();
   $$('[data-like]').forEach(function (b) {
@@ -3021,12 +3023,12 @@ function findArtistPicture(a) {
 function isAlbumSaved(id) { return savedAlbums.some(function (x) { return String(x.id) === String(id); }); }
 function slimAlbum(a) { return { id: a.id, title: a.title, cover: a.cover, artist: a.artist ? { id: a.artist.id, name: a.artist.name } : null, releaseDate: a.releaseDate, numberOfTracks: a.numberOfTracks, type: a.type }; }
 function toggleAlbum(a) {
-  if (isAlbumSaved(a.id)) { savedAlbums = savedAlbums.filter(function (x) { return String(x.id) !== String(a.id); }); toast(t('albumRemoved_t')); }
+  if (isAlbumSaved(a.id)) { savedAlbums = savedAlbums.filter(function (x) { return String(x.id) !== String(a.id); }); albumsDel[String(a.id)] = Date.now(); toast(t('albumRemoved_t')); }
   else {
-    savedAlbums.unshift(slimAlbum(a)); savedAlbums = savedAlbums.slice(0, 500); toast(t('albumSaved_t'));
+    var sa = slimAlbum(a); sa.at = Date.now(); savedAlbums.unshift(sa); savedAlbums = savedAlbums.slice(0, 500); delete albumsDel[String(a.id)]; toast(t('albumSaved_t'));
     if (a.artist && a.artist.name) tasteAdd({ id: 'al' + a.id, title: a.title, artist: a.artist.name, artistId: a.artist.id }, 2, 'album');
   }
-  store.set('bm_albums', savedAlbums); cloudMark('albums');
+  store.set('bm_albums', savedAlbums); store.set('bm_albums_del', albumsDel); cloudMark('albums');
   var on = isAlbumSaved(a.id);
   $$('[data-albsave="' + a.id + '"]').forEach(function (el) { el.classList.toggle('on', on); el.textContent = on ? '✓' : '+'; el.title = t(on ? 'savedAlbum' : 'saveAlbum'); });
   var b = $('[data-albsaveb]'); if (b && String(b.getAttribute('data-albsaveb')) === String(a.id)) { b.textContent = on ? '✓ ' + t('savedAlbum') : '💿 ' + t('saveAlbum'); b.classList.toggle('on', on); }
@@ -4322,16 +4324,48 @@ function cleanLog(a) {
     .sort(function (x, y) { return x.t - y.t; }).slice(-40);
 }
 function mergeLog(a, b) { var seen = {}, out = []; cleanLog(a).concat(cleanLog(b)).forEach(function (e) { var k = e.t + '|' + e.s; if (!seen[k]) { seen[k] = 1; out.push(e); } }); return cleanLog(out); }
+/* ♥ y álbumes son CONJUNTOS: se unen entre dispositivos (nada se pierde por editar en dos a la vez) y lo quitado viaja como "tumba" con su fecha.
+ * Cada elemento lleva `at` (cuándo se añadió); una tumba más nueva que el elemento lo borra, un ♥ nuevo después de quitarlo gana a la tumba. */
+function setMergeDocs(a, b, idOf, cap) {
+  var rem = {}, best = {}, order = [], cut = Date.now() - 120 * 86400000;
+  [a, b].forEach(function (d) { var r = (d && d.removed) || {}; Object.keys(r).forEach(function (k) { var v = +r[k] || 0; if (v > (rem[k] || 0)) rem[k] = v; }); });
+  [a, b].forEach(function (d) {
+    ((d && d.items) || []).forEach(function (x) {
+      if (!x) return;
+      var k = String(idOf(x)), at = +x.at || 0;
+      if (!best[k]) { best[k] = x; order.push(k); } else if (at > (+best[k].at || 0)) best[k] = x;
+    });
+  });
+  var items = [];
+  order.forEach(function (k) {
+    var x = best[k], at = +x.at || 0;
+    if (rem[k] !== undefined && rem[k] >= at) return;       // se quitó después de añadirlo
+    items.push(x); delete rem[k];                           // sigue vivo: la tumba vieja sobra
+  });
+  items = items.map(function (x, i) { return [x, i]; }).sort(function (p, q) { return ((+q[0].at || 0) - (+p[0].at || 0)) || (p[1] - q[1]); }).map(function (p) { return p[0]; }).slice(0, cap);
+  var keep = Object.keys(rem).filter(function (k) { return rem[k] > cut; }).sort(function (x, y) { return rem[y] - rem[x]; }).slice(0, 500), removed = {};
+  keep.forEach(function (k) { removed[k] = rem[k]; });
+  return { items: items, removed: removed };
+}
+function setSig(d, idOf) {
+  var it = ((d && d.items) || []).map(function (x) { return String(idOf(x)) + ':' + (+x.at || 0); }).sort().join(',');
+  var r = (d && d.removed) || {};
+  return it + '|' + Object.keys(r).sort().map(function (k) { return k + ':' + (+r[k] || 0); }).join(',');
+}
+function cleanDel(o) { var out = {}; if (o && typeof o === 'object') Object.keys(o).slice(0, 600).forEach(function (k) { if (typeof o[k] === 'number') out[k] = o[k]; }); return out; }
+function fbClean(o) { return JSON.parse(JSON.stringify(o)); }       // Firestore rechaza `undefined`: fuera los huecos antes de escribir
 var KINDS = {
   likes: {
-    get: function () { return { items: liked.slice(0, 1000) }; },
-    set: function (d) { liked = d.items || []; store.set('bm_liked', liked); },
-    merge: function (a, b) { var seen = {}, out = []; (a.items || []).concat(b.items || []).forEach(function (x) { if (!seen[tid(x)]) { seen[tid(x)] = 1; out.push(x); } }); return { items: out.slice(0, 1000) }; }
+    union: true, idOf: function (x) { return tid(x); },
+    get: function () { return { items: liked.slice(0, 1000), removed: likedDel }; },
+    set: function (d) { liked = d.items || []; likedDel = cleanDel(d.removed); store.set('bm_liked', liked); store.set('bm_liked_del', likedDel); },
+    merge: function (a, b) { return setMergeDocs(a, b, tid, 1000); }
   },
   albums: {
-    get: function () { return { items: savedAlbums.slice(0, 500) }; },
-    set: function (d) { savedAlbums = d.items || []; store.set('bm_albums', savedAlbums); },
-    merge: function (a, b) { var seen = {}, out = []; (a.items || []).concat(b.items || []).forEach(function (x) { if (!seen[x.id]) { seen[x.id] = 1; out.push(x); } }); return { items: out.slice(0, 500) }; }
+    union: true, idOf: function (x) { return x.id; },
+    get: function () { return { items: savedAlbums.slice(0, 500), removed: albumsDel }; },
+    set: function (d) { savedAlbums = d.items || []; albumsDel = cleanDel(d.removed); store.set('bm_albums', savedAlbums); store.set('bm_albums_del', albumsDel); },
+    merge: function (a, b) { return setMergeDocs(a, b, function (x) { return x.id; }, 500); }
   },
   taste: {
     get: function () { return { artists: taste.artists, genres: taste.genres, seen: cleanSeen(taste.seen), skips: cleanSkips(taste.skips), log: cleanLog(taste.log) }; },
@@ -4363,7 +4397,7 @@ function cloudMark(kind) {
   if (kind !== 'playlists') { cloud.sync.ts[kind] = Date.now(); cloudMeta(); }
   var queued = !!cloud.timers[kind];
   clearTimeout(cloud.timers[kind]);
-  cloud.timers[kind] = setTimeout(function () { cloud.timers[kind] = null; cloudPush(kind); }, 1500);
+  cloud.timers[kind] = setTimeout(function () { cloud.timers[kind] = null; try { cloudPush(kind); } catch (e) { cloudDone(e); } }, 1500);
   if (!queued) { cloud.pending++; renderAccount(); }
 }
 function cloudDone(err) {
@@ -4379,17 +4413,20 @@ function cloudPush(kind) {
   if (!cloud.user || !cloud.refs) { cloudDone(); return; }
   if (kind === 'playlists') return cloudPushPlaylists();
   var K = KINDS[kind]; if (!K) { cloudDone(); return; }
-  var doc = K.get(); doc.updatedAt = cloud.sync.ts[kind] || Date.now();
+  var doc = fbClean(K.get()); doc.updatedAt = cloud.sync.ts[kind] || Date.now();
   cloud.refs.kv.doc(kind).set(doc).then(function () { cloudDone(); }, cloudDone);
 }
 function cloudPushPlaylists() {
+  try { cloudPushPlaylists2(); } catch (e) { cloudDone(e); }
+}
+function cloudPushPlaylists2() {
   var ops = [], now = Date.now(), live = {};
   playlists.forEach(function (p) {
     live[p.id] = 1;
     var sig = plSig(p);
     if (cloud.plSig[p.id] === sig) return;
     p.updatedAt = now; cloud.plSig[p.id] = sig;
-    ops.push(cloud.refs.pls.doc(p.id).set({ name: p.name, tracks: p.tracks.slice(0, 1000), cover: p.cover || null, description: String(p.description || '').slice(0, 400), updatedAt: now }));
+    ops.push(cloud.refs.pls.doc(p.id).set(fbClean({ name: p.name, tracks: p.tracks.slice(0, 1000), cover: p.cover || null, description: String(p.description || '').slice(0, 400), updatedAt: now })));
   });
   Object.keys(cloud.plSig).forEach(function (id) { if (!live[id]) { delete cloud.plSig[id]; ops.push(cloud.refs.pls.doc(id).delete()); } });
   if (ops.length) store.set('bm_playlists', playlists);
@@ -4412,7 +4449,7 @@ function cloudSync(u) {
   var uid = u.uid, root = cloud.db.collection('music_profiles').doc(uid);
   cloud.refs = { kv: root.collection('kv'), pls: root.collection('playlists') };
   return Promise.all([cloud.refs.kv.get(), cloud.refs.pls.get()]).then(function (res) {
-    var rkv = {}, rpl = {};
+    var rkv = {}, rpl = {}, need = {};
     res[0].docs.forEach(function (d) { rkv[d.id] = d.data(); });
     res[1].docs.forEach(function (d) { rpl[d.id] = d.data(); });
     var foreign = !!cloud.sync.uid && cloud.sync.uid !== uid;        // lo que hay aquí es de otra cuenta: se reemplaza, no se mezcla
@@ -4423,7 +4460,8 @@ function cloudSync(u) {
       Object.keys(KINDS).forEach(function (kind) {
         var K = KINDS[kind], r = rkv[kind], mine = cloud.sync.ts[kind] || 0;
         if (!r) { if (!foreign && first) cloud.sync.ts[kind] = Date.now(); return; }       // la nube no tiene nada: se sube lo local
-        if (first && !foreign) { K.set(K.merge(K.get(), r)); cloud.sync.ts[kind] = Date.now(); }  // primera vez: unión
+        if (K.union) { var m = K.merge(K.get(), r); K.set(m); if (setSig(m, K.idOf) !== setSig(r, K.idOf)) need[kind] = 1; cloud.sync.ts[kind] = Math.max(cloud.sync.ts[kind] || 0, r.updatedAt || 0); }   // ♥ y álbumes: siempre unión
+        else if (first && !foreign) { K.set(K.merge(K.get(), r)); cloud.sync.ts[kind] = Date.now(); }  // primera vez: unión
         else if ((r.updatedAt || 0) > mine) { K.set(r); cloud.sync.ts[kind] = r.updatedAt; }       // luego: gana lo más reciente
       });
       var local = {}; playlists.forEach(function (p) { local[p.id] = p; });
@@ -4439,7 +4477,7 @@ function cloudSync(u) {
     cloud.sync.uid = uid; cloudMeta();
     renderSidebar(); updateNowPlaying(); if (route.name !== 'search') render();
     cloudAttach();
-    Object.keys(KINDS).forEach(function (kind) { if (!rkv[kind] || first) cloudMark(kind); });    // sube lo que la nube no tenía o se mezcló
+    Object.keys(KINDS).forEach(function (kind) { if (!rkv[kind] || first || need[kind]) cloudMark(kind); });    // sube lo que la nube no tenía, se mezcló o falta en la nube
     cloudMark('playlists');
   });
 }
@@ -4449,6 +4487,12 @@ function cloudAttach() {
     snap.docChanges().forEach(function (c) {
       if (c.type === 'removed' || c.doc.metadata.hasPendingWrites) return;
       var r = c.doc.data(), K = KINDS[c.doc.id];
+      if (K && K.union) {           // ♥ y álbumes: se une con lo local; si aquí hay algo que la nube no tiene, se sube
+        var m = K.merge(K.get(), r), same = setSig(m, K.idOf) === setSig(K.get(), K.idOf), up = setSig(m, K.idOf) !== setSig(r, K.idOf);
+        if (!same) { cloud.applying = true; try { K.set(m); } finally { cloud.applying = false; } if (route.name === 'home' || route.name === 'liked' || route.name === 'library' || route.name === 'albums') render(); updateNowPlaying(); }
+        if (up) cloudMark(c.doc.id);
+        return;
+      }
       if (!K || (r.updatedAt || 0) <= (cloud.sync.ts[c.doc.id] || 0)) return;       // es nuestro eco o algo más viejo
       cloud.applying = true; try { K.set(r); cloud.sync.ts[c.doc.id] = r.updatedAt; cloudMeta(); } finally { cloud.applying = false; }
       if (route.name === 'home' || route.name === 'liked' || route.name === 'library' || route.name === 'albums') render();
@@ -4474,8 +4518,8 @@ function cloudAttach() {
 function cloudDetach() { cloud.unsub.forEach(function (f) { try { f(); } catch (e) {} }); cloud.unsub = []; }
 
 function cloudClearLocal() {
-  ['bm_liked', 'bm_albums', 'bm_playlists', 'bm_taste', 'bm_recs', 'bm_recent', 'bm_lyrprefs', 'bm_sync'].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
-  liked = []; savedAlbums = []; playlists = []; recent = []; lyrPrefs = {};
+  ['bm_liked', 'bm_albums', 'bm_liked_del', 'bm_albums_del', 'bm_playlists', 'bm_taste', 'bm_recs', 'bm_recent', 'bm_lyrprefs', 'bm_sync'].forEach(function (k) { try { localStorage.removeItem(k); } catch (e) {} });
+  liked = []; savedAlbums = []; playlists = []; recent = []; lyrPrefs = {}; likedDel = {}; albumsDel = {};
   taste = { v: 2, artists: {}, genres: {}, seen: [], skips: {} };
   cloud.sync = { uid: null, ts: {} }; cloud.plSig = {};
   renderSidebar(); updateNowPlaying(); render();
