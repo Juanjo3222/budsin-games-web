@@ -4089,7 +4089,7 @@ function sessionSave(closed) {
   if (qi < 0 || !queue.length) return;
   var start = Math.max(0, qi - 3), end = Math.min(queue.length, start + 60);   // una ventana de la cola basta
   store.set(SESSION_KEY, {
-    v: 1, ts: Date.now(), owner: 'bm', closed: !!closed, playing: !audio.paused && !!audio.getAttribute('src'),
+    v: 1, ts: Date.now(), owner: 'bm', closed: !!closed, playing: (!audio.paused || (typeof vid !== 'undefined' && vid.leave)) && !!audio.getAttribute('src'),
     qi: qi - start, t: audio.getAttribute('src') ? (audio.currentTime || 0) : restoreT, queue: queue.slice(start, end), dj: dj.on ? 1 : 0   // dj: the portal's mini player carries the DJ on
   });
 }
@@ -4188,8 +4188,9 @@ if (bc) bc.onmessage = function (e) {
 // Al irse (botón "Budsin Games", atrás, cerrar): deja la sesión marcada como cerrada y avisa.
 window.addEventListener('pagehide', function () {
   if (!owner) return;
+  if (typeof vidPrepareLeave === 'function') vidPrepareLeave();            // watching the video: the games' mini player carries on with its audio
   sessionSave(true);
-  bcPost({ t: 'bye', from: 'bm', closed: true, playing: !audio.paused });
+  bcPost({ t: 'bye', from: 'bm', closed: true, playing: !audio.paused || (typeof vid !== 'undefined' && vid.leave) });
 });
 // "Atrás" puede devolver esta página desde la caché con el audio ya parado: se recarga para retomar la sesión.
 window.addEventListener('pageshow', function (e) { if (e.persisted) location.reload(); });
@@ -4643,7 +4644,20 @@ var VT = {
 };
 function VL(k) { return (VT[lang] && VT[lang][k]) || VT.es[k]; }
 var ORIGIN_API = '/api/music/';
-var vid = { found: {}, cur: null, open: false, was: null, key: null };
+var vid = { found: {}, cur: null, open: false, was: null, key: null, leave: false };
+// Where the song's AUDIO should be for the point the video is at. Videos often carry an intro the album audio lacks, so the
+// difference in length (when the video is the longer one, up to 90 s) is taken off.
+function vidAudioPos() {
+  var v = $('#vidEl'); if (!v) return null;
+  var c = cur(), td = (c && +c.duration) || (isFinite(audio.duration) ? audio.duration : 0), vd = isFinite(v.duration) ? v.duration : 0;
+  var off = td && vd > td ? Math.min(vd - td, 90) : 0;
+  return { pos: Math.max(0, (v.currentTime || 0) - off), playing: !v.paused && !v.ended };
+}
+function vidPrepareLeave() {
+  if (!vid.open) return;
+  var h = vidAudioPos();
+  if (h && audio.getAttribute('src')) { try { audio.currentTime = h.pos; } catch (e) {} vid.leave = h.playing; }
+}
 function vidBtnSync() {
   var b = $('#bVid'); if (!b) return;
   b.hidden = !vid.cur; b.title = b.ariaLabel = VL('btn'); b.classList.toggle('on', vid.open);
@@ -4680,11 +4694,16 @@ function vidOpen() {
 }
 function vidClose(resume) {
   if (!vid.open) return;
+  var h = vidAudioPos();
   vid.open = false;
   $('#vidm').classList.remove('on'); $('#vidFrame').innerHTML = '';
   document.body.classList.remove('vidmode');
   var was = vid.was; vid.was = null; vidBtnSync();
-  if (resume !== false && was && was.playing && cur()) audio.play().catch(function () {});
+  // Closing the video: the song goes on as audio from the point the video had reached (if it was playing).
+  if (resume !== false && cur()) {
+    if (h && audio.getAttribute('src')) { try { audio.currentTime = h.pos; } catch (e) {} if (h.playing) audio.play().catch(function () {}); }
+    else if (was && was.playing) audio.play().catch(function () {});
+  }
 }
 audio.addEventListener('loadedmetadata', vidCheck);
 audio.addEventListener('play', function () { if (vid.open) vidClose(false); });          // pressing play anywhere ends the video
