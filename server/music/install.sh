@@ -41,7 +41,8 @@ echo "yt-dlp $(/usr/local/bin/yt-dlp --version)"
 # --- ffmpeg (solo para «Ver video oficial»: une la imagen y el audio en un mp4) ---
 if ! command -v ffmpeg >/dev/null 2>&1; then
   if command -v apt-get >/dev/null 2>&1; then
-    DEBIAN_FRONTEND=noninteractive apt-get install -y ffmpeg >/dev/null 2>&1 || echo "AVISO: no se pudo instalar ffmpeg; el video oficial puede no funcionar"
+    echo "Instalando ffmpeg (puede tardar varios minutos en un VPS pequeño; se ve el progreso)..."
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ffmpeg || echo "AVISO: no se pudo instalar ffmpeg; el video oficial puede no funcionar"
   else
     echo "AVISO: instala ffmpeg a mano para que funcione el video oficial"
   fi
