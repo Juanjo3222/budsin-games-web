@@ -2269,6 +2269,25 @@ audio.addEventListener('error', function () {
   else { toast(t('playErr1')); errStreak = 0; }
 });
 audio.addEventListener('playing', function () { errStreak = 0; setLoading(false); });
+/* Warm the next songs: the server needs ~3 s to fetch a new track, so while this one plays it already prepares the next two (one at a time,
+ * a tiny range request that the server answers once the file is ready). When the song ends the next one is already on the server's disk. */
+var warm = { done: {}, n: 0, timer: 0, busy: false };
+function warmNext() {
+  clearTimeout(warm.timer);
+  if (!cur() || audio.paused || warm.busy || shuffle || repeat === 2) return;
+  try { if (navigator.connection && navigator.connection.saveData) return; } catch (e) {}
+  var tr = null;
+  for (var k = 1; k <= 2 && !tr; k++) { var c = queue[qi + k]; if (c && !warm.done[tid(c)]) tr = c; }
+  if (!tr) return;
+  if (warm.n++ > 300) { warm.done = {}; warm.n = 0; }
+  warm.done[tid(tr)] = 1; warm.busy = true;
+  var from = qi;
+  fetch(streamUrl(tr), { headers: { Range: 'bytes=0-1' }, cache: 'no-store' })
+    .then(function (r) { try { if (r.body && r.body.cancel) r.body.cancel(); } catch (e) {} })
+    .catch(function () {})
+    .then(function () { warm.busy = false; if (qi === from) warm.timer = setTimeout(warmNext, 800); });
+}
+audio.addEventListener('playing', function () { clearTimeout(warm.timer); warm.timer = setTimeout(warmNext, 2500); });
 audio.addEventListener('canplay', function () { if (!audio.paused) setLoading(false); });
 audio.addEventListener('waiting', function () { if (cur() && !audio.paused) setLoading(true); });
 audio.addEventListener('stalled', function () { if (cur() && !audio.paused && audio.readyState < 3) setLoading(true); });

@@ -574,7 +574,11 @@ const DOWNLOAD_TIMEOUT_MS = Number(process.env.YTM_DOWNLOAD_TIMEOUT_MS) || 45000
 // add one without editing code.
 const PLAYER_CLIENTS: string[] = (
   process.env.YTM_PLAYER_CLIENTS ||
-  "web_embedded,default,tv_embedded,web_safari,mweb,ios"
+  // `default` first: measured on prod (17-nov-2026), web_embedded answered
+  // "Requested format is not available" for every track tried, and each such
+  // failure cost 3-5 s before the next client ran, while `default` served
+  // the file in ~3 s. A cold track went from ~7 s to ~3.5 s by this order alone.
+  "default,tv_embedded,web_embedded,web_safari,mweb,ios"
 )
   .split(",")
   .map((s) => s.trim())
@@ -824,7 +828,7 @@ function ytDlpAttempts(id: string): [string, string[]][] {
   const base = requireYtmBase();
   const instance = process.env.YTM_INVIDIOUS_INSTANCE;
   if (!instance)
-    return PLAYER_CLIENTS.map((client) => [
+    return clientsByLuck().map((client) => [
       client,
       [
         "--extractor-args",
@@ -862,6 +866,16 @@ function ytDlpAttempts(id: string): [string, string[]][] {
       ],
     ],
   ];
+}
+
+// The client that served the last track goes first on the next one: when YouTube
+// changes which clients work, the order fixes itself after one slow track
+// instead of making every track pay for the broken ones.
+let lastGoodClient: string | null = null;
+function clientsByLuck(): string[] {
+  return lastGoodClient && PLAYER_CLIENTS.includes(lastGoodClient)
+    ? [lastGoodClient, ...PLAYER_CLIENTS.filter((c) => c !== lastGoodClient)]
+    : PLAYER_CLIENTS;
 }
 
 function downloadWithYtDlp(id: string): Promise<string> {
@@ -929,6 +943,7 @@ function downloadWithYtDlp(id: string): Promise<string> {
         console.warn(`[ytm] copying ${id} to R2 failed:`, err instanceof Error ? err.message : err),
       );
       blockedStreak = 0;
+      if (PLAYER_CLIENTS.includes(client)) lastGoodClient = client;
       return final;
     }
 
