@@ -21,6 +21,7 @@ export interface Room {
   owner: string | null;
   created: number;
   last_msg: number;
+  slow: number;
 }
 export interface Msg {
   id: number;
@@ -30,6 +31,8 @@ export interface Msg {
   ts: number;
   deleted: number;
   media: string | null;
+  edited: number;
+  reply_to: number | null;
 }
 export interface Media {
   id: string;
@@ -63,6 +66,21 @@ function trackLabel(media: string | null): string {
   try { const t = JSON.parse(media.slice(6)); return `🎵 ${t.title} — ${t.artist}`; } catch { return "🎵"; }
 }
 
+export interface HistoryRow extends Msg {
+  username: string | null;
+  avatar: string;
+  mkind: string | null;
+  mw: number | null;
+  mh: number | null;
+  mdur: number | null;
+  mstatus: string | null;
+  rtext: string | null;
+  rmedia: string | null;
+  rdel: number | null;
+  runame: string | null;
+  rx: Record<string, string[]>;
+}
+
 export class ChatDb {
   readonly db: Database;
   constructor(file: string) {
@@ -92,6 +110,10 @@ export class ChatDb {
         room TEXT, status TEXT NOT NULL DEFAULT 'pending');
       CREATE INDEX IF NOT EXISTS media_uid ON media(uid, ts);
       CREATE TABLE IF NOT EXISTS user_stickers(uid TEXT NOT NULL, media_id TEXT NOT NULL, added INTEGER NOT NULL, PRIMARY KEY(uid, media_id));
+      CREATE TABLE IF NOT EXISTS message_edits(msg_id INTEGER NOT NULL, text TEXT NOT NULL, ts INTEGER NOT NULL);
+      CREATE INDEX IF NOT EXISTS message_edits_msg ON message_edits(msg_id);
+      CREATE TABLE IF NOT EXISTS reactions(msg_id INTEGER NOT NULL, uid TEXT NOT NULL, emoji TEXT NOT NULL, ts INTEGER NOT NULL, PRIMARY KEY(msg_id, uid, emoji));
+      CREATE TABLE IF NOT EXISTS pins(room TEXT NOT NULL, msg_id INTEGER NOT NULL, by_uid TEXT NOT NULL, ts INTEGER NOT NULL, PRIMARY KEY(room, msg_id));
       CREATE TABLE IF NOT EXISTS reports(
         id INTEGER PRIMARY KEY AUTOINCREMENT, msg_id INTEGER NOT NULL, room TEXT NOT NULL, reported_uid TEXT NOT NULL, reporter_uid TEXT NOT NULL,
         reason TEXT NOT NULL, text TEXT NOT NULL, ts INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'open', UNIQUE(msg_id, reporter_uid));
@@ -102,6 +124,9 @@ export class ChatDb {
     if (!has("messages", "media")) this.db.exec("ALTER TABLE messages ADD COLUMN media TEXT");
     if (!has("users", "media_until")) this.db.exec("ALTER TABLE users ADD COLUMN media_until INTEGER NOT NULL DEFAULT 0");
     if (!has("reports", "media")) this.db.exec("ALTER TABLE reports ADD COLUMN media TEXT");
+    if (!has("messages", "edited")) this.db.exec("ALTER TABLE messages ADD COLUMN edited INTEGER NOT NULL DEFAULT 0");
+    if (!has("messages", "reply_to")) this.db.exec("ALTER TABLE messages ADD COLUMN reply_to INTEGER");
+    if (!has("rooms", "slow")) this.db.exec("ALTER TABLE rooms ADD COLUMN slow INTEGER NOT NULL DEFAULT 0");
   }
 
   // ---- users ----
@@ -144,7 +169,7 @@ export class ChatDb {
 
   // ---- rooms ----
   room(key: string): Room | null {
-    return (this.db.query("SELECT key,kind,name,owner,created,last_msg FROM rooms WHERE key=?").get(key) as Room) ?? null;
+    return (this.db.query("SELECT key,kind,name,owner,created,last_msg,slow FROM rooms WHERE key=?").get(key) as Room) ?? null;
   }
   /** Creates the room if it does not exist (idempotent). `nameKey` makes names unique inside a kind (class groups). */
   createRoom(key: string, kind: string, name: string, owner: string | null, now: number, unique?: string): "ok" | "exists" {
@@ -157,10 +182,10 @@ export class ChatDb {
     }
   }
   roomByNameKey(kind: string, unique: string): Room | null {
-    return (this.db.query("SELECT key,kind,name,owner,created,last_msg FROM rooms WHERE kind=? AND name_key=?").get(kind, unique) as Room) ?? null;
+    return (this.db.query("SELECT key,kind,name,owner,created,last_msg,slow FROM rooms WHERE kind=? AND name_key=?").get(kind, unique) as Room) ?? null;
   }
   activeRooms(kind: string, limit = 40): Room[] {
-    return this.db.query("SELECT key,kind,name,owner,created,last_msg FROM rooms WHERE kind=? ORDER BY last_msg DESC, created DESC LIMIT ?").all(kind, limit) as Room[];
+    return this.db.query("SELECT key,kind,name,owner,created,last_msg,slow FROM rooms WHERE kind=? ORDER BY last_msg DESC, created DESC LIMIT ?").all(kind, limit) as Room[];
   }
   countRooms(kind: string): number {
     return (this.db.query("SELECT COUNT(*) n FROM rooms WHERE kind=?").get(kind) as { n: number }).n;
@@ -185,7 +210,7 @@ export class ChatDb {
   /** Rooms of a kind this person belongs to. */
   roomsOf(uid: string, kind: string): Room[] {
     return this.db
-      .query("SELECT r.key,r.kind,r.name,r.owner,r.created,r.last_msg FROM rooms r JOIN members m ON m.room=r.key WHERE m.uid=? AND r.kind=? ORDER BY r.name")
+      .query("SELECT r.key,r.kind,r.name,r.owner,r.created,r.last_msg,r.slow FROM rooms r JOIN members m ON m.room=r.key WHERE m.uid=? AND r.kind=? ORDER BY r.name")
       .all(uid, kind) as Room[];
   }
   countMemberships(uid: string, kind: string): number {
@@ -259,26 +284,92 @@ export class ChatDb {
   }
 
   // ---- messages ----
-  addMessage(room: string, uid: string, text: string, now: number, media: string | null = null): number {
-    const id = Number(this.db.query("INSERT INTO messages(room,uid,text,ts,media) VALUES(?,?,?,?,?)").run(room, uid, text, now, media).lastInsertRowid);
+  addMessage(room: string, uid: string, text: string, now: number, media: string | null = null, replyTo: number | null = null): number {
+    const id = Number(this.db.query("INSERT INTO messages(room,uid,text,ts,media,reply_to) VALUES(?,?,?,?,?,?)").run(room, uid, text, now, media, replyTo).lastInsertRowid);
     this.db.query("UPDATE rooms SET last_msg=? WHERE key=?").run(now, room);
     return id;
   }
   message(id: number): Msg | null {
-    return (this.db.query("SELECT id,room,uid,text,ts,deleted,media FROM messages WHERE id=?").get(id) as Msg) ?? null;
+    return (this.db.query("SELECT id,room,uid,text,ts,deleted,media,edited,reply_to FROM messages WHERE id=?").get(id) as Msg) ?? null;
   }
-  history(room: string, before: number | null, limit = 50): (Msg & { username: string | null; avatar: string; mkind: string | null; mw: number | null; mh: number | null; mdur: number | null; mstatus: string | null })[] {
+  history(room: string, before: number | null, limit = 50): HistoryRow[] {
     const rows = this.db
       .query(
-        `SELECT m.id,m.room,m.uid,m.text,m.ts,m.deleted,m.media,u.username,u.avatar,d.kind mkind,d.w mw,d.h mh,d.dur mdur,d.status mstatus
+        `SELECT m.id,m.room,m.uid,m.text,m.ts,m.deleted,m.media,m.edited,m.reply_to,u.username,u.avatar,d.kind mkind,d.w mw,d.h mh,d.dur mdur,d.status mstatus,
+                r.text rtext,r.media rmedia,r.deleted rdel,ru.username runame
            FROM messages m LEFT JOIN users u ON u.uid=m.uid LEFT JOIN media d ON d.id=m.media
+                LEFT JOIN messages r ON r.id=m.reply_to LEFT JOIN users ru ON ru.uid=r.uid
           WHERE m.room=? AND m.deleted=0 AND (? IS NULL OR m.id<?) ORDER BY m.id DESC LIMIT ?`,
       )
-      .all(room, before, before, limit) as any[];
-    return rows.reverse();
+      .all(room, before, before, limit) as HistoryRow[];
+    rows.reverse();
+    const rx = this.reactionsFor(rows.map((r) => r.id));
+    for (const r of rows) r.rx = rx.get(r.id) ?? {};
+    return rows;
+  }
+  // ---- reactions ----
+  /** emoji -> usernames, for a batch of messages */
+  reactionsFor(ids: number[]): Map<number, Record<string, string[]>> {
+    const out = new Map<number, Record<string, string[]>>();
+    if (!ids.length) return out;
+    const q = ids.map(() => "?").join(",");
+    const rows = this.db.query(`SELECT x.msg_id,x.emoji,u.username FROM reactions x JOIN users u ON u.uid=x.uid WHERE x.msg_id IN (${q}) ORDER BY x.ts`).all(...ids) as { msg_id: number; emoji: string; username: string | null }[];
+    for (const r of rows) {
+      const m = out.get(r.msg_id) ?? {};
+      (m[r.emoji] ??= []).push(r.username ?? "?");
+      out.set(r.msg_id, m);
+    }
+    return out;
+  }
+  /** toggles; returns "on" | "off" | "full" (too many different emoji on one message) */
+  toggleReaction(msgId: number, uid: string, emoji: string, now: number, maxKinds = 8): "on" | "off" | "full" {
+    const had = this.db.query("SELECT 1 x FROM reactions WHERE msg_id=? AND uid=? AND emoji=?").get(msgId, uid, emoji);
+    if (had) {
+      this.db.query("DELETE FROM reactions WHERE msg_id=? AND uid=? AND emoji=?").run(msgId, uid, emoji);
+      return "off";
+    }
+    const kinds = (this.db.query("SELECT COUNT(DISTINCT emoji) n FROM reactions WHERE msg_id=?").get(msgId) as { n: number }).n;
+    const exists = this.db.query("SELECT 1 x FROM reactions WHERE msg_id=? AND emoji=?").get(msgId, emoji);
+    if (!exists && kinds >= maxKinds) return "full";
+    this.db.query("INSERT INTO reactions(msg_id,uid,emoji,ts) VALUES(?,?,?,?)").run(msgId, uid, emoji, now);
+    return "on";
+  }
+  // ---- edits ----
+  editMessage(id: number, text: string, old: string, now: number) {
+    this.db.query("INSERT INTO message_edits(msg_id,text,ts) VALUES(?,?,?)").run(id, old, now);
+    this.db.query("UPDATE messages SET text=?, edited=? WHERE id=?").run(text, now, id);
+  }
+  editsOf(id: number): { text: string; ts: number }[] {
+    return this.db.query("SELECT text,ts FROM message_edits WHERE msg_id=? ORDER BY ts").all(id) as { text: string; ts: number }[];
+  }
+  editCount(id: number): number {
+    return (this.db.query("SELECT COUNT(*) n FROM message_edits WHERE msg_id=?").get(id) as { n: number }).n;
+  }
+  // ---- pins ----
+  pins(room: string): { id: number; text: string; username: string | null; media: string | null }[] {
+    return this.db
+      .query("SELECT m.id,m.text,m.media,u.username FROM pins p JOIN messages m ON m.id=p.msg_id AND m.deleted=0 LEFT JOIN users u ON u.uid=m.uid WHERE p.room=? ORDER BY p.ts DESC")
+      .all(room) as { id: number; text: string; username: string | null; media: string | null }[];
+  }
+  pinCount(room: string): number {
+    return (this.db.query("SELECT COUNT(*) n FROM pins p JOIN messages m ON m.id=p.msg_id AND m.deleted=0 WHERE p.room=?").get(room) as { n: number }).n;
+  }
+  addPin(room: string, msgId: number, by: string, now: number) {
+    this.db.query("INSERT OR IGNORE INTO pins(room,msg_id,by_uid,ts) VALUES(?,?,?,?)").run(room, msgId, by, now);
+  }
+  removePin(room: string, msgId: number) {
+    this.db.query("DELETE FROM pins WHERE room=? AND msg_id=?").run(room, msgId);
+  }
+  setSlow(room: string, seconds: number) {
+    this.db.query("UPDATE rooms SET slow=? WHERE key=?").run(seconds, room);
   }
   deleteMessage(id: number) {
     this.db.query("UPDATE messages SET deleted=1 WHERE id=?").run(id);
+    this.db.query("DELETE FROM pins WHERE msg_id=?").run(id);
+  }
+  /** is this media referenced by an open report? then its file must be kept even if the author deletes the message */
+  mediaUnderReport(mediaId: string): boolean {
+    return !!this.db.query("SELECT 1 x FROM reports WHERE media=? AND status='open'").get(mediaId);
   }
   /** Deletes old messages and returns the media files that are no longer needed (stickers in someone's library and media of open reports stay). */
   purgeOlderThan(ts: number): { messages: number; files: { id: string; mime: string }[] } {

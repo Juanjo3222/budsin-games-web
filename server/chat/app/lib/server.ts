@@ -107,6 +107,8 @@ export function createChatServer(opts: ServerOptions) {
   const DAILY_BYTES = 25_000_000;
   const imgBurst = new Limiter(1, 15_000), imgHour = new Limiter(20, 3600_000), audBurst = new Limiter(1, 8_000), audHour = new Limiter(30, 3600_000), stickHour = new Limiter(6, 3600_000);
   const strikes = new Map<string, number[]>();
+  const lastInRoom = new Map<string, number>();
+  const editLimit = new Limiter(6, 60_000), reactLimit = new Limiter(30, 60_000), typingLimit = new Limiter(1, 2_000);
   const sockets = new Set<Sock>();
   const roomSockets = new Map<string, Set<Sock>>();
   const burst = new Limiter(5, 10_000);       // 5 mensajes cada 10 s
@@ -254,6 +256,19 @@ export function createChatServer(opts: ServerOptions) {
         return send(ws, { t: "classes", items: myClasses(ws.data.claims!.uid) });
       case "class.kick":
         return classKick(ws, m);
+      case "edit":
+        return editMessage(ws, m);
+      case "delete":
+        return deleteOwn(ws, m);
+      case "react":
+        return react(ws, m);
+      case "typing":
+        return typing(ws, m);
+      case "pin":
+      case "unpin":
+        return pinCmd(ws, t, m);
+      case "room.slow":
+        return slowCmd(ws, m);
       case "sticker.list":
       case "sticker.remove":
       case "sticker.save":
@@ -334,7 +349,7 @@ export function createChatServer(opts: ServerOptions) {
       c.rooms.add(room.key);
       (roomSockets.get(room.key) ?? roomSockets.set(room.key, new Set()).get(room.key)!).add(ws);
     }
-    send(ws, { t: "joined", room: room.key, name: room.name, kind: room.kind, history: db.history(room.key, null, HISTORY).map(wire), online: onlineCount(room.key) });
+    send(ws, { t: "joined", room: room.key, name: room.name, kind: room.kind, history: db.history(room.key, null, HISTORY).map(wire), online: onlineCount(room.key), pins: pinWire(room.key), slow: room.slow, owner: room.owner === c.claims!.uid });
     broadcast(room.key, { t: "online", room: room.key, n: onlineCount(room.key) }, ws);
   }
 
@@ -482,13 +497,19 @@ export function createChatServer(opts: ServerOptions) {
     send(ws, { t: "ok", cmd: "class.kick" });
   }
 
-  const wire = (r: { id: number; uid: string; text: string; ts: number; username: string | null; avatar: string; media?: string | null; mkind?: string | null; mw?: number | null; mh?: number | null; mdur?: number | null; mstatus?: string | null }) => {
+  const snip = (t: string, n: number) => (t.length > n ? t.slice(0, n - 1) + "…" : t);
+  const mediaLabel = (m: string | null | undefined) => (!m ? "" : m.startsWith("track:") ? "track" : m.startsWith("preset:") ? "sticker" : "media");
+  const wire = (r: { id: number; uid: string; text: string; ts: number; username: string | null; avatar: string; media?: string | null; mkind?: string | null; mw?: number | null; mh?: number | null; mdur?: number | null; mstatus?: string | null; edited?: number; reply_to?: number | null; rtext?: string | null; rmedia?: string | null; rdel?: number | null; runame?: string | null; rx?: Record<string, string[]> }) => {
     const o: Record<string, unknown> = { id: r.id, uid: r.uid, u: r.username ?? "?", a: r.avatar ?? "a01", text: r.text, ts: r.ts };
+    if (r.edited) o.e = r.edited;
+    if (r.reply_to) o.rp = r.rdel || !r.runame ? { id: r.reply_to, gone: true } : { id: r.reply_to, u: r.runame, text: snip(r.rtext ?? "", 90), k: mediaLabel(r.rmedia) || "text" };
+    if (r.rx && Object.keys(r.rx).length) o.rx = r.rx;
     if (r.media?.startsWith("track:")) { try { o.track = JSON.parse(r.media.slice(6)); } catch { /* corrupto: se ignora */ } }
     else if (r.media?.startsWith("preset:")) o.sticker = r.media.slice(7);
     else if (r.media && r.mkind) o.media = r.mstatus === "ok" ? { id: r.media, kind: r.mkind, w: r.mw ?? 0, h: r.mh ?? 0, dur: r.mdur ?? 0 } : { id: r.media, kind: r.mkind, hidden: true };
     return o;
   };
+  const pinWire = (room: string) => db.pins(room).map((p) => ({ id: p.id, u: p.username ?? "?", text: p.text ? snip(p.text, 140) : mediaLabel(p.media) === "track" ? "🎵" : "…", k: mediaLabel(p.media) || "text" }));
 
   function historyOf(ws: Sock, m: Record<string, unknown>) {
     const key = String(m.room ?? "");
@@ -513,9 +534,23 @@ export function createChatServer(opts: ServerOptions) {
       if (tr === "blocked") return err(ws, "blocked", { why: "profanity", cid: m.cid });
       sharedTrack = tr;
     }
+    // respuesta: tiene que ser un mensaje de esta misma sala que siga ahí
+    let replyTo: number | null = null;
+    if (m.reply != null) {
+      const rm = db.message(Number(m.reply));
+      if (!rm || rm.deleted || rm.room !== key) return err(ws, "bad_request", { cid: m.cid });
+      replyTo = rm.id;
+    }
+    // @menciones: valen solo si son el nombre exacto de alguien del chat; el resto de «@algo» sigue contando como contacto externo
+    const mentioned = new Set<string>();
+    const forFilter = text.replace(/@([A-Za-z0-9][A-Za-z0-9._-]{1,18}[A-Za-z0-9])/g, (all, name: string) => {
+      const mu = db.userByName(name);
+      if (mu?.username && mu.username.toLowerCase() === name.toLowerCase() && !mu.banned) { mentioned.add(mu.uid); return mu.username; }
+      return all;
+    });
     const mediaRef = sharedTrack ? null : (m.media == null ? null : String(m.media));
     if (mediaRef && text.length > 120) return err(ws, "too_long");        // el pie de una imagen es corto
-    const why = text || !(mediaRef || sharedTrack) ? checkMessage(text) : null;
+    const why = text || !(mediaRef || sharedTrack) ? checkMessage(forFilter) : null;
     if (why) return err(ws, "blocked", { why, cid: m.cid });
     // ---- medios: sticker predefinido, sticker propio, imagen o audio ya subido ----
     let mediaId: string | null = sharedTrack ? "track:" + JSON.stringify(sharedTrack) : null;
@@ -534,15 +569,29 @@ export function createChatServer(opts: ServerOptions) {
         mediaId = md.id;
       }
     }
+    // modo lento de la sala: no aplica a admins ni a quien administra el grupo
+    const roomRow = db.room(key);
+    if (roomRow && roomRow.slow > 0 && !c.admin && roomRow.owner !== u.uid) {
+      const k = `${u.uid}|${key}`, prev = lastInRoom.get(k) ?? 0, left = roomRow.slow * 1000 - (now() - prev);
+      if (left > 0) return err(ws, "slowmode", { retry: left, cid: m.cid });
+    }
     const wait = Math.max(burst.take(u.uid, now()), 0) || minute.take(u.uid, now());
     if (wait) return err(ws, "rate", { retry: wait, cid: m.cid });
     const last = lastText.get(u.uid);
     if (!mediaId && last && last.text === text.toLowerCase() && now() - last.at < 30_000) return err(ws, "duplicate", { cid: m.cid });
     if (!mediaId) lastText.set(u.uid, { text: text.toLowerCase(), at: now() });
     if (key.startsWith("dm:") && !dmAllowed(key, u.uid)) return err(ws, "dm_closed", { cid: m.cid });
-    const id = db.addMessage(key, u.uid, text, now(), mediaId);
+    lastInRoom.set(`${u.uid}|${key}`, now());
+    const id = db.addMessage(key, u.uid, text, now(), mediaId, replyTo);
     const row = db.history(key, id + 1, 1)[0];
     broadcast(key, { t: "msg", room: key, m: wire({ ...row, username: u.username, avatar: u.avatar }), cid: m.cid });
+    // menciones: se avisa a la persona (si el grupo o chat privado la incluye)
+    for (const muid of mentioned) {
+      if (muid === u.uid) continue;
+      if (key.startsWith("class:") && !db.isMember(key, muid)) continue;
+      if (key.startsWith("dm:") && dmPeer(key, u.uid) !== muid) continue;
+      for (const s2 of sockets) if (s2.data.claims?.uid === muid) send(s2, { t: "mention", room: key, id, u: u.username });
+    }
     if (key.startsWith("dm:")) {
       // la otra persona puede no tener el chat abierto: se le avisa para que cargue la conversación
       const peer = dmPeer(key, u.uid)!;
@@ -570,6 +619,91 @@ export function createChatServer(opts: ServerOptions) {
       broadcast(msg.room, { t: "del", room: msg.room, id: msg.id });
     }
     send(ws, { t: "reported", id: msg.id });
+  }
+
+  // ---- editar, borrar, reaccionar, escribiendo, fijar y modo lento ----
+  const REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥", "👏"];
+  const EDIT_WINDOW = 15 * 60_000;
+  const manages = (ws: Sock, room: Room | null) => !!room && (ws.data.admin || (room.kind === "class" && room.owner === ws.data.claims!.uid));
+
+  function editMessage(ws: Sock, m: Record<string, unknown>) {
+    const c = ws.data, u = c.user!;
+    const msg = db.message(Number(m.id));
+    if (!msg || msg.deleted) return err(ws, "bad_request");
+    if (msg.uid !== u.uid) return err(ws, "forbidden");
+    if (!c.rooms.has(msg.room)) return err(ws, "not_joined");
+    if (u.muted_until > now()) return err(ws, "muted", { until: u.muted_until });
+    if (msg.media) return err(ws, "cant_edit");                         // solo mensajes de texto
+    if (now() - msg.ts > EDIT_WINDOW) return err(ws, "edit_expired");
+    const text = clean(m.text, MAX_TEXT + 1);
+    if (text.length > MAX_TEXT) return err(ws, "too_long");
+    const mentionsOk = text.replace(/@([A-Za-z0-9][A-Za-z0-9._-]{1,18}[A-Za-z0-9])/g, (all, name: string) => { const mu = db.userByName(name); return mu?.username && mu.username.toLowerCase() === name.toLowerCase() ? mu.username : all; });
+    const why = checkMessage(mentionsOk);
+    if (why) return err(ws, "blocked", { why });
+    if (text === msg.text) return;
+    if (editLimit.take(u.uid, now())) return err(ws, "rate");
+    db.editMessage(msg.id, text, msg.text, now());                       // el texto anterior queda guardado para los admins
+    broadcast(msg.room, { t: "edited", room: msg.room, id: msg.id, text, e: now() });
+  }
+
+  function deleteOwn(ws: Sock, m: Record<string, unknown>) {
+    const c = ws.data, uid = c.claims!.uid;
+    const msg = db.message(Number(m.id));
+    if (!msg || msg.deleted) return err(ws, "bad_request");
+    if (!c.rooms.has(msg.room)) return err(ws, "not_joined");
+    const room = db.room(msg.room);
+    if (msg.uid !== uid && !manages(ws, room)) return err(ws, "forbidden");
+    db.deleteMessage(msg.id);
+    if (msg.media && !msg.media.startsWith("preset:") && !msg.media.startsWith("track:")) {
+      const md = db.media(msg.media);
+      if (md && md.kind !== "sticker") {
+        if (db.mediaUnderReport(md.id)) db.setMediaStatus(md.id, "hidden");        // reportado: se oculta pero el archivo se queda para el admin
+        else { void deleteFiles([{ id: md.id, mime: md.mime }]); db.deleteMedia(md.id); }
+      }
+    }
+    broadcast(msg.room, { t: "del", room: msg.room, id: msg.id });
+    broadcast(msg.room, { t: "pins", room: msg.room, items: pinWire(msg.room) });
+  }
+
+  function react(ws: Sock, m: Record<string, unknown>) {
+    const c = ws.data, u = c.user!;
+    const msg = db.message(Number(m.id));
+    const emoji = String(m.emoji ?? "");
+    if (!msg || msg.deleted || !REACTIONS.includes(emoji)) return err(ws, "bad_request");
+    if (!c.rooms.has(msg.room)) return err(ws, "not_joined");
+    if (u.muted_until > now()) return err(ws, "muted", { until: u.muted_until });
+    if (reactLimit.take(u.uid, now())) return err(ws, "rate");
+    if (db.toggleReaction(msg.id, u.uid, emoji, now()) === "full") return err(ws, "reaction_full");
+    broadcast(msg.room, { t: "rx", room: msg.room, id: msg.id, rx: db.reactionsFor([msg.id]).get(msg.id) ?? {} });
+  }
+
+  function typing(ws: Sock, m: Record<string, unknown>) {
+    const c = ws.data, u = c.user!;
+    const key = String(m.room ?? "");
+    if (!c.rooms.has(key) || !u.username || u.muted_until > now()) return;
+    if (typingLimit.take(`${u.uid}|${key}`, now())) return;
+    broadcast(key, { t: "typing", room: key, u: u.username }, ws);
+  }
+
+  function pinCmd(ws: Sock, t: string, m: Record<string, unknown>) {
+    const msg = db.message(Number(m.id));
+    if (!msg || msg.deleted) return err(ws, "bad_request");
+    if (!ws.data.rooms.has(msg.room)) return err(ws, "not_joined");
+    if (!manages(ws, db.room(msg.room))) return err(ws, "forbidden");
+    if (t === "pin") {
+      if (db.pinCount(msg.room) >= 3) return err(ws, "pin_limit");
+      db.addPin(msg.room, msg.id, ws.data.claims!.uid, now());
+    } else db.removePin(msg.room, msg.id);
+    broadcast(msg.room, { t: "pins", room: msg.room, items: pinWire(msg.room) });
+  }
+
+  function slowCmd(ws: Sock, m: Record<string, unknown>) {
+    const key = String(m.room ?? ""), secs = Number(m.seconds);
+    const room = db.room(key);
+    if (!room || ![0, 5, 10, 30, 60].includes(secs)) return err(ws, "bad_request");
+    if (!manages(ws, room)) return err(ws, "forbidden");
+    db.setSlow(key, secs);
+    broadcast(key, { t: "slow", room: key, seconds: secs });
   }
 
   /** 3 strikes in 24 h (an image blocked by the scanner, or reported) take away the right to upload for a day. */
@@ -697,7 +831,12 @@ export function createChatServer(opts: ServerOptions) {
     if (!ws.data.admin) return err(ws, "forbidden");
     switch (t) {
       case "admin.reports":
-        return send(ws, { t: "admin.reports", items: db.openReports(100) });
+        return send(ws, { t: "admin.reports", items: db.openReports(100).map((r) => ({ ...r, edits: db.editCount(r.msg_id) })) });
+      case "admin.edits": {
+        const msg = db.message(Number(m.id));
+        if (!msg) return err(ws, "bad_request");
+        return send(ws, { t: "admin.edits", id: msg.id, current: msg.text, items: db.editsOf(msg.id) });
+      }
       case "admin.find":
         return send(ws, { t: "admin.users", items: db.findUsers(String(m.q ?? "").slice(0, 40)).map((u) => ({ uid: u.uid, username: u.username, avatar: u.avatar, email: u.email, muted_until: u.muted_until, banned: u.banned, last_seen: u.last_seen, media_until: u.media_until })) });
       case "admin.delete": {

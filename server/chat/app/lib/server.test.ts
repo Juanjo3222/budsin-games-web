@@ -471,3 +471,172 @@ describe("canciones compartidas desde Budsin Music", () => {
     a.close(); b.close();
   });
 });
+
+describe("editar, borrar, responder, reaccionar, fijar y modo lento", () => {
+  let ana: Client, beto: Client, cami: Client, boss: Client;
+  let classKey = "";
+  beforeAll(async () => {
+    clock += 3600_000 * 60;
+    ana = await user("v1", "Ana_V2"); beto = await user("v2", "Beto_V2"); cami = await user("v3", "Cami_V2");
+    boss = await Client.open(); boss.send({ t: "auth", token: token("boss", "boss@x.com") }); await boss.next((m) => m.t === "hello");
+    await boss.req({ t: "profile", username: "Admin_V2", avatar: "a01" }, (m) => m.t === "me" || m.t === "err");
+    for (const c of [ana, beto, cami, boss]) await c.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    const made = await ana.req({ t: "class.create", name: "Clase V2" }, (m) => m.t === "class.created");
+    classKey = made.item.key;
+    for (const c of [beto, cami]) await c.req({ t: "class.join", code: made.item.code }, (m) => m.t === "class.joined");
+    for (const c of [ana, beto, cami]) await c.req({ t: "join", room: classKey }, (m) => m.t === "joined");
+  });
+  afterAll(() => { for (const x of [ana, beto, cami, boss]) x.close(); });
+  const flush = (...cs: Client[]) => cs.forEach((c) => { c.inbox = c.inbox.filter((m) => !["del", "pins", "rx", "edited", "typing", "slow", "mention"].includes(m.t)); });
+  const say = async (c: Client, to: Client, room: string, text: string, extra: Record<string, unknown> = {}) => {
+    flush(ana, beto, cami);
+    clock += 4000;
+    c.send({ t: "send", room, text, ...extra });
+    return to.next((m) => m.t === "msg" && m.m.text === text);
+  };
+
+  test("editar: solo lo tuyo, con filtro, marca de «editado» y el texto anterior guardado para los admins", async () => {
+    const got = await say(ana, beto, "global", "hola munod");
+    const id = got.m.id;
+    flush(beto);
+    ana.send({ t: "edit", id, text: "hola mundo" });
+    const ed = await beto.next((m) => m.t === "edited");
+    expect(ed).toMatchObject({ room: "global", id, text: "hola mundo" });
+    expect(ed.e).toBeGreaterThan(0);
+    expect((await beto.req({ t: "edit", id, text: "yo lo cambio" }, (m) => m.t === "err")).code).toBe("forbidden");
+    expect((await ana.req({ t: "edit", id, text: "eres un pendejo" }, (m) => m.t === "err")).why).toBe("profanity");   // no se puede editar para saltarse el filtro
+    expect((await ana.req({ t: "edit", id, text: "visita www.malo.com" }, (m) => m.t === "err")).why).toBe("link");
+    // el historial lo trae marcado
+    const j = await cami.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    expect(j.history.find((x: any) => x.id === id)).toMatchObject({ text: "hola mundo" });
+    expect(j.history.find((x: any) => x.id === id).e).toBeGreaterThan(0);
+    // el admin ve lo que decía antes
+    const hist = await boss.req({ t: "admin.edits", id }, (m) => m.t === "admin.edits");
+    expect(hist.items.map((x: any) => x.text)).toEqual(["hola munod"]);
+    expect((await ana.req({ t: "admin.edits", id }, (m) => m.t === "err")).code).toBe("forbidden");
+  });
+  test("no se editan imágenes/canciones ni mensajes de hace más de 15 minutos", async () => {
+    clock += 4000;
+    ana.send({ t: "send", room: "global", media: "preset:rocket" });
+    const st = await beto.next((m) => m.t === "msg" && m.m.sticker);
+    expect((await ana.req({ t: "edit", id: st.m.id, text: "nada" }, (m) => m.t === "err")).code).toBe("cant_edit");
+    const old = await say(ana, beto, "global", "mensaje viejo");
+    clock += 16 * 60_000;
+    expect((await ana.req({ t: "edit", id: old.m.id, text: "mensaje nuevo" }, (m) => m.t === "err")).code).toBe("edit_expired");
+  });
+  test("borrar: lo tuyo sí, lo de otros no; y el admin siempre", async () => {
+    const mine = await say(ana, beto, "global", "borrame");
+    expect((await beto.req({ t: "delete", id: mine.m.id }, (m) => m.t === "err")).code).toBe("forbidden");
+    ana.send({ t: "delete", id: mine.m.id });
+    expect((await beto.next((m) => m.t === "del" && m.id === mine.m.id)).id).toBe(mine.m.id);
+    expect((await ana.req({ t: "delete", id: mine.m.id }, (m) => m.t === "err")).code).toBe("bad_request");   // ya no existe
+    const other = await say(beto, ana, "global", "mensaje de beto");
+    boss.send({ t: "delete", id: other.m.id });
+    expect((await ana.next((m) => m.t === "del" && m.id === other.m.id)).id).toBe(other.m.id);
+  });
+  test("en un grupo de clase, quien lo administra borra lo de los demás", async () => {
+    const msg = await say(beto, ana, classKey, "algo fuera de lugar");
+    expect((await cami.req({ t: "delete", id: msg.m.id }, (m) => m.t === "err")).code).toBe("forbidden");
+    ana.send({ t: "delete", id: msg.m.id });
+    expect((await beto.next((m) => m.t === "del" && m.id === msg.m.id)).id).toBe(msg.m.id);
+  });
+  test("responder: cita el mensaje; si el original se borra, queda como «eliminado»", async () => {
+    const orig = await say(ana, beto, "global", "¿quién juega Pacman?");
+    clock += 4000;
+    beto.send({ t: "send", room: "global", text: "yo", reply: orig.m.id });
+    const rep = await ana.next((m) => m.t === "msg" && m.m.text === "yo");
+    expect(rep.m.rp).toMatchObject({ id: orig.m.id, u: "Ana_V2", text: "¿quién juega Pacman?", k: "text" });
+    // responder a algo de otra sala o inexistente se rechaza
+    clock += 4000;
+    expect((await beto.req({ t: "send", room: classKey, text: "x", reply: orig.m.id }, (m) => m.t === "err")).code).toBe("bad_request");
+    expect((await beto.req({ t: "send", room: "global", text: "x", reply: 999999 }, (m) => m.t === "err")).code).toBe("bad_request");
+    ana.send({ t: "delete", id: orig.m.id });
+    await beto.next((m) => m.t === "del" && m.id === orig.m.id);
+    const j = await cami.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    expect(j.history.find((x: any) => x.id === rep.m.id).rp).toEqual({ id: orig.m.id, gone: true });
+  });
+  test("reacciones: se activan y desactivan, se cuentan por emoji y solo valen las permitidas", async () => {
+    const msg = await say(ana, beto, "global", "reaccionen");
+    flush(ana);
+    beto.send({ t: "react", id: msg.m.id, emoji: "👍" });
+    expect((await ana.next((m) => m.t === "rx")).rx).toEqual({ "👍": ["Beto_V2"] });
+    cami.send({ t: "react", id: msg.m.id, emoji: "👍" });
+    expect((await ana.next((m) => m.t === "rx")).rx["👍"]).toEqual(["Beto_V2", "Cami_V2"]);
+    beto.send({ t: "react", id: msg.m.id, emoji: "👍" });                                         // la quita
+    expect((await ana.next((m) => m.t === "rx")).rx).toEqual({ "👍": ["Cami_V2"] });
+    expect((await beto.req({ t: "react", id: msg.m.id, emoji: "🖕" }, (m) => m.t === "err")).code).toBe("bad_request");
+    expect((await beto.req({ t: "react", id: 999999, emoji: "👍" }, (m) => m.t === "err")).code).toBe("bad_request");
+    const j = await beto.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    expect(j.history.find((x: any) => x.id === msg.m.id).rx).toEqual({ "👍": ["Cami_V2"] });
+  });
+  test("«escribiendo…»: les llega a los demás, no a ti, y no se puede inundar", async () => {
+    flush(ana, beto);
+    ana.send({ t: "typing", room: "global" });
+    expect(await beto.next((m) => m.t === "typing")).toMatchObject({ room: "global", u: "Ana_V2" });
+    ana.send({ t: "typing", room: "global" });                                                    // dentro de los 2 s: se ignora
+    await Bun.sleep(150);
+    expect(beto.inbox.some((m) => m.t === "typing")).toBe(false);
+    expect(ana.inbox.some((m) => m.t === "typing")).toBe(false);
+  });
+  test("fijar: solo quien administra el grupo, máximo 3, y se quita al borrar el mensaje", async () => {
+    const m1 = await say(ana, beto, classKey, "Examen el lunes");
+    expect((await beto.req({ t: "pin", id: m1.m.id }, (m) => m.t === "err")).code).toBe("forbidden");
+    flush(beto);
+    ana.send({ t: "pin", id: m1.m.id });
+    const pins = await beto.next((m) => m.t === "pins");
+    expect(pins.items).toEqual([{ id: m1.m.id, u: "Ana_V2", text: "Examen el lunes", k: "text" }]);
+    const j = await cami.req({ t: "join", room: classKey }, (m) => m.t === "joined");
+    expect(j.pins.length).toBe(1);
+    for (const txt of ["aviso 2", "aviso 3"]) { const x = await say(ana, beto, classKey, txt); flush(beto); ana.send({ t: "pin", id: x.m.id }); await beto.next((m) => m.t === "pins"); }
+    const x4 = await say(ana, beto, classKey, "aviso 4");
+    expect((await ana.req({ t: "pin", id: x4.m.id }, (m) => m.t === "err")).code).toBe("pin_limit");
+    flush(beto);
+    ana.send({ t: "unpin", id: m1.m.id });
+    expect((await beto.next((m) => m.t === "pins")).items.length).toBe(2);
+    ana.send({ t: "delete", id: x4.m.id }); await beto.next((m) => m.t === "del" && m.id === x4.m.id);
+    // en la sala global solo fija un admin
+    const g = await say(ana, beto, "global", "anuncio");
+    expect((await ana.req({ t: "pin", id: g.m.id }, (m) => m.t === "err")).code).toBe("forbidden");
+    flush(beto);
+    boss.send({ t: "pin", id: g.m.id });
+    expect((await beto.next((m) => m.t === "pins")).items[0].text).toBe("anuncio");
+  });
+  test("modo lento: lo activa quien administra, los demás esperan y quien administra no", async () => {
+    expect((await beto.req({ t: "room.slow", room: classKey, seconds: 10 }, (m) => m.t === "err")).code).toBe("forbidden");
+    expect((await ana.req({ t: "room.slow", room: classKey, seconds: 7 }, (m) => m.t === "err")).code).toBe("bad_request");
+    ana.send({ t: "room.slow", room: classKey, seconds: 10 });
+    expect((await beto.next((m) => m.t === "slow")).seconds).toBe(10);
+    await say(beto, ana, classKey, "primero");
+    clock += 1000;
+    beto.send({ t: "send", room: classKey, text: "segundo muy pronto" });
+    const e = await beto.next((m) => m.t === "err");
+    expect(e.code).toBe("slowmode");
+    expect(e.retry).toBeGreaterThan(7000);
+    await say(ana, beto, classKey, "yo mando seguido");                                           // la dueña no espera
+    await say(ana, beto, classKey, "otra vez");
+    clock += 11_000;
+    await say(beto, ana, classKey, "ya pasaron los 10 s");
+    ana.send({ t: "room.slow", room: classKey, seconds: 0 });
+    expect((await beto.next((m) => m.t === "slow")).seconds).toBe(0);
+  });
+  test("menciones: solo valen nombres reales; avisan a la persona; un @inventado sigue bloqueado", async () => {
+    const note = cami.next((m) => m.t === "mention");
+    await say(ana, beto, "global", "hola @Cami_V2 ¿vienes?");
+    expect(await note).toMatchObject({ room: "global", u: "Ana_V2" });
+    clock += 4000;
+    ana.send({ t: "send", room: "global", text: "escríbeme a @nadie_real" });
+    expect((await ana.next((m) => m.t === "err")).why).toBe("contact");
+    clock += 4000;
+    ana.send({ t: "send", room: "global", text: "pídeme en @An4_V2" });                           // nombre disfrazado: no cuenta
+    expect((await ana.next((m) => m.t === "err")).why).toBe("contact");
+    // no se menciona a quien no está en el grupo: se publica pero no se le avisa
+    const eve = await user("v9", "Eve_V2");
+    await eve.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    clock += 4000;
+    ana.send({ t: "send", room: classKey, text: "ojo @Eve_V2" });
+    await beto.next((m) => m.t === "msg" && m.m.text === "ojo @Eve_V2");
+    await Bun.sleep(150);
+    expect(eve.inbox.some((m) => m.t === "mention")).toBe(false);
+    eve.close();
+  });
+});

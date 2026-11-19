@@ -335,3 +335,34 @@ d("imágenes apagadas (valor por defecto)", () => {
     } finally { off.stop(); }
   });
 });
+
+d("borrar mis imágenes", () => {
+  test("borrar el mensaje borra el archivo; si estaba reportado se conserva oculto para el admin", async () => {
+    clock += 3600_000 * 80;
+    const a = await user("w1", "Ana_Del"), b = await user("w2", "Beto_Del");
+    for (const c of [a, b]) await c.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    clock += 31 * 60_000;
+    // 1) sin reporte: el archivo desaparece
+    const r1 = await up("w1", "image", png);
+    a.send({ t: "send", room: "global", media: r1.json.id });
+    const m1 = await b.next((m) => m.t === "msg" && m.m.media?.id === r1.json.id);
+    expect(existsSync(path.join(mediaDir, `${r1.json.id}.webp`))).toBe(true);
+    a.send({ t: "delete", id: m1.m.id });
+    await b.next((m) => m.t === "del" && m.id === m1.m.id);
+    await Bun.sleep(100);
+    expect(existsSync(path.join(mediaDir, `${r1.json.id}.webp`))).toBe(false);
+    expect(db.media(r1.json.id)).toBeNull();
+    // 2) con reporte abierto: se oculta pero el archivo se queda (evidencia)
+    clock += 60_000;
+    const r2 = await up("w1", "image", png);
+    a.send({ t: "send", room: "global", media: r2.json.id });
+    const m2 = await b.next((m) => m.t === "msg" && m.m.media?.id === r2.json.id);
+    await b.req({ t: "report", id: m2.m.id, reason: "sexual" }, (m) => m.t === "reported");
+    a.send({ t: "delete", id: m2.m.id });
+    await b.next((m) => m.t === "del" && m.id === m2.m.id);
+    await Bun.sleep(100);
+    expect(existsSync(path.join(mediaDir, `${r2.json.id}.webp`))).toBe(true);
+    expect(db.media(r2.json.id)?.status).toBe("hidden");
+    a.close(); b.close();
+  });
+});
