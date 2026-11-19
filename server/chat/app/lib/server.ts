@@ -31,6 +31,8 @@ export interface ServerOptions {
   mediaDir?: string;       // dónde se guardan imágenes, stickers y audios
   scan?: Scanner;          // detector de contenido sexual; sin él NO se aceptan imágenes ni stickers (falla cerrado)
   tools?: Tools;           // rutas de ffmpeg y ffprobe
+  /** Dominios cuyos enlaces SÍ se pueden enviar en los mensajes (con sus subdominios). Vacío: ningún enlace. */
+  allowedLinks?: string[];
   /** Reglas de correo permitidas (ver access.ts). Sin esta opción entra cualquiera (null/undefined); index.ts pasa las de colegios por defecto. */
   allowedDomains?: string[] | null;
   /** Imágenes y stickers propios: APAGADO por defecto. Sin una defensa real contra material de abuso infantil (hashes + revisión) no deben activarse con menores en el sitio. */
@@ -216,7 +218,7 @@ export function createChatServer(opts: ServerOptions) {
         err(ws, "too_many_tabs");
         return ws.close(1008, "tabs");
       }
-      return send(ws, { t: "hello", me: me(ws), avatars: AVATARS, features: { images: !!opts.imagesEnabled, audio: true } });
+      return send(ws, { t: "hello", me: me(ws), avatars: AVATARS, features: { images: !!opts.imagesEnabled, audio: true, links: opts.allowedLinks ?? [] } });
     }
     if (!c.claims) return err(ws, "not_authed");
     refresh(ws);
@@ -550,7 +552,7 @@ export function createChatServer(opts: ServerOptions) {
     });
     const mediaRef = sharedTrack ? null : (m.media == null ? null : String(m.media));
     if (mediaRef && text.length > 120) return err(ws, "too_long");        // el pie de una imagen es corto
-    const why = text || !(mediaRef || sharedTrack) ? checkMessage(forFilter) : null;
+    const why = text || !(mediaRef || sharedTrack) ? checkMessage(forFilter, opts.allowedLinks) : null;
     if (why) return err(ws, "blocked", { why, cid: m.cid });
     // ---- medios: sticker predefinido, sticker propio, imagen o audio ya subido ----
     let mediaId: string | null = sharedTrack ? "track:" + JSON.stringify(sharedTrack) : null;
@@ -638,7 +640,7 @@ export function createChatServer(opts: ServerOptions) {
     const text = clean(m.text, MAX_TEXT + 1);
     if (text.length > MAX_TEXT) return err(ws, "too_long");
     const mentionsOk = text.replace(/@([A-Za-z0-9][A-Za-z0-9._-]{1,18}[A-Za-z0-9])/g, (all, name: string) => { const mu = db.userByName(name); return mu?.username && mu.username.toLowerCase() === name.toLowerCase() ? mu.username : all; });
-    const why = checkMessage(mentionsOk);
+    const why = checkMessage(mentionsOk, opts.allowedLinks);
     if (why) return err(ws, "blocked", { why });
     if (text === msg.text) return;
     if (editLimit.take(u.uid, now())) return err(ws, "rate");

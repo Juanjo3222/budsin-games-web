@@ -326,7 +326,7 @@ d("imágenes apagadas (valor por defecto)", () => {
       const got: any[] = []; ws.onmessage = (e) => got.push(JSON.parse(String(e.data)));
       await new Promise((r) => (ws.onopen = r));
       ws.send(JSON.stringify({ t: "auth", token: token("x1") })); await Bun.sleep(150);
-      expect(got.find((m) => m.t === "hello").features).toEqual({ images: false, audio: true });
+      expect(got.find((m) => m.t === "hello").features).toEqual({ images: false, audio: true, links: [] });
       ws.send(JSON.stringify({ t: "profile", username: "Off_Test", avatar: "a01" })); await Bun.sleep(150);
       ws.send(JSON.stringify({ t: "join", room: "global" })); await Bun.sleep(150);
       ws.send(JSON.stringify({ t: "send", room: "global", media: "preset:rocket" })); await Bun.sleep(200);

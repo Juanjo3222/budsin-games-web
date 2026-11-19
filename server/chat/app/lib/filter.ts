@@ -75,14 +75,67 @@ function digitsCount(text: string): number {
   return digits.length;
 }
 
-/** Why a chat message may not be sent, or null. */
-export function checkMessage(text: string): Block | null {
+// ---- enlaces permitidos (lista blanca) ----
+// Por defecto NINGÚN enlace pasa. Con una lista de dominios, solo pasan los que apuntan a esos dominios (y a sus subdominios).
+// Se comprueba el NOMBRE DE SERVIDOR REAL del enlace, no el texto: «google.com.malo.com», «malogoogle.com» o
+// «https://google.com@malo.com» no cuentan como Google. Además se rechazan las redirecciones y proxys conocidos de los
+// dominios permitidos (google.com/url?q=…, translate.google.com…), que servirían para llegar a cualquier sitio.
+const SCHEME_LINK = /(?<![@\w.-])(?:https?:\/\/|www\.)[^\s<>"'`]+/gi;
+const BARE_LINK = /(?<![@\w.\/-])[a-z0-9][a-z0-9-]*(?:\.[a-z0-9-]+)*\.(?:com|net|org|io|gg|me|dev|co|ly|tv|xyz|app|link|ru|es|mx|ar|pe|cl|br|us|uk|info|site|online|shop|store|fun|click|top|cc|to|ws|tk|ml|ga|cf|gq|edu|gov|ac)(?:\/[^\s<>"'`]*)?(?![\w@-])/gi;
+const PROXY_HOSTS = /^(translate\.google\.com|translate\.goog|webcache\.googleusercontent\.com|cache\.google\.com)$/;
+const REDIRECT_PATH = /^\/(url|amp|translate|imgres|aclk|pagead|search\/howsearchworks)(\/|\?|$)/i;
+
+function hostAllowed(host: string, rules: string[]): boolean {
+  return rules.some((r) => host === r || host.endsWith("." + r));
+}
+
+/** host of a link-like token, or null when it is not a safe, plain, public hostname. */
+function linkHost(token: string): { host: string; path: string } | null {
+  let u: URL;
+  try { u = new URL(/^https?:\/\//i.test(token) ? token : "https://" + token); } catch { return null; }
+  if (u.username || u.password) return null;                      // https://google.com@malo.com
+  const host = u.hostname.toLowerCase().replace(/\.$/, "");
+  if (!/^[a-z0-9.-]+$/.test(host) || host.split(".").some((l) => !l || l.startsWith("xn--"))) return null;   // IDN: homógrafos
+  if (/^\d+(\.\d+){3}$/.test(host) || !host.includes(".")) return null;                                      // IP o nombre interno
+  return { host, path: u.pathname + u.search };
+}
+
+/** "block" if any link in the text is not allowed; otherwise the text with each allowed link replaced by a neutral word. */
+function scrubLinks(t: string, rules: string[]): { text: string; bad: boolean } | "block" {
+  const tokens = [...(t.match(SCHEME_LINK) ?? []), ...(t.replace(SCHEME_LINK, " ").match(BARE_LINK) ?? [])];
+  if (tokens.length > 2) return "block";                          // máximo 2 enlaces por mensaje
+  let text = t, bad = false;
+  for (const raw of tokens) {
+    const token = raw.replace(/[.,;:!?)\]}]+$/, "");
+    const l = linkHost(token);
+    if (!l || !hostAllowed(l.host, rules)) return "block";
+    if (PROXY_HOSTS.test(l.host) || REDIRECT_PATH.test(l.path)) return "block";
+    if (hasBadWord(decodeURIComponent(l.path.replace(/%(?![0-9a-f]{2})/gi, "")).replace(/[/?&=_+.-]+/g, " "))) bad = true;   // «…?q=porno»
+    text = text.split(token).join(" enlace ");
+  }
+  return { text, bad };
+}
+
+/** Why a chat message may not be sent, or null. `links`: dominios cuyos enlaces sí se permiten (vacío = ninguno). */
+export function checkMessage(text: string, links?: string[]): Block | null {
   const t = text.trim();
   if (!t || !/[\p{L}\p{N}]/u.test(t)) return "empty";
-  if (hasBadWord(t)) return "profanity";
-  if (LINK.test(t) || EMAIL.test(t)) return "link";
-  if (MENTION.test(t) || digitsCount(t) >= 7 || CONTACT_WORDS.test(fold(t).replace(/[^a-z ]/g, " ")) ) return "contact";
+  let work = t;
+  if (links && links.length) {
+    const r = scrubLinks(t, links);
+    if (r === "block") return "link";
+    if (r.bad) return "profanity";
+    work = r.text;
+  }
+  if (hasBadWord(work)) return "profanity";
+  if (LINK.test(work) || EMAIL.test(work)) return "link";
+  if (MENTION.test(work) || digitsCount(work) >= 7 || CONTACT_WORDS.test(fold(work).replace(/[^a-z ]/g, " ")) ) return "contact";
   return null;
+}
+
+/** Normalizes the configured list: "Google.com, https://www.budsin.dev/x" -> ["google.com", "budsin.dev"]. */
+export function parseLinkRules(list: string | undefined): string[] {
+  return (list ?? "").split(",").map((s) => s.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/.*$/, "").replace(/^\*\./, "")).filter((s) => /^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/.test(s));
 }
 
 // ---- nombres de usuario ----

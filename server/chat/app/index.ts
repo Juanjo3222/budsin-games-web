@@ -2,6 +2,7 @@ import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { googleKeyProvider } from "./lib/auth";
 import { parseRules } from "./lib/access";
+import { parseLinkRules } from "./lib/filter";
 import { ChatDb } from "./lib/db";
 import { httpScanner } from "./lib/media";
 import { createChatServer } from "./lib/server";
@@ -17,6 +18,7 @@ const scanUrl = process.env.CHAT_SCAN_URL || "http://127.0.0.1:3105";
 const chat = createChatServer({
   mediaDir: process.env.CHAT_MEDIA_DIR || path.join(dataDir, "media"),
   scan: httpScanner(scanUrl),
+  allowedLinks: parseLinkRules(process.env.CHAT_ALLOWED_LINKS ?? "budsin.dev,google.com,prescott.edu.pe"),   // enlaces permitidos en los mensajes; CHAT_ALLOWED_LINKS= (vacío) los prohíbe todos
   allowedDomains: parseRules(process.env.CHAT_ALLOWED_DOMAINS),   // por defecto: solo cuentas de colegio/universidad; CHAT_ALLOWED_DOMAINS=* lo abre
   imagesEnabled: process.env.CHAT_IMAGES === "1",   // apagado por defecto (ver README: CSAM)
   mediaMinAgeMs: process.env.CHAT_MEDIA_MIN_AGE_MIN ? Number(process.env.CHAT_MEDIA_MIN_AGE_MIN) * 60_000 : undefined,
