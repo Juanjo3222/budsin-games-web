@@ -102,8 +102,8 @@ export class ChatDb {
     this.db.query("UPDATE users SET banned=? WHERE uid=?").run(on ? 1 : 0, uid);
   }
   findUsers(q: string, limit = 20): User[] {
-    const like = `%${q.replace(/[%_\\]/g, "")}%`;
-    return this.db.query("SELECT uid,username,avatar,email,created,last_seen,uname_changed,muted_until,banned FROM users WHERE username LIKE ? OR email LIKE ? ORDER BY last_seen DESC LIMIT ?").all(like, like, limit) as User[];
+    const like = `%${q.replace(/[\\%_]/g, "\\$&")}%`;          // % y _ de lo escrito valen como letras normales
+    return this.db.query("SELECT uid,username,avatar,email,created,last_seen,uname_changed,muted_until,banned FROM users WHERE username LIKE ? ESCAPE '\\' OR email LIKE ? ESCAPE '\\' ORDER BY last_seen DESC LIMIT ?").all(like, like, limit) as User[];
   }
   userByName(name: string): User | null {
     return (this.db.query("SELECT uid,username,avatar,email,created,last_seen,uname_changed,muted_until,banned FROM users WHERE name_key=?").get(nameKey(name)) as User) ?? null;

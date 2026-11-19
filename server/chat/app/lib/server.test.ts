@@ -217,6 +217,10 @@ describe("reportes y administración", () => {
   test("buscar usuarios", async () => {
     const r = await boss.req({ t: "admin.find", q: "rita" }, (x) => x.t === "admin.users");
     expect(r.items[0]).toMatchObject({ username: "Rita_A", uid: "r1" });
+    const u = await boss.req({ t: "admin.find", q: "Rita_A" }, (x) => x.t === "admin.users");   // el guion bajo es una letra más, no un comodín
+    expect(u.items.map((i: any) => i.username)).toEqual(["Rita_A"]);
+    expect((await boss.req({ t: "admin.find", q: "R_ta" }, (x) => x.t === "admin.users")).items).toEqual([]);
+    expect((await boss.req({ t: "admin.find", q: "%" }, (x) => x.t === "admin.users")).items).toEqual([]);
   });
 });
 
@@ -387,5 +391,24 @@ describe("amigos y mensajes directos", () => {
     let last: any;
     for (let i = 0; i < 11; i++) last = await eve.req({ t: "friend.request", username: "NoExiste" + i }, (m) => m.t === "err");
     expect(last.code).toBe("rate");
+  });
+});
+
+describe("admin: salas", () => {
+  test("el admin lista y borra un grupo inapropiado; los demás no pueden", async () => {
+    clock += 3600_000 * 30;
+    const boss = await Client.open(); await boss.login("boss", "boss@x.com");
+    const owner = await user("z1", "Zeta_Uno");
+    const made = await owner.req({ t: "class.create", name: "Grupo para borrar" }, (m) => m.t === "class.created");
+    await owner.req({ t: "join", room: made.item.key }, (m) => m.t === "joined");
+    expect((await owner.req({ t: "admin.rooms" }, (m) => m.t === "err")).code).toBe("forbidden");
+    const list = await boss.req({ t: "admin.rooms" }, (m) => m.t === "admin.rooms");
+    expect(list.items.some((r: any) => r.key === made.item.key && r.members === 1)).toBe(true);
+    expect((await boss.req({ t: "admin.deleteroom", key: "global" }, (m) => m.t === "err")).code).toBe("bad_request");
+    const left = owner.next((m) => m.t === "class.left");
+    await boss.req({ t: "admin.deleteroom", key: made.item.key }, (m) => m.t === "ok");
+    expect((await left).room).toBe(made.item.key);
+    expect(db.room(made.item.key)).toBeNull();
+    boss.close(); owner.close();
   });
 });

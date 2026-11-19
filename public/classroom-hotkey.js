@@ -499,6 +499,40 @@
   }
 
   // ─────────────────────────────────────────────
+  //  Budsin Chat button inside games: opens the chat room of this game in a new tab (/chat/#/game/<slug>/<name>).
+  //  Next to the music button (bottom right). Not in the chat/music pages, not inside iframes; can be turned off from the chat menu.
+  // ─────────────────────────────────────────────
+  function ensureChatButton() {
+    try {
+      if (window.top !== window) return;
+      var path = location.pathname;
+      if (path.indexOf("/musica/") === 0 || path.indexOf("/chat/") === 0) return;
+      if (!/(^|\.)budsin\.dev$/.test(location.hostname) && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") return;
+      if (/^\/(index\.html)?$/.test(path) || /\/(admin|settings)\.html$/.test(path)) return;   // the portal has its own entry
+      if (localStorage.getItem("bc_gamebtn") === "0") return;
+      if (document.getElementById("bc-fab")) return;
+      var slug = (path.split("/").filter(Boolean)[0] || "").replace(/\.html?$/i, "").toLowerCase().replace(/[^a-z0-9-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+      if (!slug) return;
+      var name = String(document.title || "").split(/\s[|\u2013\u2014-]\s/)[0].replace(/\s+/g, " ").trim().slice(0, 40);
+      var lang = "es";
+      try { var l = (localStorage.getItem("budsin_language") || "").slice(0, 2).toLowerCase(); if (l === "en" || l === "pt") lang = l; } catch (e) {}
+      var label = { es: "Chat de este juego", en: "Chat for this game", pt: "Chat deste jogo" }[lang];
+      var a = document.createElement("a");
+      a.id = "bc-fab";
+      a.href = "https://games.budsin.dev/chat/#/game/" + slug + (name ? "/" + encodeURIComponent(name) : "");
+      a.target = "_blank";
+      a.rel = "noopener";
+      a.title = label;
+      a.setAttribute("aria-label", label);
+      a.textContent = "\uD83D\uDCAC";
+      a.style.cssText = "position:fixed;right:66px;bottom:14px;width:44px;height:44px;border-radius:50%;z-index:999991;display:grid;place-items:center;font-size:20px;text-decoration:none;background:rgba(16,19,25,.9);box-shadow:0 6px 20px rgba(0,0,0,.5),inset 0 0 0 1px rgba(255,255,255,.14);opacity:.78;cursor:pointer;";
+      a.addEventListener("mouseenter", function () { a.style.opacity = "1"; });
+      a.addEventListener("mouseleave", function () { a.style.opacity = ".78"; });
+      document.body.appendChild(a);
+    } catch (e) {}
+  }
+
+  // ─────────────────────────────────────────────
   //  Focus trap (keeps hotkey responsive when iframe is focused)
   // ─────────────────────────────────────────────
   function ensureFocusTrap() {
@@ -649,6 +683,7 @@
   refreshDisguiseMetadata();
   ensureQuickToggleButton();
   ensureMusicMenu();
+  ensureChatButton();
   bindIframeHotkeys();
   startActivityListeners();
 

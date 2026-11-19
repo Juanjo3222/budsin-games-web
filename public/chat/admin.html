@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+<!-- End Google Tag Manager -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#121212">
+<title>Moderación · Budsin Chat</title>
+<style>
+:root{color-scheme:dark;--bg:#121212;--panel:#181818;--card:#1f1f1f;--line:rgba(255,255,255,.09);--text:#fff;--muted:#a7a7a7;--accent:#25d0b4;--danger:#ff6b6b;--warn:#ffb020}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px}
+header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;flex-wrap:wrap}
+header h1{margin:0;font-size:1.15rem}header a{color:var(--muted);text-decoration:none;font-size:.85rem}header a:hover{color:#fff}.sp{flex:1}
+#state{font-size:.8rem;color:var(--muted)}
+nav{display:flex;gap:6px;padding:10px 18px 0;flex-wrap:wrap}
+nav button{border:0;background:var(--card);color:var(--muted);padding:8px 16px;border-radius:999px;cursor:pointer;font:inherit}nav button.on{background:var(--accent);color:#000;font-weight:700}
+main{padding:14px 18px 60px;max-width:1000px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin:10px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.who{font-weight:700}.meta{color:var(--muted);font-size:.8rem}
+.quote{background:var(--bg);border-left:3px solid var(--warn);border-radius:6px;padding:8px 12px;margin:8px 0;overflow-wrap:anywhere;white-space:pre-wrap}
+button.b{border:1px solid var(--line);background:none;color:var(--text);padding:6px 12px;border-radius:999px;cursor:pointer;font:inherit;font-size:.82rem}
+button.b:hover{background:rgba(255,255,255,.08)}button.b.red{border-color:var(--danger);color:var(--danger)}button.b.go{background:var(--accent);color:#000;border-color:var(--accent);font-weight:700}
+input{background:var(--bg);border:1px solid var(--line);color:inherit;border-radius:999px;padding:9px 16px;font:inherit;min-width:240px;outline:none}input:focus{border-color:var(--accent)}
+.tag{font-size:.7rem;border-radius:999px;padding:2px 8px;background:rgba(255,255,255,.1)}.tag.red{background:var(--danger);color:#000}.tag.warn{background:var(--warn);color:#000}
+.empty{color:var(--muted);text-align:center;padding:40px 0}
+#gate{max-width:420px;margin:12vh auto;text-align:center}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;color:#000;padding:8px 16px;border-radius:999px;font-weight:600;display:none}
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<header><h1>🛡️ Moderación · Budsin Chat</h1><a href="/chat/">← Chat</a><div class="sp"></div><span id="state">Conectando…</span></header>
+<div id="gate" hidden><p>Esta página es solo para administradores. Entra con tu cuenta de Google.</p><button class="b go" id="signin">Entrar con Google</button></div>
+<div id="app" hidden>
+  <nav><button data-tab="reports" class="on">Reportes <span id="nrep"></span></button><button data-tab="users">Usuarios</button><button data-tab="rooms">Grupos y salas</button></nav>
+  <main id="view"></main>
+</div>
+<div id="toast"></div>
+<script>
+(function () {
+'use strict';
+var $ = function (s) { return document.querySelector(s); };
+var FB_CONFIG = { apiKey: 'AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U', authDomain: 'juanjo-games.firebaseapp.com', projectId: 'juanjo-games', storageBucket: 'juanjo-games.firebasestorage.app', messagingSenderId: '927529249414', appId: '1:927529249414:web:410a686dc7f0da25ec3f07' };
+var FB_BASE = 'https://www.gstatic.com/firebasejs/10.12.5/';
+var WS_URL = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/api/chat/ws';
+var S = { ws: null, fb: null, user: null, tab: 'reports', reports: [], users: [], rooms: [], q: '', admin: false, retry: 0 };
+var REASON = { spam: 'Spam', insult: 'Insultos o acoso', sexual: 'Contenido sexual', personal: 'Datos personales', other: 'Otro' };
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function toast(t) { var x = $('#toast'); x.textContent = t; x.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(function () { x.style.display = 'none'; }, 2600); }
+function loadScript(src) { return new Promise(function (ok, ko) { var e = document.createElement('script'); e.src = src; e.onload = ok; e.onerror = function () { ko(); }; document.head.appendChild(e); }); }
+function wsend(o) { if (S.ws && S.ws.readyState === 1) S.ws.send(JSON.stringify(o)); }
+function when(ts) { return ts ? new Date(ts).toLocaleString() : '—'; }
+
+function boot() {
+  var have = window.firebase && window.firebase.auth;
+  (have ? Promise.resolve() : loadScript(FB_BASE + 'firebase-app-compat.js').then(function () { return loadScript(FB_BASE + 'firebase-auth-compat.js'); })).then(function () {
+    var app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(FB_CONFIG);
+    S.fb = app.auth();
+    S.fb.onAuthStateChanged(function (u) { S.user = u; if (!u) { $('#gate').hidden = false; $('#app').hidden = true; $('#state').textContent = ''; return; } $('#gate').hidden = true; connect(); });
+  }).catch(function () { $('#state').textContent = 'No se pudo cargar el inicio de sesión'; });
+}
+$('#signin').addEventListener('click', function () { if (S.fb) S.fb.signInWithPopup(new window.firebase.auth.GoogleAuthProvider()); });
+
+function connect() {
+  if (S.ws || !S.user) return;
+  var ws = new WebSocket(WS_URL); S.ws = ws;
+  ws.onopen = function () { S.user.getIdToken().then(function (t) { wsend({ t: 'auth', token: t }); }); };
+  ws.onmessage = function (e) { var m; try { m = JSON.parse(e.data); } catch (x) { return; } onMsg(m); };
+  ws.onclose = function () { if (S.ws !== ws) return; S.ws = null; $('#state').textContent = 'Desconectado. Reintentando…'; S.retry = Math.min(S.retry + 1, 6); setTimeout(connect, Math.min(15000, 800 * Math.pow(2, S.retry))); };
+}
+function onMsg(m) {
+  switch (m.t) {
+    case 'hello':
+      S.retry = 0;
+      if (!m.me.admin) { $('#state').textContent = 'Tu cuenta no es de administrador.'; $('#app').hidden = true; $('#gate').hidden = false; $('#gate').querySelector('p').textContent = 'Tu cuenta (' + (S.user.email || '') + ') no es de administrador.'; return; }
+      S.admin = true; $('#app').hidden = false; $('#state').textContent = 'Conectado como ' + (S.user.email || ''); refresh(); clearInterval(S.iv); S.iv = setInterval(function () { if (S.tab === 'reports') wsend({ t: 'admin.reports' }); }, 15000); return;
+    case 'admin.reports': S.reports = m.items; $('#nrep').textContent = m.items.length ? '(' + m.items.length + ')' : ''; if (S.tab === 'reports') render(); return;
+    case 'admin.users': S.users = m.items; if (S.tab === 'users') render(); return;
+    case 'admin.rooms': S.rooms = m.items; if (S.tab === 'rooms') render(); return;
+    case 'ok': toast('Hecho ✓'); refresh(); return;
+    case 'err': toast('Error: ' + m.code); if (m.code === 'auth_failed' || m.code === 'banned') { S.ws && S.ws.close(); } return;
+  }
+}
+function refresh() { wsend({ t: 'admin.reports' }); if (S.tab === 'users') wsend({ t: 'admin.find', q: S.q }); if (S.tab === 'rooms') wsend({ t: 'admin.rooms' }); }
+
+document.querySelectorAll('nav button').forEach(function (b) { b.addEventListener('click', function () { S.tab = b.getAttribute('data-tab'); document.querySelectorAll('nav button').forEach(function (x) { x.classList.toggle('on', x === b); }); refresh(); render(); }); });
+
+function btn(text, cls, fn) { var b = el('button', 'b ' + (cls || ''), text); b.addEventListener('click', fn); return b; }
+function muteButtons(uid) {
+  var box = el('span'); box.style.cssText = 'display:inline-flex;gap:6px;flex-wrap:wrap';
+  [['🔇 10 min', 10], ['🔇 1 h', 60], ['🔇 24 h', 1440], ['🔇 7 días', 10080]].forEach(function (p) { box.appendChild(btn(p[0], '', function () { wsend({ t: 'admin.mute', uid: uid, minutes: p[1] }); })); });
+  return box;
+}
+function render() {
+  var v = $('#view'); v.textContent = '';
+  if (S.tab === 'reports') {
+    if (!S.reports.length) { v.appendChild(el('div', 'empty', '✅ No hay reportes pendientes.')); return; }
+    S.reports.forEach(function (r) {
+      var c = el('div', 'card'); var top = el('div', 'row');
+      top.appendChild(el('span', 'who', r.reported_name || r.reported_uid)); top.appendChild(el('span', 'tag warn', REASON[r.reason] || r.reason));
+      top.appendChild(el('span', 'tag', r.room.indexOf('dm:') === 0 ? 'privado' : r.room.indexOf('class:') === 0 ? 'grupo' : r.room.indexOf('game:') === 0 ? 'juego' : 'global'));
+      top.appendChild(el('span', 'meta', 'reportó ' + (r.reporter_name || '?') + ' · ' + when(r.ts))); c.appendChild(top);
+      c.appendChild(el('div', 'quote', r.text));
+      var act = el('div', 'row');
+      act.appendChild(btn('🗑 Borrar mensaje', 'red', function () { wsend({ t: 'admin.delete', id: r.msg_id }); }));
+      act.appendChild(btn('Descartar reporte', '', function () { wsend({ t: 'admin.dismiss', id: r.id }); }));
+      act.appendChild(btn('✏️ Quitar nombre/avatar', '', function () { if (confirm('¿Borrar el nombre y avatar de esta persona para que elija otro?')) wsend({ t: 'admin.rename', uid: r.reported_uid }); }));
+      act.appendChild(muteButtons(r.reported_uid));
+      act.appendChild(btn('⛔ Banear', 'red', function () { if (confirm('¿Banear a ' + (r.reported_name || 'esta persona') + '? No podrá usar el chat.')) wsend({ t: 'admin.ban', uid: r.reported_uid, on: true }); }));
+      c.appendChild(act); v.appendChild(c);
+    });
+    return;
+  }
+  if (S.tab === 'users') {
+    var row = el('div', 'row'); var inp = el('input'); inp.placeholder = 'Buscar por nombre de usuario o correo'; inp.value = S.draft || ''; inp.addEventListener('input', function () { S.draft = inp.value; });
+    var go = btn('Buscar', 'go', function () { S.q = inp.value.trim(); S.draft = inp.value; wsend({ t: 'admin.find', q: S.q }); });
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go.click(); }); row.appendChild(inp); row.appendChild(go); v.appendChild(row);
+    if (!S.users.length) { v.appendChild(el('div', 'empty', 'Escribe un nombre o correo y busca.')); return; }
+    S.users.forEach(function (u) {
+      var c = el('div', 'card'); var top = el('div', 'row'); top.appendChild(el('span', 'who', u.username || '(sin nombre)')); top.appendChild(el('span', 'meta', u.email));
+      if (u.banned) top.appendChild(el('span', 'tag red', 'baneado')); if (u.muted_until > Date.now()) top.appendChild(el('span', 'tag warn', 'silenciado hasta ' + when(u.muted_until)));
+      top.appendChild(el('span', 'meta', 'visto ' + when(u.last_seen))); c.appendChild(top);
+      var act = el('div', 'row'); act.appendChild(muteButtons(u.uid));
+      if (u.muted_until > Date.now()) act.appendChild(btn('🔊 Quitar silencio', '', function () { wsend({ t: 'admin.mute', uid: u.uid, minutes: 0 }); }));
+      act.appendChild(btn('✏️ Quitar nombre/avatar', '', function () { if (confirm('¿Borrar nombre y avatar?')) wsend({ t: 'admin.rename', uid: u.uid }); }));
+      act.appendChild(u.banned ? btn('Quitar ban', '', function () { wsend({ t: 'admin.ban', uid: u.uid, on: false }); }) : btn('⛔ Banear', 'red', function () { if (confirm('¿Banear a ' + (u.username || u.email) + '?')) wsend({ t: 'admin.ban', uid: u.uid, on: true }); }));
+      c.appendChild(act); v.appendChild(c);
+    });
+    return;
+  }
+  if (!S.rooms.length) { v.appendChild(el('div', 'empty', 'No hay grupos ni salas de juego.')); return; }
+  S.rooms.forEach(function (r) {
+    var c = el('div', 'card'); var top = el('div', 'row'); top.appendChild(el('span', 'who', r.name)); top.appendChild(el('span', 'tag', r.kind === 'class' ? 'grupo' : 'juego'));
+    top.appendChild(el('span', 'meta', (r.members != null ? r.members + ' miembros · ' : '') + r.online + ' en línea · último mensaje ' + when(r.last_msg)));
+    top.appendChild(el('div', 'sp')); top.appendChild(btn('🗑 Borrar', 'red', function () { if (confirm('¿Borrar «' + r.name + '» con todos sus mensajes?')) wsend({ t: 'admin.deleteroom', key: r.key }); }));
+    c.appendChild(top); v.appendChild(c);
+  });
+}
+boot();
+})();
+</script>
+<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+</body>
+</html>

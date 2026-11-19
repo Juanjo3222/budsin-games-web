@@ -489,6 +489,20 @@ export function createChatServer(opts: ServerOptions) {
         broadcast(msg.room, { t: "del", room: msg.room, id: msg.id });
         return send(ws, { t: "ok", cmd: t });
       }
+      case "admin.rooms": {
+        const rooms = [...db.activeRooms("class", 200), ...db.activeRooms("game", 200)].map((r) => ({ key: r.key, kind: r.kind, name: r.name, members: r.kind === "class" ? db.memberCount(r.key) : undefined, online: onlineCount(r.key), last_msg: r.last_msg }));
+        return send(ws, { t: "admin.rooms", items: rooms });
+      }
+      case "admin.deleteroom": {
+        // un grupo o sala con nombre inapropiado: se borra con sus mensajes y todos salen
+        const key = String(m.key ?? "");
+        const r = db.room(key);
+        if (!r || r.kind === "global" || r.kind === "dm") return err(ws, "bad_request");
+        for (const s of [...(roomSockets.get(key) ?? [])]) { s.data.rooms.delete(key); send(s, { t: r.kind === "class" ? "class.left" : "dm.closed", room: key, kicked: true }); }
+        roomSockets.delete(key);
+        db.deleteRoom(key);
+        return send(ws, { t: "ok", cmd: t });
+      }
       case "admin.dismiss":
         db.closeReport(Number(m.id), "dismissed");
         return send(ws, { t: "ok", cmd: t });
