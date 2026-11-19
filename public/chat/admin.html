@@ -113,9 +113,26 @@ function render() {
       top.appendChild(el('span', 'who', r.reported_name || r.reported_uid)); top.appendChild(el('span', 'tag warn', REASON[r.reason] || r.reason));
       top.appendChild(el('span', 'tag', r.room.indexOf('dm:') === 0 ? 'privado' : r.room.indexOf('class:') === 0 ? 'grupo' : r.room.indexOf('game:') === 0 ? 'juego' : 'global'));
       top.appendChild(el('span', 'meta', 'reportó ' + (r.reporter_name || '?') + ' · ' + when(r.ts))); c.appendChild(top);
-      c.appendChild(el('div', 'quote', r.text));
+      if (r.media) {
+        var mbox = el('div', 'quote'); mbox.appendChild(el('div', 'meta', (r.media_kind === 'audio' ? '🎤 Nota de voz' : r.media_kind === 'sticker' ? '🖼 Sticker' : '🖼 Imagen') + ' reportada · estado: ' + (r.media_status || 'borrada')));
+        if (r.media_status) {
+          var vb = btn('👁 Ver el archivo (puede ser contenido sensible)', '', function () {
+            vb.disabled = true; S.user.getIdToken().then(function (t) { return fetch('/api/chat/media/' + r.media, { headers: { Authorization: 'Bearer ' + t } }); })
+              .then(function (res) { if (!res.ok) throw new Error('x'); return res.blob(); })
+              .then(function (blob) { var u = URL.createObjectURL(blob); var node = r.media_kind === 'audio' ? el('audio') : el('img'); if (r.media_kind === 'audio') node.controls = true; node.src = u; node.style.cssText = 'max-width:100%;max-height:360px;display:block;margin-top:8px;border-radius:8px'; mbox.appendChild(node); vb.remove(); })
+              .catch(function () { vb.disabled = false; toast('No se pudo cargar'); });
+          });
+          mbox.appendChild(vb);
+        }
+        c.appendChild(mbox);
+      } else c.appendChild(el('div', 'quote', r.text));
       var act = el('div', 'row');
       act.appendChild(btn('🗑 Borrar mensaje', 'red', function () { wsend({ t: 'admin.delete', id: r.msg_id }); }));
+      if (r.media && r.media_status) {
+        act.appendChild(btn('🗑 Borrar archivo para siempre', 'red', function () { if (confirm('¿Borrar el archivo definitivamente?')) wsend({ t: 'admin.media.delete', id: r.media }); }));
+        act.appendChild(btn('↩ Restaurar (es inocente)', '', function () { wsend({ t: 'admin.media.restore', id: r.media }); }));
+        [['🚫 sin imágenes 24 h', 24], ['🚫 sin imágenes 30 d', 720]].forEach(function (p) { act.appendChild(btn(p[0], '', function () { wsend({ t: 'admin.nomedia', uid: r.reported_uid, hours: p[1] }); })); });
+      }
       act.appendChild(btn('Descartar reporte', '', function () { wsend({ t: 'admin.dismiss', id: r.id }); }));
       act.appendChild(btn('✏️ Quitar nombre/avatar', '', function () { if (confirm('¿Borrar el nombre y avatar de esta persona para que elija otro?')) wsend({ t: 'admin.rename', uid: r.reported_uid }); }));
       act.appendChild(muteButtons(r.reported_uid));
@@ -131,6 +148,7 @@ function render() {
     if (!S.users.length) { v.appendChild(el('div', 'empty', 'Escribe un nombre o correo y busca.')); return; }
     S.users.forEach(function (u) {
       var c = el('div', 'card'); var top = el('div', 'row'); top.appendChild(el('span', 'who', u.username || '(sin nombre)')); top.appendChild(el('span', 'meta', u.email));
+      if (u.media_until > Date.now()) top.appendChild(el('span', 'tag warn', 'sin imágenes hasta ' + when(u.media_until)));
       if (u.banned) top.appendChild(el('span', 'tag red', 'baneado')); if (u.muted_until > Date.now()) top.appendChild(el('span', 'tag warn', 'silenciado hasta ' + when(u.muted_until)));
       top.appendChild(el('span', 'meta', 'visto ' + when(u.last_seen))); c.appendChild(top);
       var act = el('div', 'row'); act.appendChild(muteButtons(u.uid));

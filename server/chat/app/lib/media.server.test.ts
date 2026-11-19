@@ -26,7 +26,7 @@ const scanned: number[] = [];
 const mediaDir = mkdtempSync(path.join(tmpdir(), "bchat-test-"));
 const db = new ChatDb(":memory:");
 const chat = createChatServer({
-  db, projectId: "juanjo-games", keys: async (k) => (k === "k1" ? publicKey : null), adminEmails: ["boss@x.com"], origins: ["https://games.budsin.dev"], now: () => clock, mediaDir,
+  db, projectId: "juanjo-games", keys: async (k) => (k === "k1" ? publicKey : null), adminEmails: ["boss@x.com"], origins: ["https://games.budsin.dev"], now: () => clock, mediaDir, imagesEnabled: true,
   scan: async (b) => { scanned.push(b.length); if (scannerDown) throw new Error("down"); return nsfw; },
 });
 const base = `http://127.0.0.1:${chat.port}`;
@@ -311,5 +311,27 @@ d("retención", () => {
     expect(gone).not.toContain(stk.id);
     expect(gone).not.toContain(rep.id);
     expect(existsSync(path.join(mediaDir, `${stk.id}.${stk.ext}`))).toBe(true);
+  });
+});
+
+d("imágenes apagadas (valor por defecto)", () => {
+  test("sin activarlas, imágenes y stickers propios se rechazan pero audios y stickers predefinidos siguen", async () => {
+    const off = createChatServer({ db: new ChatDb(":memory:"), projectId: "juanjo-games", keys: async (k) => (k === "k1" ? publicKey : null), adminEmails: [], origins: ["https://games.budsin.dev"], now: () => clock, mediaDir, scan: async () => 0, mediaMinAgeMs: 0 });
+    try {
+      for (const kind of ["image", "sticker"]) {
+        const r = await fetch(`http://127.0.0.1:${off.port}/api/chat/upload?kind=${kind}&room=global`, { method: "POST", headers: { authorization: `Bearer ${token("x1")}` }, body: png });
+        expect([r.status, (await r.json() as any).error]).toEqual([403, "images_disabled"]);
+      }
+      const ws = new WebSocket(`ws://127.0.0.1:${off.port}/api/chat/ws`, { headers: { origin: "https://games.budsin.dev" } } as any);
+      const got: any[] = []; ws.onmessage = (e) => got.push(JSON.parse(String(e.data)));
+      await new Promise((r) => (ws.onopen = r));
+      ws.send(JSON.stringify({ t: "auth", token: token("x1") })); await Bun.sleep(150);
+      expect(got.find((m) => m.t === "hello").features).toEqual({ images: false, audio: true });
+      ws.send(JSON.stringify({ t: "profile", username: "Off_Test", avatar: "a01" })); await Bun.sleep(150);
+      ws.send(JSON.stringify({ t: "join", room: "global" })); await Bun.sleep(150);
+      ws.send(JSON.stringify({ t: "send", room: "global", media: "preset:rocket" })); await Bun.sleep(200);
+      expect(got.some((m) => m.t === "msg" && m.m.sticker === "rocket")).toBe(true);
+      ws.close();
+    } finally { off.stop(); }
   });
 });

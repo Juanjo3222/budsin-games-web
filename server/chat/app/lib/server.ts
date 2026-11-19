@@ -30,6 +30,9 @@ export interface ServerOptions {
   mediaDir?: string;       // dónde se guardan imágenes, stickers y audios
   scan?: Scanner;          // detector de contenido sexual; sin él NO se aceptan imágenes ni stickers (falla cerrado)
   tools?: Tools;           // rutas de ffmpeg y ffprobe
+  /** Imágenes y stickers propios: APAGADO por defecto. Sin una defensa real contra material de abuso infantil (hashes + revisión) no deben activarse con menores en el sitio. */
+  imagesEnabled?: boolean;
+  mediaMinAgeMs?: number;  // cuánto debe tener una cuenta para subir imágenes (el audio pide la mitad); por defecto 30 min
   scanHealth?: () => Promise<boolean>;   // ¿responde el detector? (solo para /api/chat/health)
 }
 
@@ -72,7 +75,7 @@ export function createChatServer(opts: ServerOptions) {
   mkdirSync(mediaDir, { recursive: true });
   const tools: Tools = opts.tools ?? { ffmpeg: "ffmpeg", ffprobe: "ffprobe" };
   const MAX_STICKERS = 24;
-  const MIN_AGE_MEDIA = 30 * 60_000, MIN_AGE_AUDIO = 10 * 60_000;     // una cuenta recién creada no sube nada todavía
+  const MIN_AGE_MEDIA = opts.mediaMinAgeMs ?? 30 * 60_000, MIN_AGE_AUDIO = Math.round(MIN_AGE_MEDIA / 3);     // una cuenta recién creada no sube nada todavía
   const DAILY_BYTES = 25_000_000;
   const imgBurst = new Limiter(1, 15_000), imgHour = new Limiter(20, 3600_000), audBurst = new Limiter(1, 8_000), audHour = new Limiter(30, 3600_000), stickHour = new Limiter(6, 3600_000);
   const strikes = new Map<string, number[]>();
@@ -175,7 +178,7 @@ export function createChatServer(opts: ServerOptions) {
         err(ws, "too_many_tabs");
         return ws.close(1008, "tabs");
       }
-      return send(ws, { t: "hello", me: me(ws), avatars: AVATARS });
+      return send(ws, { t: "hello", me: me(ws), avatars: AVATARS, features: { images: !!opts.imagesEnabled, audio: true } });
     }
     if (!c.claims) return err(ws, "not_authed");
     refresh(ws);
@@ -479,6 +482,7 @@ export function createChatServer(opts: ServerOptions) {
       } else {
         const md = db.media(mediaRef);
         if (!md || md.uid !== u.uid || md.status === "hidden") return err(ws, "bad_media", { cid: m.cid });
+        if (md.kind !== "audio" && !opts.imagesEnabled) return err(ws, "images_disabled", { cid: m.cid });
         if (u.media_until > now()) return err(ws, "media_suspended", { cid: m.cid });
         if (md.kind === "audio" && !(key.startsWith("dm:") || key.startsWith("class:"))) return err(ws, "audio_not_allowed", { cid: m.cid });
         if (md.kind === "sticker") { if (!db.hasSticker(u.uid, md.id)) return err(ws, "bad_media", { cid: m.cid }); }
@@ -561,6 +565,7 @@ export function createChatServer(opts: ServerOptions) {
     const url = new URL(req.url);
     const kind = url.searchParams.get("kind") as MediaKind;
     if (!["image", "sticker", "audio"].includes(kind)) return json({ error: "bad_request" }, 400);
+    if (kind !== "audio" && !opts.imagesEnabled) return json({ error: "images_disabled" }, 403);
     const claims = await verifyFirebaseToken(bearer(req), projectId, keys, now());
     if (!claims) return json({ error: "auth_failed" }, 401);
     const user = db.touchUser(claims.uid, claims.email, now());
