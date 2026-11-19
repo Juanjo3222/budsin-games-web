@@ -147,6 +147,12 @@ Estas funcionalidades fueron **aprobadas por el usuario** y deben implementarse 
 - Recomendaciones, autoplay y radio se calculan en el cliente con los endpoints existentes (`browse`, `artist/:id`, `artist/:id/similar`, `lookup/artist`); no hay backend nuevo.
 - Instalación en el VPS: `sudo bash server/music/install.sh` (idempotente; verifica checksums de bun y yt-dlp y valida el Caddyfile con marcha atrás).
 
+### 💬 Budsin Chat (excepción autorizada por el usuario, 19-nov-2026)
+- El usuario pidió **Budsin Chat** y, ante las preguntas, eligió explícitamente **«Servidor propio en el VPS»** y **«Sí, anular la Regla 4 solo para Budsin Chat»**. Alcance autorizado: (1) crear `server/chat/` (servicio Bun + WebSocket + SQLite, sin dependencias, con su instalador) fuera de `public/`, **solo** para el chat; (2) usar el inicio de sesión de Google ya existente (mismo Firebase Auth del proyecto `juanjo-games`) como identidad obligatoria del chat. No se añade ningún sistema de login nuevo y **el chat no escribe en Firestore**: los mensajes, nombres y reportes viven en SQLite en el VPS. No amplía la excepción a nada más.
+- Página: `public/chat/index.html`; el WebSocket es `wss://games.budsin.dev/api/chat/ws` (Caddy → `127.0.0.1:3104`, servicio `budsin-chat`, usuario propio, `MemoryMax=384M`).
+- Alcance por fases (acordado): global + salas por juego → grupos de clase (nombres únicos, no duplicados) → mensajes directos entre amigos (solicitud + bloqueo) → panel en `/admin.html`.
+- **Moderación obligatoria** (el sitio lo usan muchos menores): cuenta de Google requerida; nombres de usuario únicos, filtrados y sin parecidos (`nameKey`); **avatares solo prediseñados (no se suben imágenes)**; filtro de groserías (ES/EN/PT), enlaces, correos, teléfonos y contactos externos; límite de velocidad; reportes que ocultan el mensaje con 3 reportes distintos; borrar, silenciar, banear y renombrar desde el panel de admin (admins = los correos verificados de siempre); los mensajes se borran a los 14 días.
+
 ### 🧠 Lógica de verificación en cliente
 
 1. **Al cargar la página**: `localStorage` cachea `budsin_pro_active` (0/1) para respuesta inmediata.

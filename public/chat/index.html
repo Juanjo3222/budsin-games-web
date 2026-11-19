@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+<!-- End Google Tag Manager -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#121212">
+<title>Budsin Chat</title>
+<style>
+:root{color-scheme:dark;--bg:#121212;--panel:#181818;--card:#1f1f1f;--line:rgba(255,255,255,.09);--text:#fff;--muted:#a7a7a7;--accent:#25d0b4;--danger:#ff6b6b}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+#app{display:grid;grid-template-columns:260px 1fr;height:100%}
+#side{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.brand{display:flex;align-items:center;gap:10px;padding:16px 16px 10px;font-weight:800;font-size:1.1rem}
+.brand i{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#25d0b4,#1fa7d8);display:grid;place-items:center;font-style:normal}
+.back{margin:0 16px 8px;color:var(--muted);text-decoration:none;font-size:.82rem}
+.back:hover{color:#fff}
+#rooms{overflow:auto;padding:6px 8px 16px;flex:1}
+.sec{margin:14px 10px 6px;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.room{display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border:0;border-radius:10px;background:none;text-align:left}
+.room:hover{background:rgba(255,255,255,.06)}.room.on{background:rgba(37,208,180,.16)}
+.room .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.room .c{font-size:.72rem;color:var(--muted)}
+.hint{margin:6px 10px;color:var(--muted);font-size:.8rem;line-height:1.4}
+#main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
+#top{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+#menuBtn{display:none;border:0;background:none;font-size:1.3rem;padding:4px 8px}
+#title{font-weight:800;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#sub{color:var(--muted);font-size:.8rem;white-space:nowrap}
+#top .sp{flex:1}
+#me{display:flex;align-items:center;gap:8px;border:0;background:var(--card);border-radius:999px;padding:4px 12px 4px 4px}
+.av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:1rem;flex:none}
+#state{width:9px;height:9px;border-radius:50%;background:#777}#state.ok{background:#3ddc84}#state.bad{background:var(--danger)}
+#msgs{flex:1;overflow-y:auto;padding:14px 16px 8px;display:flex;flex-direction:column;gap:2px}
+.msg{display:flex;gap:10px;padding:5px 8px;border-radius:10px;position:relative}
+.msg:hover{background:rgba(255,255,255,.04)}.msg .av{margin-top:2px}
+.body{min-width:0}.who{display:flex;gap:8px;align-items:baseline}.who b{font-size:.9rem}.who time{color:var(--muted);font-size:.7rem}
+.txt{overflow-wrap:anywhere;line-height:1.4;white-space:pre-wrap}
+.msg.mine .who b{color:var(--accent)}
+.rep{position:absolute;right:8px;top:2px;border:0;background:var(--card);border-radius:8px;padding:2px 8px;font-size:.8rem;opacity:0;color:var(--muted)}
+.msg:hover .rep,.rep:focus{opacity:1}
+.more{align-self:center;border:0;background:var(--card);color:var(--muted);border-radius:999px;padding:6px 14px;margin-bottom:8px;font-size:.8rem}
+.sys{align-self:center;color:var(--muted);font-size:.8rem;margin:8px 0}
+#composer{display:flex;flex-wrap:wrap;gap:8px;padding:10px 70px 14px 14px;border-top:1px solid var(--line);background:var(--panel)}
+#in{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:999px;color:inherit;padding:11px 16px;font:inherit;outline:none}
+#in:focus{border-color:var(--accent)}
+#go{border:0;border-radius:999px;background:var(--accent);color:#000;font-weight:800;padding:0 20px}
+#go:disabled{opacity:.4;cursor:default}
+#cnt{width:100%;font-size:.72rem;color:var(--muted);padding-left:16px;min-height:1em}#cnt.err{color:var(--danger)}
+#gate{position:absolute;inset:0;z-index:5;background:rgba(18,18,18,.97);display:none;align-items:center;justify-content:center;padding:20px;overflow:auto}
+#gate.on{display:flex}
+.card{width:min(460px,100%);background:var(--card);border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:14px;border:1px solid var(--line)}
+.card h1{margin:0;font-size:1.4rem}.card p{margin:0;color:var(--muted);line-height:1.5}
+.btn{border:0;border-radius:999px;background:var(--accent);color:#000;font-weight:800;padding:12px 20px;letter-spacing:.03em}
+.btn.ghost{background:none;border:1px solid var(--line);color:var(--text)}
+.field{background:var(--bg);border:1px solid var(--line);border-radius:12px;color:inherit;padding:12px 14px;font:inherit;width:100%;outline:none}.field:focus{border-color:var(--accent)}
+#avs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+#avs button{aspect-ratio:1;border-radius:50%;border:2px solid transparent;display:grid;place-items:center;font-size:1.4rem;padding:0}
+#avs button.on{border-color:#fff}
+.error{color:var(--danger);font-size:.85rem;min-height:1.2em}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#000;padding:9px 16px;border-radius:999px;font-weight:600;font-size:.85rem;z-index:30;display:none;max-width:90vw}
+.menu{position:fixed;z-index:40;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 14px;border-radius:8px}.menu button:hover{background:rgba(255,255,255,.08)}
+.menu .h{padding:6px 14px;color:var(--muted);font-size:.75rem}
+@media(max-width:760px){
+  #app{grid-template-columns:1fr}
+  #side{position:fixed;inset:0 25% 0 0;z-index:20;transform:translateX(-102%);transition:transform .2s;width:auto;box-shadow:0 0 40px rgba(0,0,0,.6)}
+  #side.open{transform:none}
+  #menuBtn{display:block}
+  #composer{padding-right:64px}
+  #me span{display:none}#me{padding:4px}
+}
+</style>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div id="app">
+  <aside id="side">
+    <div class="brand"><i>💬</i><span>Budsin Chat</span></div>
+    <a class="back" id="backLink" href="https://games.budsin.dev/">← Budsin Games</a>
+    <div id="rooms"></div>
+  </aside>
+  <main id="main">
+    <div id="top">
+      <button id="menuBtn" aria-label="Menu">☰</button>
+      <div id="title">Budsin Chat</div><div id="sub"></div>
+      <span id="state" title=""></span>
+      <div class="sp"></div>
+      <button id="me" hidden></button>
+    </div>
+    <div id="msgs" aria-live="polite"></div>
+    <form id="composer" autocomplete="off">
+      <input id="in" maxlength="300" disabled>
+      <button id="go" disabled></button>
+      <div id="cnt"></div>
+    </form>
+    <div id="gate" class="on"><div class="card" id="card"></div></div>
+  </main>
+</div>
+<div id="toast" role="status"></div>
+<script>
+(function () {
+'use strict';
+var $ = function (s) { return document.querySelector(s); };
+var lang = 'es';
+try { var l = (localStorage.getItem('budsin_language') || navigator.language || '').slice(0, 2).toLowerCase(); if (l === 'en' || l === 'pt') lang = l; } catch (e) {}
+document.documentElement.lang = lang;
+
+var TXT = {
+  es: { loading: 'Conectando…', signinH: 'Entra a Budsin Chat', signinP: 'Para chatear necesitas una cuenta de Google. Solo se usa tu cuenta para identificarte: los demás verán únicamente el nombre y el avatar que elijas aquí.', signin: 'Entrar con Google', profH: 'Elige tu nombre y avatar', profP: 'Es lo único que verán los demás. Nada de nombres reales, apellidos ni datos personales. Los nombres inapropiados se bloquean.', name: 'Nombre de usuario', nameHint: '3–20 letras, números, punto, guion o guion bajo', save: 'Guardar', cancel: 'Cancelar', global: 'Sala global', games: 'Juegos', gamesNone: 'Aún no hay salas de juegos activas. Entra a una desde la página del juego.', gamesHint: 'Cada juego tiene su sala.', send: 'Enviar', ph: 'Escribe un mensaje…', online: 'en línea', older: 'Cargar anteriores', report: 'Reportar', reportT: '¿Por qué lo reportas?', reasons: { spam: 'Spam', insult: 'Insultos o acoso', sexual: 'Contenido sexual', personal: 'Datos personales', other: 'Otro motivo' }, reported: 'Reporte enviado. Gracias 🙏', welcome: 'Sé amable: aquí hay gente de todas las edades.', rules: 'No compartas datos personales ni enlaces.', offline: 'Sin conexión. Reintentando…', you: 'Tú', edit: 'Cambiar nombre o avatar', signout: 'Cerrar sesión', admin: 'Panel de admin', gameRoom: 'Sala de', err: { auth_failed: 'No pudimos verificar tu cuenta. Vuelve a entrar.', banned: 'Tu cuenta no puede usar el chat.', muted: 'Estás silenciado por un rato.', rate: 'Vas muy rápido. Espera unos segundos.', duplicate: 'Ya enviaste ese mensaje.', too_long: 'Mensaje demasiado largo (máx. 300).', need_username: 'Elige un nombre primero.', not_joined: 'Entra primero a la sala.', no_room: 'Esa sala no existe.', room_name: 'Nombre de sala no permitido.', rooms_full: 'Hay demasiadas salas.', too_many_tabs: 'Tienes demasiadas pestañas abiertas.', too_many_rooms: 'Tienes demasiadas salas abiertas.', name_length: 'El nombre debe tener entre 3 y 20 caracteres.', name_chars: 'Solo letras, números, punto, guion y guion bajo (sin espacios).', name_reserved: 'Ese nombre está reservado.', name_profanity: 'Ese nombre no está permitido.', name_link: 'Un nombre no puede ser un enlace.', name_taken: 'Ese nombre ya está en uso (o es muy parecido a otro).', name_cooldown: 'Solo puedes cambiar tu nombre una vez por semana.', bad_avatar: 'Avatar no válido.', own_message: 'No puedes reportar tu propio mensaje.', already_reported: 'Ya lo reportaste.', forbidden: 'No permitido.', server_error: 'Error del servidor. Intenta de nuevo.', bad_request: 'Solicitud no válida.', blocked: { profanity: 'Ese mensaje tiene lenguaje no permitido.', link: 'No se pueden enviar enlaces ni correos.', contact: 'No compartas teléfonos, usuarios ni otras redes.', empty: 'Escribe algo.' } } },
+  en: { loading: 'Connecting…', signinH: 'Join Budsin Chat', signinP: 'You need a Google account to chat. It is only used to identify you: others will see just the name and avatar you pick here.', signin: 'Sign in with Google', profH: 'Pick your name and avatar', profP: 'This is all others will see. No real names, surnames or personal info. Inappropriate names are blocked.', name: 'Username', nameHint: '3–20 letters, numbers, dot, dash or underscore', save: 'Save', cancel: 'Cancel', global: 'Global room', games: 'Games', gamesNone: 'No active game rooms yet. Join one from the game page.', gamesHint: 'Every game has its own room.', send: 'Send', ph: 'Write a message…', online: 'online', older: 'Load older', report: 'Report', reportT: 'Why are you reporting it?', reasons: { spam: 'Spam', insult: 'Insults or harassment', sexual: 'Sexual content', personal: 'Personal info', other: 'Other' }, reported: 'Report sent. Thanks 🙏', welcome: 'Be kind: people of all ages are here.', rules: 'Do not share personal info or links.', offline: 'Offline. Retrying…', you: 'You', edit: 'Change name or avatar', signout: 'Sign out', admin: 'Admin panel', gameRoom: 'Room of', err: { auth_failed: 'We could not verify your account. Sign in again.', banned: 'Your account cannot use the chat.', muted: 'You are muted for a while.', rate: 'You are going too fast. Wait a few seconds.', duplicate: 'You already sent that.', too_long: 'Message too long (max 300).', need_username: 'Pick a name first.', not_joined: 'Join the room first.', no_room: 'That room does not exist.', room_name: 'Room name not allowed.', rooms_full: 'Too many rooms.', too_many_tabs: 'Too many tabs open.', too_many_rooms: 'Too many rooms open.', name_length: 'The name must be 3 to 20 characters.', name_chars: 'Only letters, numbers, dot, dash and underscore (no spaces).', name_reserved: 'That name is reserved.', name_profanity: 'That name is not allowed.', name_link: 'A name cannot be a link.', name_taken: 'That name is taken (or too similar to another).', name_cooldown: 'You can change your name once a week.', bad_avatar: 'Invalid avatar.', own_message: 'You cannot report your own message.', already_reported: 'Already reported.', forbidden: 'Not allowed.', server_error: 'Server error. Try again.', bad_request: 'Invalid request.', blocked: { profanity: 'That message has language that is not allowed.', link: 'Links and emails cannot be sent.', contact: 'Do not share phone numbers, usernames or other networks.', empty: 'Write something.' } } },
+  pt: { loading: 'Conectando…', signinH: 'Entre no Budsin Chat', signinP: 'Para conversar você precisa de uma conta Google. Ela só serve para identificar você: os outros verão apenas o nome e o avatar que escolher aqui.', signin: 'Entrar com o Google', profH: 'Escolha seu nome e avatar', profP: 'É só isso que os outros verão. Nada de nomes reais, sobrenomes ou dados pessoais. Nomes impróprios são bloqueados.', name: 'Nome de usuário', nameHint: '3–20 letras, números, ponto, hífen ou sublinhado', save: 'Salvar', cancel: 'Cancelar', global: 'Sala global', games: 'Jogos', gamesNone: 'Ainda não há salas de jogos ativas. Entre em uma pela página do jogo.', gamesHint: 'Cada jogo tem sua sala.', send: 'Enviar', ph: 'Escreva uma mensagem…', online: 'online', older: 'Carregar anteriores', report: 'Denunciar', reportT: 'Por que você está denunciando?', reasons: { spam: 'Spam', insult: 'Insultos ou assédio', sexual: 'Conteúdo sexual', personal: 'Dados pessoais', other: 'Outro motivo' }, reported: 'Denúncia enviada. Obrigado 🙏', welcome: 'Seja gentil: aqui há pessoas de todas as idades.', rules: 'Não compartilhe dados pessoais nem links.', offline: 'Sem conexão. Tentando de novo…', you: 'Você', edit: 'Mudar nome ou avatar', signout: 'Sair', admin: 'Painel de admin', gameRoom: 'Sala de', err: { auth_failed: 'Não foi possível verificar sua conta. Entre de novo.', banned: 'Sua conta não pode usar o chat.', muted: 'Você está silenciado por um tempo.', rate: 'Você está indo rápido demais. Espere alguns segundos.', duplicate: 'Você já enviou isso.', too_long: 'Mensagem longa demais (máx. 300).', need_username: 'Escolha um nome primeiro.', not_joined: 'Entre na sala primeiro.', no_room: 'Essa sala não existe.', room_name: 'Nome de sala não permitido.', rooms_full: 'Salas demais.', too_many_tabs: 'Abas demais abertas.', too_many_rooms: 'Salas demais abertas.', name_length: 'O nome deve ter de 3 a 20 caracteres.', name_chars: 'Só letras, números, ponto, hífen e sublinhado (sem espaços).', name_reserved: 'Esse nome é reservado.', name_profanity: 'Esse nome não é permitido.', name_link: 'Um nome não pode ser um link.', name_taken: 'Esse nome já está em uso (ou é parecido demais com outro).', name_cooldown: 'Você só pode mudar o nome uma vez por semana.', bad_avatar: 'Avatar inválido.', own_message: 'Você não pode denunciar a própria mensagem.', already_reported: 'Já denunciado.', forbidden: 'Não permitido.', server_error: 'Erro do servidor. Tente de novo.', bad_request: 'Pedido inválido.', blocked: { profanity: 'Essa mensagem tem linguagem não permitida.', link: 'Não é possível enviar links nem e-mails.', contact: 'Não compartilhe telefones, usuários nem outras redes.', empty: 'Escreva algo.' } } }
+};
+var T = TXT[lang];
+function errText(code, why) { var e = T.err[code]; if (code === 'blocked') return T.err.blocked[why] || T.err.blocked.profanity; return typeof e === 'string' ? e : (T.err.server_error); }
+
+// ---- avatares prediseñados (no se suben imágenes: nada que moderar) ----
+var AV_EMOJI = ['🐱', '🐶', '🦊', '🐼', '🐸', '🦁', '🐯', '🐵', '🐧', '🦄', '🐙', '🦖', '🚀', '👾', '🤖', '🎮', '⚽', '🎧', '🍕', '🌈', '🔥', '⭐', '🍉', '🧊'];
+var AV_COLORS = [['#ef4444', '#7f1d1d'], ['#f97316', '#7c2d12'], ['#eab308', '#713f12'], ['#22c55e', '#14532d'], ['#14b8a6', '#134e4a'], ['#3b82f6', '#1e3a8a'], ['#8b5cf6', '#4c1d95'], ['#ec4899', '#831843']];
+function avStyle(id) { var n = parseInt(String(id).slice(1), 10) || 1, c = AV_COLORS[(n - 1) % AV_COLORS.length]; return 'background:linear-gradient(135deg,' + c[0] + ',' + c[1] + ')'; }
+function avEmoji(id) { return AV_EMOJI[(parseInt(String(id).slice(1), 10) || 1) - 1] || '🙂'; }
+function avatar(id) { var d = document.createElement('div'); d.className = 'av'; d.setAttribute('style', avStyle(id)); d.textContent = avEmoji(id); return d; }
+
+// ---- estado ----
+var S = { fb: null, user: null, ws: null, authed: false, me: null, avatars: [], rooms: {}, cur: null, retry: 0, reconnect: null, gameRooms: [], wantJoin: null, closing: false };
+var FB_CONFIG = { apiKey: 'AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U', authDomain: 'juanjo-games.firebaseapp.com', projectId: 'juanjo-games', storageBucket: 'juanjo-games.firebasestorage.app', messagingSenderId: '927529249414', appId: '1:927529249414:web:410a686dc7f0da25ec3f07' };
+var FB_BASE = 'https://www.gstatic.com/firebasejs/10.12.5/';
+var WS_URL = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/api/chat/ws';
+
+function toast(msg) { var t = $('#toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(function () { t.style.display = 'none'; }, 3200); }
+function loadScript(src) { return new Promise(function (ok, ko) { var el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = function () { ko(new Error('load ' + src)); }; document.head.appendChild(el); }); }
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+// ---- compuerta (inicio de sesión / perfil / conectando) ----
+function gate(kind, msg) {
+  var g = $('#gate'), c = $('#card');
+  c.textContent = '';
+  if (!kind) { g.classList.remove('on'); return; }
+  g.classList.add('on');
+  if (kind === 'loading') { c.appendChild(el('h1', null, T.loading)); if (msg) c.appendChild(el('p', null, msg)); return; }
+  if (kind === 'signin') {
+    c.appendChild(el('h1', null, '💬 ' + T.signinH)); c.appendChild(el('p', null, T.signinP));
+    if (msg) c.appendChild(el('div', 'error', msg));
+    var b = el('button', 'btn', T.signin); b.id = 'signinBtn'; c.appendChild(b);
+    b.addEventListener('click', signIn);
+    return;
+  }
+  if (kind === 'profile') {
+    var editing = !!(S.me && S.me.username);
+    c.appendChild(el('h1', null, T.profH)); c.appendChild(el('p', null, T.profP));
+    var inp = el('input', 'field'); inp.id = 'nameIn'; inp.maxLength = 20; inp.placeholder = T.name; inp.autocomplete = 'off'; inp.spellcheck = false; inp.value = (S.me && S.me.username) || '';
+    c.appendChild(inp); c.appendChild(el('p', null, T.nameHint));
+    var avs = el('div'); avs.id = 'avs'; var pick = (S.me && S.me.avatar) || 'a01';
+    (S.avatars.length ? S.avatars : AV_EMOJI.map(function (_, i) { return 'a' + String(i + 1).padStart(2, '0'); })).forEach(function (id) {
+      var b = el('button', id === pick ? 'on' : '', avEmoji(id)); b.type = 'button'; b.setAttribute('style', avStyle(id)); b.setAttribute('data-av', id);
+      b.addEventListener('click', function () { pick = id; [].forEach.call(avs.children, function (x) { x.classList.toggle('on', x === b); }); });
+      avs.appendChild(b);
+    });
+    c.appendChild(avs);
+    var er = el('div', 'error', msg || ''); er.id = 'profErr'; c.appendChild(er);
+    var row = el('div'); row.style.cssText = 'display:flex;gap:10px';
+    var ok = el('button', 'btn', T.save); ok.id = 'saveProfile'; row.appendChild(ok);
+    if (editing) { var no = el('button', 'btn ghost', T.cancel); no.addEventListener('click', function () { gate(null); }); row.appendChild(no); }
+    c.appendChild(row);
+    var submit = function () { er.textContent = ''; wsend({ t: 'profile', username: inp.value.trim(), avatar: pick }); };
+    ok.addEventListener('click', submit);
+    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+    setTimeout(function () { inp.focus(); }, 50);
+  }
+}
+
+// ---- Firebase / cuenta ----
+function boot() {
+  gate('loading');
+  var have = window.firebase && window.firebase.auth;
+  (have ? Promise.resolve() : loadScript(FB_BASE + 'firebase-app-compat.js').then(function () { return loadScript(FB_BASE + 'firebase-auth-compat.js'); }))
+    .then(function () {
+      var app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(FB_CONFIG);
+      S.fb = app.auth();
+      S.fb.onAuthStateChanged(function (u) {
+        S.user = u || null;
+        if (!u) { disconnect(true); gate('signin'); $('#me').hidden = true; return; }
+        connect();
+      });
+    }).catch(function () { gate('signin', T.err.server_error); });
+}
+function signIn() {
+  if (!S.fb) return;
+  S.fb.signInWithPopup(new window.firebase.auth.GoogleAuthProvider()).catch(function (e) {
+    if (e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) return;
+    gate('signin', T.err.server_error);
+  });
+}
+
+// ---- conexión ----
+function setState(kind, tip) { var s = $('#state'); s.className = kind || ''; s.title = tip || ''; }
+function wsend(o) { if (S.ws && S.ws.readyState === 1) S.ws.send(JSON.stringify(o)); }
+function disconnect(final) { S.closing = !!final; clearTimeout(S.reconnect); if (S.ws) { try { S.ws.close(); } catch (e) {} } S.ws = null; S.authed = false; }
+function connect() {
+  if (S.ws || !S.user) return;
+  setState('', T.loading);
+  S.closing = false;
+  var ws = new WebSocket(WS_URL);
+  S.ws = ws;
+  ws.onopen = function () {
+    S.user.getIdToken().then(function (tok) { wsend({ t: 'auth', token: tok }); }, function () { gate('signin', T.err.auth_failed); });
+  };
+  ws.onmessage = function (e) { var m; try { m = JSON.parse(e.data); } catch (x) { return; } onMsg(m); };
+  ws.onclose = function () {
+    if (S.ws !== ws) return;
+    S.ws = null; S.authed = false; setState('bad', T.offline);
+    $('#in').disabled = true; $('#go').disabled = true;
+    if (S.closing || S.fatal) return;
+    S.retry = Math.min(S.retry + 1, 6);
+    S.reconnect = setTimeout(connect, Math.min(15000, 800 * Math.pow(2, S.retry)));
+  };
+  ws.onerror = function () {};
+}
+
+function onMsg(m) {
+  switch (m.t) {
+    case 'hello':
+      S.authed = true; S.retry = 0; S.fatal = false; S.me = m.me; S.avatars = m.avatars || []; setState('ok', 'OK'); renderMe();
+      if (!m.me.username) { gate('profile'); return; }
+      gate(null); startRooms(); return;
+    case 'me':
+      S.me = m.me; renderMe();
+      if ($('#card #nameIn')) { gate(null); startRooms(); }
+      return;
+    case 'reset_profile': S.me.username = null; gate('profile'); return;
+    case 'joined': {
+      var r = room(m.room); r.name = m.name; r.kind = m.kind; r.msgs = m.history; r.online = m.online; r.loaded = true; r.more = m.history.length >= 50;
+      renderRooms(); if (S.cur === m.room) { renderTop(); renderMsgs(true); } return;
+    }
+    case 'history': { var h = room(m.room); h.msgs = m.items.concat(h.msgs); h.more = m.items.length >= 50; if (S.cur === m.room) renderMsgs(false, true); return; }
+    case 'msg': { var rm = room(m.room); rm.msgs.push(m.m); if (rm.msgs.length > 400) rm.msgs.shift(); if (S.cur === m.room) { appendMsg(m.m, true); if (m.cid && m.m.uid === (S.me && S.me.uid)) clearInput(m.cid); } return; }
+    case 'del': { var dr = room(m.room); dr.msgs = dr.msgs.filter(function (x) { return x.id !== m.id; }); if (S.cur === m.room) renderMsgs(false); return; }
+    case 'online': { room(m.room).online = m.n; if (S.cur === m.room) renderTop(); renderRooms(); return; }
+    case 'rooms': S.gameRooms = m.game || []; renderRooms(); return;
+    case 'reported': toast(T.reported); return;
+    case 'err': onErr(m); return;
+  }
+}
+function onErr(m) {
+  var code = m.code;
+  if (code === 'auth_failed' || code === 'banned') { S.fatal = true; gate('signin', errText(code)); return; }
+  if ($('#card #nameIn')) { $('#profErr').textContent = code === 'name_cooldown' ? errText(code) : errText(code, m.why); return; }
+  var msg = errText(code, m.why);
+  if (code === 'rate' && m.retry) msg += ' (' + Math.ceil(m.retry / 1000) + 's)';
+  if (code === 'blocked' || code === 'rate' || code === 'duplicate' || code === 'too_long' || code === 'muted') { var c = $('#cnt'); c.className = 'err'; c.textContent = msg; clearTimeout(onErr.t); onErr.t = setTimeout(function () { c.className = ''; c.textContent = ''; updateCount(); }, 4000); return; }
+  toast(msg);
+}
+
+// ---- salas ----
+function room(key) { return S.rooms[key] || (S.rooms[key] = { key: key, name: key, kind: '', msgs: [], online: 0, loaded: false, more: false }); }
+function startRooms() {
+  $('#in').placeholder = T.ph; $('#go').textContent = T.send;
+  // volver a entrar a las salas abiertas tras una reconexión
+  var keys = Object.keys(S.rooms);
+  if (S.wantJoin) { keys.push(S.wantJoin.key); }
+  if (keys.indexOf('global') < 0) keys.unshift('global');
+  keys.forEach(function (k) { if (k === 'global') wsend({ t: 'join', room: 'global' }); else if (k.indexOf('game:') === 0) wsend({ t: 'join', room: k, name: (S.wantJoin && S.wantJoin.key === k ? S.wantJoin.name : S.rooms[k] && S.rooms[k].name) || '' }); });
+  if (S.wantJoin) { S.cur = S.wantJoin.key; S.wantJoin = null; } else if (!S.cur) S.cur = 'global';
+  wsend({ t: 'rooms' });
+  clearInterval(startRooms.iv); startRooms.iv = setInterval(function () { wsend({ t: 'rooms' }); }, 30000);
+  renderRooms(); renderTop(); renderMsgs(true);
+  $('#in').disabled = false; $('#go').disabled = false;
+}
+function openRoom(key, name) {
+  if (key.indexOf('game:') === 0 && !(S.rooms[key] && S.rooms[key].loaded)) wsend({ t: 'join', room: key, name: name || '' });
+  S.cur = key; renderRooms(); renderTop(); renderMsgs(true); $('#side').classList.remove('open'); $('#in').focus();
+}
+function renderRooms() {
+  var box = $('#rooms'); box.textContent = '';
+  var add = function (key, name, icon, n) {
+    var b = el('button', 'room' + (S.cur === key ? ' on' : '')); b.appendChild(el('span', null, icon)); b.appendChild(el('span', 'n', name)); if (n) b.appendChild(el('span', 'c', String(n)));
+    b.addEventListener('click', function () { openRoom(key, name); }); box.appendChild(b);
+  };
+  add('global', T.global, '🌍', room('global').online);
+  box.appendChild(el('div', 'sec', T.games));
+  var seen = {};
+  S.gameRooms.forEach(function (g) { seen[g.key] = 1; add(g.key, g.name, '🎮', g.online); });
+  Object.keys(S.rooms).forEach(function (k) { if (k.indexOf('game:') === 0 && !seen[k]) add(k, S.rooms[k].name, '🎮', S.rooms[k].online); });
+  if (!S.gameRooms.length && !Object.keys(S.rooms).some(function (k) { return k.indexOf('game:') === 0; })) box.appendChild(el('div', 'hint', T.gamesNone));
+}
+function renderTop() {
+  var r = room(S.cur || 'global');
+  $('#title').textContent = r.kind === 'game' ? T.gameRoom + ' ' + r.name : (r.key === 'global' ? T.global : r.name);
+  $('#sub').textContent = r.online ? r.online + ' ' + T.online : '';
+}
+function renderMe() {
+  var b = $('#me'); b.hidden = !S.me || !S.me.username; if (b.hidden) return;
+  b.textContent = ''; b.appendChild(avatar(S.me.avatar)); b.appendChild(el('span', null, S.me.username));
+}
+function fmtTime(ts) { var d = new Date(ts); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function msgNode(m) {
+  var mine = S.me && m.uid === S.me.uid;
+  var d = el('div', 'msg' + (mine ? ' mine' : '')); d.setAttribute('data-id', m.id);
+  d.appendChild(avatar(m.a));
+  var body = el('div', 'body'); var who = el('div', 'who'); who.appendChild(el('b', null, m.u)); who.appendChild(el('time', null, fmtTime(m.ts)));
+  body.appendChild(who); body.appendChild(el('div', 'txt', m.text)); d.appendChild(body);
+  if (!mine) { var r = el('button', 'rep', '⚑'); r.title = T.report; r.setAttribute('aria-label', T.report); r.addEventListener('click', function (e) { e.stopPropagation(); reportMenu(r, m); }); d.appendChild(r); }
+  return d;
+}
+function nearBottom(box) { return box.scrollHeight - box.scrollTop - box.clientHeight < 120; }
+function renderMsgs(toBottom, keepPos) {
+  var box = $('#msgs'), r = room(S.cur || 'global'), prevH = box.scrollHeight;
+  box.textContent = '';
+  if (r.more) { var mb = el('button', 'more', T.older); mb.addEventListener('click', function () { var first = r.msgs[0]; if (first) wsend({ t: 'history', room: r.key, before: first.id }); }); box.appendChild(mb); }
+  box.appendChild(el('div', 'sys', T.welcome + ' ' + T.rules));
+  r.msgs.forEach(function (m) { box.appendChild(msgNode(m)); });
+  if (keepPos) box.scrollTop = box.scrollHeight - prevH; else if (toBottom) box.scrollTop = box.scrollHeight;
+}
+function appendMsg(m, stick) { var box = $('#msgs'), was = nearBottom(box); box.appendChild(msgNode(m)); if (was || (S.me && m.uid === S.me.uid)) box.scrollTop = box.scrollHeight; }
+
+// ---- reportar ----
+function closeMenu() { var m = document.querySelector('.menu'); if (m && m.parentNode) m.parentNode.removeChild(m); }
+function reportMenu(anchor, m) {
+  closeMenu();
+  var menu = el('div', 'menu'); menu.appendChild(el('div', 'h', T.reportT));
+  Object.keys(T.reasons).forEach(function (k) { var b = el('button', null, T.reasons[k]); b.addEventListener('click', function () { closeMenu(); wsend({ t: 'report', id: m.id, reason: k }); }); menu.appendChild(b); });
+  document.body.appendChild(menu);
+  var r = anchor.getBoundingClientRect(); menu.style.top = Math.min(window.innerHeight - menu.offsetHeight - 8, r.bottom + 4) + 'px'; menu.style.left = Math.max(8, Math.min(window.innerWidth - menu.offsetWidth - 8, r.right - menu.offsetWidth)) + 'px';
+}
+document.addEventListener('click', function (e) { if (!e.target.closest('.menu')) closeMenu(); });
+
+// ---- mi perfil / cuenta ----
+$('#me').addEventListener('click', function (e) {
+  e.stopPropagation(); closeMenu();
+  var menu = el('div', 'menu');
+  var add = function (t, fn) { var b = el('button', null, t); b.addEventListener('click', function () { closeMenu(); fn(); }); menu.appendChild(b); };
+  add('✏️ ' + T.edit, function () { gate('profile'); });
+  if (S.me && S.me.admin) add('🛡️ ' + T.admin, function () { location.href = '/admin.html#chat'; });
+  add('↩ ' + T.signout, function () { if (S.fb) S.fb.signOut(); });
+  document.body.appendChild(menu);
+  var r = this.getBoundingClientRect(); menu.style.top = (r.bottom + 6) + 'px'; menu.style.left = Math.max(8, r.right - 220) + 'px'; menu.style.minWidth = '200px';
+});
+
+// ---- escribir ----
+function updateCount() { var v = $('#in').value.length; var c = $('#cnt'); if (c.className === 'err') return; c.textContent = v > 240 ? v + ' / 300' : ''; }
+function clearInput(cid) { if ($('#in').getAttribute('data-cid') === cid) { $('#in').value = ''; $('#in').removeAttribute('data-cid'); updateCount(); } }
+$('#in').addEventListener('input', updateCount);
+$('#composer').addEventListener('submit', function (e) {
+  e.preventDefault();
+  var v = $('#in').value.trim(); if (!v || !S.authed) return;
+  var cid = String(Date.now()) + Math.random().toString(36).slice(2, 6);
+  $('#in').setAttribute('data-cid', cid);
+  wsend({ t: 'send', room: S.cur || 'global', text: v, cid: cid });
+});
+
+$('#menuBtn').addEventListener('click', function () { $('#side').classList.toggle('open'); });
+$('#msgs').addEventListener('click', function () { $('#side').classList.remove('open'); });
+$('#in').placeholder = T.ph; $('#go').textContent = T.send;
+document.addEventListener('visibilitychange', function () { if (!document.hidden && S.user && !S.ws) { clearTimeout(S.reconnect); connect(); } });
+
+// #/game/<slug>/<nombre>: entra a la sala de ese juego (así enlazan los juegos)
+(function () {
+  var m = /^#\/game\/([a-z0-9][a-z0-9-]{0,59})(?:\/(.*))?$/.exec(location.hash || '');
+  if (m) { var name = ''; try { name = decodeURIComponent(m[2] || ''); } catch (e) {} S.wantJoin = { key: 'game:' + m[1], name: name }; }
+})();
+
+if (window.__BUDSIN_CHAT_TEST) { window.__chat = { S: S }; }
+boot();
+})();
+</script>
+<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+</body>
+</html>

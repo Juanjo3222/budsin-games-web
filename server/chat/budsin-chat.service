@@ -1,0 +1,29 @@
+[Unit]
+Description=Budsin Chat - chat en tiempo real (WebSocket + SQLite)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=budsin-chat
+Group=budsin-chat
+EnvironmentFile=/etc/budsin-chat.env
+WorkingDirectory=/opt/budsin-chat/app
+Environment=HOME=/var/lib/budsin-chat
+ExecStart=/usr/local/bin/bun index.ts
+Restart=on-failure
+RestartSec=3
+# Límites para que no pueda afectar a PayPal, a Music ni al sitio
+MemoryMax=384M
+CPUQuota=60%
+TasksMax=100
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadWritePaths=/var/lib/budsin-chat
+
+[Install]
+WantedBy=multi-user.target

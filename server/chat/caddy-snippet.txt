@@ -1,0 +1,10 @@
+	# Budsin Chat: backend local (server/chat). WebSocket en /api/chat/ws; Caddy reenvía la conexión sin cortarla.
+	handle /api/chat/* {
+		header >Cache-Control "no-store"
+		reverse_proxy 127.0.0.1:3104 {
+			flush_interval -1
+			transport http {
+				read_timeout 1h
+			}
+		}
+	}

@@ -1,0 +1,10 @@
+{
+  "name": "budsin-chat",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "bun index.ts",
+    "test": "bun test"
+  }
+}
