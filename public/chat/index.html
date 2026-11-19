@@ -12,106 +12,225 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#121212">
+<meta name="color-scheme" content="light dark">
 <title>Budsin Chat</title>
 <style>
-:root{color-scheme:dark;--bg:#121212;--panel:#181818;--card:#1f1f1f;--line:rgba(255,255,255,.09);--text:#fff;--muted:#a7a7a7;--accent:#25d0b4;--danger:#ff6b6b}
-*{box-sizing:border-box}html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px;overflow:hidden}
-button{font:inherit;color:inherit;cursor:pointer}
-#app{display:grid;grid-template-columns:260px 1fr;height:100%}
-#side{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
-.brand{display:flex;align-items:center;gap:10px;padding:16px 16px 10px;font-weight:800;font-size:1.1rem}
-.brand i{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#25d0b4,#1fa7d8);display:grid;place-items:center;font-style:normal}
-.back{margin:0 16px 8px;color:var(--muted);text-decoration:none;font-size:.82rem}
-.back:hover{color:#fff}
-#rooms{overflow:auto;padding:6px 8px 16px;flex:1}
-.sec{margin:14px 10px 6px;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800}
-.room{display:flex;align-items:center;gap:8px;width:100%;padding:9px 10px;border:0;border-radius:10px;background:none;text-align:left}
-.room:hover{background:rgba(255,255,255,.06)}.room.on{background:rgba(37,208,180,.16)}
-.room .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.room .c{font-size:.72rem;color:var(--muted)}
-.hint{margin:6px 10px;color:var(--muted);font-size:.8rem;line-height:1.4}
-#main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
-#top{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
-#menuBtn{display:none;border:0;background:none;font-size:1.3rem;padding:4px 8px}
-#title{font-weight:800;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#sub{color:var(--muted);font-size:.8rem;white-space:nowrap}
-#top .sp{flex:1}
-#me{display:flex;align-items:center;gap:8px;border:0;background:var(--card);border-radius:999px;padding:4px 12px 4px 4px}
-.av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:1rem;flex:none}
-#state{width:9px;height:9px;border-radius:50%;background:#777}#state.ok{background:#3ddc84}#state.bad{background:var(--danger)}
-#msgs{flex:1;overflow-y:auto;padding:14px 16px 8px;display:flex;flex-direction:column;gap:2px}
-.msg{display:flex;gap:10px;padding:5px 8px;border-radius:10px;position:relative}
-.msg:hover{background:rgba(255,255,255,.04)}.msg .av{margin-top:2px}
-.body{min-width:0}.who{display:flex;gap:8px;align-items:baseline}.who b{font-size:.9rem}.who time{color:var(--muted);font-size:.7rem}
-.txt{overflow-wrap:anywhere;line-height:1.4;white-space:pre-wrap}
-.msg.mine .who b{color:var(--accent)}
-.tools{display:flex;gap:4px;align-items:center}.tool{border:0;background:var(--card);color:var(--text);width:40px;height:40px;border-radius:50%;font-size:1.1rem;display:grid;place-items:center;padding:0}.tool:hover{background:rgba(255,255,255,.12)}.tool[hidden]{display:none}
-.mimg{position:relative;display:inline-block;margin-top:4px;border-radius:12px;overflow:hidden;max-width:min(320px,100%);cursor:zoom-in;background:var(--card)}
-.mimg img{display:block;max-width:100%;max-height:320px;width:auto;height:auto}
-.mimg.blur img{filter:blur(26px) brightness(.8);cursor:pointer}
-.mimg .veil{position:absolute;inset:0;display:none;align-items:center;justify-content:center;text-align:center;font-size:.8rem;font-weight:700;padding:10px;background:rgba(0,0,0,.25);cursor:pointer}
-.mimg.blur .veil{display:flex}
-.stk{margin-top:4px;position:relative;display:inline-block}.stk img{width:140px;height:140px;object-fit:contain;display:block}.stk.blur img{filter:blur(18px)}.stk .veil{position:absolute;inset:0;display:none;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;text-align:center;cursor:pointer}.stk.blur .veil{display:flex}
-.stk .save{position:absolute;right:0;top:0;border:0;background:var(--card);border-radius:50%;width:26px;height:26px;opacity:0;padding:0}.stk:hover .save{opacity:1}
-.pst{font-size:76px;line-height:1.1;margin-top:2px}
-.aud{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:999px;padding:6px 14px 6px 6px;margin-top:4px;width:min(300px,100%)}
-.aud button{border:0;background:var(--accent);color:#000;width:34px;height:34px;border-radius:50%;font-size:.95rem;padding:0;flex:none}
-.aud .bar{flex:1;height:5px;border-radius:5px;background:rgba(255,255,255,.18);position:relative;cursor:pointer}.aud .bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:5px;background:var(--accent)}.aud time{font-size:.75rem;color:var(--muted);min-width:34px;text-align:right}
-.hid{margin-top:4px;color:var(--muted);font-size:.85rem;border:1px dashed var(--line);border-radius:10px;padding:8px 12px;display:inline-block}
-#panel{position:fixed;left:14px;bottom:78px;width:min(360px,calc(100vw - 28px));max-height:min(420px,60vh);background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.55);z-index:25;display:none;flex-direction:column;overflow:hidden}
-#panel.on{display:flex}#panel .tabs{display:flex;gap:4px;padding:8px;overflow-x:auto;border-bottom:1px solid var(--line)}#panel .tabs button{border:0;background:none;border-radius:999px;padding:6px 12px;white-space:nowrap;color:var(--muted)}#panel .tabs button.on{background:var(--accent);color:#000;font-weight:700}
-#panel .grid{padding:10px;overflow-y:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-#panel .grid button{border:0;background:rgba(255,255,255,.05);border-radius:12px;aspect-ratio:1;padding:0;font-size:2.2rem;position:relative;display:grid;place-items:center}#panel .grid button:hover{background:rgba(255,255,255,.12)}
-#panel .grid img{width:100%;height:100%;object-fit:contain;border-radius:10px}#panel .grid .x{position:absolute;right:2px;top:2px;width:22px;height:22px;border-radius:50%;background:var(--bg);font-size:.7rem;display:none}#panel .grid button:hover .x{display:grid;place-items:center}
-#panel .grid .add{font-size:1.6rem;color:var(--accent)}#panel .note{padding:10px 14px;color:var(--muted);font-size:.8rem;line-height:1.4}
-#rec{flex:1;display:none;align-items:center;gap:10px;background:var(--card);border-radius:999px;padding:6px 8px 6px 16px}#rec.on{display:flex}
-#rec .dot{width:10px;height:10px;border-radius:50%;background:var(--danger);animation:blink 1s infinite}@keyframes blink{50%{opacity:.25}}
-#rec audio{height:34px;flex:1;min-width:0}#rec .t{font-variant-numeric:tabular-nums;flex:1}
-#rec button{border:0;border-radius:999px;padding:8px 14px;font-weight:700}
-#lb{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.9);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}#lb.on{display:flex}#lb img{max-width:100%;max-height:100%;border-radius:8px}
-.trk{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 10px 8px 8px;margin-top:4px;width:min(340px,100%)}
-.trk img{width:52px;height:52px;border-radius:8px;object-fit:cover;background:#222;flex:none}.trk .ti{min-width:0;flex:1}.trk .ti b{display:block;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trk .ti span{display:block;font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trk .ti small{color:#25d0b4;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.trk button,.trk a{border:0;background:var(--accent);color:#000;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;padding:0;font-size:.95rem;text-decoration:none;flex:none}.trk a{background:rgba(255,255,255,.1);color:#fff}
-.dest{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto}.dest button{border:0;background:var(--bg);border-radius:12px;padding:11px 14px;text-align:left;display:flex;gap:10px;align-items:center}.dest button:hover{background:rgba(255,255,255,.08)}
-body.has-bmmini #app{height:calc(100% - 92px)}#bm-mini:not(.bm-game){bottom:10px!important}
-.uname{cursor:pointer}.uname:hover{text-decoration:underline}
-.mini{border:0;background:rgba(255,255,255,.1);border-radius:50%;width:24px;height:24px;padding:0;line-height:1;margin-left:4px}.mini.ok{background:var(--accent);color:#000}
-.dot{width:8px;height:8px;border-radius:50%;background:#555;flex:none}.dot.on{background:#3ddc84}
-.badge{background:var(--danger);color:#fff;border-radius:999px;font-size:.7rem;padding:1px 7px;font-weight:700}
-.room .av{width:22px;height:22px;font-size:.8rem}
-.rep{position:absolute;right:8px;top:2px;border:0;background:var(--card);border-radius:8px;padding:2px 8px;font-size:.8rem;opacity:0;color:var(--muted)}
-.msg:hover .rep,.rep:focus{opacity:1}
-.more{align-self:center;border:0;background:var(--card);color:var(--muted);border-radius:999px;padding:6px 14px;margin-bottom:8px;font-size:.8rem}
-.sys{align-self:center;color:var(--muted);font-size:.8rem;margin:8px 0}
-#composer{display:flex;flex-wrap:wrap;gap:8px;padding:10px 70px 14px 14px;border-top:1px solid var(--line);background:var(--panel)}
-#in{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:999px;color:inherit;padding:11px 16px;font:inherit;outline:none}
-#in:focus{border-color:var(--accent)}
-#go{border:0;border-radius:999px;background:var(--accent);color:#000;font-weight:800;padding:0 20px}
-#go:disabled{opacity:.4;cursor:default}
-#cnt{width:100%;font-size:.72rem;color:var(--muted);padding-left:16px;min-height:1em}#cnt.err{color:var(--danger)}
-#gate{position:absolute;inset:0;z-index:5;background:rgba(18,18,18,.97);display:none;align-items:center;justify-content:center;padding:20px;overflow:auto}
-#gate.on{display:flex}
-.card{width:min(460px,100%);background:var(--card);border-radius:18px;padding:26px;display:flex;flex-direction:column;gap:14px;border:1px solid var(--line)}
-.card h1{margin:0;font-size:1.4rem}.card p{margin:0;color:var(--muted);line-height:1.5}
-.btn{border:0;border-radius:999px;background:var(--accent);color:#000;font-weight:800;padding:12px 20px;letter-spacing:.03em}
-.btn.ghost{background:none;border:1px solid var(--line);color:var(--text)}
-.field{background:var(--bg);border:1px solid var(--line);border-radius:12px;color:inherit;padding:12px 14px;font:inherit;width:100%;outline:none}.field:focus{border-color:var(--accent)}
-#avs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-#avs button{aspect-ratio:1;border-radius:50%;border:2px solid transparent;display:grid;place-items:center;font-size:1.4rem;padding:0}
-#avs button.on{border-color:#fff}
-.error{color:var(--danger);font-size:.85rem;min-height:1.2em}
-#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#000;padding:9px 16px;border-radius:999px;font-weight:600;font-size:.85rem;z-index:30;display:none;max-width:90vw}
-.menu{position:fixed;z-index:40;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
-.menu button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 14px;border-radius:8px}.menu button:hover{background:rgba(255,255,255,.08)}
-.menu .h{padding:6px 14px;color:var(--muted);font-size:.75rem}
-@media(max-width:760px){
-  #app{grid-template-columns:1fr}
-  #side{position:fixed;inset:0 25% 0 0;z-index:20;transform:translateX(-102%);transition:transform .2s;width:auto;box-shadow:0 0 40px rgba(0,0,0,.6)}
-  #side.open{transform:none}
-  #menuBtn{display:block}
-  #composer{padding-right:64px}
-  #me span{display:none}#me{padding:4px}
+:root{
+  color-scheme:light dark;
+  --bg:#f4f1ea;--surface:#fffdf8;--side:#ebe6db;--line:#d6cfc0;--line2:#e7e1d5;
+  --text:#1d1b17;--muted:#6b655a;--accent:#17695a;--accent-ink:#fff;--accent-soft:#d8e9e3;
+  --mention:#fbe6b0;--mention-bar:#c78a0b;--danger:#b3261e;--ok:#2e7d4f;--hover:rgba(40,30,10,.05);
+  --shadow:0 6px 20px rgba(40,30,10,.16);
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#151412;--surface:#1b1a17;--side:#110f0e;--line:#302d28;--line2:#25231f;
+  --text:#ece7dd;--muted:#9b9488;--accent:#62c4ac;--accent-ink:#0b1814;--accent-soft:#1c322c;
+  --mention:#3b3216;--mention-bar:#d9a130;--danger:#ff8d83;--ok:#74d29b;--hover:rgba(255,245,225,.055);
+  --shadow:0 8px 26px rgba(0,0,0,.55);}}
+:root[data-theme="dark"]{
+  --bg:#151412;--surface:#1b1a17;--side:#110f0e;--line:#302d28;--line2:#25231f;
+  --text:#ece7dd;--muted:#9b9488;--accent:#62c4ac;--accent-ink:#0b1814;--accent-soft:#1c322c;
+  --mention:#3b3216;--mention-bar:#d9a130;--danger:#ff8d83;--ok:#74d29b;--hover:rgba(255,245,225,.055);
+  --shadow:0 8px 26px rgba(0,0,0,.55);}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.45 var(--font);overflow:hidden;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit;color:inherit}
+.ic{width:18px;height:18px;flex:none;display:inline-block;vertical-align:middle}
+.ic.sm{width:15px;height:15px}
+#app{display:grid;grid-template-columns:248px 1fr;height:100%}
+
+/* ---------- barra lateral ---------- */
+#side{background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.ws{display:flex;align-items:center;gap:9px;padding:14px 16px 4px}
+.ws .mark{width:24px;height:24px;border-radius:5px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:13px;display:grid;place-items:center}
+.ws b{font-weight:600;font-size:15px}
+.back{display:block;padding:2px 16px 10px;color:var(--muted);text-decoration:none;font-size:12.5px}
+.back:hover{color:var(--text);text-decoration:underline}
+#rooms{flex:1;overflow:auto;padding:2px 8px 10px}
+.sec{display:flex;align-items:center;justify-content:space-between;padding:14px 6px 3px;font-size:12px;font-weight:600;color:var(--muted)}
+.sec button{border:0;background:none;color:var(--muted);width:22px;height:22px;border-radius:4px;display:grid;place-items:center;padding:0}
+.sec button:hover{background:var(--hover);color:var(--text)}
+.room{display:flex;align-items:center;gap:8px;width:100%;height:30px;padding:0 8px;border:0;border-radius:5px;background:none;text-align:left;color:var(--muted)}
+.room:hover{background:var(--hover);color:var(--text)}
+.room.on{background:var(--accent-soft);color:var(--text);font-weight:600}
+.room.unread{color:var(--text);font-weight:600}
+.room .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.room .c{font-size:11.5px;color:var(--muted);font-weight:400}
+.room .av{width:20px;height:20px;border-radius:5px;font-size:12px}
+.badge{min-width:18px;height:18px;border-radius:9px;padding:0 5px;background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:700;display:grid;place-items:center}
+.badge.mention{background:var(--danger);color:#fff}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--line);flex:none}.dot.on{background:var(--ok)}
+.item{display:flex;align-items:center;gap:6px;height:30px;padding:0 8px;border-radius:5px;color:var(--muted)}
+.item .n{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .mini{margin-left:auto}
+.hint{padding:4px 8px;color:var(--muted);font-size:12.5px;line-height:1.4}
+.mini{border:1px solid var(--line);background:var(--surface);border-radius:4px;width:24px;height:24px;padding:0;display:grid;place-items:center;font-size:12px}
+.mini.ok{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+#meBar{border-top:1px solid var(--line);padding:8px}
+#me{display:flex;align-items:center;gap:9px;width:100%;border:0;background:none;border-radius:6px;padding:5px 6px;text-align:left}
+#me:hover{background:var(--hover)}
+#me .nm{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#me small{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
+
+/* ---------- avatares planos ---------- */
+.av{width:36px;height:36px;border-radius:8px;display:grid;place-items:center;font-size:20px;line-height:1;flex:none;user-select:none}
+
+/* ---------- zona principal ---------- */
+#main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative;background:var(--surface)}
+#top{display:flex;align-items:center;gap:10px;height:48px;padding:0 14px 0 16px;border-bottom:1px solid var(--line);flex:none}
+#menuBtn{display:none}
+#title{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#sub{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.tag{border:1px solid var(--line);border-radius:4px;padding:0 6px;font-size:11.5px;color:var(--muted);height:20px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+#top .sp{flex:1}
+.ib{border:0;background:none;color:var(--muted);width:32px;height:32px;border-radius:6px;display:grid;place-items:center;padding:0}
+.ib:hover{background:var(--hover);color:var(--text)}.ib[hidden]{display:none}
+.ib.has{color:var(--accent)}
+#pinbar{border-bottom:1px solid var(--line);background:var(--accent-soft);padding:6px 16px;font-size:13px;display:flex;align-items:center;gap:8px;cursor:pointer;flex:none}
+#pinbar[hidden]{display:none}#pinbar .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#pinbar b{font-weight:600}
+#msgs{flex:1;overflow-y:auto;padding:6px 0 4px;position:relative}
+.empty{padding:40px 16px;color:var(--muted);text-align:center}
+.intro{padding:14px 16px 6px;color:var(--muted);font-size:12.5px}
+.more{display:block;margin:6px auto;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:6px;padding:4px 12px;font-size:12.5px}
+.day,.newdiv{position:relative;text-align:center;margin:14px 16px 6px;font-size:12px;font-weight:600;color:var(--muted)}
+.day::before,.newdiv::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px solid var(--line2)}
+.day span,.newdiv span{position:relative;background:var(--surface);padding:0 10px}
+.newdiv{color:var(--danger)}.newdiv::before{border-color:var(--danger);opacity:.55}
+
+/* ---------- mensajes ---------- */
+.msg{position:relative;display:grid;grid-template-columns:68px 1fr;padding:2px 16px 2px 0}
+.msg:not(.cont){margin-top:10px}
+.msg:hover{background:var(--hover)}
+.msg .av{margin-left:16px;margin-top:2px}
+.msg .gt{position:absolute;left:0;top:5px;width:64px;text-align:right;font-size:11px;color:var(--muted);display:none}
+.msg:hover .gt{display:block}
+.msg.mention{background:var(--mention);box-shadow:inset 3px 0 var(--mention-bar)}
+.msg.flash{animation:flash 1.4s ease-out}
+@keyframes flash{0%{background:var(--mention)}100%{background:transparent}}
+.body{min-width:0}
+.who{display:flex;align-items:baseline;gap:7px;line-height:1.3}
+.who b{font-weight:600}.who b.uname{cursor:pointer}.who b.uname:hover{text-decoration:underline}
+.msg.mine .who b{color:var(--accent)}
+.who time,.etag{font-size:11.5px;color:var(--muted);font-weight:400}
+.txt{white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word}
+.mn{background:var(--mention);border-radius:3px;padding:0 2px;font-weight:500}
+.mn.me{font-weight:700}
+.quote{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--muted);border-left:2px solid var(--line);padding-left:8px;margin:0 0 2px;cursor:pointer;max-width:560px}
+.quote b{color:var(--text);font-weight:600;white-space:nowrap}.quote span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.quote.gone{font-style:italic;cursor:default}
+.ht{position:absolute;top:-15px;right:16px;display:none;background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:var(--shadow);padding:2px;gap:1px;z-index:3}
+.msg:hover .ht,.msg:focus-within .ht{display:flex}
+.ht button{border:0;background:none;color:var(--muted);width:28px;height:28px;border-radius:4px;display:grid;place-items:center;padding:0}
+.ht button:hover{background:var(--hover);color:var(--text)}
+.rxs{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.rx{height:24px;padding:0 8px;border:1px solid var(--line);border-radius:12px;background:var(--surface);display:inline-flex;align-items:center;gap:5px;font-size:13px}
+.rx small{font-size:12px;color:var(--muted);font-weight:600}
+.rx.me{border-color:var(--accent);background:var(--accent-soft)}.rx.me small{color:var(--accent)}
+.rx:hover{border-color:var(--muted)}
+
+/* ---------- multimedia ---------- */
+.mimg{position:relative;display:inline-block;margin-top:4px;border-radius:6px;overflow:hidden;max-width:min(320px,100%);cursor:zoom-in;border:1px solid var(--line);background:var(--line2)}
+.mimg img{display:block;max-width:100%;max-height:320px;width:auto;height:auto}
+.mimg.blur img,.stk.blur img{filter:blur(24px) brightness(.85)}.mimg.blur,.stk.blur{cursor:pointer}
+.veil{position:absolute;inset:0;display:none;align-items:center;justify-content:center;gap:6px;text-align:center;font-size:12.5px;font-weight:600;padding:10px;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6);cursor:pointer}
+.blur .veil{display:flex}
+.stk{margin-top:4px;position:relative;display:inline-block}.stk img{width:132px;height:132px;object-fit:contain;display:block}
+.stk .save{position:absolute;right:0;top:0;border:1px solid var(--line);background:var(--surface);border-radius:5px;width:26px;height:26px;opacity:0;padding:0;display:grid;place-items:center;color:var(--text)}.stk:hover .save{opacity:1}
+.pst{font-size:64px;line-height:1.15;margin-top:2px}
+.aud{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:6px 12px 6px 6px;margin-top:4px;width:min(300px,100%);background:var(--surface)}
+.aud button{border:0;background:var(--accent);color:var(--accent-ink);width:32px;height:32px;border-radius:6px;padding:0;display:grid;place-items:center;flex:none}
+.aud .bar{flex:1;height:4px;border-radius:2px;background:var(--line);position:relative;cursor:pointer}.aud .bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:2px;background:var(--accent)}
+.aud time{font-size:12px;color:var(--muted);min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+.trk{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:8px;margin-top:4px;width:min(340px,100%);background:var(--surface)}
+.trk img{width:48px;height:48px;border-radius:5px;object-fit:cover;background:var(--line2);flex:none}
+.trk .ti{min-width:0;flex:1}.trk .ti small{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--muted)}
+.trk .ti b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.trk .ti span{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.trk button,.trk a{border:1px solid var(--line);background:var(--surface);color:var(--text);width:32px;height:32px;border-radius:6px;display:grid;place-items:center;padding:0;text-decoration:none;flex:none}
+.trk button{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.hid{margin-top:4px;color:var(--muted);font-size:13px;border:1px dashed var(--line);border-radius:6px;padding:6px 10px;display:inline-block}
+.gonemsg{font-style:italic;color:var(--muted)}
+
+/* ---------- escribiendo, ir al final, redactar ---------- */
+#jump{position:absolute;right:22px;bottom:104px;z-index:4;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:16px;height:30px;padding:0 12px 0 8px;display:none;align-items:center;gap:4px;font-size:12.5px;font-weight:600;box-shadow:var(--shadow)}
+#jump.on{display:inline-flex}
+#typing{height:20px;padding:0 18px;font-size:12.5px;color:var(--muted);flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#composer{padding:0 16px 14px;flex:none;position:relative}
+#composer .box{border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
+#composer .box:focus-within{border-color:var(--accent)}
+#ctx{display:none;align-items:center;gap:8px;padding:6px 10px;background:var(--hover);border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+#ctx.on{display:flex}#ctx .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#ctx b{color:var(--text);font-weight:600}
+#row{display:flex;align-items:center;gap:2px;padding:4px 6px 4px 4px}
+.tool{border:0;background:none;color:var(--muted);width:32px;height:32px;border-radius:6px;display:grid;place-items:center;padding:0;flex:none}
+.tool:hover{background:var(--hover);color:var(--text)}.tool[hidden]{display:none}.tool:disabled{opacity:.4;cursor:default}
+#in{flex:1;min-width:0;border:0;background:transparent;padding:8px 6px;outline:none}
+#go{border:0;border-radius:6px;background:var(--accent);color:var(--accent-ink);font-weight:600;height:32px;padding:0 14px;display:flex;align-items:center;gap:6px}
+#go:disabled{opacity:.4;cursor:default}
+#cnt{min-height:18px;font-size:12px;color:var(--muted);padding:3px 2px 0}#cnt.err{color:var(--danger)}
+#rec{flex:1;display:none;align-items:center;gap:10px;padding:2px 8px}#rec.on{display:flex}
+#rec .dotr{width:9px;height:9px;border-radius:50%;background:var(--danger);animation:blink 1s infinite}@keyframes blink{50%{opacity:.25}}
+#rec audio{height:32px;flex:1;min-width:0}#rec .t{flex:1;font-variant-numeric:tabular-nums}
+#rec button{border:1px solid var(--line);background:var(--surface);border-radius:6px;height:30px;padding:0 12px;font-weight:600}
+#ment{position:absolute;left:62px;bottom:62px;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:4px;min-width:200px;display:none;z-index:25}
+#ment.on{display:block}#ment button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;text-align:left;padding:6px 8px;border-radius:5px}
+#ment button.sel,#ment button:hover{background:var(--accent-soft)}
+
+/* ---------- paneles, menús, avisos ---------- */
+#panel{position:absolute;left:16px;bottom:66px;width:min(344px,calc(100% - 32px));max-height:min(380px,60vh);background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);z-index:25;display:none;flex-direction:column;overflow:hidden}
+#panel.on{display:flex}
+#panel .tabs{display:flex;gap:2px;padding:6px;overflow-x:auto;border-bottom:1px solid var(--line)}
+#panel .tabs button{border:0;background:none;border-radius:5px;padding:5px 10px;white-space:nowrap;color:var(--muted);font-size:13px}
+#panel .tabs button.on{background:var(--accent-soft);color:var(--text);font-weight:600}
+#panel .grid{padding:8px;overflow-y:auto;display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+#panel .grid.big{grid-template-columns:repeat(4,1fr)}
+#panel .grid button{border:0;background:none;border-radius:6px;aspect-ratio:1;padding:0;font-size:1.5rem;position:relative;display:grid;place-items:center}
+#panel .grid.big button{font-size:2.1rem}
+#panel .grid button:hover{background:var(--hover)}
+#panel .grid img{width:100%;height:100%;object-fit:contain;border-radius:5px}
+#panel .grid .x{position:absolute;right:1px;top:1px;width:20px;height:20px;border-radius:4px;background:var(--surface);border:1px solid var(--line);display:none;place-items:center}
+#panel .grid button:hover .x{display:grid}
+#panel .grid .add{border:1px dashed var(--line);color:var(--accent)}
+#panel .note{padding:8px 12px;color:var(--muted);font-size:12.5px;line-height:1.4}
+.menu{position:fixed;z-index:60;background:var(--surface);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);padding:4px;min-width:190px}
+.menu button{display:flex;align-items:center;gap:9px;width:100%;text-align:left;border:0;background:none;padding:7px 10px;border-radius:5px}
+.menu button:hover{background:var(--hover)}.menu button.danger{color:var(--danger)}
+.menu .h{padding:6px 10px 4px;color:var(--muted);font-size:12px}
+.menu hr{border:0;border-top:1px solid var(--line2);margin:4px 0}
+.menu .emo{display:flex;gap:2px;padding:2px}.menu .emo button{width:34px;height:34px;justify-content:center;padding:0;font-size:1.2rem}
+#toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:var(--text);color:var(--surface);padding:8px 14px;border-radius:6px;font-size:13px;z-index:80;display:none;max-width:90vw}
+#lb{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}#lb.on{display:flex}#lb img{max-width:100%;max-height:100%;border-radius:6px}
+
+/* ---------- pantallas de entrada y cuadros ---------- */
+#gate{position:absolute;inset:0;z-index:40;background:var(--bg);display:none;align-items:center;justify-content:center;padding:20px;overflow:auto}
+#gate.on{display:flex}
+.card{width:min(440px,100%);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.card h1{margin:0;font-size:18px;font-weight:600}
+.card p{margin:0;color:var(--muted);line-height:1.5}
+.btn{border:1px solid var(--accent);border-radius:6px;background:var(--accent);color:var(--accent-ink);font-weight:600;padding:8px 16px}
+.btn.ghost{background:none;border-color:var(--line);color:var(--text);font-weight:500}
+.field{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:9px 10px;width:100%;outline:none}.field:focus{border-color:var(--accent)}
+#avs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+#avs button{aspect-ratio:1;border-radius:8px;border:2px solid transparent;display:grid;place-items:center;font-size:1.4rem;padding:0}
+#avs button.on{border-color:var(--text)}
+.error{color:var(--danger);font-size:13px;min-height:1.2em}
+.dest{display:flex;flex-direction:column;gap:4px;max-height:40vh;overflow:auto}
+.dest button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:9px 12px;text-align:left;display:flex;gap:9px;align-items:center}.dest button:hover{background:var(--hover)}
+.row2{display:flex;gap:8px}
+
+@media (max-width:760px){
+  #app{grid-template-columns:1fr}
+  #side{position:fixed;inset:0 22% 0 0;z-index:30;transform:translateX(-102%);transition:transform .18s;box-shadow:var(--shadow)}
+  #side.open{transform:none}
+  #menuBtn{display:grid}
+  .msg{grid-template-columns:56px 1fr}.msg .av{margin-left:10px}.msg .gt{width:52px}
+  #composer{padding:0 10px 10px}
+  #jump{right:14px}
+  .ht{right:8px}
+}
+body.has-bmmini #app{height:calc(100% - 92px)}
+#bm-mini:not(.bm-game){bottom:10px!important}
 </style>
 </head>
 <body>
@@ -121,107 +240,164 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
 <div id="app">
   <aside id="side">
-    <div class="brand"><i>💬</i><span>Budsin Chat</span></div>
-    <a class="back" id="backLink" href="https://games.budsin.dev/">← Budsin Games</a>
-    <div id="rooms"></div>
+    <div class="ws"><span class="mark">B</span><b>Budsin Chat</b></div>
+    <a class="back" id="backLink" href="https://games.budsin.dev/">Volver a Budsin Games</a>
+    <nav id="rooms"></nav>
+    <div id="meBar"><button id="me" type="button" hidden></button></div>
   </aside>
   <main id="main">
-    <div id="top">
-      <button id="menuBtn" aria-label="Menu">☰</button>
-      <div id="title">Budsin Chat</div><div id="sub"></div>
-      <button id="manage" hidden style="border:0;background:var(--card);border-radius:999px;padding:5px 12px;font-size:.8rem">⚙ <span id="manageT"></span></button>
-      <span id="state" title=""></span>
+    <header id="top">
+      <button id="menuBtn" class="ib" type="button" aria-label="Menu"></button>
+      <div id="title">Budsin Chat</div><div id="sub"></div><span class="tag" id="slowTag" hidden></span>
       <div class="sp"></div>
-      <button id="me" hidden></button>
-    </div>
+      <button id="manage" class="ib" type="button" hidden></button>
+    </header>
+    <div id="pinbar" hidden></div>
     <div id="msgs" aria-live="polite"></div>
+    <button id="jump" type="button"><span></span></button>
+    <div id="typing" aria-live="polite"></div>
     <form id="composer" autocomplete="off">
-      <div class="tools"><button type="button" class="tool" id="bAttach" title="" disabled>📎</button><button type="button" class="tool" id="bStk" title="" disabled>🙂</button><button type="button" class="tool" id="bMic" title="" hidden disabled>🎤</button></div>
-      <input id="in" maxlength="300" disabled>
-      <div id="rec"><span class="dot"></span><span class="t" id="recT">0:00</span><audio id="recA" controls hidden></audio><button type="button" id="recCancel">✕</button><button type="button" id="recStop" style="background:var(--danger);color:#fff">■</button><button type="button" id="recSend" style="background:var(--accent);color:#000" hidden></button></div>
-      <button id="go" disabled></button>
+      <div class="box">
+        <div id="ctx"></div>
+        <div id="row">
+          <button type="button" class="tool" id="bAttach" disabled></button>
+          <button type="button" class="tool" id="bStk" disabled></button>
+          <button type="button" class="tool" id="bMic" hidden disabled></button>
+          <input id="in" maxlength="300" disabled>
+          <div id="rec"><span class="dotr"></span><span class="t" id="recT">0:00</span><audio id="recA" controls hidden></audio><button type="button" id="recCancel"></button><button type="button" id="recStop"></button><button type="button" id="recSend" hidden></button></div>
+          <button id="go" type="submit" disabled>Enviar</button>
+        </div>
+      </div>
       <div id="cnt"></div>
+      <div id="ment"></div>
+      <div id="panel" role="dialog"></div>
       <input type="file" id="fileImg" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
       <input type="file" id="fileStk" accept="image/png,image/jpeg,image/gif,image/webp" hidden>
     </form>
-    <div id="panel" role="dialog"></div>
     <div id="gate" class="on"><div class="card" id="card"></div></div>
   </main>
 </div>
 <div id="toast" role="status"></div>
 <div id="lb" role="dialog"><img alt=""></div>
 <script>
+var TXT = {"es":{"shareH":"Compartir canción","shareP":"Elige dónde quieres compartirla.","shareDone":"Canción compartida","listen":"Escuchar","openMusic":"Abrir en Budsin Music","shareNone":"No hay ninguna canción para compartir.","attach":"Enviar una imagen","stickers":"Stickers","mic":"Nota de voz","uploading":"Subiendo…","mySt":"Mis stickers","createSt":"Crear sticker","stNote":"Crea stickers con tus imágenes (hasta 24). Se revisan antes de guardarse.","saveSt":"Guardar sticker","hiddenMedia":"Contenido oculto mientras se revisa","tapView":"Toca para ver","rec":"Grabando…","sendVoice":"Enviar nota de voz","micDenied":"No pude usar el micrófono. Revisa el permiso del navegador.","voiceOnly":"Las notas de voz solo están en chats privados y grupos de clase.","packs":{"react":"Reacciones","game":"Gaming","animal":"Animales","food":"Comida"},"gameBtn":"Botón de chat en los juegos","friends":"Amigos","addFriend":"Agregar amigo","friendH":"Agrega un amigo","friendP":"Escribe su nombre de usuario exacto. Solo podrán escribirse por privado cuando acepte.","friendName":"Nombre de usuario","sendReq":"Enviar solicitud","reqSent":"Solicitud enviada","requests":"Solicitudes","pending":"Enviada","friendNone":"Aún no tienes amigos.","dmWith":"Chat con","removeFriend":"Quitar amigo","blockUser":"Bloquear","blockedL":"Bloqueados","unblock":"Desbloquear","blockedNone":"No has bloqueado a nadie.","addToFriends":"Agregar amigo","blockAsk":"¿Bloquear a esta persona? Ya no podrá escribirte y no verás sus mensajes.","removeAsk":"¿Quitar a este amigo? Se cierra el chat privado.","newDm":"te escribió","unreadMsg":"Mensaje nuevo de","classes":"Grupos de clase","newClass":"Nuevo grupo","joinClass":"Unirse con código","classH":"Crea un grupo de clase","classP":"Un grupo es privado: solo entra quien tenga su código o enlace. Cada nombre es único (no se puede repetir).","className":"Nombre del grupo (ej. 3A Matemáticas)","create":"Crear","joinH":"Unirte a un grupo","joinP":"Escribe el código de 8 caracteres que te dio tu compañero o profe.","codeIn":"Código","join":"Unirme","code":"Código","copyCode":"Copiar código","copyLink":"Copiar enlace","copied":"Copiado","leave":"Salir del grupo","leaveAsk":"¿Salir de este grupo?","members":"Miembros","kick":"Expulsar","classNone":"Crea un grupo o únete con un código.","sysJoin":"se unió al grupo","manage":"Grupo","loading":"Conectando…","signinH":"Entra a Budsin Chat","signinP":"Budsin Chat es solo para cuentas de Google de colegios y universidades (por ejemplo, tu correo escolar que termina en.edu o.edu.pe). Solo se usa tu cuenta para identificarte: los demás verán únicamente el nombre y el avatar que elijas aquí.","signin":"Entrar con Google","profH":"Elige tu nombre y avatar","profP":"Es lo único que verán los demás. Nada de nombres reales, apellidos ni datos personales. Los nombres inapropiados se bloquean.","name":"Nombre de usuario","nameHint":"3–20 letras, números, punto, guion o guion bajo","save":"Guardar","cancel":"Cancelar","global":"Sala global","games":"Juegos","gamesNone":"Aún no hay salas de juegos activas. Entra a una desde la página del juego.","gamesHint":"Cada juego tiene su sala.","send":"Enviar","ph":"Escribe un mensaje…","online":"en línea","older":"Cargar anteriores","report":"Reportar","reportT":"¿Por qué lo reportas?","reasons":{"spam":"Spam","insult":"Insultos o acoso","sexual":"Contenido sexual","personal":"Datos personales","other":"Otro motivo"},"reported":"Reporte enviado. Gracias","welcome":"Aquí hay personas de todas las edades. No compartas datos personales ni enlaces.","rules":"No compartas datos personales ni enlaces.","offline":"Sin conexión. Reintentando…","you":"Tú","edit":"Cambiar nombre o avatar","signout":"Cerrar sesión","admin":"Panel de admin","gameRoom":"Sala de","err":{"domain_not_allowed":"Budsin Chat es solo para cuentas de colegio o universidad (por ejemplo @tucolegio.edu.pe). Elige tu cuenta escolar. Si tu colegio usa otro dominio, pide que lo agreguen.","email_unverified":"Tu correo no está verificado.","media_blocked":"Esa imagen no está permitida.","media_too_large":"El archivo es demasiado grande.","media_rate":"Vas muy rápido enviando archivos. Espera un momento.","media_new_account":"Las cuentas nuevas deben esperar un rato antes de enviar imágenes o audios.","media_suspended":"Perdiste el permiso de enviar imágenes y audios por un tiempo.","media_quota":"Llegaste al máximo de archivos por hoy.","media_timeout":"Tardó demasiado. Intenta con otro archivo.","bad_media":"Ese archivo no es una imagen o audio válido.","audio_not_allowed":"Las notas de voz solo se pueden enviar en chats privados y grupos de clase.","audio_too_long":"La nota de voz es demasiado larga (máx. 30 s).","audio_too_short":"La nota de voz es demasiado corta.","scan_unavailable":"Ahora no se pueden enviar imágenes. Intenta más tarde.","sticker_limit":"Ya tienes 24 stickers, el máximo.","friend_not_found":"No encontré a nadie con ese nombre.","friend_self":"Ese eres tú.","friend_exists":"Ya son amigos o ya enviaste la solicitud.","friend_limit":"Alcanzaste el máximo de 30 amigos.","friend_pending_limit":"Tienes demasiadas solicitudes pendientes.","dm_closed":"Ese chat privado ya no está disponible.","class_name_length":"El nombre del grupo debe tener entre 3 y 40 caracteres.","class_name_blocked":"Ese nombre de grupo no está permitido (sin groserías, enlaces ni datos personales).","class_exists":"Ya existe un grupo con ese nombre. Pide el código a tus compañeros para unirte.","class_limit_created":"Ya creaste 3 grupos, el máximo.","class_limit_joined":"Ya estás en 8 grupos, el máximo.","class_not_found":"No encontré ningún grupo con ese código.","class_full":"Ese grupo está lleno.","auth_failed":"No pudimos verificar tu cuenta. Vuelve a entrar.","banned":"Tu cuenta no puede usar el chat.","muted":"Estás silenciado por un rato.","rate":"Vas muy rápido. Espera unos segundos.","duplicate":"Ya enviaste ese mensaje.","too_long":"Mensaje demasiado largo (máx. 300).","need_username":"Elige un nombre primero.","not_joined":"Entra primero a la sala.","no_room":"Esa sala no existe.","room_name":"Nombre de sala no permitido.","rooms_full":"Hay demasiadas salas.","too_many_tabs":"Tienes demasiadas pestañas abiertas.","too_many_rooms":"Tienes demasiadas salas abiertas.","name_length":"El nombre debe tener entre 3 y 20 caracteres.","name_chars":"Solo letras, números, punto, guion y guion bajo (sin espacios).","name_reserved":"Ese nombre está reservado.","name_profanity":"Ese nombre no está permitido.","name_link":"Un nombre no puede ser un enlace.","name_taken":"Ese nombre ya está en uso (o es muy parecido a otro).","name_cooldown":"Solo puedes cambiar tu nombre una vez por semana.","bad_avatar":"Avatar no válido.","own_message":"No puedes reportar tu propio mensaje.","already_reported":"Ya lo reportaste.","forbidden":"No permitido.","server_error":"Error del servidor. Intenta de nuevo.","bad_request":"Solicitud no válida.","blocked":{"profanity":"Ese mensaje tiene lenguaje no permitido.","link":"No se pueden enviar enlaces ni correos.","contact":"No compartas teléfonos, usuarios ni otras redes.","empty":"Escribe algo."},"cant_edit":"Los mensajes con imagen, sticker o canción no se pueden editar.","edit_expired":"Solo se puede editar un mensaje durante los primeros 15 minutos.","reaction_full":"Ese mensaje ya tiene muchas reacciones distintas.","pin_limit":"Solo se pueden fijar 3 mensajes.","slowmode":"Modo lento: espera antes de enviar otro mensaje."},"back":"Volver a Budsin Games","channels":"Salas","dms":"Mensajes directos","reply":"Responder","replying":"Respondiendo a","editing":"Editando mensaje","editedTag":"editado","copy":"Copiar texto","copiedMsg":"Copiado","pin":"Fijar mensaje","unpin":"Quitar de fijados","pinned":"Fijado","pinnedMany":"Mensajes fijados","del":"Eliminar","deleteAsk":"¿Eliminar este mensaje? No se puede deshacer.","react":"Reaccionar","editMsg":"Editar","more":"Más acciones","newMsgs":"Nuevos mensajes","jumpN":"{n} mensajes nuevos","jump1":"1 mensaje nuevo","jumpDown":"Ir al final","today":"Hoy","yesterday":"Ayer","typing1":"{a} está escribiendo…","typing2":"{a} y {b} están escribiendo…","typingN":"Varias personas están escribiendo…","slow":"Modo lento","slowOff":"Desactivado","secs":"{n} s","youMentioned":"Te mencionaron","gone":"Mensaje eliminado","empty":"Todavía no hay mensajes. Escribe el primero.","emojiTab":"Emoji","roomOptions":"Opciones de la sala","stateOn":"Conectado","stateOff":"Sin conexión","mentionHint":"Mencionar","noPins":"No hay mensajes fijados.","cancelEdit":"Cancelar","saveEdit":"Guardar cambio","roomsGames":"Salas de juegos","theme":"Tema","theme_auto":"según el sistema","theme_light":"claro","theme_dark":"oscuro","stopRec":"Detener"},"en":{"shareH":"Share song","shareP":"Choose where to share it.","shareDone":"Song shared","listen":"Listen","openMusic":"Open in Budsin Music","shareNone":"There is no song to share.","attach":"Send an image","stickers":"Stickers","mic":"Voice note","uploading":"Uploading…","mySt":"My stickers","createSt":"Create sticker","stNote":"Make stickers from your images (up to 24). They are checked before being saved.","saveSt":"Save sticker","hiddenMedia":"Content hidden while it is reviewed","tapView":"Tap to view","rec":"Recording…","sendVoice":"Send voice note","micDenied":"I could not use the microphone. Check the browser permission.","voiceOnly":"Voice notes are only in private chats and class groups.","packs":{"react":"Reactions","game":"Gaming","animal":"Animals","food":"Food"},"gameBtn":"Chat button in games","friends":"Friends","addFriend":"Add friend","friendH":"Add a friend","friendP":"Type their exact username. You can only message privately once they accept.","friendName":"Username","sendReq":"Send request","reqSent":"Request sent","requests":"Requests","pending":"Sent","friendNone":"You have no friends yet.","dmWith":"Chat with","removeFriend":"Remove friend","blockUser":"Block","blockedL":"Blocked","unblock":"Unblock","blockedNone":"You have not blocked anyone.","addToFriends":"Add friend","blockAsk":"Block this person? They will not be able to message you and you will not see their messages.","removeAsk":"Remove this friend? The private chat closes.","newDm":"messaged you","unreadMsg":"New message from","classes":"Class groups","newClass":"New group","joinClass":"Join with code","classH":"Create a class group","classP":"A group is private: only people with its code or link get in. Each name is unique (no repeats).","className":"Group name (e.g. 3A Math)","create":"Create","joinH":"Join a group","joinP":"Type the 8-character code your classmate or teacher gave you.","codeIn":"Code","join":"Join","code":"Code","copyCode":"Copy code","copyLink":"Copy link","copied":"Copied","leave":"Leave group","leaveAsk":"Leave this group?","members":"Members","kick":"Remove","classNone":"Create a group or join with a code.","sysJoin":"joined the group","manage":"Group","loading":"Connecting…","signinH":"Join Budsin Chat","signinP":"Budsin Chat is only for Google accounts of schools and universities (for example, your school email ending in.edu). It is only used to identify you: others will see just the name and avatar you pick here.","signin":"Sign in with Google","profH":"Pick your name and avatar","profP":"This is all others will see. No real names, surnames or personal info. Inappropriate names are blocked.","name":"Username","nameHint":"3–20 letters, numbers, dot, dash or underscore","save":"Save","cancel":"Cancel","global":"Global room","games":"Games","gamesNone":"No active game rooms yet. Join one from the game page.","gamesHint":"Every game has its own room.","send":"Send","ph":"Write a message…","online":"online","older":"Load older","report":"Report","reportT":"Why are you reporting it?","reasons":{"spam":"Spam","insult":"Insults or harassment","sexual":"Sexual content","personal":"Personal info","other":"Other"},"reported":"Report sent. Thanks","welcome":"People of all ages are here. Do not share personal info or links.","rules":"Do not share personal info or links.","offline":"Offline. Retrying…","you":"You","edit":"Change name or avatar","signout":"Sign out","admin":"Admin panel","gameRoom":"Room of","err":{"domain_not_allowed":"Budsin Chat is only for school or university accounts (for example @yourschool.edu). Pick your school account. If your school uses another domain, ask for it to be added.","email_unverified":"Your email is not verified.","media_blocked":"That image is not allowed.","media_too_large":"The file is too large.","media_rate":"You are sending files too fast. Wait a moment.","media_new_account":"New accounts must wait a while before sending images or audio.","media_suspended":"You lost the right to send images and audio for a while.","media_quota":"You reached today's file limit.","media_timeout":"It took too long. Try another file.","bad_media":"That file is not a valid image or audio.","audio_not_allowed":"Voice notes can only be sent in private chats and class groups.","audio_too_long":"The voice note is too long (max 30 s).","audio_too_short":"The voice note is too short.","scan_unavailable":"Images cannot be sent right now. Try later.","sticker_limit":"You already have 24 stickers, the maximum.","friend_not_found":"I could not find anyone with that name.","friend_self":"That is you.","friend_exists":"You are already friends or you already sent the request.","friend_limit":"You reached the maximum of 30 friends.","friend_pending_limit":"You have too many pending requests.","dm_closed":"That private chat is no longer available.","class_name_length":"The group name must be 3 to 40 characters.","class_name_blocked":"That group name is not allowed (no profanity, links or personal info).","class_exists":"A group with that name already exists. Ask your classmates for the code to join.","class_limit_created":"You already created 3 groups, the maximum.","class_limit_joined":"You are already in 8 groups, the maximum.","class_not_found":"I could not find a group with that code.","class_full":"That group is full.","auth_failed":"We could not verify your account. Sign in again.","banned":"Your account cannot use the chat.","muted":"You are muted for a while.","rate":"You are going too fast. Wait a few seconds.","duplicate":"You already sent that.","too_long":"Message too long (max 300).","need_username":"Pick a name first.","not_joined":"Join the room first.","no_room":"That room does not exist.","room_name":"Room name not allowed.","rooms_full":"Too many rooms.","too_many_tabs":"Too many tabs open.","too_many_rooms":"Too many rooms open.","name_length":"The name must be 3 to 20 characters.","name_chars":"Only letters, numbers, dot, dash and underscore (no spaces).","name_reserved":"That name is reserved.","name_profanity":"That name is not allowed.","name_link":"A name cannot be a link.","name_taken":"That name is taken (or too similar to another).","name_cooldown":"You can change your name once a week.","bad_avatar":"Invalid avatar.","own_message":"You cannot report your own message.","already_reported":"Already reported.","forbidden":"Not allowed.","server_error":"Server error. Try again.","bad_request":"Invalid request.","blocked":{"profanity":"That message has language that is not allowed.","link":"Links and emails cannot be sent.","contact":"Do not share phone numbers, usernames or other networks.","empty":"Write something."},"cant_edit":"Messages with an image, sticker or song cannot be edited.","edit_expired":"A message can only be edited during the first 15 minutes.","reaction_full":"That message already has many different reactions.","pin_limit":"Only 3 messages can be pinned.","slowmode":"Slow mode: wait before sending another message."},"back":"Back to Budsin Games","channels":"Channels","dms":"Direct messages","reply":"Reply","replying":"Replying to","editing":"Editing message","editedTag":"edited","copy":"Copy text","copiedMsg":"Copied","pin":"Pin message","unpin":"Unpin","pinned":"Pinned","pinnedMany":"Pinned messages","del":"Delete","deleteAsk":"Delete this message? This cannot be undone.","react":"React","editMsg":"Edit","more":"More actions","newMsgs":"New messages","jumpN":"{n} new messages","jump1":"1 new message","jumpDown":"Jump to latest","today":"Today","yesterday":"Yesterday","typing1":"{a} is typing…","typing2":"{a} and {b} are typing…","typingN":"Several people are typing…","slow":"Slow mode","slowOff":"Off","secs":"{n} s","youMentioned":"You were mentioned","gone":"Message deleted","empty":"No messages yet. Write the first one.","emojiTab":"Emoji","roomOptions":"Room options","stateOn":"Connected","stateOff":"Offline","mentionHint":"Mention","noPins":"No pinned messages.","cancelEdit":"Cancel","saveEdit":"Save change","roomsGames":"Game rooms","theme":"Theme","theme_auto":"system","theme_light":"light","theme_dark":"dark","stopRec":"Stop"},"pt":{"shareH":"Compartilhar música","shareP":"Escolha onde compartilhar.","shareDone":"Música compartilhada","listen":"Ouvir","openMusic":"Abrir no Budsin Music","shareNone":"Não há música para compartilhar.","attach":"Enviar uma imagem","stickers":"Stickers","mic":"Nota de voz","uploading":"Enviando…","mySt":"Meus stickers","createSt":"Criar sticker","stNote":"Crie stickers com suas imagens (até 24). Elas são verificadas antes de salvar.","saveSt":"Salvar sticker","hiddenMedia":"Conteúdo oculto enquanto é revisado","tapView":"Toque para ver","rec":"Gravando…","sendVoice":"Enviar nota de voz","micDenied":"Não consegui usar o microfone. Verifique a permissão do navegador.","voiceOnly":"Notas de voz só existem em conversas privadas e grupos de turma.","packs":{"react":"Reações","game":"Gaming","animal":"Animais","food":"Comida"},"gameBtn":"Botão de chat nos jogos","friends":"Amigos","addFriend":"Adicionar amigo","friendH":"Adicione um amigo","friendP":"Digite o nome de usuário exato. Vocês só poderão conversar em particular quando aceitar.","friendName":"Nome de usuário","sendReq":"Enviar pedido","reqSent":"Pedido enviado","requests":"Pedidos","pending":"Enviado","friendNone":"Você ainda não tem amigos.","dmWith":"Conversa com","removeFriend":"Remover amigo","blockUser":"Bloquear","blockedL":"Bloqueados","unblock":"Desbloquear","blockedNone":"Você não bloqueou ninguém.","addToFriends":"Adicionar amigo","blockAsk":"Bloquear esta pessoa? Ela não poderá escrever para você e você não verá as mensagens dela.","removeAsk":"Remover este amigo? A conversa privada será fechada.","newDm":"escreveu para você","unreadMsg":"Nova mensagem de","classes":"Turmas","newClass":"Novo grupo","joinClass":"Entrar com código","classH":"Crie um grupo de turma","classP":"Um grupo é privado: só entra quem tem o código ou o link. Cada nome é único (não pode repetir).","className":"Nome do grupo (ex. 3A Matemática)","create":"Criar","joinH":"Entrar em um grupo","joinP":"Digite o código de 8 caracteres que seu colega ou professor passou.","codeIn":"Código","join":"Entrar","code":"Código","copyCode":"Copiar código","copyLink":"Copiar link","copied":"Copiado","leave":"Sair do grupo","leaveAsk":"Sair deste grupo?","members":"Membros","kick":"Remover","classNone":"Crie um grupo ou entre com um código.","sysJoin":"entrou no grupo","manage":"Grupo","loading":"Conectando…","signinH":"Entre no Budsin Chat","signinP":"O Budsin Chat é só para contas Google de escolas e universidades (por exemplo, seu e-mail escolar terminado em.edu ou.edu.br). Ela só serve para identificar você: os outros verão apenas o nome e o avatar que escolher aqui.","signin":"Entrar com o Google","profH":"Escolha seu nome e avatar","profP":"É só isso que os outros verão. Nada de nomes reais, sobrenomes ou dados pessoais. Nomes impróprios são bloqueados.","name":"Nome de usuário","nameHint":"3–20 letras, números, ponto, hífen ou sublinhado","save":"Salvar","cancel":"Cancelar","global":"Sala global","games":"Jogos","gamesNone":"Ainda não há salas de jogos ativas. Entre em uma pela página do jogo.","gamesHint":"Cada jogo tem sua sala.","send":"Enviar","ph":"Escreva uma mensagem…","online":"online","older":"Carregar anteriores","report":"Denunciar","reportT":"Por que você está denunciando?","reasons":{"spam":"Spam","insult":"Insultos ou assédio","sexual":"Conteúdo sexual","personal":"Dados pessoais","other":"Outro motivo"},"reported":"Denúncia enviada. Obrigado","welcome":"Aqui há pessoas de todas as idades. Não compartilhe dados pessoais nem links.","rules":"Não compartilhe dados pessoais nem links.","offline":"Sem conexão. Tentando de novo…","you":"Você","edit":"Mudar nome ou avatar","signout":"Sair","admin":"Painel de admin","gameRoom":"Sala de","err":{"domain_not_allowed":"O Budsin Chat é só para contas de escola ou universidade (por exemplo @suaescola.edu.br). Escolha sua conta escolar. Se sua escola usa outro domínio, peça para adicioná-lo.","email_unverified":"Seu e-mail não está verificado.","media_blocked":"Essa imagem não é permitida.","media_too_large":"O arquivo é grande demais.","media_rate":"Você está enviando arquivos rápido demais. Espere um momento.","media_new_account":"Contas novas devem esperar um pouco antes de enviar imagens ou áudios.","media_suspended":"Você perdeu o direito de enviar imagens e áudios por um tempo.","media_quota":"Você atingiu o limite de arquivos de hoje.","media_timeout":"Demorou demais. Tente outro arquivo.","bad_media":"Esse arquivo não é uma imagem ou áudio válido.","audio_not_allowed":"Notas de voz só podem ser enviadas em conversas privadas e grupos de turma.","audio_too_long":"A nota de voz é longa demais (máx. 30 s).","audio_too_short":"A nota de voz é curta demais.","scan_unavailable":"Não é possível enviar imagens agora. Tente mais tarde.","sticker_limit":"Você já tem 24 stickers, o máximo.","friend_not_found":"Não encontrei ninguém com esse nome.","friend_self":"Esse é você.","friend_exists":"Vocês já são amigos ou você já enviou o pedido.","friend_limit":"Você atingiu o máximo de 30 amigos.","friend_pending_limit":"Você tem pedidos pendentes demais.","dm_closed":"Essa conversa privada não está mais disponível.","class_name_length":"O nome do grupo deve ter de 3 a 40 caracteres.","class_name_blocked":"Esse nome de grupo não é permitido (sem palavrões, links nem dados pessoais).","class_exists":"Já existe um grupo com esse nome. Peça o código aos colegas para entrar.","class_limit_created":"Você já criou 3 grupos, o máximo.","class_limit_joined":"Você já está em 8 grupos, o máximo.","class_not_found":"Não encontrei nenhum grupo com esse código.","class_full":"Esse grupo está cheio.","auth_failed":"Não foi possível verificar sua conta. Entre de novo.","banned":"Sua conta não pode usar o chat.","muted":"Você está silenciado por um tempo.","rate":"Você está indo rápido demais. Espere alguns segundos.","duplicate":"Você já enviou isso.","too_long":"Mensagem longa demais (máx. 300).","need_username":"Escolha um nome primeiro.","not_joined":"Entre na sala primeiro.","no_room":"Essa sala não existe.","room_name":"Nome de sala não permitido.","rooms_full":"Salas demais.","too_many_tabs":"Abas demais abertas.","too_many_rooms":"Salas demais abertas.","name_length":"O nome deve ter de 3 a 20 caracteres.","name_chars":"Só letras, números, ponto, hífen e sublinhado (sem espaços).","name_reserved":"Esse nome é reservado.","name_profanity":"Esse nome não é permitido.","name_link":"Um nome não pode ser um link.","name_taken":"Esse nome já está em uso (ou é parecido demais com outro).","name_cooldown":"Você só pode mudar o nome uma vez por semana.","bad_avatar":"Avatar inválido.","own_message":"Você não pode denunciar a própria mensagem.","already_reported":"Já denunciado.","forbidden":"Não permitido.","server_error":"Erro do servidor. Tente de novo.","bad_request":"Pedido inválido.","blocked":{"profanity":"Essa mensagem tem linguagem não permitida.","link":"Não é possível enviar links nem e-mails.","contact":"Não compartilhe telefones, usuários nem outras redes.","empty":"Escreva algo."},"cant_edit":"Mensagens com imagem, sticker ou música não podem ser editadas.","edit_expired":"Só dá para editar uma mensagem nos primeiros 15 minutos.","reaction_full":"Essa mensagem já tem muitas reações diferentes.","pin_limit":"Só dá para fixar 3 mensagens.","slowmode":"Modo lento: espere antes de enviar outra mensagem."},"back":"Voltar ao Budsin Games","channels":"Salas","dms":"Mensagens diretas","reply":"Responder","replying":"Respondendo a","editing":"Editando mensagem","editedTag":"editada","copy":"Copiar texto","copiedMsg":"Copiado","pin":"Fixar mensagem","unpin":"Desafixar","pinned":"Fixada","pinnedMany":"Mensagens fixadas","del":"Excluir","deleteAsk":"Excluir esta mensagem? Não dá para desfazer.","react":"Reagir","editMsg":"Editar","more":"Mais ações","newMsgs":"Novas mensagens","jumpN":"{n} novas mensagens","jump1":"1 nova mensagem","jumpDown":"Ir para o fim","today":"Hoje","yesterday":"Ontem","typing1":"{a} está digitando…","typing2":"{a} e {b} estão digitando…","typingN":"Várias pessoas estão digitando…","slow":"Modo lento","slowOff":"Desativado","secs":"{n} s","youMentioned":"Você foi mencionado","gone":"Mensagem excluída","empty":"Ainda não há mensagens. Escreva a primeira.","emojiTab":"Emoji","roomOptions":"Opções da sala","stateOn":"Conectado","stateOff":"Sem conexão","mentionHint":"Mencionar","noPins":"Não há mensagens fixadas.","cancelEdit":"Cancelar","saveEdit":"Salvar alteração","roomsGames":"Salas de jogos","theme":"Tema","theme_auto":"do sistema","theme_light":"claro","theme_dark":"escuro","stopRec":"Parar"}};
 (function () {
 'use strict';
 var $ = function (s) { return document.querySelector(s); };
 var lang = 'es';
-try { var l = (localStorage.getItem('budsin_language') || navigator.language || '').slice(0, 2).toLowerCase(); if (l === 'en' || l === 'pt') lang = l; } catch (e) {}
+try { var lg = (localStorage.getItem('budsin_language') || navigator.language || '').slice(0, 2).toLowerCase(); if (lg === 'en' || lg === 'pt') lang = lg; } catch (e) {}
 document.documentElement.lang = lang;
 
-var TXT = {
-  es: { shareH: 'Compartir canción', shareP: 'Elige dónde quieres compartirla.', shareDone: 'Canción compartida ✓', listen: 'Escuchar', openMusic: 'Abrir en Budsin Music', shareNone: 'No hay ninguna canción para compartir.', attach: 'Enviar una imagen', stickers: 'Stickers', mic: 'Nota de voz', uploading: 'Subiendo…', mySt: 'Mis stickers', createSt: 'Crear sticker', stNote: 'Crea stickers con tus imágenes (hasta 24). Se revisan antes de guardarse.', saveSt: 'Guardar sticker', hiddenMedia: '🚫 Contenido oculto mientras se revisa', tapView: 'Toca para ver', rec: 'Grabando…', sendVoice: 'Enviar nota de voz', micDenied: 'No pude usar el micrófono. Revisa el permiso del navegador.', voiceOnly: 'Las notas de voz solo están en chats privados y grupos de clase.', packs: { react: 'Reacciones', game: 'Gaming', animal: 'Animales', food: 'Comida' }, gameBtn: 'Botón de chat en los juegos', friends: 'Amigos', addFriend: 'Agregar amigo', friendH: 'Agrega un amigo', friendP: 'Escribe su nombre de usuario exacto. Solo podrán escribirse por privado cuando acepte.', friendName: 'Nombre de usuario', sendReq: 'Enviar solicitud', reqSent: 'Solicitud enviada ✓', requests: 'Solicitudes', pending: 'Enviada', friendNone: 'Aún no tienes amigos.', dmWith: 'Chat con', removeFriend: 'Quitar amigo', blockUser: 'Bloquear', blockedL: 'Bloqueados', unblock: 'Desbloquear', blockedNone: 'No has bloqueado a nadie.', addToFriends: 'Agregar amigo', blockAsk: '¿Bloquear a esta persona? Ya no podrá escribirte y no verás sus mensajes.', removeAsk: '¿Quitar a este amigo? Se cierra el chat privado.', newDm: 'te escribió', unreadMsg: 'Mensaje nuevo de', classes: 'Clases', newClass: 'Crear grupo de clase', joinClass: 'Unirme con código', classH: 'Crea un grupo de clase', classP: 'Un grupo es privado: solo entra quien tenga su código o enlace. Cada nombre es único (no se puede repetir).', className: 'Nombre del grupo (ej. 3A Matemáticas)', create: 'Crear', joinH: 'Unirte a un grupo', joinP: 'Escribe el código de 8 caracteres que te dio tu compañero o profe.', codeIn: 'Código', join: 'Unirme', code: 'Código', copyCode: 'Copiar código', copyLink: 'Copiar enlace', copied: 'Copiado ✓', leave: 'Salir del grupo', leaveAsk: '¿Salir de este grupo?', members: 'Miembros', kick: 'Expulsar', classNone: 'Crea un grupo o únete con un código.', sysJoin: 'se unió al grupo', manage: 'Grupo', loading: 'Conectando…', signinH: 'Entra a Budsin Chat', signinP: 'Budsin Chat es solo para cuentas de Google de colegios y universidades (por ejemplo, tu correo escolar que termina en .edu o .edu.pe). Solo se usa tu cuenta para identificarte: los demás verán únicamente el nombre y el avatar que elijas aquí.', signin: 'Entrar con Google', profH: 'Elige tu nombre y avatar', profP: 'Es lo único que verán los demás. Nada de nombres reales, apellidos ni datos personales. Los nombres inapropiados se bloquean.', name: 'Nombre de usuario', nameHint: '3–20 letras, números, punto, guion o guion bajo', save: 'Guardar', cancel: 'Cancelar', global: 'Sala global', games: 'Juegos', gamesNone: 'Aún no hay salas de juegos activas. Entra a una desde la página del juego.', gamesHint: 'Cada juego tiene su sala.', send: 'Enviar', ph: 'Escribe un mensaje…', online: 'en línea', older: 'Cargar anteriores', report: 'Reportar', reportT: '¿Por qué lo reportas?', reasons: { spam: 'Spam', insult: 'Insultos o acoso', sexual: 'Contenido sexual', personal: 'Datos personales', other: 'Otro motivo' }, reported: 'Reporte enviado. Gracias 🙏', welcome: 'Sé amable: aquí hay gente de todas las edades.', rules: 'No compartas datos personales ni enlaces.', offline: 'Sin conexión. Reintentando…', you: 'Tú', edit: 'Cambiar nombre o avatar', signout: 'Cerrar sesión', admin: 'Panel de admin', gameRoom: 'Sala de', err: { domain_not_allowed: 'Budsin Chat es solo para cuentas de colegio o universidad (por ejemplo @tucolegio.edu.pe). Elige tu cuenta escolar. Si tu colegio usa otro dominio, pide que lo agreguen.', email_unverified: 'Tu correo no está verificado.', media_blocked: 'Esa imagen no está permitida.', media_too_large: 'El archivo es demasiado grande.', media_rate: 'Vas muy rápido enviando archivos. Espera un momento.', media_new_account: 'Las cuentas nuevas deben esperar un rato antes de enviar imágenes o audios.', media_suspended: 'Perdiste el permiso de enviar imágenes y audios por un tiempo.', media_quota: 'Llegaste al máximo de archivos por hoy.', media_timeout: 'Tardó demasiado. Intenta con otro archivo.', bad_media: 'Ese archivo no es una imagen o audio válido.', audio_not_allowed: 'Las notas de voz solo se pueden enviar en chats privados y grupos de clase.', audio_too_long: 'La nota de voz es demasiado larga (máx. 30 s).', audio_too_short: 'La nota de voz es demasiado corta.', scan_unavailable: 'Ahora no se pueden enviar imágenes. Intenta más tarde.', sticker_limit: 'Ya tienes 24 stickers, el máximo.',  friend_not_found: 'No encontré a nadie con ese nombre.', friend_self: 'Ese eres tú 😅', friend_exists: 'Ya son amigos o ya enviaste la solicitud.', friend_limit: 'Alcanzaste el máximo de 30 amigos.', friend_pending_limit: 'Tienes demasiadas solicitudes pendientes.', dm_closed: 'Ese chat privado ya no está disponible.', class_name_length: 'El nombre del grupo debe tener entre 3 y 40 caracteres.', class_name_blocked: 'Ese nombre de grupo no está permitido (sin groserías, enlaces ni datos personales).', class_exists: 'Ya existe un grupo con ese nombre. Pide el código a tus compañeros para unirte.', class_limit_created: 'Ya creaste 3 grupos, el máximo.', class_limit_joined: 'Ya estás en 8 grupos, el máximo.', class_not_found: 'No encontré ningún grupo con ese código.', class_full: 'Ese grupo está lleno.', auth_failed: 'No pudimos verificar tu cuenta. Vuelve a entrar.', banned: 'Tu cuenta no puede usar el chat.', muted: 'Estás silenciado por un rato.', rate: 'Vas muy rápido. Espera unos segundos.', duplicate: 'Ya enviaste ese mensaje.', too_long: 'Mensaje demasiado largo (máx. 300).', need_username: 'Elige un nombre primero.', not_joined: 'Entra primero a la sala.', no_room: 'Esa sala no existe.', room_name: 'Nombre de sala no permitido.', rooms_full: 'Hay demasiadas salas.', too_many_tabs: 'Tienes demasiadas pestañas abiertas.', too_many_rooms: 'Tienes demasiadas salas abiertas.', name_length: 'El nombre debe tener entre 3 y 20 caracteres.', name_chars: 'Solo letras, números, punto, guion y guion bajo (sin espacios).', name_reserved: 'Ese nombre está reservado.', name_profanity: 'Ese nombre no está permitido.', name_link: 'Un nombre no puede ser un enlace.', name_taken: 'Ese nombre ya está en uso (o es muy parecido a otro).', name_cooldown: 'Solo puedes cambiar tu nombre una vez por semana.', bad_avatar: 'Avatar no válido.', own_message: 'No puedes reportar tu propio mensaje.', already_reported: 'Ya lo reportaste.', forbidden: 'No permitido.', server_error: 'Error del servidor. Intenta de nuevo.', bad_request: 'Solicitud no válida.', blocked: { profanity: 'Ese mensaje tiene lenguaje no permitido.', link: 'No se pueden enviar enlaces ni correos.', contact: 'No compartas teléfonos, usuarios ni otras redes.', empty: 'Escribe algo.' } } },
-  en: { shareH: 'Share song', shareP: 'Choose where to share it.', shareDone: 'Song shared ✓', listen: 'Listen', openMusic: 'Open in Budsin Music', shareNone: 'There is no song to share.', attach: 'Send an image', stickers: 'Stickers', mic: 'Voice note', uploading: 'Uploading…', mySt: 'My stickers', createSt: 'Create sticker', stNote: 'Make stickers from your images (up to 24). They are checked before being saved.', saveSt: 'Save sticker', hiddenMedia: '🚫 Content hidden while it is reviewed', tapView: 'Tap to view', rec: 'Recording…', sendVoice: 'Send voice note', micDenied: 'I could not use the microphone. Check the browser permission.', voiceOnly: 'Voice notes are only in private chats and class groups.', packs: { react: 'Reactions', game: 'Gaming', animal: 'Animals', food: 'Food' }, gameBtn: 'Chat button in games', friends: 'Friends', addFriend: 'Add friend', friendH: 'Add a friend', friendP: 'Type their exact username. You can only message privately once they accept.', friendName: 'Username', sendReq: 'Send request', reqSent: 'Request sent ✓', requests: 'Requests', pending: 'Sent', friendNone: 'You have no friends yet.', dmWith: 'Chat with', removeFriend: 'Remove friend', blockUser: 'Block', blockedL: 'Blocked', unblock: 'Unblock', blockedNone: 'You have not blocked anyone.', addToFriends: 'Add friend', blockAsk: 'Block this person? They will not be able to message you and you will not see their messages.', removeAsk: 'Remove this friend? The private chat closes.', newDm: 'messaged you', unreadMsg: 'New message from', classes: 'Classes', newClass: 'Create class group', joinClass: 'Join with code', classH: 'Create a class group', classP: 'A group is private: only people with its code or link get in. Each name is unique (no repeats).', className: 'Group name (e.g. 3A Math)', create: 'Create', joinH: 'Join a group', joinP: 'Type the 8-character code your classmate or teacher gave you.', codeIn: 'Code', join: 'Join', code: 'Code', copyCode: 'Copy code', copyLink: 'Copy link', copied: 'Copied ✓', leave: 'Leave group', leaveAsk: 'Leave this group?', members: 'Members', kick: 'Remove', classNone: 'Create a group or join with a code.', sysJoin: 'joined the group', manage: 'Group', loading: 'Connecting…', signinH: 'Join Budsin Chat', signinP: 'Budsin Chat is only for Google accounts of schools and universities (for example, your school email ending in .edu). It is only used to identify you: others will see just the name and avatar you pick here.', signin: 'Sign in with Google', profH: 'Pick your name and avatar', profP: 'This is all others will see. No real names, surnames or personal info. Inappropriate names are blocked.', name: 'Username', nameHint: '3–20 letters, numbers, dot, dash or underscore', save: 'Save', cancel: 'Cancel', global: 'Global room', games: 'Games', gamesNone: 'No active game rooms yet. Join one from the game page.', gamesHint: 'Every game has its own room.', send: 'Send', ph: 'Write a message…', online: 'online', older: 'Load older', report: 'Report', reportT: 'Why are you reporting it?', reasons: { spam: 'Spam', insult: 'Insults or harassment', sexual: 'Sexual content', personal: 'Personal info', other: 'Other' }, reported: 'Report sent. Thanks 🙏', welcome: 'Be kind: people of all ages are here.', rules: 'Do not share personal info or links.', offline: 'Offline. Retrying…', you: 'You', edit: 'Change name or avatar', signout: 'Sign out', admin: 'Admin panel', gameRoom: 'Room of', err: { domain_not_allowed: 'Budsin Chat is only for school or university accounts (for example @yourschool.edu). Pick your school account. If your school uses another domain, ask for it to be added.', email_unverified: 'Your email is not verified.', media_blocked: 'That image is not allowed.', media_too_large: 'The file is too large.', media_rate: 'You are sending files too fast. Wait a moment.', media_new_account: 'New accounts must wait a while before sending images or audio.', media_suspended: 'You lost the right to send images and audio for a while.', media_quota: 'You reached today\'s file limit.', media_timeout: 'It took too long. Try another file.', bad_media: 'That file is not a valid image or audio.', audio_not_allowed: 'Voice notes can only be sent in private chats and class groups.', audio_too_long: 'The voice note is too long (max 30 s).', audio_too_short: 'The voice note is too short.', scan_unavailable: 'Images cannot be sent right now. Try later.', sticker_limit: 'You already have 24 stickers, the maximum.',  friend_not_found: 'I could not find anyone with that name.', friend_self: 'That is you 😅', friend_exists: 'You are already friends or you already sent the request.', friend_limit: 'You reached the maximum of 30 friends.', friend_pending_limit: 'You have too many pending requests.', dm_closed: 'That private chat is no longer available.', class_name_length: 'The group name must be 3 to 40 characters.', class_name_blocked: 'That group name is not allowed (no profanity, links or personal info).', class_exists: 'A group with that name already exists. Ask your classmates for the code to join.', class_limit_created: 'You already created 3 groups, the maximum.', class_limit_joined: 'You are already in 8 groups, the maximum.', class_not_found: 'I could not find a group with that code.', class_full: 'That group is full.', auth_failed: 'We could not verify your account. Sign in again.', banned: 'Your account cannot use the chat.', muted: 'You are muted for a while.', rate: 'You are going too fast. Wait a few seconds.', duplicate: 'You already sent that.', too_long: 'Message too long (max 300).', need_username: 'Pick a name first.', not_joined: 'Join the room first.', no_room: 'That room does not exist.', room_name: 'Room name not allowed.', rooms_full: 'Too many rooms.', too_many_tabs: 'Too many tabs open.', too_many_rooms: 'Too many rooms open.', name_length: 'The name must be 3 to 20 characters.', name_chars: 'Only letters, numbers, dot, dash and underscore (no spaces).', name_reserved: 'That name is reserved.', name_profanity: 'That name is not allowed.', name_link: 'A name cannot be a link.', name_taken: 'That name is taken (or too similar to another).', name_cooldown: 'You can change your name once a week.', bad_avatar: 'Invalid avatar.', own_message: 'You cannot report your own message.', already_reported: 'Already reported.', forbidden: 'Not allowed.', server_error: 'Server error. Try again.', bad_request: 'Invalid request.', blocked: { profanity: 'That message has language that is not allowed.', link: 'Links and emails cannot be sent.', contact: 'Do not share phone numbers, usernames or other networks.', empty: 'Write something.' } } },
-  pt: { shareH: 'Compartilhar música', shareP: 'Escolha onde compartilhar.', shareDone: 'Música compartilhada ✓', listen: 'Ouvir', openMusic: 'Abrir no Budsin Music', shareNone: 'Não há música para compartilhar.', attach: 'Enviar uma imagem', stickers: 'Stickers', mic: 'Nota de voz', uploading: 'Enviando…', mySt: 'Meus stickers', createSt: 'Criar sticker', stNote: 'Crie stickers com suas imagens (até 24). Elas são verificadas antes de salvar.', saveSt: 'Salvar sticker', hiddenMedia: '🚫 Conteúdo oculto enquanto é revisado', tapView: 'Toque para ver', rec: 'Gravando…', sendVoice: 'Enviar nota de voz', micDenied: 'Não consegui usar o microfone. Verifique a permissão do navegador.', voiceOnly: 'Notas de voz só existem em conversas privadas e grupos de turma.', packs: { react: 'Reações', game: 'Gaming', animal: 'Animais', food: 'Comida' }, gameBtn: 'Botão de chat nos jogos', friends: 'Amigos', addFriend: 'Adicionar amigo', friendH: 'Adicione um amigo', friendP: 'Digite o nome de usuário exato. Vocês só poderão conversar em particular quando aceitar.', friendName: 'Nome de usuário', sendReq: 'Enviar pedido', reqSent: 'Pedido enviado ✓', requests: 'Pedidos', pending: 'Enviado', friendNone: 'Você ainda não tem amigos.', dmWith: 'Conversa com', removeFriend: 'Remover amigo', blockUser: 'Bloquear', blockedL: 'Bloqueados', unblock: 'Desbloquear', blockedNone: 'Você não bloqueou ninguém.', addToFriends: 'Adicionar amigo', blockAsk: 'Bloquear esta pessoa? Ela não poderá escrever para você e você não verá as mensagens dela.', removeAsk: 'Remover este amigo? A conversa privada será fechada.', newDm: 'escreveu para você', unreadMsg: 'Nova mensagem de', classes: 'Turmas', newClass: 'Criar grupo de turma', joinClass: 'Entrar com código', classH: 'Crie um grupo de turma', classP: 'Um grupo é privado: só entra quem tem o código ou o link. Cada nome é único (não pode repetir).', className: 'Nome do grupo (ex. 3A Matemática)', create: 'Criar', joinH: 'Entrar em um grupo', joinP: 'Digite o código de 8 caracteres que seu colega ou professor passou.', codeIn: 'Código', join: 'Entrar', code: 'Código', copyCode: 'Copiar código', copyLink: 'Copiar link', copied: 'Copiado ✓', leave: 'Sair do grupo', leaveAsk: 'Sair deste grupo?', members: 'Membros', kick: 'Remover', classNone: 'Crie um grupo ou entre com um código.', sysJoin: 'entrou no grupo', manage: 'Grupo', loading: 'Conectando…', signinH: 'Entre no Budsin Chat', signinP: 'O Budsin Chat é só para contas Google de escolas e universidades (por exemplo, seu e-mail escolar terminado em .edu ou .edu.br). Ela só serve para identificar você: os outros verão apenas o nome e o avatar que escolher aqui.', signin: 'Entrar com o Google', profH: 'Escolha seu nome e avatar', profP: 'É só isso que os outros verão. Nada de nomes reais, sobrenomes ou dados pessoais. Nomes impróprios são bloqueados.', name: 'Nome de usuário', nameHint: '3–20 letras, números, ponto, hífen ou sublinhado', save: 'Salvar', cancel: 'Cancelar', global: 'Sala global', games: 'Jogos', gamesNone: 'Ainda não há salas de jogos ativas. Entre em uma pela página do jogo.', gamesHint: 'Cada jogo tem sua sala.', send: 'Enviar', ph: 'Escreva uma mensagem…', online: 'online', older: 'Carregar anteriores', report: 'Denunciar', reportT: 'Por que você está denunciando?', reasons: { spam: 'Spam', insult: 'Insultos ou assédio', sexual: 'Conteúdo sexual', personal: 'Dados pessoais', other: 'Outro motivo' }, reported: 'Denúncia enviada. Obrigado 🙏', welcome: 'Seja gentil: aqui há pessoas de todas as idades.', rules: 'Não compartilhe dados pessoais nem links.', offline: 'Sem conexão. Tentando de novo…', you: 'Você', edit: 'Mudar nome ou avatar', signout: 'Sair', admin: 'Painel de admin', gameRoom: 'Sala de', err: { domain_not_allowed: 'O Budsin Chat é só para contas de escola ou universidade (por exemplo @suaescola.edu.br). Escolha sua conta escolar. Se sua escola usa outro domínio, peça para adicioná-lo.', email_unverified: 'Seu e-mail não está verificado.', media_blocked: 'Essa imagem não é permitida.', media_too_large: 'O arquivo é grande demais.', media_rate: 'Você está enviando arquivos rápido demais. Espere um momento.', media_new_account: 'Contas novas devem esperar um pouco antes de enviar imagens ou áudios.', media_suspended: 'Você perdeu o direito de enviar imagens e áudios por um tempo.', media_quota: 'Você atingiu o limite de arquivos de hoje.', media_timeout: 'Demorou demais. Tente outro arquivo.', bad_media: 'Esse arquivo não é uma imagem ou áudio válido.', audio_not_allowed: 'Notas de voz só podem ser enviadas em conversas privadas e grupos de turma.', audio_too_long: 'A nota de voz é longa demais (máx. 30 s).', audio_too_short: 'A nota de voz é curta demais.', scan_unavailable: 'Não é possível enviar imagens agora. Tente mais tarde.', sticker_limit: 'Você já tem 24 stickers, o máximo.',  friend_not_found: 'Não encontrei ninguém com esse nome.', friend_self: 'Esse é você 😅', friend_exists: 'Vocês já são amigos ou você já enviou o pedido.', friend_limit: 'Você atingiu o máximo de 30 amigos.', friend_pending_limit: 'Você tem pedidos pendentes demais.', dm_closed: 'Essa conversa privada não está mais disponível.', class_name_length: 'O nome do grupo deve ter de 3 a 40 caracteres.', class_name_blocked: 'Esse nome de grupo não é permitido (sem palavrões, links nem dados pessoais).', class_exists: 'Já existe um grupo com esse nome. Peça o código aos colegas para entrar.', class_limit_created: 'Você já criou 3 grupos, o máximo.', class_limit_joined: 'Você já está em 8 grupos, o máximo.', class_not_found: 'Não encontrei nenhum grupo com esse código.', class_full: 'Esse grupo está cheio.', auth_failed: 'Não foi possível verificar sua conta. Entre de novo.', banned: 'Sua conta não pode usar o chat.', muted: 'Você está silenciado por um tempo.', rate: 'Você está indo rápido demais. Espere alguns segundos.', duplicate: 'Você já enviou isso.', too_long: 'Mensagem longa demais (máx. 300).', need_username: 'Escolha um nome primeiro.', not_joined: 'Entre na sala primeiro.', no_room: 'Essa sala não existe.', room_name: 'Nome de sala não permitido.', rooms_full: 'Salas demais.', too_many_tabs: 'Abas demais abertas.', too_many_rooms: 'Salas demais abertas.', name_length: 'O nome deve ter de 3 a 20 caracteres.', name_chars: 'Só letras, números, ponto, hífen e sublinhado (sem espaços).', name_reserved: 'Esse nome é reservado.', name_profanity: 'Esse nome não é permitido.', name_link: 'Um nome não pode ser um link.', name_taken: 'Esse nome já está em uso (ou é parecido demais com outro).', name_cooldown: 'Você só pode mudar o nome uma vez por semana.', bad_avatar: 'Avatar inválido.', own_message: 'Você não pode denunciar a própria mensagem.', already_reported: 'Já denunciado.', forbidden: 'Não permitido.', server_error: 'Erro do servidor. Tente de novo.', bad_request: 'Pedido inválido.', blocked: { profanity: 'Essa mensagem tem linguagem não permitida.', link: 'Não é possível enviar links nem e-mails.', contact: 'Não compartilhe telefones, usuários nem outras redes.', empty: 'Escreva algo.' } } }
+var T = {}; Object.keys(TXT.es).forEach(function (k) { T[k] = TXT[lang][k] != null ? TXT[lang][k] : TXT.es[k]; });
+T.err = Object.assign({}, TXT.es.err, TXT[lang].err); T.err.blocked = Object.assign({}, TXT.es.err.blocked, TXT[lang].err.blocked);
+function fmt(s, v) { return String(s).replace(/\{(\w+)\}/g, function (_, k) { return v && v[k] != null ? v[k] : ''; }); }
+function errText(code, why) { if (code === 'blocked') return T.err.blocked[why] || T.err.blocked.profanity; var e = T.err[code]; return typeof e === 'string' ? e : T.err.server_error; }
+
+// ---------- tema (automático según el sistema, o fijo) ----------
+function applyTheme(v) { var r = document.documentElement; if (v === 'light' || v === 'dark') r.setAttribute('data-theme', v); else r.removeAttribute('data-theme'); }
+try { applyTheme(localStorage.getItem('bc_theme') || 'auto'); } catch (e) {}
+
+// ---------- iconos de línea (propios) ----------
+var IC = {
+  hash: '<path d="M5 9h14M5 15h14M10 4L8 20M16 4l-2 16"/>',
+  users: '<circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M16 5.2a3.2 3.2 0 010 5.6M18 14.3c1.8.8 3 2.6 3 4.7"/>',
+  user: '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-3.9 3.1-7 7-7s7 3.1 7 7"/>',
+  game: '<rect x="3" y="8" width="18" height="10" rx="4"/><path d="M8 11v4M6 13h4M15.5 12h.01M18 14h.01"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  key: '<circle cx="8" cy="15" r="3.5"/><path d="M10.5 12.5L20 3M16 7l3 3"/>',
+  send: '<path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/>',
+  smile: '<circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9.5h.01M15 9.5h.01"/>',
+  clip: '<path d="M20 11l-8.5 8.5a5 5 0 01-7-7L13 4a3.3 3.3 0 014.7 4.7L9.2 17.2a1.7 1.7 0 01-2.4-2.4L14 7.6"/>',
+  mic: '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/>',
+  reply: '<path d="M9 8L4 13l5 5"/><path d="M4 13h10a6 6 0 016 6"/>',
+  edit: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  more: '<circle cx="5" cy="12" r="1.2"/><circle cx="12" cy="12" r="1.2"/><circle cx="19" cy="12" r="1.2"/>',
+  pin: '<path d="M12 17v5M8 3h8l-1 6 3 4H6l3-4z"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  down: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+  music: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  play: '<path d="M8 5l11 7-11 7z"/>',
+  pause: '<path d="M8 5v14M16 5v14"/>',
+  ext: '<path d="M14 4h6v6M20 4l-9 9M18 14v5H5V6h5"/>',
+  copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v10a1 1 0 001 1h3"/>',
+  flag: '<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  logout: '<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',
+  ban: '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
+  eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/>',
+  check: '<path d="M5 12l5 5 9-10"/>',
+  save: '<path d="M6 4h10l3 3v13H6zM9 4v5h6V4M9 20v-6h6v6"/>',
+  moon: '<path d="M20 14.5A8 8 0 019.5 4 8 8 0 1020 14.5z"/>',
+  lock: '<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/>'
 };
-var T = TXT[lang];
-function errText(code, why) { var e = T.err[code]; if (code === 'blocked') return T.err.blocked[why] || T.err.blocked.profanity; return typeof e === 'string' ? e : (T.err.server_error); }
+function icon(n, cls) { return '<svg class="ic' + (cls ? ' ' + cls : '') + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + (IC[n] || '') + '</svg>'; }
+function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function ibtn(name, label, cls, fn) { var b = el('button', cls || ''); b.type = 'button'; b.innerHTML = icon(name); b.title = label; b.setAttribute('aria-label', label); if (fn) b.addEventListener('click', fn); return b; }
+function withIcon(name, text) { var f = document.createDocumentFragment(); var s = document.createElement('span'); s.innerHTML = icon(name, 'sm'); f.appendChild(s.firstChild); f.appendChild(document.createTextNode(text)); return f; }
 
-// ---- avatares prediseñados (no se suben imágenes: nada que moderar) ----
+// ---------- avatares prediseñados (planos, sin subir imágenes) ----------
 var AV_EMOJI = ['🐱', '🐶', '🦊', '🐼', '🐸', '🦁', '🐯', '🐵', '🐧', '🦄', '🐙', '🦖', '🚀', '👾', '🤖', '🎮', '⚽', '🎧', '🍕', '🌈', '🔥', '⭐', '🍉', '🧊'];
-var AV_COLORS = [['#ef4444', '#7f1d1d'], ['#f97316', '#7c2d12'], ['#eab308', '#713f12'], ['#22c55e', '#14532d'], ['#14b8a6', '#134e4a'], ['#3b82f6', '#1e3a8a'], ['#8b5cf6', '#4c1d95'], ['#ec4899', '#831843']];
-function avStyle(id) { var n = parseInt(String(id).slice(1), 10) || 1, c = AV_COLORS[(n - 1) % AV_COLORS.length]; return 'background:linear-gradient(135deg,' + c[0] + ',' + c[1] + ')'; }
+var AV_COLORS = ['#e8c4b4', '#ecd391', '#c4d9ad', '#a9d6cb', '#adc8e4', '#c5bce6', '#e2b8d3', '#dfb09e', '#cfd1ae', '#b4d0dc', '#e0bcbc', '#c7d3bf'];
+function avBg(id) { var n = parseInt(String(id).slice(1), 10) || 1; return AV_COLORS[(n - 1) % AV_COLORS.length]; }
 function avEmoji(id) { return AV_EMOJI[(parseInt(String(id).slice(1), 10) || 1) - 1] || '🙂'; }
-function avatar(id) { var d = document.createElement('div'); d.className = 'av'; d.setAttribute('style', avStyle(id)); d.textContent = avEmoji(id); return d; }
+function avatar(id, cls) { var d = el('div', 'av' + (cls ? ' ' + cls : ''), avEmoji(id)); d.style.background = avBg(id); return d; }
 
-// ---- estado ----
-var S = { pendingShare: null, features: { images: false, audio: true }, myStickers: [], revealed: {}, stTab: 'mine', friends: [], incoming: [], outgoing: [], blocked: [], unread: {}, classes: [], members: {}, wantClass: null, fb: null, user: null, ws: null, authed: false, me: null, avatars: [], rooms: {}, cur: null, retry: 0, reconnect: null, gameRooms: [], wantJoin: null, closing: false };
+// ---------- estado ----------
+var S = { pendingShare: null, features: { images: false, audio: true }, myStickers: [], revealed: {}, stTab: 'emoji', friends: [], incoming: [], outgoing: [], blocked: [], unread: {}, classes: [], members: {}, wantClass: null, fb: null, user: null, ws: null, authed: false, me: null, avatars: [], rooms: {}, cur: null, retry: 0, reconnect: null, gameRooms: [], wantJoin: null, closing: false, ctx: null, typing: {}, drafts: {}, pill: 0, lastTyped: 0, fatal: false };
 var FB_CONFIG = { apiKey: 'AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U', authDomain: 'juanjo-games.firebaseapp.com', projectId: 'juanjo-games', storageBucket: 'juanjo-games.firebasestorage.app', messagingSenderId: '927529249414', appId: '1:927529249414:web:410a686dc7f0da25ec3f07' };
 var FB_BASE = 'https://www.gstatic.com/firebasejs/10.12.5/';
 var WS_URL = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/api/chat/ws';
+var EDIT_MS = 15 * 60000;
+var REACTIONS = ['👍', '❤️', '😂', '😮', '😢', '🙏', '🔥', '👏'];
 
-function toast(msg) { var t = $('#toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(function () { t.style.display = 'none'; }, 3200); }
-function loadScript(src) { return new Promise(function (ok, ko) { var el = document.createElement('script'); el.src = src; el.onload = ok; el.onerror = function () { ko(new Error('load ' + src)); }; document.head.appendChild(el); }); }
-function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+function room(key) { return S.rooms[key] || (S.rooms[key] = { key: key, name: key, kind: '', msgs: [], online: 0, loaded: false, more: false, pins: [], slow: 0, owner: false, dividerId: null }); }
+function cur() { return room(S.cur || 'global'); }
+function myName() { return S.me && S.me.username || ''; }
+function canManage(r) { return !!(S.me && (S.me.admin || (r.kind === 'class' && r.owner))); }
+function toast(msg) { var t = $('#toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.t); toast.t = setTimeout(function () { t.style.display = 'none'; }, 3000); }
+function loadScript(src) { return new Promise(function (ok, ko) { var e = document.createElement('script'); e.src = src; e.onload = ok; e.onerror = function () { ko(new Error('load ' + src)); }; document.head.appendChild(e); }); }
+function fmtTime(ts) { var d = new Date(ts); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function dayKey(ts) { var d = new Date(ts); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
+function dayLabel(ts) {
+  var now = Date.now(); if (dayKey(ts) === dayKey(now)) return T.today; if (dayKey(ts) === dayKey(now - 86400000)) return T.yesterday;
+  try { return new Intl.DateTimeFormat(lang, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(ts)); } catch (e) { return new Date(ts).toLocaleDateString(); }
+}
+function fmtDur(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
 
-// ---- compuerta (inicio de sesión / perfil / conectando) ----
+// ---------- pantallas de entrada y cuadros ----------
 function gate(kind, msg) {
-  var g = $('#gate'), c = $('#card');
-  c.textContent = '';
+  var g = $('#gate'), c = $('#card'); c.textContent = '';
   if (!kind) { g.classList.remove('on'); return; }
   g.classList.add('on');
   if (kind === 'loading') { c.appendChild(el('h1', null, T.loading)); if (msg) c.appendChild(el('p', null, msg)); return; }
   if (kind === 'signin') {
-    c.appendChild(el('h1', null, '💬 ' + T.signinH)); c.appendChild(el('p', null, T.signinP));
+    c.appendChild(el('h1', null, T.signinH)); c.appendChild(el('p', null, T.signinP));
     if (msg) c.appendChild(el('div', 'error', msg));
-    var b = el('button', 'btn', T.signin); b.id = 'signinBtn'; c.appendChild(b);
-    b.addEventListener('click', signIn);
-    return;
+    var b = el('button', 'btn', T.signin); b.id = 'signinBtn'; c.appendChild(b); b.addEventListener('click', signIn); return;
   }
   if (kind === 'friendAdd') {
-    c.appendChild(el('h1', null, '👋 ' + T.friendH)); c.appendChild(el('p', null, T.friendP));
+    c.appendChild(el('h1', null, T.friendH)); c.appendChild(el('p', null, T.friendP));
     var fi = el('input', 'field'); fi.id = 'friendIn'; fi.maxLength = 20; fi.placeholder = T.friendName; fi.autocomplete = 'off'; fi.spellcheck = false; c.appendChild(fi);
     var fer = el('div', 'error', msg || ''); fer.id = 'friendErr'; c.appendChild(fer);
-    var frow = el('div'); frow.style.cssText = 'display:flex;gap:10px';
-    var fok = el('button', 'btn', T.sendReq); fok.id = 'friendGo'; frow.appendChild(fok);
-    var fno = el('button', 'btn ghost', T.cancel); fno.addEventListener('click', function () { gate(null); }); frow.appendChild(fno); c.appendChild(frow);
-    var fgo = function () { fer.textContent = ''; var v = fi.value.trim(); if (!v) return; S.sentTo = v; wsend({ t: 'friend.request', username: v }); };
+    var fr = el('div', 'row2'); var fok = el('button', 'btn', T.sendReq); fok.id = 'friendGo'; fr.appendChild(fok);
+    var fno = el('button', 'btn ghost', T.cancel); fno.addEventListener('click', function () { gate(null); }); fr.appendChild(fno); c.appendChild(fr);
+    var fgo = function () { fer.textContent = ''; var v = fi.value.trim(); if (!v) return; wsend({ t: 'friend.request', username: v }); };
     fok.addEventListener('click', fgo); fi.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); fgo(); } });
-    setTimeout(function () { fi.focus(); }, 50);
-    return;
+    setTimeout(function () { fi.focus(); }, 50); return;
   }
   if (kind === 'classNew' || kind === 'classJoin') {
     var isNew = kind === 'classNew';
-    c.appendChild(el('h1', null, (isNew ? '🏫 ' + T.classH : '🔑 ' + T.joinH))); c.appendChild(el('p', null, isNew ? T.classP : T.joinP));
-    var ci = el('input', 'field'); ci.id = 'classIn'; ci.maxLength = isNew ? 40 : 8; ci.placeholder = isNew ? T.className : T.codeIn; ci.autocomplete = 'off'; ci.spellcheck = false; if (!isNew) ci.style.cssText = 'text-transform:uppercase;letter-spacing:.25em';
-    c.appendChild(ci);
+    c.appendChild(el('h1', null, isNew ? T.classH : T.joinH)); c.appendChild(el('p', null, isNew ? T.classP : T.joinP));
+    var ci = el('input', 'field'); ci.id = 'classIn'; ci.maxLength = isNew ? 40 : 8; ci.placeholder = isNew ? T.className : T.codeIn; ci.autocomplete = 'off'; ci.spellcheck = false; if (!isNew) ci.style.cssText = 'text-transform:uppercase;letter-spacing:.2em'; c.appendChild(ci);
     var cer = el('div', 'error', msg || ''); cer.id = 'classErr'; c.appendChild(cer);
-    var crow = el('div'); crow.style.cssText = 'display:flex;gap:10px';
-    var cok = el('button', 'btn', isNew ? T.create : T.join); cok.id = 'classGo'; crow.appendChild(cok);
-    var cno = el('button', 'btn ghost', T.cancel); cno.addEventListener('click', function () { gate(null); }); crow.appendChild(cno); c.appendChild(crow);
+    var cr = el('div', 'row2'); var cok = el('button', 'btn', isNew ? T.create : T.join); cok.id = 'classGo'; cr.appendChild(cok);
+    var cno = el('button', 'btn ghost', T.cancel); cno.addEventListener('click', function () { gate(null); }); cr.appendChild(cno); c.appendChild(cr);
     var go = function () { cer.textContent = ''; var v = ci.value.trim(); if (!v) return; wsend(isNew ? { t: 'class.create', name: v } : { t: 'class.join', code: v }); };
     cok.addEventListener('click', go); ci.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
-    setTimeout(function () { ci.focus(); }, 50);
-    return;
+    setTimeout(function () { ci.focus(); }, 50); return;
   }
   if (kind === 'profile') {
     var editing = !!(S.me && S.me.username);
@@ -230,127 +406,115 @@ function gate(kind, msg) {
     c.appendChild(inp); c.appendChild(el('p', null, T.nameHint));
     var avs = el('div'); avs.id = 'avs'; var pick = (S.me && S.me.avatar) || 'a01';
     (S.avatars.length ? S.avatars : AV_EMOJI.map(function (_, i) { return 'a' + String(i + 1).padStart(2, '0'); })).forEach(function (id) {
-      var b = el('button', id === pick ? 'on' : '', avEmoji(id)); b.type = 'button'; b.setAttribute('style', avStyle(id)); b.setAttribute('data-av', id);
-      b.addEventListener('click', function () { pick = id; [].forEach.call(avs.children, function (x) { x.classList.toggle('on', x === b); }); });
-      avs.appendChild(b);
-    });
-    c.appendChild(avs);
+      var b = el('button', id === pick ? 'on' : '', avEmoji(id)); b.type = 'button'; b.style.background = avBg(id); b.setAttribute('data-av', id);
+      b.addEventListener('click', function () { pick = id; [].forEach.call(avs.children, function (x) { x.classList.toggle('on', x === b); }); }); avs.appendChild(b);
+    }); c.appendChild(avs);
     var er = el('div', 'error', msg || ''); er.id = 'profErr'; c.appendChild(er);
-    var row = el('div'); row.style.cssText = 'display:flex;gap:10px';
-    var ok = el('button', 'btn', T.save); ok.id = 'saveProfile'; row.appendChild(ok);
+    var row = el('div', 'row2'); var ok = el('button', 'btn', T.save); ok.id = 'saveProfile'; row.appendChild(ok);
     if (editing) { var no = el('button', 'btn ghost', T.cancel); no.addEventListener('click', function () { gate(null); }); row.appendChild(no); }
     c.appendChild(row);
     var submit = function () { er.textContent = ''; wsend({ t: 'profile', username: inp.value.trim(), avatar: pick }); };
-    ok.addEventListener('click', submit);
-    inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+    ok.addEventListener('click', submit); inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
     setTimeout(function () { inp.focus(); }, 50);
   }
 }
 
-// ---- Firebase / cuenta ----
+// ---------- cuenta ----------
 function boot() {
   gate('loading');
   var have = window.firebase && window.firebase.auth;
-  (have ? Promise.resolve() : loadScript(FB_BASE + 'firebase-app-compat.js').then(function () { return loadScript(FB_BASE + 'firebase-auth-compat.js'); }))
-    .then(function () {
-      var app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(FB_CONFIG);
-      S.fb = app.auth();
-      S.fb.onAuthStateChanged(function (u) {
-        S.user = u || null;
-        if (!u) { disconnect(true); gate('signin'); $('#me').hidden = true; return; }
-        connect();
-      });
-    }).catch(function () { gate('signin', T.err.server_error); });
+  (have ? Promise.resolve() : loadScript(FB_BASE + 'firebase-app-compat.js').then(function () { return loadScript(FB_BASE + 'firebase-auth-compat.js'); })).then(function () {
+    var app = window.firebase.apps.length ? window.firebase.app() : window.firebase.initializeApp(FB_CONFIG);
+    S.fb = app.auth();
+    S.fb.onAuthStateChanged(function (u) { S.user = u || null; if (!u) { disconnect(true); gate('signin'); $('#me').hidden = true; return; } connect(); });
+  }).catch(function () { gate('signin', T.err.server_error); });
 }
 function signIn() {
   if (!S.fb) return;
-  var prov = new window.firebase.auth.GoogleAuthProvider(); prov.setCustomParameters({ prompt: 'select_account' });   // deja elegir la cuenta del colegio
-  S.fb.signInWithPopup(prov).catch(function (e) {
-    if (e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) return;
-    gate('signin', T.err.server_error);
-  });
+  var prov = new window.firebase.auth.GoogleAuthProvider(); prov.setCustomParameters({ prompt: 'select_account' });
+  S.fb.signInWithPopup(prov).catch(function (e) { if (e && (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request')) return; gate('signin', T.err.server_error); });
 }
 
-// ---- conexión ----
-function setState(kind, tip) { var s = $('#state'); s.className = kind || ''; s.title = tip || ''; }
+// ---------- conexión ----------
+function setState(kind) { var s = $('#state'), t = $('#stateT'); if (s) s.className = 'dot' + (kind === 'ok' ? ' on' : ''); if (t) t.textContent = kind === 'ok' ? T.stateOn : T.stateOff; }
 function wsend(o) { if (S.ws && S.ws.readyState === 1) S.ws.send(JSON.stringify(o)); }
 function disconnect(final) { S.closing = !!final; clearTimeout(S.reconnect); if (S.ws) { try { S.ws.close(); } catch (e) {} } S.ws = null; S.authed = false; }
 function connect() {
   if (S.ws || !S.user) return;
-  setState('', T.loading);
-  S.closing = false; S.fatal = false;
-  var ws = new WebSocket(WS_URL);
-  S.ws = ws;
-  ws.onopen = function () {
-    S.user.getIdToken().then(function (tok) { wsend({ t: 'auth', token: tok }); }, function () { gate('signin', T.err.auth_failed); });
-  };
+  S.closing = false; S.fatal = false; setState('');
+  var ws = new WebSocket(WS_URL); S.ws = ws;
+  ws.onopen = function () { S.user.getIdToken().then(function (tok) { wsend({ t: 'auth', token: tok }); }, function () { gate('signin', T.err.auth_failed); }); };
   ws.onmessage = function (e) { var m; try { m = JSON.parse(e.data); } catch (x) { return; } onMsg(m); };
   ws.onclose = function () {
-    if (S.ws !== ws) return;
-    S.ws = null; S.authed = false; setState('bad', T.offline);
-    $('#in').disabled = true; $('#go').disabled = true;
+    if (S.ws !== ws) return; S.ws = null; S.authed = false; setState('');
+    $('#in').disabled = true; $('#go').disabled = true; syncTools();
     if (S.closing || S.fatal) return;
-    S.retry = Math.min(S.retry + 1, 6);
-    S.reconnect = setTimeout(connect, Math.min(15000, 800 * Math.pow(2, S.retry)));
+    S.retry = Math.min(S.retry + 1, 6); S.reconnect = setTimeout(connect, Math.min(15000, 800 * Math.pow(2, S.retry)));
   };
   ws.onerror = function () {};
 }
 
+// ---------- mensajes del servidor ----------
 function onMsg(m) {
   switch (m.t) {
     case 'hello':
-      S.authed = true; S.retry = 0; S.fatal = false; S.me = m.me; S.avatars = m.avatars || []; S.features = m.features || { images: false, audio: true }; setState('ok', 'OK'); renderMe();
+      S.authed = true; S.retry = 0; S.fatal = false; S.me = m.me; S.avatars = m.avatars || []; S.features = m.features || { images: false, audio: true };
+      setState('ok'); renderMe();
       if (!m.me.username) { gate('profile'); return; }
       gate(null); startRooms(); return;
     case 'me':
-      S.me = m.me; renderMe();
-      if ($('#card #nameIn')) { gate(null); startRooms(); }
-      return;
+      S.me = m.me; renderMe(); if ($('#card #nameIn')) { gate(null); startRooms(); } return;
     case 'reset_profile': S.me.username = null; gate('profile'); return;
     case 'joined': {
       var r = room(m.room); if (m.kind !== 'dm') r.name = m.name; r.kind = m.kind; r.msgs = m.history; r.online = m.online; r.loaded = true; r.more = m.history.length >= 50;
-      renderRooms(); if (S.cur === m.room) { renderTop(); renderMsgs(true); }
+      r.pins = m.pins || []; r.slow = m.slow || 0; r.owner = !!m.owner;
+      renderRooms(); if (S.cur === m.room) { renderTop(); renderMsgs('bottom'); }
       if (S.pendingShare && S.pendingShare.key === m.room) { var ps = S.pendingShare; S.pendingShare = null; wsend({ t: 'send', room: ps.key, track: ps.track, text: '', cid: 't' + Date.now() }); finishShare(ps.key); }
       return;
     }
-    case 'history': { var h = room(m.room); h.msgs = m.items.concat(h.msgs); h.more = m.items.length >= 50; if (S.cur === m.room) renderMsgs(false, true); return; }
-    case 'msg': { var rm = room(m.room); rm.msgs.push(m.m); if (rm.msgs.length > 400) rm.msgs.shift(); if (S.cur === m.room) { appendMsg(m.m, true); if (m.cid && m.m.uid === (S.me && S.me.uid)) clearInput(m.cid); } return; }
-    case 'del': { var dr = room(m.room); dr.msgs = dr.msgs.filter(function (x) { return x.id !== m.id; }); if (S.cur === m.room) renderMsgs(false); return; }
+    case 'history': { var h = room(m.room); h.msgs = m.items.concat(h.msgs); h.more = m.items.length >= 50; if (S.cur === m.room) renderMsgs('older'); return; }
+    case 'msg': {
+      var rm = room(m.room); rm.msgs.push(m.m); if (rm.msgs.length > 400) rm.msgs.shift();
+      delete (S.typing[m.room] || {})[m.m.u];
+      var own = S.me && m.m.uid === S.me.uid;
+      if (own) { clearInput(m.cid); }
+      else incoming(m.room, m.m);
+      if (S.cur === m.room) appendMsg(m.m, own); return;
+    }
+    case 'edited': { var er = room(m.room); er.msgs.forEach(function (x) { if (x.id === m.id) { x.text = m.text; x.e = m.e; } }); if (S.cur === m.room) refreshMsg(m.id); return; }
+    case 'rx': { var xr = room(m.room); xr.msgs.forEach(function (x) { if (x.id === m.id) x.rx = m.rx; }); if (S.cur === m.room) refreshMsg(m.id); return; }
+    case 'del': { var dr = room(m.room); dr.msgs = dr.msgs.filter(function (x) { return x.id !== m.id; }); dr.msgs.forEach(function (x) { if (x.rp && x.rp.id === m.id) x.rp = { id: m.id, gone: true }; }); if (S.cur === m.room) renderMsgs('keep'); return; }
+    case 'pins': { room(m.room).pins = m.items || []; if (S.cur === m.room) renderPins(); return; }
+    case 'slow': { room(m.room).slow = m.seconds; if (S.cur === m.room) renderTop(); return; }
+    case 'typing': { var ty = S.typing[m.room] || (S.typing[m.room] = {}); ty[m.u] = Date.now() + 4500; renderTyping(); return; }
+    case 'mention': { if (S.cur !== m.room || document.hidden) { var u = S.unread[m.room] || (S.unread[m.room] = { n: 0, m: false }); u.m = true; if (!u.n) u.n = 1; updateBadges(); } return; }
     case 'online': { room(m.room).online = m.n; if (S.cur === m.room) renderTop(); renderRooms(); return; }
     case 'rooms': S.gameRooms = m.game || []; renderRooms(); return;
-    case 'classes': S.classes = m.items || []; S.classes.forEach(function (c) { var r = room(c.key); r.name = c.name; r.kind = 'class'; if (!r.loaded) wsend({ t: 'join', room: c.key }); }); renderRooms(); if (S.wantClass) { wsend({ t: 'class.join', code: S.wantClass }); S.wantClass = null; } return;
-    case 'class.created': case 'class.joined': {
-      gate(null); var it = m.item; if (!it) return;
-      if (!S.classes.some(function (c) { return c.key === it.key; })) S.classes.push(it);
-      var cr = room(it.key); cr.name = it.name; cr.kind = 'class'; wsend({ t: 'join', room: it.key }); S.cur = it.key; renderRooms(); renderTop(); renderMsgs(true); return;
-    }
-    case 'class.left': {
-      S.classes = S.classes.filter(function (c) { return c.key !== m.room; }); delete S.rooms[m.room];
-      if (S.cur === m.room) { S.cur = 'global'; renderTop(); renderMsgs(true); } renderRooms(); return;
-    }
-    case 'friends': {
-      S.friends = m.friends || []; S.incoming = m.incoming || []; S.outgoing = m.outgoing || []; S.blocked = m.blocked || [];
-      S.friends.forEach(function (f) { var r = room(f.room); r.name = f.username; r.kind = 'dm'; r.peer = f.uid; });
-      if ($('#card #friendIn')) { gate(null); toast(T.reqSent); }
-      var sig = S.blocked.map(function (b) { return b.uid; }).join(',');
-      renderRooms(); if (S.cur) renderTop(); if (sig !== S.blockedSig) { S.blockedSig = sig; if (S.cur) renderMsgs(true); } return;
-    }
-    case 'dm.notify': {
-      if (S.cur === m.room) return;
-      S.unread[m.room] = (S.unread[m.room] || 0) + 1; toast('💬 ' + T.unreadMsg + ' ' + m.u); renderRooms(); return;
-    }
-    case 'dm.closed': {
-      delete S.rooms[m.room]; if (S.cur === m.room) { S.cur = 'global'; renderTop(); renderMsgs(true); } renderRooms(); return;
-    }
+    case 'reported': toast(T.reported); return;
     case 'media.hidden': case 'media.restored': {
       var mr = room(m.room), changed = false;
       mr.msgs.forEach(function (x) { if (x.media && x.media.id === m.id) { x.media = m.t === 'media.hidden' ? { id: m.id, kind: x.media.kind, hidden: true } : m.media; changed = true; } });
-      if (changed && S.cur === m.room) renderMsgs(false); return;
+      if (changed && S.cur === m.room) renderMsgs('keep'); return;
     }
     case 'stickers': S.myStickers = m.items || []; if ($('#panel').classList.contains('on')) renderPanel(); return;
-    case 'class.members': S.members[m.room] = m; if (S.cur === m.room) classMenuRender(); return;
-    case 'sys': { if (S.cur === m.room) { var bx = $('#msgs'); bx.appendChild(el('div', 'sys', m.u + ' ' + T.sysJoin)); bx.scrollTop = bx.scrollHeight; } return; }
-    case 'reported': toast(T.reported); return;
+    case 'classes': S.classes = m.items || []; S.classes.forEach(function (c) { var r2 = room(c.key); r2.name = c.name; r2.kind = 'class'; if (!r2.loaded) wsend({ t: 'join', room: c.key }); }); renderRooms(); if (S.wantClass) { wsend({ t: 'class.join', code: S.wantClass }); S.wantClass = null; } return;
+    case 'class.created': case 'class.joined': {
+      gate(null); var it = m.item; if (!it) return;
+      if (!S.classes.some(function (c) { return c.key === it.key; })) S.classes.push(it);
+      var cr = room(it.key); cr.name = it.name; cr.kind = 'class'; wsend({ t: 'join', room: it.key }); switchTo(it.key); return;
+    }
+    case 'class.left': { S.classes = S.classes.filter(function (c) { return c.key !== m.room; }); delete S.rooms[m.room]; if (S.cur === m.room) switchTo('global'); renderRooms(); return; }
+    case 'class.members': S.members[m.room] = m; renderMemList(); return;
+    case 'sys': { if (S.cur === m.room) { var bx = $('#msgs'); bx.appendChild(el('div', 'intro', m.u + ' ' + T.sysJoin)); } return; }
+    case 'friends': {
+      S.friends = m.friends || []; S.incoming = m.incoming || []; S.outgoing = m.outgoing || []; S.blocked = m.blocked || [];
+      S.friends.forEach(function (f) { var r3 = room(f.room); r3.name = f.username; r3.kind = 'dm'; r3.peer = f.uid; });
+      if ($('#card #friendIn')) { gate(null); toast(T.reqSent); }
+      var sig = S.blocked.map(function (b) { return b.uid; }).join(',');
+      renderRooms(); if (S.cur) renderTop(); if (sig !== S.blockedSig) { S.blockedSig = sig; if (S.cur) renderMsgs('bottom'); } return;
+    }
+    case 'dm.notify': { if (S.cur === m.room && !document.hidden) return; var du = S.unread[m.room] || (S.unread[m.room] = { n: 0, m: false }); du.n++; toast(T.unreadMsg + ' ' + m.u); updateBadges(); return; }
+    case 'dm.closed': { delete S.rooms[m.room]; if (S.cur === m.room) switchTo('global'); renderRooms(); return; }
     case 'err': onErr(m); return;
   }
 }
@@ -359,169 +523,394 @@ function onErr(m) {
   if (code === 'auth_failed' || code === 'banned' || code === 'domain_not_allowed' || code === 'email_unverified') { S.fatal = true; gate('signin', errText(code)); return; }
   if ($('#card #friendIn')) { $('#friendErr').textContent = errText(code, m.why); return; }
   if ($('#card #classIn')) { $('#classErr').textContent = errText(code, m.why); return; }
-  if ($('#card #nameIn')) { $('#profErr').textContent = code === 'name_cooldown' ? errText(code) : errText(code, m.why); return; }
+  if ($('#card #nameIn')) { $('#profErr').textContent = errText(code, m.why); return; }
   var msg = errText(code, m.why);
-  if (code === 'rate' && m.retry) msg += ' (' + Math.ceil(m.retry / 1000) + 's)';
-  if (code === 'blocked' || code === 'rate' || code === 'duplicate' || code === 'too_long' || code === 'muted') { var c = $('#cnt'); c.className = 'err'; c.textContent = msg; clearTimeout(onErr.t); onErr.t = setTimeout(function () { c.className = ''; c.textContent = ''; updateCount(); }, 4000); return; }
+  if ((code === 'rate' || code === 'slowmode') && m.retry) msg = code === 'slowmode' ? T.err.slowmode + ' (' + Math.ceil(m.retry / 1000) + ' s)' : msg + ' (' + Math.ceil(m.retry / 1000) + ' s)';
+  if (['blocked', 'rate', 'duplicate', 'too_long', 'muted', 'slowmode', 'cant_edit', 'edit_expired'].indexOf(code) >= 0) { flashCount(msg); return; }
   toast(msg);
 }
+function flashCount(msg) { var c = $('#cnt'); c.className = 'err'; c.textContent = msg; clearTimeout(flashCount.t); flashCount.t = setTimeout(function () { c.className = ''; c.textContent = ''; updateCount(); }, 4500); }
 
-// ---- salas ----
-function room(key) { return S.rooms[key] || (S.rooms[key] = { key: key, name: key, kind: '', msgs: [], online: 0, loaded: false, more: false }); }
+// ---------- no leídos ----------
+function totalUnread() { var n = 0; Object.keys(S.unread).forEach(function (k) { n += S.unread[k].n || 0; }); return n; }
+function updateBadges() { renderRooms(); var n = totalUnread(); document.title = (n ? '(' + n + ') ' : '') + 'Budsin Chat'; }
+function mentionsMe(m) { var n = myName(); if (!n || !m.text) return false; return new RegExp('(^|[^A-Za-z0-9._-])@' + n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![A-Za-z0-9._-])', 'i').test(m.text); }
+function incoming(key, m) {
+  var viewing = S.cur === key && !document.hidden;
+  if (viewing) { if (!atBottom()) { S.pill++; showPill(); } return; }
+  var u = S.unread[key] || (S.unread[key] = { n: 0, m: false }); u.n++; if (mentionsMe(m)) u.m = true; updateBadges();
+}
+function enterRoom(key) {
+  var r = room(key), u = S.unread[key];
+  r.dividerId = null;
+  if (u && u.n > 0 && r.msgs.length) { var idx = Math.max(0, r.msgs.length - u.n); if (r.msgs[idx]) r.dividerId = r.msgs[idx].id; }
+  delete S.unread[key]; S.pill = 0; updateBadges();
+}
+document.addEventListener('visibilitychange', function () { if (!document.hidden) { if (S.user && !S.ws) { clearTimeout(S.reconnect); connect(); } if (S.cur && atBottom()) { delete S.unread[S.cur]; updateBadges(); } } });
+
+// ---------- salas ----------
 function startRooms() {
-  $('#in').placeholder = T.ph; $('#go').textContent = T.send;
-  // volver a entrar a las salas abiertas tras una reconexión
-  var keys = Object.keys(S.rooms);
-  if (S.wantJoin) { keys.push(S.wantJoin.key); }
+  $('#in').placeholder = T.ph; $('#in').disabled = false; $('#go').disabled = false;
+  var keys = Object.keys(S.rooms).filter(function (k) { return k.indexOf('class:') !== 0; });
+  if (S.wantJoin) keys.push(S.wantJoin.key);
   if (keys.indexOf('global') < 0) keys.unshift('global');
-  keys = keys.filter(function (k) { return k.indexOf('class:') !== 0; });
   keys.forEach(function (k) { if (k === 'global') wsend({ t: 'join', room: 'global' }); else if (k.indexOf('game:') === 0) wsend({ t: 'join', room: k, name: (S.wantJoin && S.wantJoin.key === k ? S.wantJoin.name : S.rooms[k] && S.rooms[k].name) || '' }); });
   if (S.wantJoin) { S.cur = S.wantJoin.key; S.wantJoin = null; } else if (!S.cur) S.cur = 'global';
   wsend({ t: 'rooms' }); wsend({ t: 'class.list' }); wsend({ t: 'friend.list' }); wsend({ t: 'sticker.list' });
   clearInterval(startRooms.iv); startRooms.iv = setInterval(function () { wsend({ t: 'rooms' }); wsend({ t: 'friend.list' }); }, 30000);
-  renderRooms(); renderTop(); renderMsgs(true);
-  $('#in').disabled = false; $('#go').disabled = false; syncTools();
-  if (readShare() && /^#\/share/.test(location.hash)) setTimeout(openShare, 700);   // da tiempo a que lleguen tus grupos y amigos
+  renderRooms(); renderTop(); renderMsgs('bottom'); syncTools();
+  if (readShare() && /^#\/share/.test(location.hash)) setTimeout(openShare, 700);
+}
+function switchTo(key) {
+  if (S.cur) S.drafts[S.cur] = $('#in').value;
+  S.cur = key; enterRoom(key); exitCtx(); $('#in').value = S.drafts[key] || ''; updateCount();
+  renderRooms(); renderTop(); renderMsgs('bottom'); renderTyping(); $('#side').classList.remove('open');
 }
 function openRoom(key, name) {
   if (key.indexOf('game:') === 0 && !(S.rooms[key] && S.rooms[key].loaded)) wsend({ t: 'join', room: key, name: name || '' });
-  if (key.indexOf('dm:') === 0) { var pr = room(key).peer; if (pr && !room(key).loaded) wsend({ t: 'dm.open', uid: pr }); delete S.unread[key]; }
-  S.cur = key; renderRooms(); renderTop(); renderMsgs(true); $('#side').classList.remove('open'); $('#in').focus();
+  if (key.indexOf('dm:') === 0 && !room(key).loaded) { var pr = room(key).peer; if (pr) wsend({ t: 'dm.open', uid: pr }); }
+  switchTo(key); $('#in').focus();
+}
+function secHead(text, btns) { var h = el('div', 'sec'); h.appendChild(el('span', null, text)); var w = el('span'); w.style.cssText = 'display:flex;gap:2px'; (btns || []).forEach(function (b) { w.appendChild(b); }); h.appendChild(w); return h; }
+function roomBtn(key, name, iconName, badgeKey, extra) {
+  var r = room(key), b = el('button', 'room' + (S.cur === key ? ' on' : '') + (S.unread[key] ? ' unread' : '')); b.type = 'button';
+  if (extra && extra.av) b.appendChild(extra.av); else { var s = document.createElement('span'); s.innerHTML = icon(iconName); b.appendChild(s.firstChild); }
+  b.appendChild(el('span', 'n', name));
+  if (extra && extra.dot != null) b.appendChild(el('span', 'dot' + (extra.dot ? ' on' : '')));
+  var u = S.unread[key]; if (u && u.n) { var bd = el('span', 'badge' + (u.m ? ' mention' : ''), String(u.n)); b.appendChild(bd); }
+  else if (extra && extra.count) b.appendChild(el('span', 'c', String(extra.count)));
+  b.addEventListener('click', function () { openRoom(key, name); }); return b;
 }
 function renderRooms() {
   var box = $('#rooms'); box.textContent = '';
-  var add = function (key, name, icon, n) {
-    var b = el('button', 'room' + (S.cur === key ? ' on' : '')); b.appendChild(el('span', null, icon)); b.appendChild(el('span', 'n', name)); if (n) b.appendChild(el('span', 'c', String(n)));
-    b.addEventListener('click', function () { openRoom(key, name); }); box.appendChild(b);
-  };
-  add('global', T.global, '🌍', room('global').online);
-  box.appendChild(el('div', 'sec', T.classes));
-  S.classes.forEach(function (c) { add(c.key, c.name, '🏫', room(c.key).online); });
-  var nb = el('button', 'room'); nb.appendChild(el('span', null, '＋')); nb.appendChild(el('span', 'n', T.newClass)); nb.id = 'newClassBtn'; nb.addEventListener('click', function () { gate('classNew'); }); box.appendChild(nb);
-  var jb = el('button', 'room'); jb.appendChild(el('span', null, '🔑')); jb.appendChild(el('span', 'n', T.joinClass)); jb.id = 'joinClassBtn'; jb.addEventListener('click', function () { gate('classJoin'); }); box.appendChild(jb);
-  box.appendChild(el('div', 'sec', T.friends));
+  box.appendChild(secHead(T.channels, []));
+  box.appendChild(roomBtn('global', T.global, 'hash', 'global', { count: room('global').online }));
+  var seen = {}, any = false;
+  S.gameRooms.forEach(function (g) { seen[g.key] = 1; any = true; box.appendChild(roomBtn(g.key, g.name, 'game', g.key, { count: g.online })); });
+  Object.keys(S.rooms).forEach(function (k) { if (k.indexOf('game:') === 0 && !seen[k]) { any = true; box.appendChild(roomBtn(k, S.rooms[k].name, 'game', k, { count: S.rooms[k].online })); } });
+  if (!any) box.appendChild(el('div', 'hint', T.gamesNone));
+  var nc = ibtn('plus', T.newClass, null, function () { gate('classNew'); }); nc.id = 'newClassBtn';
+  var jc = ibtn('key', T.joinClass, null, function () { gate('classJoin'); }); jc.id = 'joinClassBtn';
+  box.appendChild(secHead(T.classes, [jc, nc]));
+  S.classes.forEach(function (c) { box.appendChild(roomBtn(c.key, c.name, 'users', c.key, { count: room(c.key).online })); });
+  var af = ibtn('plus', T.addFriend, null, function () { gate('friendAdd'); }); af.id = 'addFriendBtn';
+  box.appendChild(secHead(T.dms, [af]));
   S.incoming.forEach(function (u) {
-    var row = el('div', 'room'); row.appendChild(avatar(u.avatar)); row.appendChild(el('span', 'n', u.username || '?'));
-    var ok = el('button', null, '✓'); ok.title = T.sendReq; ok.className = 'mini ok'; ok.addEventListener('click', function () { wsend({ t: 'friend.accept', uid: u.uid }); });
-    var no = el('button', null, '✗'); no.className = 'mini'; no.addEventListener('click', function () { wsend({ t: 'friend.decline', uid: u.uid }); });
+    var row = el('div', 'item'); row.appendChild(avatar(u.avatar, 'sm')); row.lastChild.style.cssText = 'width:20px;height:20px;border-radius:5px;font-size:12px'; row.appendChild(el('span', 'n', u.username || '?'));
+    var ok = el('button', 'mini ok'); ok.innerHTML = icon('check', 'sm'); ok.title = T.sendReq; ok.addEventListener('click', function () { wsend({ t: 'friend.accept', uid: u.uid }); });
+    var no = el('button', 'mini'); no.innerHTML = icon('x', 'sm'); no.title = T.cancel; no.addEventListener('click', function () { wsend({ t: 'friend.decline', uid: u.uid }); });
     row.appendChild(ok); row.appendChild(no); box.appendChild(row);
   });
-  S.friends.forEach(function (f) {
-    var b = el('button', 'room' + (S.cur === f.room ? ' on' : '')); var a = avatar(f.avatar); b.appendChild(a);
-    b.appendChild(el('span', 'n', f.username || '?')); var dot = el('span', 'dot' + (f.online ? ' on' : '')); b.appendChild(dot);
-    if (S.unread[f.room]) b.appendChild(el('span', 'badge', String(S.unread[f.room])));
-    b.addEventListener('click', function () { openRoom(f.room, f.username); }); box.appendChild(b);
-  });
-  S.outgoing.forEach(function (u) { var row = el('div', 'room'); row.appendChild(el('span', null, '⏳')); row.appendChild(el('span', 'n', (u.username || '?') + ' · ' + T.pending)); var no = el('button', null, '✗'); no.className = 'mini'; no.addEventListener('click', function () { wsend({ t: 'friend.decline', uid: u.uid }); }); row.appendChild(no); box.appendChild(row); });
-  var fb = el('button', 'room'); fb.appendChild(el('span', null, '＋')); fb.appendChild(el('span', 'n', T.addFriend)); fb.id = 'addFriendBtn'; fb.addEventListener('click', function () { gate('friendAdd'); }); box.appendChild(fb);
-  box.appendChild(el('div', 'sec', T.games));
-  var seen = {};
-  S.gameRooms.forEach(function (g) { seen[g.key] = 1; add(g.key, g.name, '🎮', g.online); });
-  Object.keys(S.rooms).forEach(function (k) { if (k.indexOf('game:') === 0 && !seen[k]) add(k, S.rooms[k].name, '🎮', S.rooms[k].online); });
-  if (!S.gameRooms.length && !Object.keys(S.rooms).some(function (k) { return k.indexOf('game:') === 0; })) box.appendChild(el('div', 'hint', T.gamesNone));
+  S.friends.forEach(function (f) { var av = avatar(f.avatar); av.style.cssText = 'width:20px;height:20px;border-radius:5px;font-size:12px;background:' + avBg(f.avatar); box.appendChild(roomBtn(f.room, f.username || '?', 'user', f.room, { av: av, dot: f.online })); });
+  S.outgoing.forEach(function (u) { var row = el('div', 'item'); row.appendChild(el('span', 'n', (u.username || '?') + ' · ' + T.pending)); var no = el('button', 'mini'); no.innerHTML = icon('x', 'sm'); no.addEventListener('click', function () { wsend({ t: 'friend.decline', uid: u.uid }); }); row.appendChild(no); box.appendChild(row); });
+  if (!S.friends.length && !S.incoming.length && !S.outgoing.length) box.appendChild(el('div', 'hint', T.friendNone));
 }
-function syncTools() { var k = room(S.cur || 'global').kind; var on = S.authed; $('#bAttach').hidden = !S.features.images; $('#bAttach').disabled = !on; $('#bStk').disabled = !on; $('#bMic').hidden = !(k === 'dm' || k === 'class') || !micAvailable(); $('#bMic').disabled = !on; $('#bAttach').title = T.attach; $('#bStk').title = T.stickers; $('#bMic').title = T.mic; }
 function renderTop() {
-  syncTools();
-  var r = room(S.cur || 'global');
-  $('#title').textContent = r.kind === 'dm' ? '💬 ' + T.dmWith + ' ' + r.name : r.kind === 'game' ? T.gameRoom + ' ' + r.name : (r.key === 'global' ? T.global : r.name);
+  var r = cur(), t = $('#title');
+  var iname = r.kind === 'dm' ? 'user' : r.kind === 'class' ? 'users' : r.kind === 'game' ? 'game' : 'hash';
+  t.innerHTML = icon(iname, 'sm') + ' ';
+  t.appendChild(document.createTextNode(r.kind === 'dm' ? r.name : r.key === 'global' ? T.global : r.name));
   $('#sub').textContent = r.online ? r.online + ' ' + T.online : '';
-  $('#manage').hidden = r.kind !== 'class' && r.kind !== 'dm';
-  $('#manageT').textContent = r.kind === 'dm' ? '⋯' : T.manage;
+  var sl = $('#slowTag'); sl.hidden = !r.slow; sl.innerHTML = r.slow ? icon('clock', 'sm') + ' ' + T.slow + ' · ' + fmt(T.secs, { n: r.slow }) : '';
+  $('#manage').hidden = !(r.kind === 'class' || r.kind === 'dm' || (S.me && S.me.admin && (r.kind === 'global' || r.kind === 'game')));
+  syncTools(); renderPins();
 }
-function classMenuRender() {
-  var list = $('#memList'); if (!list || !S.cur) return;
-  var d = S.members[S.cur]; if (!d) return; list.textContent = '';
+function renderMe() {
+  var b = $('#me'); b.hidden = !S.me || !S.me.username; if (b.hidden) return;
+  b.textContent = ''; b.appendChild(avatar(S.me.avatar)); b.lastChild.style.cssText = 'width:30px;height:30px;border-radius:7px;font-size:17px;background:' + avBg(S.me.avatar);
+  var nm = el('span', 'nm', S.me.username); var sm = el('small', null, ''); sm.id = 'stateRow'; var dot = el('span', 'dot' + (S.authed ? ' on' : '')); dot.id = 'state'; var st = el('span', null, S.authed ? T.stateOn : T.stateOff); st.id = 'stateT';
+  sm.appendChild(dot); sm.appendChild(document.createTextNode(' ')); sm.appendChild(st); nm.appendChild(sm); b.appendChild(nm);
+}
+function renderPins() {
+  var r = cur(), bar = $('#pinbar'); if (!r.pins || !r.pins.length) { bar.hidden = true; return; }
+  bar.hidden = false; bar.textContent = ''; var s = document.createElement('span'); s.innerHTML = icon('pin', 'sm'); bar.appendChild(s.firstChild);
+  var p = r.pins[0], t = el('span', 't'); t.appendChild(el('b', null, (r.pins.length > 1 ? T.pinnedMany + ' (' + r.pins.length + ') · ' : T.pinned + ' · ') + p.u + ': ')); t.appendChild(document.createTextNode(p.text)); bar.appendChild(t);
+}
+$('#pinbar').addEventListener('click', function (e) {
+  var r = cur(); if (!r.pins.length) return; closeMenu();
+  var menu = el('div', 'menu'); menu.style.minWidth = '300px'; menu.appendChild(el('div', 'h', T.pinnedMany));
+  r.pins.forEach(function (p) { var b = el('button'); b.appendChild(el('span', null, p.u + ': ' + p.text)); b.addEventListener('click', function () { closeMenu(); scrollToMsg(p.id); }); menu.appendChild(b); });
+  document.body.appendChild(menu); var rc = this.getBoundingClientRect(); menu.style.top = (rc.bottom + 4) + 'px'; menu.style.left = Math.max(8, rc.left + 16) + 'px'; e.stopPropagation();
+});
+
+// ---------- lista de mensajes ----------
+function atBottom() { var b = $('#msgs'); return b.scrollHeight - b.scrollTop - b.clientHeight < 90; }
+function toBottom() { var b = $('#msgs'); b.scrollTop = b.scrollHeight; S.pill = 0; $('#jump').classList.remove('on'); }
+function showPill() { var j = $('#jump'); j.classList.add('on'); j.querySelector('span').textContent = S.pill ? (S.pill === 1 ? T.jump1 : fmt(T.jumpN, { n: S.pill })) : T.jumpDown; }
+$('#msgs').addEventListener('scroll', function () { if (atBottom()) { S.pill = 0; $('#jump').classList.remove('on'); if (S.cur && S.unread[S.cur]) { delete S.unread[S.cur]; updateBadges(); } } else if (this.scrollHeight > this.clientHeight * 1.6) { showPill(); } });
+$('#jump').addEventListener('click', toBottom);
+function isCont(prev, m) { return !!prev && !m.rp && prev.uid === m.uid && m.ts - prev.ts < 300000 && dayKey(prev.ts) === dayKey(m.ts); }
+function sepFor(prev, m, r) {
+  var f = document.createDocumentFragment();
+  if (!prev || dayKey(prev.ts) !== dayKey(m.ts)) { var d = el('div', 'day'); d.appendChild(el('span', null, dayLabel(m.ts))); f.appendChild(d); }
+  if (r.dividerId === m.id) { var n = el('div', 'newdiv'); n.appendChild(el('span', null, T.newMsgs)); f.appendChild(n); }
+  return f;
+}
+function renderMsgs(mode) {
+  var box = $('#msgs'), r = cur(), prevH = box.scrollHeight, prevTop = box.scrollTop, wasBottom = atBottom();
+  box.textContent = '';
+  if (r.more) { var mb = el('button', 'more', T.older); mb.type = 'button'; mb.addEventListener('click', function () { var first = r.msgs[0]; if (first) wsend({ t: 'history', room: r.key, before: first.id }); }); box.appendChild(mb); }
+  box.appendChild(el('div', 'intro', T.welcome));
+  var prev = null, shown = 0;
+  r.msgs.forEach(function (m) {
+    if (isBlockedUid(m.uid)) return;
+    box.appendChild(sepFor(prev, m, r)); box.appendChild(msgEl(m, isCont(prev, m))); prev = m; shown++;
+  });
+  if (!shown) box.appendChild(el('div', 'empty', T.empty));
+  if (mode === 'bottom' || (mode === 'keep' && wasBottom)) { toBottom(); if (r.dividerId) { var nd = box.querySelector('.newdiv'); if (nd) nd.scrollIntoView({ block: 'center' }); } }
+  else if (mode === 'older') box.scrollTop = box.scrollHeight - prevH + prevTop;
+  else box.scrollTop = prevTop;
+}
+function isBlockedUid(uid) { return S.blocked.some(function (b) { return b.uid === uid; }); }
+function appendMsg(m, own) {
+  var box = $('#msgs'), r = cur(), was = atBottom();
+  var idx = r.msgs.indexOf(m), prev = idx > 0 ? r.msgs[idx - 1] : null;
+  if (isBlockedUid(m.uid)) return;
+  var emp = box.querySelector('.empty'); if (emp) emp.remove();
+  box.appendChild(sepFor(prev, m, r)); box.appendChild(msgEl(m, isCont(prev, m)));
+  if (was || own) toBottom(); else { S.pill++; showPill(); }
+}
+function refreshMsg(id) {
+  var node = $('#msgs').querySelector('.msg[data-id="' + id + '"]'); if (!node) return;
+  var r = cur(), m = r.msgs.filter(function (x) { return x.id === id; })[0]; if (!m) return;
+  var fresh = msgEl(m, node.classList.contains('cont')); node.replaceWith(fresh);
+}
+function scrollToMsg(id) { var n = $('#msgs').querySelector('.msg[data-id="' + id + '"]'); if (!n) return; n.scrollIntoView({ block: 'center', behavior: 'smooth' }); n.classList.remove('flash'); void n.offsetWidth; n.classList.add('flash'); }
+
+function textNodes(text) {
+  var f = document.createDocumentFragment(), re = /@([A-Za-z0-9][A-Za-z0-9._-]{1,18}[A-Za-z0-9])/g, last = 0, mm;
+  while ((mm = re.exec(text))) {
+    if (mm.index > last) f.appendChild(document.createTextNode(text.slice(last, mm.index)));
+    var s = el('span', 'mn' + (myName() && mm[1].toLowerCase() === myName().toLowerCase() ? ' me' : ''), mm[0]); f.appendChild(s); last = mm.index + mm[0].length;
+  }
+  if (last < text.length) f.appendChild(document.createTextNode(text.slice(last)));
+  return f;
+}
+function canEditMsg(m) { return !!S.me && m.uid === S.me.uid && !m.media && !m.track && !m.sticker && Date.now() - m.ts < EDIT_MS; }
+function msgEl(m, cont) {
+  var mine = !!S.me && m.uid === S.me.uid, r = cur();
+  var d = el('div', 'msg' + (cont ? ' cont' : '') + (mine ? ' mine' : '') + (!mine && mentionsMe(m) ? ' mention' : '')); d.setAttribute('data-id', m.id);
+  if (cont) { d.appendChild(el('div')); d.appendChild(el('span', 'gt', fmtTime(m.ts))); } else d.appendChild(avatar(m.a));
+  var body = el('div', 'body');
+  if (m.rp) {
+    var q = el('div', 'quote' + (m.rp.gone ? ' gone' : ''));
+    if (m.rp.gone) q.appendChild(el('span', null, T.gone));
+    else { var sc = document.createElement('span'); sc.innerHTML = icon('reply', 'sm'); q.appendChild(sc.firstChild); q.appendChild(el('b', null, m.rp.u)); q.appendChild(el('span', null, m.rp.k === 'track' ? 'Budsin Music' : m.rp.k === 'sticker' ? 'Sticker' : m.rp.k === 'media' ? '…' : m.rp.text)); q.addEventListener('click', function () { scrollToMsg(m.rp.id); }); }
+    body.appendChild(q);
+  }
+  if (!cont) {
+    var who = el('div', 'who'); var nm = el('b', mine ? '' : 'uname', m.u); who.appendChild(nm); who.appendChild(el('time', null, fmtTime(m.ts)));
+    if (!mine) nm.addEventListener('click', function (e) { e.stopPropagation(); userMenu(nm, m); });
+    body.appendChild(who);
+  }
+  if (m.text) { var tx = el('div', 'txt'); tx.appendChild(textNodes(m.text)); if (m.e) tx.appendChild(el('span', 'etag', ' (' + T.editedTag + ')')); body.appendChild(tx); }
+  var mn = mediaNode(m, mine); if (mn) body.appendChild(mn);
+  if (m.rx && Object.keys(m.rx).length) {
+    var rxs = el('div', 'rxs');
+    Object.keys(m.rx).forEach(function (em) {
+      var names = m.rx[em], me = myName() && names.indexOf(myName()) >= 0;
+      var c = el('button', 'rx' + (me ? ' me' : ''), em); c.type = 'button'; c.appendChild(el('small', null, String(names.length))); c.title = names.join(', ');
+      c.addEventListener('click', function () { wsend({ t: 'react', id: m.id, emoji: em }); }); rxs.appendChild(c);
+    }); body.appendChild(rxs);
+  }
+  d.appendChild(body);
+  // barra de acciones al pasar el cursor
+  var ht = el('div', 'ht');
+  ht.appendChild(ibtn('smile', T.react, null, function (e) { e.stopPropagation(); reactMenu(this, m); }));
+  ht.appendChild(ibtn('reply', T.reply, null, function () { startReply(m); }));
+  if (canEditMsg(m)) ht.appendChild(ibtn('edit', T.editMsg, null, function () { startEdit(m); }));
+  if (mine || canManage(r)) ht.appendChild(ibtn('trash', T.del, null, function () { if (confirm(T.deleteAsk)) wsend({ t: 'delete', id: m.id }); }));
+  var more = ibtn('more', T.more, 'b-more', function (e) { e.stopPropagation(); msgMenu(this, m); }); ht.appendChild(more);
+  d.appendChild(ht);
+  return d;
+}
+
+// ---------- menús ----------
+function closeMenu() { var m = document.querySelector('.menu'); if (m && m.parentNode) m.parentNode.removeChild(m); }
+document.addEventListener('click', function (e) { if (!e.target.closest('.menu') && !e.target.closest('#panel') && !e.target.closest('#bStk') && !e.target.closest('#ment')) { closeMenu(); closePanel(); } });
+function placeMenu(menu, anchor, alignRight) {
+  document.body.appendChild(menu);
+  var r = anchor.getBoundingClientRect(), w = menu.offsetWidth, h = menu.offsetHeight;
+  var left = alignRight ? r.right - w : r.left; left = Math.max(8, Math.min(window.innerWidth - w - 8, left));
+  var top = r.bottom + 4; if (top + h > window.innerHeight - 8) top = Math.max(8, r.top - h - 4);
+  menu.style.left = left + 'px'; menu.style.top = top + 'px';
+}
+function menuItem(menu, iconName, text, fn, cls) { var b = el('button', cls || ''); b.type = 'button'; b.appendChild(withIcon(iconName, text)); b.addEventListener('click', function () { closeMenu(); fn(); }); menu.appendChild(b); return b; }
+function reactMenu(anchor, m) {
+  closeMenu(); var menu = el('div', 'menu'); var row = el('div', 'emo');
+  REACTIONS.forEach(function (em) { var b = el('button', null, em); b.type = 'button'; b.addEventListener('click', function () { closeMenu(); wsend({ t: 'react', id: m.id, emoji: em }); }); row.appendChild(b); });
+  menu.appendChild(row); placeMenu(menu, anchor, true);
+}
+function msgMenu(anchor, m) {
+  closeMenu(); var r = cur(), mine = S.me && m.uid === S.me.uid, menu = el('div', 'menu');
+  menuItem(menu, 'reply', T.reply, function () { startReply(m); });
+  if (m.text) menuItem(menu, 'copy', T.copy, function () { try { navigator.clipboard.writeText(m.text).then(function () { toast(T.copiedMsg); }, function () {}); } catch (e) {} });
+  if (canManage(r)) {
+    var pinned = r.pins.some(function (p) { return p.id === m.id; });
+    menuItem(menu, 'pin', pinned ? T.unpin : T.pin, function () { wsend({ t: pinned ? 'unpin' : 'pin', id: m.id }); });
+  }
+  if (!mine) menuItem(menu, 'flag', T.report, function () { reportMenu(anchor, m); });
+  if (mine || canManage(r)) { menu.appendChild(el('hr')); menuItem(menu, 'trash', T.del, function () { if (confirm(T.deleteAsk)) wsend({ t: 'delete', id: m.id }); }, 'danger'); }
+  placeMenu(menu, anchor, true);
+}
+function reportMenu(anchor, m) {
+  var menu = el('div', 'menu'); menu.appendChild(el('div', 'h', T.reportT));
+  Object.keys(T.reasons).forEach(function (k) { var b = el('button', null, T.reasons[k]); b.type = 'button'; b.addEventListener('click', function () { closeMenu(); wsend({ t: 'report', id: m.id, reason: k }); }); menu.appendChild(b); });
+  setTimeout(function () { placeMenu(menu, anchor, true); }, 0);
+}
+function userMenu(anchor, m) {
+  closeMenu(); var menu = el('div', 'menu'); menu.appendChild(el('div', 'h', m.u));
+  menuItem(menu, 'plus', T.addToFriends, function () { wsend({ t: 'friend.request', username: m.u }); toast(T.reqSent); });
+  menuItem(menu, 'at', T.mentionHint, function () { var i = $('#in'); i.value = (i.value + ' @' + m.u + ' ').replace(/^\s+/, ''); i.focus(); updateCount(); });
+  menuItem(menu, 'ban', T.blockUser, function () { if (confirm(T.blockAsk)) wsend({ t: 'block', uid: m.uid }); }, 'danger');
+  placeMenu(menu, anchor, false);
+}
+IC.at = '<circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 005 0V12a9 9 0 10-3.5 7.1"/>';
+
+// ---------- opciones de la sala ----------
+function renderMemList() {
+  var list = $('#memList'); if (!list || !S.cur) return; var d = S.members[S.cur]; if (!d) return; list.textContent = '';
   d.items.forEach(function (u) {
-    var row = el('div', 'h'); row.style.cssText = 'display:flex;gap:8px;align-items:center;color:#fff'; row.appendChild(avatar(u.avatar)); row.appendChild(el('span', null, (u.username || '?') + (u.uid === d.owner ? ' ⭐' : '')));
-    if (S.me && d.owner === S.me.uid && u.uid !== S.me.uid) { var k = el('button', null, T.kick); k.style.cssText = 'width:auto;margin-left:auto;padding:2px 8px;font-size:.75rem'; k.addEventListener('click', function (e) { e.stopPropagation(); wsend({ t: 'class.kick', room: S.cur, uid: u.uid }); row.parentNode.removeChild(row); }); row.appendChild(k); }
+    var row = el('div', 'h'); row.style.cssText = 'display:flex;gap:8px;align-items:center;color:var(--text)'; var av = avatar(u.avatar); av.style.cssText = 'width:20px;height:20px;border-radius:5px;font-size:12px;background:' + avBg(u.avatar); row.appendChild(av);
+    row.appendChild(el('span', null, (u.username || '?') + (u.uid === d.owner ? ' ★' : '')));
+    if (S.me && d.owner === S.me.uid && u.uid !== S.me.uid) { var k = el('button', null, T.kick); k.style.cssText = 'width:auto;margin-left:auto;padding:2px 8px;font-size:12px;border:1px solid var(--line);border-radius:4px'; k.addEventListener('click', function (e) { e.stopPropagation(); wsend({ t: 'class.kick', room: S.cur, uid: u.uid }); row.remove(); }); row.appendChild(k); }
     list.appendChild(row);
   });
 }
-function classInfo(key) { return S.classes.filter(function (c) { return c.key === key; })[0] || null; }
-function shareLink(code) { return location.origin + '/chat/#/class/' + code; }
-function copy(text) { try { navigator.clipboard.writeText(text).then(function () { toast(T.copied); }, function () {}); } catch (e) {} }
 $('#manage').addEventListener('click', function (e) {
-  e.stopPropagation(); closeMenu();
-  var cur = room(S.cur || 'global');
-  if (cur.kind === 'dm') {
-    var dmenu = el('div', 'menu'); dmenu.style.minWidth = '220px';
-    var dadd = function (t, fn) { var b = el('button', null, t); b.addEventListener('click', function () { closeMenu(); fn(); }); dmenu.appendChild(b); };
-    dadd('➖ ' + T.removeFriend, function () { if (confirm(T.removeAsk)) wsend({ t: 'friend.remove', uid: cur.peer }); });
-    dadd('🚫 ' + T.blockUser, function () { if (confirm(T.blockAsk)) wsend({ t: 'block', uid: cur.peer }); });
-    document.body.appendChild(dmenu); var dr = this.getBoundingClientRect(); dmenu.style.top = (dr.bottom + 6) + 'px'; dmenu.style.left = Math.max(8, Math.min(window.innerWidth - 230, dr.right - 220)) + 'px';
-    return;
+  e.stopPropagation(); closeMenu(); var r = cur(), menu = el('div', 'menu'); menu.id = 'classMenu'; menu.style.minWidth = '250px';
+  if (r.kind === 'dm') {
+    menuItem(menu, 'x', T.removeFriend, function () { if (confirm(T.removeAsk)) wsend({ t: 'friend.remove', uid: r.peer }); });
+    menuItem(menu, 'ban', T.blockUser, function () { if (confirm(T.blockAsk)) wsend({ t: 'block', uid: r.peer }); }, 'danger');
+    placeMenu(menu, this, true); return;
   }
-  var ci = classInfo(S.cur); if (!ci) return;
-  wsend({ t: 'class.members', room: ci.key });
-  var menu = el('div', 'menu'); menu.id = 'classMenu'; menu.style.minWidth = '240px';
-  menu.appendChild(el('div', 'h', T.code + ': ' + ci.code));
-  var add = function (t, fn) { var b = el('button', null, t); b.addEventListener('click', function () { closeMenu(); fn(); }); menu.appendChild(b); };
-  add('📋 ' + T.copyCode, function () { copy(ci.code); });
-  add('🔗 ' + T.copyLink, function () { copy(shareLink(ci.code)); });
-  menu.appendChild(el('div', 'h', T.members)); var list = el('div'); list.id = 'memList'; menu.appendChild(list);
-  add('🚪 ' + T.leave, function () { if (confirm(T.leaveAsk)) wsend({ t: 'class.leave', room: ci.key }); });
-  document.body.appendChild(menu);
-  var r = this.getBoundingClientRect(); menu.style.top = (r.bottom + 6) + 'px'; menu.style.left = Math.max(8, Math.min(window.innerWidth - 250, r.right - 240)) + 'px';
+  var ci = S.classes.filter(function (c) { return c.key === r.key; })[0];
+  if (ci) {
+    wsend({ t: 'class.members', room: ci.key });
+    menu.appendChild(el('div', 'h', T.code + ': ' + ci.code));
+    menuItem(menu, 'copy', T.copyCode, function () { copyText(ci.code); });
+    menuItem(menu, 'ext', T.copyLink, function () { copyText(location.origin + '/chat/#/class/' + ci.code); });
+    menu.appendChild(el('hr')); menu.appendChild(el('div', 'h', T.members)); var list = el('div'); list.id = 'memList'; menu.appendChild(list);
+  }
+  if (canManage(r)) {
+    menu.appendChild(el('hr')); menu.appendChild(el('div', 'h', T.slow));
+    var row = el('div', 'emo'); row.style.flexWrap = 'wrap';
+    [0, 5, 10, 30, 60].forEach(function (s) { var b = el('button', null, s ? fmt(T.secs, { n: s }) : T.slowOff); b.type = 'button'; b.style.cssText = 'width:auto;padding:4px 9px;font-size:12.5px;border:1px solid ' + (r.slow === s ? 'var(--accent)' : 'var(--line)') + ';border-radius:5px'; b.addEventListener('click', function () { closeMenu(); wsend({ t: 'room.slow', room: r.key, seconds: s }); }); row.appendChild(b); });
+    menu.appendChild(row);
+  }
+  if (ci) { menu.appendChild(el('hr')); menuItem(menu, 'logout', T.leave, function () { if (confirm(T.leaveAsk)) wsend({ t: 'class.leave', room: ci.key }); }, 'danger'); }
+  placeMenu(menu, this, true); renderMemList();
 });
-function renderMe() {
-  var b = $('#me'); b.hidden = !S.me || !S.me.username; if (b.hidden) return;
-  b.textContent = ''; b.appendChild(avatar(S.me.avatar)); b.appendChild(el('span', null, S.me.username));
+function copyText(t) { try { navigator.clipboard.writeText(t).then(function () { toast(T.copied); }, function () {}); } catch (e) {} }
+$('#me').addEventListener('click', function (e) {
+  e.stopPropagation(); closeMenu(); var menu = el('div', 'menu'); menu.style.minWidth = '230px';
+  menuItem(menu, 'edit', T.edit, function () { gate('profile'); });
+  var th = 'auto'; try { th = localStorage.getItem('bc_theme') || 'auto'; } catch (x) {}
+  menuItem(menu, 'moon', T.theme + ': ' + T['theme_' + th], function () { var n = th === 'auto' ? 'dark' : th === 'dark' ? 'light' : 'auto'; try { localStorage.setItem('bc_theme', n); } catch (x) {} applyTheme(n); toast(T.theme + ': ' + T['theme_' + n]); });
+  menuItem(menu, 'ban', T.blockedL + (S.blocked.length ? ' (' + S.blocked.length + ')' : ''), function () { blockedMenu(); });
+  var btnOn = true; try { btnOn = localStorage.getItem('bc_gamebtn') !== '0'; } catch (x) {}
+  menuItem(menu, 'game', T.gameBtn + ': ' + (btnOn ? 'ON' : 'OFF'), function () { try { localStorage.setItem('bc_gamebtn', btnOn ? '0' : '1'); } catch (x) {} toast(T.gameBtn + ': ' + (btnOn ? 'OFF' : 'ON')); });
+  if (S.me && S.me.admin) menuItem(menu, 'shield', T.admin, function () { location.href = '/chat/admin.html'; });
+  menuItem(menu, 'logout', T.signout, function () { if (S.fb) S.fb.signOut(); });
+  placeMenu(menu, this, false);
+});
+function blockedMenu() {
+  var menu = el('div', 'menu'); menu.style.minWidth = '240px'; menu.appendChild(el('div', 'h', T.blockedL));
+  if (!S.blocked.length) menu.appendChild(el('div', 'h', T.blockedNone));
+  S.blocked.forEach(function (u) { var b = el('button', null, (u.username || '?') + ' — ' + T.unblock); b.type = 'button'; b.addEventListener('click', function () { closeMenu(); wsend({ t: 'unblock', uid: u.uid }); }); menu.appendChild(b); });
+  setTimeout(function () { placeMenu(menu, $('#me'), false); }, 0);
 }
-function fmtTime(ts) { var d = new Date(ts); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
-function msgNode(m) {
-  var mine = S.me && m.uid === S.me.uid;
-  var d = el('div', 'msg' + (mine ? ' mine' : '')); d.setAttribute('data-id', m.id);
-  d.appendChild(avatar(m.a));
-  var body = el('div', 'body'); var who = el('div', 'who'); who.appendChild(el('b', null, m.u)); who.appendChild(el('time', null, fmtTime(m.ts)));
-  if (!mine) { who.firstChild.className = 'uname'; who.firstChild.addEventListener('click', function (e) { e.stopPropagation(); userMenu(who.firstChild, m); }); }
-  body.appendChild(who); if (m.text) body.appendChild(el('div', 'txt', m.text)); var mn = mediaNode(m, mine); if (mn) body.appendChild(mn); d.appendChild(body);
-  if (!mine) { var r = el('button', 'rep', '⚑'); r.title = T.report; r.setAttribute('aria-label', T.report); r.addEventListener('click', function (e) { e.stopPropagation(); reportMenu(r, m); }); d.appendChild(r); }
-  return d;
+
+// ---------- redactar: responder, editar, escribiendo, menciones ----------
+function renderCtx() {
+  var c = $('#ctx'); if (!S.ctx) { c.classList.remove('on'); c.textContent = ''; return; }
+  c.classList.add('on'); c.textContent = '';
+  var s = document.createElement('span'); s.innerHTML = icon(S.ctx.kind === 'edit' ? 'edit' : 'reply', 'sm'); c.appendChild(s.firstChild);
+  var t = el('span', 't'); if (S.ctx.kind === 'edit') t.appendChild(el('b', null, T.editing)); else { t.appendChild(document.createTextNode(T.replying + ' ')); t.appendChild(el('b', null, S.ctx.u + ': ')); t.appendChild(document.createTextNode(S.ctx.text)); }
+  c.appendChild(t); c.appendChild(ibtn('x', T.cancel, 'ib', exitCtx));
+  $('#go').lastChild.textContent = S.ctx.kind === 'edit' ? T.saveEdit : T.send;
 }
-// ---- imágenes, stickers y audios ----
+function startReply(m) { S.ctx = { kind: 'reply', id: m.id, u: m.u, text: m.text ? m.text.slice(0, 80) : (m.track ? 'Budsin Music' : '…') }; renderCtx(); $('#in').focus(); }
+function startEdit(m) { S.ctx = { kind: 'edit', id: m.id, u: m.u }; S.ctx.prevValue = $('#in').value; $('#in').value = m.text; renderCtx(); $('#in').focus(); updateCount(); }
+function exitCtx() { if (S.ctx && S.ctx.kind === 'edit') $('#in').value = S.ctx.prevValue || ''; S.ctx = null; renderCtx(); }
+function updateCount() { var v = $('#in').value.length, c = $('#cnt'); if (c.className === 'err') return; c.textContent = v > 240 ? v + ' / 300' : ''; }
+function clearInput(cid) { if (cid && $('#in').getAttribute('data-cid') === cid) { $('#in').value = ''; $('#in').removeAttribute('data-cid'); if (S.ctx && S.ctx.kind === 'reply') { S.ctx = null; renderCtx(); } updateCount(); } }
+function renderTyping() {
+  var now = Date.now(), t = S.typing[S.cur] || {}, names = Object.keys(t).filter(function (n) { return t[n] > now; }), box = $('#typing');
+  box.textContent = names.length === 0 ? '' : names.length === 1 ? fmt(T.typing1, { a: names[0] }) : names.length === 2 ? fmt(T.typing2, { a: names[0], b: names[1] }) : T.typingN;
+}
+setInterval(renderTyping, 1000);
+$('#composer').addEventListener('submit', function (e) {
+  e.preventDefault(); var v = $('#in').value.trim(); if (!v || !S.authed) return;
+  if (S.ctx && S.ctx.kind === 'edit') { wsend({ t: 'edit', id: S.ctx.id, text: v }); S.ctx.prevValue = ''; S.ctx = null; renderCtx(); $('#in').value = ''; updateCount(); return; }
+  var cid = String(Date.now()) + Math.random().toString(36).slice(2, 6); $('#in').setAttribute('data-cid', cid);
+  var o = { t: 'send', room: S.cur || 'global', text: v, cid: cid }; if (S.ctx && S.ctx.kind === 'reply') o.reply = S.ctx.id; wsend(o);
+});
+$('#in').addEventListener('input', function () {
+  updateCount(); mentionSuggest();
+  if (this.value.trim() && Date.now() - S.lastTyped > 2500) { S.lastTyped = Date.now(); wsend({ t: 'typing', room: S.cur || 'global' }); }
+});
+$('#in').addEventListener('keydown', function (e) {
+  var mn = $('#ment');
+  if (mn.classList.contains('on')) {
+    var items = [].slice.call(mn.querySelectorAll('button')), idx = items.findIndex(function (b) { return b.classList.contains('sel'); });
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); items.forEach(function (b) { b.classList.remove('sel'); }); idx = (idx + (e.key === 'ArrowDown' ? 1 : items.length - 1)) % items.length; items[idx].classList.add('sel'); return; }
+    if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); (items[idx] || items[0]).click(); return; }
+    if (e.key === 'Escape') { mn.classList.remove('on'); return; }
+  }
+  if (e.key === 'Escape' && S.ctx) { exitCtx(); return; }
+  if (e.key === 'ArrowUp' && !this.value) { var mine = cur().msgs.filter(function (m) { return canEditMsg(m); }).pop(); if (mine) { e.preventDefault(); startEdit(mine); } }
+});
+function mentionSuggest() {
+  var i = $('#in'), mn = $('#ment'), pre = i.value.slice(0, i.selectionStart || i.value.length), mm = /(^|\s)@([A-Za-z0-9._-]{0,19})$/.exec(pre);
+  if (!mm) { mn.classList.remove('on'); return; }
+  var q = mm[2].toLowerCase(), r = cur(), seen = {}, list = [];
+  var add = function (n) { if (n && n !== '?' && !seen[n] && n !== myName() && n.toLowerCase().indexOf(q) === 0) { seen[n] = 1; list.push(n); } };
+  r.msgs.slice().reverse().forEach(function (m) { add(m.u); });
+  if (S.members[r.key]) S.members[r.key].items.forEach(function (u) { add(u.username); });
+  S.friends.forEach(function (f) { add(f.username); });
+  list = list.slice(0, 6); if (!list.length) { mn.classList.remove('on'); return; }
+  mn.textContent = ''; list.forEach(function (n, k) { var b = el('button', k === 0 ? 'sel' : '', '@' + n); b.type = 'button'; b.addEventListener('mousedown', function (ev) { ev.preventDefault(); }); b.addEventListener('click', function () { var start = (i.selectionStart || i.value.length) - mm[2].length - 1; i.value = i.value.slice(0, start) + '@' + n + ' ' + i.value.slice(i.selectionStart || i.value.length); mn.classList.remove('on'); i.focus(); updateCount(); }); mn.appendChild(b); });
+  mn.classList.add('on');
+}
+
+// ---------- multimedia ----------
 var PRESET = { laugh: '😂', cry: '😭', love: '😍', cool: '😎', think: '🤔', wow: '😮', angry: '😡', sleep: '😴', party: '🥳', clap: '👏', thumbs: '👍', ok: '👌', controller: '🎮', trophy: '🏆', gg: '🤝', fire: '🔥', rocket: '🚀', ghost: '👻', crown: '👑', bomb: '💣', sword: '⚔️', heart: '❤️', star: '⭐', skull: '💀', cat: '🐱', dog: '🐶', fox: '🦊', panda: '🐼', frog: '🐸', lion: '🦁', unicorn: '🦄', penguin: '🐧', octopus: '🐙', dino: '🦖', monkey: '🐵', bear: '🐻', pizza: '🍕', burger: '🍔', fries: '🍟', icecream: '🍦', donut: '🍩', cake: '🍰', watermelon: '🍉', taco: '🌮', popcorn: '🍿', cookie: '🍪', candy: '🍬', soda: '🥤' };
 var PACKS = [['react', ['laugh', 'cry', 'love', 'cool', 'think', 'wow', 'angry', 'sleep', 'party', 'clap', 'thumbs', 'ok']], ['game', ['controller', 'trophy', 'gg', 'fire', 'rocket', 'ghost', 'crown', 'bomb', 'sword', 'heart', 'star', 'skull']], ['animal', ['cat', 'dog', 'fox', 'panda', 'frog', 'lion', 'unicorn', 'penguin', 'octopus', 'dino', 'monkey', 'bear']], ['food', ['pizza', 'burger', 'fries', 'icecream', 'donut', 'cake', 'watermelon', 'taco', 'popcorn', 'cookie', 'candy', 'soda']]];
+var EMOJI = '😀😃😄😁😆😅😂🤣🙂😉😊😇🥰😍😘😋😜🤪😎🤓🥳😏😒😞😔😟😕🙁😣😖😫😩🥺😢😭😤😠😡🤯😳🥵🥶😱😨😰😥😓🤗🤔🤭🤫😶😐😑😬🙄😯😮😲🥱😴🤤😪😵🤐🤢🤧😷🤒🤕👍👎👏🙌👋🤝🙏💪👀✌️🤞👌🔥💯✨⭐🎉🎮🏆❤️🧡💛💚💙💜🖤💔'.match(/(\p{Extended_Pictographic}️?(‍\p{Extended_Pictographic}️?)*)/gu);
 function mediaUrl(id) { return '/api/chat/media/' + id; }
-function isPublicRoom() { var k = (room(S.cur || 'global').kind || ''); return k === 'global' || k === 'game' || k === ''; }
-function fmtDur(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+function isPublicRoom() { var k = cur().kind || ''; return k === 'global' || k === 'game' || k === ''; }
 function trackCard(t) {
   var c = el('div', 'trk'); var img = el('img'); img.alt = ''; img.referrerPolicy = 'no-referrer'; img.loading = 'lazy';
   img.addEventListener('error', function () { if (!img.getAttribute('data-fb') && t.artwork) { img.setAttribute('data-fb', '1'); img.src = '/api/music/art?u=' + encodeURIComponent(t.artwork); } else img.style.visibility = 'hidden'; });
   img.src = t.artwork || ''; if (!t.artwork) img.style.visibility = 'hidden'; c.appendChild(img);
-  var ti = el('div', 'ti'); ti.appendChild(el('small', null, '🎵 Budsin Music')); ti.appendChild(el('b', null, t.title)); ti.appendChild(el('span', null, t.artist)); c.appendChild(ti);
-  var play = el('button', null, '▶'); play.title = T.listen; play.setAttribute('aria-label', T.listen);
-  play.addEventListener('click', function () { if (window.BmMini) window.BmMini.play([t], 0); else window.open('/musica/#/search/' + encodeURIComponent(t.title + ' ' + t.artist), '_blank'); });
-  c.appendChild(play);
-  var open = el('a', null, '↗'); open.href = '/musica/#/search/' + encodeURIComponent(t.title + ' ' + t.artist); open.target = '_blank'; open.rel = 'noopener'; open.title = T.openMusic; open.setAttribute('aria-label', T.openMusic); c.appendChild(open);
+  var ti = el('div', 'ti'); var sm = el('small'); sm.innerHTML = icon('music', 'sm') + ' Budsin Music'; ti.appendChild(sm); ti.appendChild(el('b', null, t.title)); ti.appendChild(el('span', null, t.artist)); c.appendChild(ti);
+  var link = '/musica/#/search/' + encodeURIComponent(t.title + ' ' + t.artist);
+  var play = ibtn('play', T.listen, null, function () { if (window.BmMini) window.BmMini.play([t], 0); else window.open(link, '_blank'); }); c.appendChild(play);
+  var open = el('a'); open.innerHTML = icon('ext'); open.href = link; open.target = '_blank'; open.rel = 'noopener'; open.title = T.openMusic; open.setAttribute('aria-label', T.openMusic); c.appendChild(open);
   return c;
 }
 function mediaNode(m, mine) {
   if (m.track) return trackCard(m.track);
-  if (m.sticker) { var p = el('div', 'pst', PRESET[m.sticker] || '🙂'); return p; }
+  if (m.sticker) return el('div', 'pst', PRESET[m.sticker] || '🙂');
   var md = m.media; if (!md) return null;
   if (md.hidden) return el('div', 'hid', T.hiddenMedia);
   var blur = isPublicRoom() && !mine && !S.revealed[md.id];
   if (md.kind === 'image' || md.kind === 'sticker') {
     var wrap = el('div', md.kind === 'sticker' ? 'stk' : 'mimg'); if (blur) wrap.classList.add('blur');
     var img = el('img'); img.loading = 'lazy'; img.alt = ''; img.src = mediaUrl(md.id); if (md.w && md.kind === 'image') { img.width = Math.min(md.w, 320); img.height = Math.round(Math.min(md.w, 320) * md.h / md.w); }
-    wrap.appendChild(img);
-    var veil = el('div', 'veil', '👁 ' + T.tapView); wrap.appendChild(veil);
-    wrap.addEventListener('click', function (e) {
-      if (e.target.closest('.save')) return;
-      if (wrap.classList.contains('blur')) { S.revealed[md.id] = 1; wrap.classList.remove('blur'); return; }
-      if (md.kind === 'image') openLightbox(mediaUrl(md.id));
-    });
-    if (md.kind === 'sticker' && !mine) { var sv = el('button', 'save', '💾'); sv.title = T.saveSt; sv.addEventListener('click', function (e) { e.stopPropagation(); wsend({ t: 'sticker.save', id: md.id }); toast(T.saveSt + ' ✓'); }); wrap.appendChild(sv); }
+    wrap.appendChild(img); var veil = el('div', 'veil'); veil.innerHTML = icon('eye', 'sm') + ' ' + T.tapView; wrap.appendChild(veil);
+    wrap.addEventListener('click', function (e) { if (e.target.closest('.save')) return; if (wrap.classList.contains('blur')) { S.revealed[md.id] = 1; wrap.classList.remove('blur'); return; } if (md.kind === 'image') openLightbox(mediaUrl(md.id)); });
+    if (md.kind === 'sticker' && !mine) { var sv = el('button', 'save'); sv.innerHTML = icon('save', 'sm'); sv.title = T.saveSt; sv.addEventListener('click', function (e) { e.stopPropagation(); wsend({ t: 'sticker.save', id: md.id }); toast(T.saveSt); }); wrap.appendChild(sv); }
     return wrap;
   }
   if (md.kind === 'audio') {
     var a = el('div', 'aud'); var au = new Audio(); au.preload = 'none'; au.src = mediaUrl(md.id);
-    var pb = el('button', null, '▶'); var bar = el('div', 'bar'); var fill = el('i'); bar.appendChild(fill); var tm = el('time', null, fmtDur(md.dur));
+    var pb = el('button'); pb.type = 'button'; pb.innerHTML = icon('play'); var bar = el('div', 'bar'); var fill = el('i'); bar.appendChild(fill); var tm = el('time', null, fmtDur(md.dur));
     pb.addEventListener('click', function () { if (au.paused) { document.querySelectorAll('.aud button').forEach(function (b) { if (b !== pb && b._stop) b._stop(); }); au.play().catch(function () {}); } else au.pause(); });
     pb._stop = function () { au.pause(); };
-    au.addEventListener('play', function () { pb.textContent = '⏸'; }); au.addEventListener('pause', function () { pb.textContent = '▶'; });
-    au.addEventListener('ended', function () { pb.textContent = '▶'; fill.style.width = '0'; tm.textContent = fmtDur(md.dur); });
+    au.addEventListener('play', function () { pb.innerHTML = icon('pause'); pb.setAttribute('data-p', '1'); }); au.addEventListener('pause', function () { pb.innerHTML = icon('play'); pb.removeAttribute('data-p'); });
+    au.addEventListener('ended', function () { pb.innerHTML = icon('play'); fill.style.width = '0'; tm.textContent = fmtDur(md.dur); });
     au.addEventListener('timeupdate', function () { var d = au.duration || md.dur || 1; fill.style.width = Math.min(100, au.currentTime / d * 100) + '%'; tm.textContent = fmtDur(au.currentTime); });
     bar.addEventListener('click', function (e) { var r = bar.getBoundingClientRect(), d = au.duration || md.dur; if (d && isFinite(d)) au.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * d; });
     a.appendChild(pb); a.appendChild(bar); a.appendChild(tm); return a;
@@ -530,127 +919,62 @@ function mediaNode(m, mine) {
 }
 function openLightbox(src) { var lb = $('#lb'); lb.querySelector('img').src = src; lb.classList.add('on'); }
 $('#lb').addEventListener('click', function () { this.classList.remove('on'); this.querySelector('img').removeAttribute('src'); });
-document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { $('#lb').classList.remove('on'); closePanel(); } });
-function nearBottom(box) { return box.scrollHeight - box.scrollTop - box.clientHeight < 120; }
-function renderMsgs(toBottom, keepPos) {
-  var box = $('#msgs'), r = room(S.cur || 'global'), prevH = box.scrollHeight;
-  box.textContent = '';
-  if (r.more) { var mb = el('button', 'more', T.older); mb.addEventListener('click', function () { var first = r.msgs[0]; if (first) wsend({ t: 'history', room: r.key, before: first.id }); }); box.appendChild(mb); }
-  box.appendChild(el('div', 'sys', T.welcome + ' ' + T.rules));
-  r.msgs.forEach(function (m) { if (!isBlockedUid(m.uid)) box.appendChild(msgNode(m)); });
-  if (keepPos) box.scrollTop = box.scrollHeight - prevH; else if (toBottom) box.scrollTop = box.scrollHeight;
-}
-function isBlockedUid(uid) { return S.blocked.some(function (b) { return b.uid === uid; }); }
-function appendMsg(m, stick) { if (isBlockedUid(m.uid)) return; var box = $('#msgs'), was = nearBottom(box); box.appendChild(msgNode(m)); if (was || (S.me && m.uid === S.me.uid)) box.scrollTop = box.scrollHeight; }
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { $('#lb').classList.remove('on'); closePanel(); closeMenu(); } });
 
-// ---- reportar ----
-function closeMenu() { var m = document.querySelector('.menu'); if (m && m.parentNode) m.parentNode.removeChild(m); }
-function reportMenu(anchor, m) {
-  closeMenu();
-  var menu = el('div', 'menu'); menu.appendChild(el('div', 'h', T.reportT));
-  Object.keys(T.reasons).forEach(function (k) { var b = el('button', null, T.reasons[k]); b.addEventListener('click', function () { closeMenu(); wsend({ t: 'report', id: m.id, reason: k }); }); menu.appendChild(b); });
-  document.body.appendChild(menu);
-  var r = anchor.getBoundingClientRect(); menu.style.top = Math.min(window.innerHeight - menu.offsetHeight - 8, r.bottom + 4) + 'px'; menu.style.left = Math.max(8, Math.min(window.innerWidth - menu.offsetWidth - 8, r.right - menu.offsetWidth)) + 'px';
-}
-document.addEventListener('click', function (e) { if (!e.target.closest('.menu')) closeMenu(); });
-
-// ---- mi perfil / cuenta ----
-$('#me').addEventListener('click', function (e) {
-  e.stopPropagation(); closeMenu();
-  var menu = el('div', 'menu');
-  var add = function (t, fn) { var b = el('button', null, t); b.addEventListener('click', function () { closeMenu(); fn(); }); menu.appendChild(b); };
-  add('✏️ ' + T.edit, function () { gate('profile'); });
-  if (S.me && S.me.admin) add('🛡️ ' + T.admin, function () { location.href = '/chat/admin.html'; });
-  add('🚫 ' + T.blockedL + (S.blocked.length ? ' (' + S.blocked.length + ')' : ''), function () { blockedMenu(); });
-  var btnOn = true; try { btnOn = localStorage.getItem('bc_gamebtn') !== '0'; } catch (e) {}
-  add('🎮 ' + T.gameBtn + ': ' + (btnOn ? 'ON' : 'OFF'), function () { try { localStorage.setItem('bc_gamebtn', btnOn ? '0' : '1'); } catch (e) {} toast(T.gameBtn + ': ' + (btnOn ? 'OFF' : 'ON')); });
-  add('↩ ' + T.signout, function () { if (S.fb) S.fb.signOut(); });
-  document.body.appendChild(menu);
-  var r = this.getBoundingClientRect(); menu.style.top = (r.bottom + 6) + 'px'; menu.style.left = Math.max(8, r.right - 220) + 'px'; menu.style.minWidth = '200px';
-});
-
-// ---- compartir una canción desde Budsin Music (#/share) ----
-function readShare() { try { var o = JSON.parse(localStorage.getItem('bc_share') || 'null'); if (o && o.track && Date.now() - o.t < 15 * 60000) return o.track; } catch (e) {} return null; }
-function clearShare() { try { localStorage.removeItem('bc_share'); } catch (e) {} if (/^#\/share/.test(location.hash)) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } }
-function shareTo(key, tr) {
-  var r = room(key);
-  if (r.loaded) { wsend({ t: 'send', room: key, track: tr, text: '', cid: 't' + Date.now() }); finishShare(key); }
-  else { S.pendingShare = { key: key, track: tr }; openRoom(key, r.name); }
-}
-function finishShare(key) { clearShare(); gate(null); toast(T.shareDone); S.cur = key; renderRooms(); renderTop(); renderMsgs(true); }
-function openShare() {
-  var tr = readShare();
-  if (!tr) { if (/^#\/share/.test(location.hash)) { clearShare(); toast(T.shareNone); } return; }
-  var c = $('#card'); c.textContent = ''; $('#gate').classList.add('on');
-  c.appendChild(el('h1', null, '🎵 ' + T.shareH)); c.appendChild(trackCard(tr)); c.appendChild(el('p', null, T.shareP));
-  var box = el('div', 'dest'); var add = function (icon, name, key) { var b = el('button'); b.appendChild(el('span', null, icon)); b.appendChild(el('span', null, name)); b.addEventListener('click', function () { shareTo(key, tr); }); box.appendChild(b); };
-  add('🌍', T.global, 'global');
-  S.classes.forEach(function (x) { add('🏫', x.name, x.key); });
-  S.friends.forEach(function (f) { add('💬', f.username || '?', f.room); });
-  Object.keys(S.rooms).forEach(function (k) { if (k.indexOf('game:') === 0 && S.rooms[k].loaded) add('🎮', S.rooms[k].name, k); });
-  c.appendChild(box);
-  var no = el('button', 'btn ghost', T.cancel); no.addEventListener('click', function () { clearShare(); gate(null); }); c.appendChild(no);
-}
-
-// ---- subir archivos ----
-function setBusy(on, text) { var c = $('#cnt'); c.className = on ? '' : c.className; if (on) c.textContent = text || T.uploading; else if (c.textContent === (text || T.uploading) || c.textContent === T.uploading) c.textContent = ''; }
-function mediaErr(code, retry) { var msg = errText(code); if (code === 'media_rate' && retry) msg += ' (' + Math.ceil(retry / 1000) + 's)'; var c = $('#cnt'); c.className = 'err'; c.textContent = msg; clearTimeout(onErr.t); onErr.t = setTimeout(function () { c.className = ''; c.textContent = ''; updateCount(); }, 5000); }
+function setBusy(on) { var c = $('#cnt'); if (on) { c.className = ''; c.textContent = T.uploading; } else if (c.textContent === T.uploading) c.textContent = ''; }
+function mediaErr(code, retry) { var msg = errText(code); if (code === 'media_rate' && retry) msg += ' (' + Math.ceil(retry / 1000) + ' s)'; flashCount(msg); }
 function uploadFile(kind, blob, roomKey) {
   if (!S.user) return Promise.reject(new Error('auth'));
   setBusy(true);
-  return S.user.getIdToken().then(function (tok) {
-    return fetch('/api/chat/upload?kind=' + kind + '&room=' + encodeURIComponent(roomKey || ''), { method: 'POST', headers: { Authorization: 'Bearer ' + tok }, body: blob });
-  }).then(function (r) { return r.json().catch(function () { return { error: 'server_error' }; }).then(function (j) { if (!r.ok || j.error) { var e = new Error(j.error || 'server_error'); e.retry = j.retry; throw e; } return j; }); })
+  return S.user.getIdToken().then(function (tok) { return fetch('/api/chat/upload?kind=' + kind + '&room=' + encodeURIComponent(roomKey || ''), { method: 'POST', headers: { Authorization: 'Bearer ' + tok }, body: blob }); })
+    .then(function (r) { return r.json().catch(function () { return { error: 'server_error' }; }).then(function (j) { if (!r.ok || j.error) { var e = new Error(j.error || 'server_error'); e.retry = j.retry; throw e; } return j; }); })
     .finally(function () { setBusy(false); });
 }
 function sendImageFile(file) {
   if (!file) return; var key = S.cur || 'global';
   if (file.size > 5000000) { mediaErr('media_too_large'); return; }
-  uploadFile('image', file, key).then(function (j) {
-    var cap = $('#in').value.trim().slice(0, 120); wsend({ t: 'send', room: key, media: j.id, text: cap, cid: 'm' + Date.now() }); $('#in').value = ''; updateCount();
-  }).catch(function (e) { mediaErr(e.message, e.retry); });
+  uploadFile('image', file, key).then(function (j) { var cap = $('#in').value.trim().slice(0, 120); wsend({ t: 'send', room: key, media: j.id, text: cap, cid: 'm' + Date.now() }); $('#in').value = ''; updateCount(); }).catch(function (e) { mediaErr(e.message, e.retry); });
 }
 $('#bAttach').addEventListener('click', function () { $('#fileImg').value = ''; $('#fileImg').click(); });
 $('#fileImg').addEventListener('change', function () { sendImageFile(this.files[0]); });
 $('#in').addEventListener('paste', function (e) { if (!S.features.images) return; var f = e.clipboardData && [].slice.call(e.clipboardData.files || []).filter(function (x) { return /^image\//.test(x.type); })[0]; if (f) { e.preventDefault(); sendImageFile(f); } });
-$('#fileStk').addEventListener('change', function () {
-  var f = this.files[0]; if (!f) return;
-  if (f.size > 5000000) { mediaErr('media_too_large'); return; }
-  uploadFile('sticker', f, '').then(function () { wsend({ t: 'sticker.list' }); toast(T.createSt + ' ✓'); }).catch(function (e) { mediaErr(e.message, e.retry); });
-});
+$('#fileStk').addEventListener('change', function () { var f = this.files[0]; if (!f) return; if (f.size > 5000000) { mediaErr('media_too_large'); return; } uploadFile('sticker', f, '').then(function () { wsend({ t: 'sticker.list' }); toast(T.createSt); }).catch(function (e) { mediaErr(e.message, e.retry); }); });
 
-// ---- panel de stickers ----
 function closePanel() { $('#panel').classList.remove('on'); }
 function renderPanel() {
   var p = $('#panel'); p.textContent = '';
   var tabs = el('div', 'tabs'); var mk = function (id, label) { var b = el('button', S.stTab === id ? 'on' : '', label); b.type = 'button'; b.addEventListener('click', function (e) { e.stopPropagation(); S.stTab = id; renderPanel(); }); tabs.appendChild(b); };
-  mk('mine', '⭐ ' + T.mySt); PACKS.forEach(function (pk) { mk(pk[0], T.packs[pk[0]]); }); p.appendChild(tabs);
+  mk('emoji', T.emojiTab); mk('mine', T.mySt); PACKS.forEach(function (pk) { mk(pk[0], T.packs[pk[0]]); }); p.appendChild(tabs);
   var grid = el('div', 'grid');
-  var sendSticker = function (ref) { var key = S.cur || 'global'; wsend({ t: 'send', room: key, media: ref, text: '', cid: 's' + Date.now() }); closePanel(); };
-  if (S.stTab === 'mine') {
-    if (S.features.images) { var add = el('button', 'add', '＋'); add.type = 'button'; add.title = T.createSt; add.addEventListener('click', function () { $('#fileStk').value = ''; $('#fileStk').click(); }); grid.appendChild(add); }
+  var sendSticker = function (ref) { wsend({ t: 'send', room: S.cur || 'global', media: ref, text: '', cid: 's' + Date.now() }); closePanel(); };
+  if (S.stTab === 'emoji') {
+    (EMOJI || []).forEach(function (em) { var b = el('button', null, em); b.type = 'button'; b.addEventListener('click', function () { var i = $('#in'); i.value += em; i.focus(); updateCount(); }); grid.appendChild(b); });
+    p.appendChild(grid);
+  } else if (S.stTab === 'mine') {
+    grid.classList.add('big');
+    if (S.features.images) { var add = el('button', 'add'); add.type = 'button'; add.innerHTML = icon('plus'); add.title = T.createSt; add.addEventListener('click', function () { $('#fileStk').value = ''; $('#fileStk').click(); }); grid.appendChild(add); }
     S.myStickers.forEach(function (st) {
       var b = el('button'); b.type = 'button'; var im = el('img'); im.src = mediaUrl(st.id); im.alt = ''; b.appendChild(im);
-      var x = el('span', 'x', '✕'); x.addEventListener('click', function (e) { e.stopPropagation(); wsend({ t: 'sticker.remove', id: st.id }); }); b.appendChild(x);
+      var x = el('span', 'x'); x.innerHTML = icon('x', 'sm'); x.addEventListener('click', function (e) { e.stopPropagation(); wsend({ t: 'sticker.remove', id: st.id }); }); b.appendChild(x);
       b.addEventListener('click', function () { sendSticker(st.id); }); grid.appendChild(b);
     });
     p.appendChild(grid); if (S.features.images) p.appendChild(el('div', 'note', T.stNote));
   } else {
+    grid.classList.add('big');
     (PACKS.filter(function (pk) { return pk[0] === S.stTab; })[0] || PACKS[0])[1].forEach(function (id) { var b = el('button', null, PRESET[id]); b.type = 'button'; b.addEventListener('click', function () { sendSticker('preset:' + id); }); grid.appendChild(b); });
     p.appendChild(grid);
   }
 }
-$('#bStk').addEventListener('click', function (e) { e.stopPropagation(); var p = $('#panel'); if (p.classList.contains('on')) { closePanel(); return; } renderPanel(); p.classList.add('on'); });
-document.addEventListener('click', function (e) { if (!e.target.closest('#panel') && !e.target.closest('#bStk')) closePanel(); });
+$('#bStk').addEventListener('click', function (e) { e.stopPropagation(); closeMenu(); var p = $('#panel'); if (p.classList.contains('on')) { closePanel(); return; } renderPanel(); p.classList.add('on'); });
 
-// ---- notas de voz (solo chats privados y grupos de clase) ----
+// ---------- notas de voz (solo privados y grupos de clase) ----------
 var REC = { mr: null, chunks: [], stream: null, t0: 0, iv: null, blob: null, type: '' };
 function micAvailable() { return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); }
 function recReset() { clearInterval(REC.iv); if (REC.stream) REC.stream.getTracks().forEach(function (t) { t.stop(); }); REC.mr = null; REC.stream = null; REC.chunks = []; REC.blob = null; $('#rec').classList.remove('on'); $('#recA').hidden = true; $('#recA').removeAttribute('src'); $('#recSend').hidden = true; $('#recStop').hidden = false; $('#in').style.display = ''; $('#go').style.display = ''; $('#recT').hidden = false; }
 function recStop() { if (REC.mr && REC.mr.state !== 'inactive') REC.mr.stop(); }
 $('#bMic').addEventListener('click', function () {
   if (!micAvailable()) { toast(T.micDenied); return; }
-  var kind = room(S.cur || 'global').kind; if (kind !== 'dm' && kind !== 'class') { toast(T.voiceOnly); return; }
+  var kind = cur().kind; if (kind !== 'dm' && kind !== 'class') { toast(T.voiceOnly); return; }
   navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
     REC.stream = stream; REC.chunks = [];
     var type = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg;codecs=opus'].filter(function (t) { return MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(t); })[0] || '';
@@ -659,10 +983,10 @@ $('#bMic').addEventListener('click', function () {
     REC.mr.onstop = function () {
       clearInterval(REC.iv); REC.stream && REC.stream.getTracks().forEach(function (t) { t.stop(); });
       REC.blob = new Blob(REC.chunks, { type: REC.mr.mimeType || REC.type || 'audio/webm' });
-      $('#recA').src = URL.createObjectURL(REC.blob); $('#recA').hidden = false; $('#recT').hidden = true; $('#recStop').hidden = true; $('#recSend').hidden = false; $('#recSend').textContent = '➤ ' + T.sendVoice;
+      $('#recA').src = URL.createObjectURL(REC.blob); $('#recA').hidden = false; $('#recT').hidden = true; $('#recStop').hidden = true; $('#recSend').hidden = false; $('#recSend').textContent = T.sendVoice;
     };
     REC.mr.start(); REC.t0 = Date.now(); $('#in').style.display = 'none'; $('#go').style.display = 'none'; $('#rec').classList.add('on');
-    REC.iv = setInterval(function () { var s = (Date.now() - REC.t0) / 1000; $('#recT').textContent = '🔴 ' + T.rec + ' ' + fmtDur(s); if (s >= 30) recStop(); }, 250);
+    REC.iv = setInterval(function () { var s = (Date.now() - REC.t0) / 1000; $('#recT').textContent = T.rec + ' ' + fmtDur(s); if (s >= 30) recStop(); }, 250);
   }).catch(function () { toast(T.micDenied); });
 });
 $('#recStop').addEventListener('click', recStop);
@@ -671,50 +995,45 @@ $('#recSend').addEventListener('click', function () {
   if (!REC.blob) return; var key = S.cur || 'global', blob = REC.blob; recReset();
   uploadFile('audio', blob, key).then(function (j) { wsend({ t: 'send', room: key, media: j.id, text: '', cid: 'a' + Date.now() }); }).catch(function (e) { mediaErr(e.message, e.retry); });
 });
-
-function blockedMenu() {
-  closeMenu(); var menu = el('div', 'menu'); menu.style.minWidth = '240px'; menu.appendChild(el('div', 'h', T.blockedL));
-  if (!S.blocked.length) menu.appendChild(el('div', 'h', T.blockedNone));
-  S.blocked.forEach(function (u) { var b = el('button', null, (u.username || '?') + ' — ' + T.unblock); b.addEventListener('click', function () { closeMenu(); wsend({ t: 'unblock', uid: u.uid }); }); menu.appendChild(b); });
-  document.body.appendChild(menu); var r = $('#me').getBoundingClientRect(); menu.style.top = (r.bottom + 6) + 'px'; menu.style.left = Math.max(8, r.right - 250) + 'px';
-}
-// clic en el nombre de alguien: agregar amigo o bloquear
-function userMenu(anchor, m) {
-  closeMenu(); var menu = el('div', 'menu'); menu.style.minWidth = '200px'; menu.appendChild(el('div', 'h', m.u));
-  var add = function (t, fn) { var b = el('button', null, t); b.addEventListener('click', function () { closeMenu(); fn(); }); menu.appendChild(b); };
-  add('➕ ' + T.addToFriends, function () { S.sentTo = m.u; wsend({ t: 'friend.request', username: m.u }); toast(T.reqSent); });
-  add('🚫 ' + T.blockUser, function () { if (confirm(T.blockAsk)) wsend({ t: 'block', uid: m.uid }); });
-  document.body.appendChild(menu); var r = anchor.getBoundingClientRect(); menu.style.top = Math.min(window.innerHeight - menu.offsetHeight - 8, r.bottom + 4) + 'px'; menu.style.left = Math.max(8, Math.min(window.innerWidth - menu.offsetWidth - 8, r.left)) + 'px';
+function syncTools() {
+  var k = cur().kind, on = S.authed;
+  $('#bAttach').hidden = !S.features.images; $('#bAttach').disabled = !on; $('#bStk').disabled = !on;
+  $('#bMic').hidden = !(k === 'dm' || k === 'class') || !micAvailable(); $('#bMic').disabled = !on;
+  $('#bAttach').title = T.attach; $('#bStk').title = T.stickers; $('#bMic').title = T.mic;
 }
 
-// ---- escribir ----
-function updateCount() { var v = $('#in').value.length; var c = $('#cnt'); if (c.className === 'err') return; c.textContent = v > 240 ? v + ' / 300' : ''; }
-function clearInput(cid) { if ($('#in').getAttribute('data-cid') === cid) { $('#in').value = ''; $('#in').removeAttribute('data-cid'); updateCount(); } }
-$('#in').addEventListener('input', updateCount);
-$('#composer').addEventListener('submit', function (e) {
-  e.preventDefault();
-  var v = $('#in').value.trim(); if (!v || !S.authed) return;
-  var cid = String(Date.now()) + Math.random().toString(36).slice(2, 6);
-  $('#in').setAttribute('data-cid', cid);
-  wsend({ t: 'send', room: S.cur || 'global', text: v, cid: cid });
-});
+// ---------- compartir una canción desde Budsin Music (#/share) ----------
+function readShare() { try { var o = JSON.parse(localStorage.getItem('bc_share') || 'null'); if (o && o.track && Date.now() - o.t < 15 * 60000) return o.track; } catch (e) {} return null; }
+function clearShare() { try { localStorage.removeItem('bc_share'); } catch (e) {} if (/^#\/share/.test(location.hash)) { try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} } }
+function shareTo(key, tr) { var r = room(key); if (r.loaded) { wsend({ t: 'send', room: key, track: tr, text: '', cid: 't' + Date.now() }); finishShare(key); } else { S.pendingShare = { key: key, track: tr }; openRoom(key, r.name); } }
+function finishShare(key) { clearShare(); gate(null); toast(T.shareDone); switchTo(key); }
+function openShare() {
+  var tr = readShare();
+  if (!tr) { if (/^#\/share/.test(location.hash)) { clearShare(); toast(T.shareNone); } return; }
+  var c = $('#card'); c.textContent = ''; $('#gate').classList.add('on');
+  c.appendChild(el('h1', null, T.shareH)); c.appendChild(trackCard(tr)); c.appendChild(el('p', null, T.shareP));
+  var box = el('div', 'dest'); var add = function (iname, name, key) { var b = el('button'); b.type = 'button'; b.appendChild(withIcon(iname, name)); b.addEventListener('click', function () { shareTo(key, tr); }); box.appendChild(b); };
+  add('hash', T.global, 'global');
+  S.classes.forEach(function (x) { add('users', x.name, x.key); });
+  S.friends.forEach(function (f) { add('user', f.username || '?', f.room); });
+  Object.keys(S.rooms).forEach(function (k) { if (k.indexOf('game:') === 0 && S.rooms[k].loaded) add('game', S.rooms[k].name, k); });
+  c.appendChild(box);
+  var no = el('button', 'btn ghost', T.cancel); no.addEventListener('click', function () { clearShare(); gate(null); }); c.appendChild(no);
+}
 
+// ---------- arranque ----------
 $('#menuBtn').addEventListener('click', function () { $('#side').classList.toggle('open'); });
 $('#msgs').addEventListener('click', function () { $('#side').classList.remove('open'); });
-$('#in').placeholder = T.ph; $('#go').textContent = T.send; $('#manageT').textContent = T.manage;
-document.addEventListener('visibilitychange', function () { if (!document.hidden && S.user && !S.ws) { clearTimeout(S.reconnect); connect(); } });
-
-// #/game/<slug>/<nombre>: entra a la sala de ese juego (así enlazan los juegos)
+$('#in').placeholder = T.ph; $('#go').lastChild.textContent = T.send; $('#backLink').textContent = '← ' + T.back;
+[['#bAttach', 'clip'], ['#bStk', 'smile'], ['#bMic', 'mic']].forEach(function (p) { $(p[0]).innerHTML = icon(p[1]); });
+$('#go').insertBefore((function () { var s = document.createElement('span'); s.innerHTML = icon('send', 'sm'); return s.firstChild; })(), $('#go').firstChild);
+$('#menuBtn').innerHTML = icon('menu'); $('#manage').innerHTML = icon('more'); $('#manage').title = T.roomOptions; $('#jump').insertAdjacentHTML('afterbegin', icon('down', 'sm'));
+$('#recCancel').textContent = T.cancel; $('#recStop').textContent = T.stopRec;
 (function () {
-  var m = /^#\/game\/([a-z0-9][a-z0-9-]{0,59})(?:\/(.*))?$/.exec(location.hash || '');
-  if (m) { var name = ''; try { name = decodeURIComponent(m[2] || ''); } catch (e) {} S.wantJoin = { key: 'game:' + m[1], name: name }; }
+  var g = /^#\/game\/([a-z0-9][a-z0-9-]{0,59})(?:\/(.*))?$/.exec(location.hash || '');
+  if (g) { var name = ''; try { name = decodeURIComponent(g[2] || ''); } catch (e) {} S.wantJoin = { key: 'game:' + g[1], name: name }; }
+  var c = /^#\/class\/([A-Za-z0-9]{8})$/.exec(location.hash || ''); if (c) S.wantClass = c[1].toUpperCase();
 })();
-
-(function () {
-  var m = /^#\/class\/([A-Za-z0-9]{8})$/.exec(location.hash || '');
-  if (m) S.wantClass = m[1].toUpperCase();
-})();
-
 if (window.__BUDSIN_CHAT_TEST) { window.__chat = { S: S }; }
 boot();
 })();
