@@ -10,6 +10,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { LIMITS, MediaError, NSFW_THRESHOLD, processAudio, processImage, type MediaKind, type Scanner, type Tools } from "./media";
 import { PRESET_IDS } from "./presets";
+import { emailAllowed } from "./access";
 
 export const AVATARS = Array.from({ length: 24 }, (_, i) => `a${String(i + 1).padStart(2, "0")}`);
 export const REPORT_REASONS = ["spam", "insult", "sexual", "personal", "other"];
@@ -30,6 +31,8 @@ export interface ServerOptions {
   mediaDir?: string;       // dónde se guardan imágenes, stickers y audios
   scan?: Scanner;          // detector de contenido sexual; sin él NO se aceptan imágenes ni stickers (falla cerrado)
   tools?: Tools;           // rutas de ffmpeg y ffprobe
+  /** Reglas de correo permitidas (ver access.ts). Sin esta opción entra cualquiera (null/undefined); index.ts pasa las de colegios por defecto. */
+  allowedDomains?: string[] | null;
   /** Imágenes y stickers propios: APAGADO por defecto. Sin una defensa real contra material de abuso infantil (hashes + revisión) no deben activarse con menores en el sitio. */
   imagesEnabled?: boolean;
   mediaMinAgeMs?: number;  // cuánto debe tener una cuenta para subir imágenes (el audio pide la mitad); por defecto 30 min
@@ -163,6 +166,14 @@ export function createChatServer(opts: ServerOptions) {
       if (!claims) {
         err(ws, "auth_failed");
         return ws.close(1008, "auth");
+      }
+      if (!claims.emailVerified) {
+        err(ws, "email_unverified");
+        return ws.close(1008, "email");
+      }
+      if (!emailAllowed(claims.email, claims.emailVerified, opts.allowedDomains ?? null, admins)) {
+        err(ws, "domain_not_allowed");
+        return ws.close(1008, "domain");
       }
       c.claims = claims;
       c.admin = claims.emailVerified && admins.has(claims.email);
@@ -568,6 +579,7 @@ export function createChatServer(opts: ServerOptions) {
     if (kind !== "audio" && !opts.imagesEnabled) return json({ error: "images_disabled" }, 403);
     const claims = await verifyFirebaseToken(bearer(req), projectId, keys, now());
     if (!claims) return json({ error: "auth_failed" }, 401);
+    if (!emailAllowed(claims.email, claims.emailVerified, opts.allowedDomains ?? null, admins)) return json({ error: "domain_not_allowed" }, 403);
     const user = db.touchUser(claims.uid, claims.email, now());
     if (user.banned) return json({ error: "banned" }, 403);
     if (!user.username) return json({ error: "need_username" }, 403);

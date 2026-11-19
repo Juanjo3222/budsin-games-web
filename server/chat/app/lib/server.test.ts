@@ -177,8 +177,7 @@ describe("reportes y administración", () => {
     nonVerified.close();
     const fake = await Client.open();
     fake.send({ t: "auth", token: token("imp", "boss@x.com", false) });
-    await fake.next((x) => x.t === "hello");
-    expect((await fake.req({ t: "admin.reports" }, (x) => x.t === "err")).code).toBe("forbidden");   // correo sin verificar no vale
+    expect((await fake.next((x) => x.t === "err")).code).toBe("email_unverified");   // un correo sin verificar ni siquiera entra (y menos como admin)
     fake.close();
   });
   test("el admin ve los reportes y los resuelve", async () => {
@@ -410,5 +409,31 @@ describe("admin: salas", () => {
     expect((await left).room).toBe(made.item.key);
     expect(db.room(made.item.key)).toBeNull();
     boss.close(); owner.close();
+  });
+});
+
+describe("solo cuentas de colegio", () => {
+  test("con reglas de dominio, un Gmail no entra, un correo de colegio sí, y el admin siempre", async () => {
+    const restricted = createChatServer({ db: new ChatDb(":memory:"), projectId: "juanjo-games", keys: async (k) => (k === "k1" ? publicKey : null), adminEmails: ["boss@gmail.com"], origins: ["https://games.budsin.dev"], now: () => clock, allowedDomains: ["*.edu", "*.edu.??", "colegiosanjose.com"] });
+    const open = async (uid: string, email: string) => {
+      const ws = new WebSocket(`ws://127.0.0.1:${restricted.port}/api/chat/ws`, { headers: { origin: "https://games.budsin.dev" } } as any);
+      const got: any[] = []; let closed = false;
+      ws.onmessage = (e) => got.push(JSON.parse(String(e.data))); ws.onclose = () => { closed = true; };
+      await new Promise((r) => (ws.onopen = r));
+      ws.send(JSON.stringify({ t: "auth", token: token(uid, email) }));
+      await Bun.sleep(200);
+      const res = { first: got[0], closed };
+      ws.close();
+      return res;
+    };
+    try {
+      const g = await open("e1", "ana@gmail.com");
+      expect(g.first).toMatchObject({ t: "err", code: "domain_not_allowed" });
+      expect(g.closed).toBe(true);
+      expect((await open("e2", "juan@ucv.edu.pe")).first.t).toBe("hello");
+      expect((await open("e3", "maria@colegiosanjose.com")).first.t).toBe("hello");
+      expect((await open("e4", "x@school.edu.evil.com")).first.code).toBe("domain_not_allowed");
+      expect((await open("e5", "boss@gmail.com")).first.t).toBe("hello");
+    } finally { restricted.stop(); }
   });
 });
