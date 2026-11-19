@@ -219,3 +219,81 @@ describe("reportes y administración", () => {
     expect(r.items[0]).toMatchObject({ username: "Rita_A", uid: "r1" });
   });
 });
+
+describe("grupos de clase", () => {
+  let ana: Client, beto: Client, eve: Client;
+  let code = "", key = "";
+  beforeAll(async () => {
+    clock += 3600_000 * 10;
+    ana = await user("k1", "Ana_Prof"); beto = await user("k2", "Beto_Alu"); eve = await user("k3", "Eve_Ext");
+  });
+  afterAll(() => { for (const x of [ana, beto, eve]) x.close(); });
+
+  test("crear un grupo: nombre filtrado y con largo válido", async () => {
+    expect((await ana.req({ t: "class.create", name: "ab" }, (m) => m.t === "err")).code).toBe("class_name_length");
+    expect((await ana.req({ t: "class.create", name: "los pendejos de 3A" }, (m) => m.t === "err")).code).toBe("class_name_blocked");
+    expect((await ana.req({ t: "class.create", name: "grupo www.malo.com" }, (m) => m.t === "err")).code).toBe("class_name_blocked");
+  });
+  test("crear: devuelve un código de 8 caracteres y la creadora ya es miembro", async () => {
+    const r = await ana.req({ t: "class.create", name: "3A Matemáticas" }, (m) => m.t === "class.created" || m.t === "err");
+    expect(r.t).toBe("class.created");
+    key = r.item.key; code = r.item.code;
+    expect(code).toMatch(/^[A-Z2-9]{8}$/);
+    expect(r.item).toMatchObject({ name: "3A Matemáticas", owner: true, members: 1 });
+    expect((await ana.req({ t: "class.list" }, (m) => m.t === "classes")).items.map((x: any) => x.name)).toEqual(["3A Matemáticas"]);
+  });
+  test("no se puede duplicar: mismo nombre aunque cambien mayúsculas, tildes, espacios o símbolos", async () => {
+    for (const n of ["3a matematicas", "3A  MATEMATICAS", "3°A - Matemáticas", "3a.matematicas"]) {
+      expect((await beto.req({ t: "class.create", name: n }, (m) => m.t === "err" || m.t === "class.created")).code).toBe("class_exists");
+    }
+    expect((await beto.req({ t: "class.create", name: "3B Matemáticas" }, (m) => m.t === "class.created" || m.t === "err")).t).toBe("class.created");
+  });
+  test("un grupo no es público: sin código no se entra, ni adivinando la clave", async () => {
+    expect((await eve.req({ t: "join", room: key }, (m) => m.t === "err" || m.t === "joined")).code).toBe("forbidden");
+    expect((await eve.req({ t: "class.join", code: "ZZZZZZZZ" }, (m) => m.t === "err" || m.t === "class.joined")).code).toBe("class_not_found");
+    expect((await eve.req({ t: "class.join", code: "abc" }, (m) => m.t === "err" || m.t === "class.joined")).code).toBe("class_not_found");
+    const l = await eve.req({ t: "rooms" }, (m) => m.t === "rooms");
+    expect(JSON.stringify(l)).not.toContain("Matem");
+  });
+  test("con el código se entra y se chatea solo entre miembros", async () => {
+    const r = await beto.req({ t: "class.join", code: code.toLowerCase() }, (m) => m.t === "class.joined" || m.t === "err");
+    expect(r.t).toBe("class.joined");
+    expect(r.item.members).toBe(2);
+    await ana.req({ t: "join", room: key }, (m) => m.t === "joined");
+    await beto.req({ t: "join", room: key }, (m) => m.t === "joined");
+    clock += 60_000;
+    ana.send({ t: "send", room: key, text: "mañana examen, estudien" });
+    expect((await beto.next((m) => m.t === "msg")).m.text).toBe("mañana examen, estudien");
+    // quien no es miembro no recibe nada ni puede escribir
+    eve.send({ t: "send", room: key, text: "intruso" });
+    expect((await eve.next((m) => m.t === "err")).code).toBe("not_joined");
+  });
+  test("el filtro y el anti-spam también valen en los grupos", async () => {
+    clock += 60_000;
+    beto.send({ t: "send", room: key, text: "llámame al 987654321" });
+    expect((await beto.next((m) => m.t === "err")).why).toBe("contact");
+  });
+  test("límites: 3 grupos creados por persona", async () => {
+    clock += 3600_000 * 2;
+    for (const n of ["Clase uno", "Clase dos"]) await ana.req({ t: "class.create", name: n }, (m) => m.t === "class.created" || m.t === "err");
+    clock += 3600_000 * 2;
+    expect((await ana.req({ t: "class.create", name: "Clase tres" }, (m) => m.t === "err" || m.t === "class.created")).code).toBe("class_limit_created");
+  });
+  test("solo la dueña expulsa", async () => {
+    expect((await beto.req({ t: "class.kick", room: key, uid: "k1" }, (m) => m.t === "err")).code).toBe("forbidden");
+    const gone = beto.next((m) => m.t === "class.left");
+    await ana.req({ t: "class.kick", room: key, uid: "k2" }, (m) => m.t === "ok");
+    expect((await gone).kicked).toBe(true);
+    beto.send({ t: "send", room: key, text: "sigo aquí" });
+    expect((await beto.next((m) => m.t === "err")).code).toBe("not_joined");
+  });
+  test("al irse la dueña el grupo pasa a otro; al irse el último se borra y el nombre queda libre", async () => {
+    await beto.req({ t: "class.join", code }, (m) => m.t === "class.joined");
+    await ana.req({ t: "class.leave", room: key }, (m) => m.t === "class.left");
+    expect(db.room(key)!.owner).toBe("k2");
+    await beto.req({ t: "class.leave", room: key }, (m) => m.t === "class.left");
+    expect(db.room(key)).toBeNull();
+    const again = await eve.req({ t: "class.create", name: "3A Matemáticas" }, (m) => m.t === "class.created" || m.t === "err");
+    expect(again.t).toBe("class.created");
+  });
+});

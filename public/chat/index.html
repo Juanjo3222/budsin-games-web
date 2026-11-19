@@ -95,6 +95,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="top">
       <button id="menuBtn" aria-label="Menu">☰</button>
       <div id="title">Budsin Chat</div><div id="sub"></div>
+      <button id="manage" hidden style="border:0;background:var(--card);border-radius:999px;padding:5px 12px;font-size:.8rem">⚙ <span id="manageT"></span></button>
       <span id="state" title=""></span>
       <div class="sp"></div>
       <button id="me" hidden></button>
@@ -118,9 +119,9 @@ try { var l = (localStorage.getItem('budsin_language') || navigator.language || 
 document.documentElement.lang = lang;
 
 var TXT = {
-  es: { loading: 'Conectando…', signinH: 'Entra a Budsin Chat', signinP: 'Para chatear necesitas una cuenta de Google. Solo se usa tu cuenta para identificarte: los demás verán únicamente el nombre y el avatar que elijas aquí.', signin: 'Entrar con Google', profH: 'Elige tu nombre y avatar', profP: 'Es lo único que verán los demás. Nada de nombres reales, apellidos ni datos personales. Los nombres inapropiados se bloquean.', name: 'Nombre de usuario', nameHint: '3–20 letras, números, punto, guion o guion bajo', save: 'Guardar', cancel: 'Cancelar', global: 'Sala global', games: 'Juegos', gamesNone: 'Aún no hay salas de juegos activas. Entra a una desde la página del juego.', gamesHint: 'Cada juego tiene su sala.', send: 'Enviar', ph: 'Escribe un mensaje…', online: 'en línea', older: 'Cargar anteriores', report: 'Reportar', reportT: '¿Por qué lo reportas?', reasons: { spam: 'Spam', insult: 'Insultos o acoso', sexual: 'Contenido sexual', personal: 'Datos personales', other: 'Otro motivo' }, reported: 'Reporte enviado. Gracias 🙏', welcome: 'Sé amable: aquí hay gente de todas las edades.', rules: 'No compartas datos personales ni enlaces.', offline: 'Sin conexión. Reintentando…', you: 'Tú', edit: 'Cambiar nombre o avatar', signout: 'Cerrar sesión', admin: 'Panel de admin', gameRoom: 'Sala de', err: { auth_failed: 'No pudimos verificar tu cuenta. Vuelve a entrar.', banned: 'Tu cuenta no puede usar el chat.', muted: 'Estás silenciado por un rato.', rate: 'Vas muy rápido. Espera unos segundos.', duplicate: 'Ya enviaste ese mensaje.', too_long: 'Mensaje demasiado largo (máx. 300).', need_username: 'Elige un nombre primero.', not_joined: 'Entra primero a la sala.', no_room: 'Esa sala no existe.', room_name: 'Nombre de sala no permitido.', rooms_full: 'Hay demasiadas salas.', too_many_tabs: 'Tienes demasiadas pestañas abiertas.', too_many_rooms: 'Tienes demasiadas salas abiertas.', name_length: 'El nombre debe tener entre 3 y 20 caracteres.', name_chars: 'Solo letras, números, punto, guion y guion bajo (sin espacios).', name_reserved: 'Ese nombre está reservado.', name_profanity: 'Ese nombre no está permitido.', name_link: 'Un nombre no puede ser un enlace.', name_taken: 'Ese nombre ya está en uso (o es muy parecido a otro).', name_cooldown: 'Solo puedes cambiar tu nombre una vez por semana.', bad_avatar: 'Avatar no válido.', own_message: 'No puedes reportar tu propio mensaje.', already_reported: 'Ya lo reportaste.', forbidden: 'No permitido.', server_error: 'Error del servidor. Intenta de nuevo.', bad_request: 'Solicitud no válida.', blocked: { profanity: 'Ese mensaje tiene lenguaje no permitido.', link: 'No se pueden enviar enlaces ni correos.', contact: 'No compartas teléfonos, usuarios ni otras redes.', empty: 'Escribe algo.' } } },
-  en: { loading: 'Connecting…', signinH: 'Join Budsin Chat', signinP: 'You need a Google account to chat. It is only used to identify you: others will see just the name and avatar you pick here.', signin: 'Sign in with Google', profH: 'Pick your name and avatar', profP: 'This is all others will see. No real names, surnames or personal info. Inappropriate names are blocked.', name: 'Username', nameHint: '3–20 letters, numbers, dot, dash or underscore', save: 'Save', cancel: 'Cancel', global: 'Global room', games: 'Games', gamesNone: 'No active game rooms yet. Join one from the game page.', gamesHint: 'Every game has its own room.', send: 'Send', ph: 'Write a message…', online: 'online', older: 'Load older', report: 'Report', reportT: 'Why are you reporting it?', reasons: { spam: 'Spam', insult: 'Insults or harassment', sexual: 'Sexual content', personal: 'Personal info', other: 'Other' }, reported: 'Report sent. Thanks 🙏', welcome: 'Be kind: people of all ages are here.', rules: 'Do not share personal info or links.', offline: 'Offline. Retrying…', you: 'You', edit: 'Change name or avatar', signout: 'Sign out', admin: 'Admin panel', gameRoom: 'Room of', err: { auth_failed: 'We could not verify your account. Sign in again.', banned: 'Your account cannot use the chat.', muted: 'You are muted for a while.', rate: 'You are going too fast. Wait a few seconds.', duplicate: 'You already sent that.', too_long: 'Message too long (max 300).', need_username: 'Pick a name first.', not_joined: 'Join the room first.', no_room: 'That room does not exist.', room_name: 'Room name not allowed.', rooms_full: 'Too many rooms.', too_many_tabs: 'Too many tabs open.', too_many_rooms: 'Too many rooms open.', name_length: 'The name must be 3 to 20 characters.', name_chars: 'Only letters, numbers, dot, dash and underscore (no spaces).', name_reserved: 'That name is reserved.', name_profanity: 'That name is not allowed.', name_link: 'A name cannot be a link.', name_taken: 'That name is taken (or too similar to another).', name_cooldown: 'You can change your name once a week.', bad_avatar: 'Invalid avatar.', own_message: 'You cannot report your own message.', already_reported: 'Already reported.', forbidden: 'Not allowed.', server_error: 'Server error. Try again.', bad_request: 'Invalid request.', blocked: { profanity: 'That message has language that is not allowed.', link: 'Links and emails cannot be sent.', contact: 'Do not share phone numbers, usernames or other networks.', empty: 'Write something.' } } },
-  pt: { loading: 'Conectando…', signinH: 'Entre no Budsin Chat', signinP: 'Para conversar você precisa de uma conta Google. Ela só serve para identificar você: os outros verão apenas o nome e o avatar que escolher aqui.', signin: 'Entrar com o Google', profH: 'Escolha seu nome e avatar', profP: 'É só isso que os outros verão. Nada de nomes reais, sobrenomes ou dados pessoais. Nomes impróprios são bloqueados.', name: 'Nome de usuário', nameHint: '3–20 letras, números, ponto, hífen ou sublinhado', save: 'Salvar', cancel: 'Cancelar', global: 'Sala global', games: 'Jogos', gamesNone: 'Ainda não há salas de jogos ativas. Entre em uma pela página do jogo.', gamesHint: 'Cada jogo tem sua sala.', send: 'Enviar', ph: 'Escreva uma mensagem…', online: 'online', older: 'Carregar anteriores', report: 'Denunciar', reportT: 'Por que você está denunciando?', reasons: { spam: 'Spam', insult: 'Insultos ou assédio', sexual: 'Conteúdo sexual', personal: 'Dados pessoais', other: 'Outro motivo' }, reported: 'Denúncia enviada. Obrigado 🙏', welcome: 'Seja gentil: aqui há pessoas de todas as idades.', rules: 'Não compartilhe dados pessoais nem links.', offline: 'Sem conexão. Tentando de novo…', you: 'Você', edit: 'Mudar nome ou avatar', signout: 'Sair', admin: 'Painel de admin', gameRoom: 'Sala de', err: { auth_failed: 'Não foi possível verificar sua conta. Entre de novo.', banned: 'Sua conta não pode usar o chat.', muted: 'Você está silenciado por um tempo.', rate: 'Você está indo rápido demais. Espere alguns segundos.', duplicate: 'Você já enviou isso.', too_long: 'Mensagem longa demais (máx. 300).', need_username: 'Escolha um nome primeiro.', not_joined: 'Entre na sala primeiro.', no_room: 'Essa sala não existe.', room_name: 'Nome de sala não permitido.', rooms_full: 'Salas demais.', too_many_tabs: 'Abas demais abertas.', too_many_rooms: 'Salas demais abertas.', name_length: 'O nome deve ter de 3 a 20 caracteres.', name_chars: 'Só letras, números, ponto, hífen e sublinhado (sem espaços).', name_reserved: 'Esse nome é reservado.', name_profanity: 'Esse nome não é permitido.', name_link: 'Um nome não pode ser um link.', name_taken: 'Esse nome já está em uso (ou é parecido demais com outro).', name_cooldown: 'Você só pode mudar o nome uma vez por semana.', bad_avatar: 'Avatar inválido.', own_message: 'Você não pode denunciar a própria mensagem.', already_reported: 'Já denunciado.', forbidden: 'Não permitido.', server_error: 'Erro do servidor. Tente de novo.', bad_request: 'Pedido inválido.', blocked: { profanity: 'Essa mensagem tem linguagem não permitida.', link: 'Não é possível enviar links nem e-mails.', contact: 'Não compartilhe telefones, usuários nem outras redes.', empty: 'Escreva algo.' } } }
+  es: { classes: 'Clases', newClass: 'Crear grupo de clase', joinClass: 'Unirme con código', classH: 'Crea un grupo de clase', classP: 'Un grupo es privado: solo entra quien tenga su código o enlace. Cada nombre es único (no se puede repetir).', className: 'Nombre del grupo (ej. 3A Matemáticas)', create: 'Crear', joinH: 'Unirte a un grupo', joinP: 'Escribe el código de 8 caracteres que te dio tu compañero o profe.', codeIn: 'Código', join: 'Unirme', code: 'Código', copyCode: 'Copiar código', copyLink: 'Copiar enlace', copied: 'Copiado ✓', leave: 'Salir del grupo', leaveAsk: '¿Salir de este grupo?', members: 'Miembros', kick: 'Expulsar', classNone: 'Crea un grupo o únete con un código.', sysJoin: 'se unió al grupo', manage: 'Grupo', loading: 'Conectando…', signinH: 'Entra a Budsin Chat', signinP: 'Para chatear necesitas una cuenta de Google. Solo se usa tu cuenta para identificarte: los demás verán únicamente el nombre y el avatar que elijas aquí.', signin: 'Entrar con Google', profH: 'Elige tu nombre y avatar', profP: 'Es lo único que verán los demás. Nada de nombres reales, apellidos ni datos personales. Los nombres inapropiados se bloquean.', name: 'Nombre de usuario', nameHint: '3–20 letras, números, punto, guion o guion bajo', save: 'Guardar', cancel: 'Cancelar', global: 'Sala global', games: 'Juegos', gamesNone: 'Aún no hay salas de juegos activas. Entra a una desde la página del juego.', gamesHint: 'Cada juego tiene su sala.', send: 'Enviar', ph: 'Escribe un mensaje…', online: 'en línea', older: 'Cargar anteriores', report: 'Reportar', reportT: '¿Por qué lo reportas?', reasons: { spam: 'Spam', insult: 'Insultos o acoso', sexual: 'Contenido sexual', personal: 'Datos personales', other: 'Otro motivo' }, reported: 'Reporte enviado. Gracias 🙏', welcome: 'Sé amable: aquí hay gente de todas las edades.', rules: 'No compartas datos personales ni enlaces.', offline: 'Sin conexión. Reintentando…', you: 'Tú', edit: 'Cambiar nombre o avatar', signout: 'Cerrar sesión', admin: 'Panel de admin', gameRoom: 'Sala de', err: { class_name_length: 'El nombre del grupo debe tener entre 3 y 40 caracteres.', class_name_blocked: 'Ese nombre de grupo no está permitido (sin groserías, enlaces ni datos personales).', class_exists: 'Ya existe un grupo con ese nombre. Pide el código a tus compañeros para unirte.', class_limit_created: 'Ya creaste 3 grupos, el máximo.', class_limit_joined: 'Ya estás en 8 grupos, el máximo.', class_not_found: 'No encontré ningún grupo con ese código.', class_full: 'Ese grupo está lleno.', auth_failed: 'No pudimos verificar tu cuenta. Vuelve a entrar.', banned: 'Tu cuenta no puede usar el chat.', muted: 'Estás silenciado por un rato.', rate: 'Vas muy rápido. Espera unos segundos.', duplicate: 'Ya enviaste ese mensaje.', too_long: 'Mensaje demasiado largo (máx. 300).', need_username: 'Elige un nombre primero.', not_joined: 'Entra primero a la sala.', no_room: 'Esa sala no existe.', room_name: 'Nombre de sala no permitido.', rooms_full: 'Hay demasiadas salas.', too_many_tabs: 'Tienes demasiadas pestañas abiertas.', too_many_rooms: 'Tienes demasiadas salas abiertas.', name_length: 'El nombre debe tener entre 3 y 20 caracteres.', name_chars: 'Solo letras, números, punto, guion y guion bajo (sin espacios).', name_reserved: 'Ese nombre está reservado.', name_profanity: 'Ese nombre no está permitido.', name_link: 'Un nombre no puede ser un enlace.', name_taken: 'Ese nombre ya está en uso (o es muy parecido a otro).', name_cooldown: 'Solo puedes cambiar tu nombre una vez por semana.', bad_avatar: 'Avatar no válido.', own_message: 'No puedes reportar tu propio mensaje.', already_reported: 'Ya lo reportaste.', forbidden: 'No permitido.', server_error: 'Error del servidor. Intenta de nuevo.', bad_request: 'Solicitud no válida.', blocked: { profanity: 'Ese mensaje tiene lenguaje no permitido.', link: 'No se pueden enviar enlaces ni correos.', contact: 'No compartas teléfonos, usuarios ni otras redes.', empty: 'Escribe algo.' } } },
+  en: { classes: 'Classes', newClass: 'Create class group', joinClass: 'Join with code', classH: 'Create a class group', classP: 'A group is private: only people with its code or link get in. Each name is unique (no repeats).', className: 'Group name (e.g. 3A Math)', create: 'Create', joinH: 'Join a group', joinP: 'Type the 8-character code your classmate or teacher gave you.', codeIn: 'Code', join: 'Join', code: 'Code', copyCode: 'Copy code', copyLink: 'Copy link', copied: 'Copied ✓', leave: 'Leave group', leaveAsk: 'Leave this group?', members: 'Members', kick: 'Remove', classNone: 'Create a group or join with a code.', sysJoin: 'joined the group', manage: 'Group', loading: 'Connecting…', signinH: 'Join Budsin Chat', signinP: 'You need a Google account to chat. It is only used to identify you: others will see just the name and avatar you pick here.', signin: 'Sign in with Google', profH: 'Pick your name and avatar', profP: 'This is all others will see. No real names, surnames or personal info. Inappropriate names are blocked.', name: 'Username', nameHint: '3–20 letters, numbers, dot, dash or underscore', save: 'Save', cancel: 'Cancel', global: 'Global room', games: 'Games', gamesNone: 'No active game rooms yet. Join one from the game page.', gamesHint: 'Every game has its own room.', send: 'Send', ph: 'Write a message…', online: 'online', older: 'Load older', report: 'Report', reportT: 'Why are you reporting it?', reasons: { spam: 'Spam', insult: 'Insults or harassment', sexual: 'Sexual content', personal: 'Personal info', other: 'Other' }, reported: 'Report sent. Thanks 🙏', welcome: 'Be kind: people of all ages are here.', rules: 'Do not share personal info or links.', offline: 'Offline. Retrying…', you: 'You', edit: 'Change name or avatar', signout: 'Sign out', admin: 'Admin panel', gameRoom: 'Room of', err: { class_name_length: 'The group name must be 3 to 40 characters.', class_name_blocked: 'That group name is not allowed (no profanity, links or personal info).', class_exists: 'A group with that name already exists. Ask your classmates for the code to join.', class_limit_created: 'You already created 3 groups, the maximum.', class_limit_joined: 'You are already in 8 groups, the maximum.', class_not_found: 'I could not find a group with that code.', class_full: 'That group is full.', auth_failed: 'We could not verify your account. Sign in again.', banned: 'Your account cannot use the chat.', muted: 'You are muted for a while.', rate: 'You are going too fast. Wait a few seconds.', duplicate: 'You already sent that.', too_long: 'Message too long (max 300).', need_username: 'Pick a name first.', not_joined: 'Join the room first.', no_room: 'That room does not exist.', room_name: 'Room name not allowed.', rooms_full: 'Too many rooms.', too_many_tabs: 'Too many tabs open.', too_many_rooms: 'Too many rooms open.', name_length: 'The name must be 3 to 20 characters.', name_chars: 'Only letters, numbers, dot, dash and underscore (no spaces).', name_reserved: 'That name is reserved.', name_profanity: 'That name is not allowed.', name_link: 'A name cannot be a link.', name_taken: 'That name is taken (or too similar to another).', name_cooldown: 'You can change your name once a week.', bad_avatar: 'Invalid avatar.', own_message: 'You cannot report your own message.', already_reported: 'Already reported.', forbidden: 'Not allowed.', server_error: 'Server error. Try again.', bad_request: 'Invalid request.', blocked: { profanity: 'That message has language that is not allowed.', link: 'Links and emails cannot be sent.', contact: 'Do not share phone numbers, usernames or other networks.', empty: 'Write something.' } } },
+  pt: { classes: 'Turmas', newClass: 'Criar grupo de turma', joinClass: 'Entrar com código', classH: 'Crie um grupo de turma', classP: 'Um grupo é privado: só entra quem tem o código ou o link. Cada nome é único (não pode repetir).', className: 'Nome do grupo (ex. 3A Matemática)', create: 'Criar', joinH: 'Entrar em um grupo', joinP: 'Digite o código de 8 caracteres que seu colega ou professor passou.', codeIn: 'Código', join: 'Entrar', code: 'Código', copyCode: 'Copiar código', copyLink: 'Copiar link', copied: 'Copiado ✓', leave: 'Sair do grupo', leaveAsk: 'Sair deste grupo?', members: 'Membros', kick: 'Remover', classNone: 'Crie um grupo ou entre com um código.', sysJoin: 'entrou no grupo', manage: 'Grupo', loading: 'Conectando…', signinH: 'Entre no Budsin Chat', signinP: 'Para conversar você precisa de uma conta Google. Ela só serve para identificar você: os outros verão apenas o nome e o avatar que escolher aqui.', signin: 'Entrar com o Google', profH: 'Escolha seu nome e avatar', profP: 'É só isso que os outros verão. Nada de nomes reais, sobrenomes ou dados pessoais. Nomes impróprios são bloqueados.', name: 'Nome de usuário', nameHint: '3–20 letras, números, ponto, hífen ou sublinhado', save: 'Salvar', cancel: 'Cancelar', global: 'Sala global', games: 'Jogos', gamesNone: 'Ainda não há salas de jogos ativas. Entre em uma pela página do jogo.', gamesHint: 'Cada jogo tem sua sala.', send: 'Enviar', ph: 'Escreva uma mensagem…', online: 'online', older: 'Carregar anteriores', report: 'Denunciar', reportT: 'Por que você está denunciando?', reasons: { spam: 'Spam', insult: 'Insultos ou assédio', sexual: 'Conteúdo sexual', personal: 'Dados pessoais', other: 'Outro motivo' }, reported: 'Denúncia enviada. Obrigado 🙏', welcome: 'Seja gentil: aqui há pessoas de todas as idades.', rules: 'Não compartilhe dados pessoais nem links.', offline: 'Sem conexão. Tentando de novo…', you: 'Você', edit: 'Mudar nome ou avatar', signout: 'Sair', admin: 'Painel de admin', gameRoom: 'Sala de', err: { class_name_length: 'O nome do grupo deve ter de 3 a 40 caracteres.', class_name_blocked: 'Esse nome de grupo não é permitido (sem palavrões, links nem dados pessoais).', class_exists: 'Já existe um grupo com esse nome. Peça o código aos colegas para entrar.', class_limit_created: 'Você já criou 3 grupos, o máximo.', class_limit_joined: 'Você já está em 8 grupos, o máximo.', class_not_found: 'Não encontrei nenhum grupo com esse código.', class_full: 'Esse grupo está cheio.', auth_failed: 'Não foi possível verificar sua conta. Entre de novo.', banned: 'Sua conta não pode usar o chat.', muted: 'Você está silenciado por um tempo.', rate: 'Você está indo rápido demais. Espere alguns segundos.', duplicate: 'Você já enviou isso.', too_long: 'Mensagem longa demais (máx. 300).', need_username: 'Escolha um nome primeiro.', not_joined: 'Entre na sala primeiro.', no_room: 'Essa sala não existe.', room_name: 'Nome de sala não permitido.', rooms_full: 'Salas demais.', too_many_tabs: 'Abas demais abertas.', too_many_rooms: 'Salas demais abertas.', name_length: 'O nome deve ter de 3 a 20 caracteres.', name_chars: 'Só letras, números, ponto, hífen e sublinhado (sem espaços).', name_reserved: 'Esse nome é reservado.', name_profanity: 'Esse nome não é permitido.', name_link: 'Um nome não pode ser um link.', name_taken: 'Esse nome já está em uso (ou é parecido demais com outro).', name_cooldown: 'Você só pode mudar o nome uma vez por semana.', bad_avatar: 'Avatar inválido.', own_message: 'Você não pode denunciar a própria mensagem.', already_reported: 'Já denunciado.', forbidden: 'Não permitido.', server_error: 'Erro do servidor. Tente de novo.', bad_request: 'Pedido inválido.', blocked: { profanity: 'Essa mensagem tem linguagem não permitida.', link: 'Não é possível enviar links nem e-mails.', contact: 'Não compartilhe telefones, usuários nem outras redes.', empty: 'Escreva algo.' } } }
 };
 var T = TXT[lang];
 function errText(code, why) { var e = T.err[code]; if (code === 'blocked') return T.err.blocked[why] || T.err.blocked.profanity; return typeof e === 'string' ? e : (T.err.server_error); }
@@ -133,7 +134,7 @@ function avEmoji(id) { return AV_EMOJI[(parseInt(String(id).slice(1), 10) || 1) 
 function avatar(id) { var d = document.createElement('div'); d.className = 'av'; d.setAttribute('style', avStyle(id)); d.textContent = avEmoji(id); return d; }
 
 // ---- estado ----
-var S = { fb: null, user: null, ws: null, authed: false, me: null, avatars: [], rooms: {}, cur: null, retry: 0, reconnect: null, gameRooms: [], wantJoin: null, closing: false };
+var S = { classes: [], members: {}, wantClass: null, fb: null, user: null, ws: null, authed: false, me: null, avatars: [], rooms: {}, cur: null, retry: 0, reconnect: null, gameRooms: [], wantJoin: null, closing: false };
 var FB_CONFIG = { apiKey: 'AIzaSyCBN77CtgH-J5NYWhVyW6p1jldXdxbok-U', authDomain: 'juanjo-games.firebaseapp.com', projectId: 'juanjo-games', storageBucket: 'juanjo-games.firebasestorage.app', messagingSenderId: '927529249414', appId: '1:927529249414:web:410a686dc7f0da25ec3f07' };
 var FB_BASE = 'https://www.gstatic.com/firebasejs/10.12.5/';
 var WS_URL = (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/api/chat/ws';
@@ -154,6 +155,20 @@ function gate(kind, msg) {
     if (msg) c.appendChild(el('div', 'error', msg));
     var b = el('button', 'btn', T.signin); b.id = 'signinBtn'; c.appendChild(b);
     b.addEventListener('click', signIn);
+    return;
+  }
+  if (kind === 'classNew' || kind === 'classJoin') {
+    var isNew = kind === 'classNew';
+    c.appendChild(el('h1', null, (isNew ? '🏫 ' + T.classH : '🔑 ' + T.joinH))); c.appendChild(el('p', null, isNew ? T.classP : T.joinP));
+    var ci = el('input', 'field'); ci.id = 'classIn'; ci.maxLength = isNew ? 40 : 8; ci.placeholder = isNew ? T.className : T.codeIn; ci.autocomplete = 'off'; ci.spellcheck = false; if (!isNew) ci.style.cssText = 'text-transform:uppercase;letter-spacing:.25em';
+    c.appendChild(ci);
+    var cer = el('div', 'error', msg || ''); cer.id = 'classErr'; c.appendChild(cer);
+    var crow = el('div'); crow.style.cssText = 'display:flex;gap:10px';
+    var cok = el('button', 'btn', isNew ? T.create : T.join); cok.id = 'classGo'; crow.appendChild(cok);
+    var cno = el('button', 'btn ghost', T.cancel); cno.addEventListener('click', function () { gate(null); }); crow.appendChild(cno); c.appendChild(crow);
+    var go = function () { cer.textContent = ''; var v = ci.value.trim(); if (!v) return; wsend(isNew ? { t: 'class.create', name: v } : { t: 'class.join', code: v }); };
+    cok.addEventListener('click', go); ci.addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); go(); } });
+    setTimeout(function () { ci.focus(); }, 50);
     return;
   }
   if (kind === 'profile') {
@@ -248,6 +263,18 @@ function onMsg(m) {
     case 'del': { var dr = room(m.room); dr.msgs = dr.msgs.filter(function (x) { return x.id !== m.id; }); if (S.cur === m.room) renderMsgs(false); return; }
     case 'online': { room(m.room).online = m.n; if (S.cur === m.room) renderTop(); renderRooms(); return; }
     case 'rooms': S.gameRooms = m.game || []; renderRooms(); return;
+    case 'classes': S.classes = m.items || []; S.classes.forEach(function (c) { var r = room(c.key); r.name = c.name; r.kind = 'class'; if (!r.loaded) wsend({ t: 'join', room: c.key }); }); renderRooms(); if (S.wantClass) { wsend({ t: 'class.join', code: S.wantClass }); S.wantClass = null; } return;
+    case 'class.created': case 'class.joined': {
+      gate(null); var it = m.item; if (!it) return;
+      if (!S.classes.some(function (c) { return c.key === it.key; })) S.classes.push(it);
+      var cr = room(it.key); cr.name = it.name; cr.kind = 'class'; wsend({ t: 'join', room: it.key }); S.cur = it.key; renderRooms(); renderTop(); renderMsgs(true); return;
+    }
+    case 'class.left': {
+      S.classes = S.classes.filter(function (c) { return c.key !== m.room; }); delete S.rooms[m.room];
+      if (S.cur === m.room) { S.cur = 'global'; renderTop(); renderMsgs(true); } renderRooms(); return;
+    }
+    case 'class.members': S.members[m.room] = m; if (S.cur === m.room) classMenuRender(); return;
+    case 'sys': { if (S.cur === m.room) { var bx = $('#msgs'); bx.appendChild(el('div', 'sys', m.u + ' ' + T.sysJoin)); bx.scrollTop = bx.scrollHeight; } return; }
     case 'reported': toast(T.reported); return;
     case 'err': onErr(m); return;
   }
@@ -255,6 +282,7 @@ function onMsg(m) {
 function onErr(m) {
   var code = m.code;
   if (code === 'auth_failed' || code === 'banned') { S.fatal = true; gate('signin', errText(code)); return; }
+  if ($('#card #classIn')) { $('#classErr').textContent = errText(code, m.why); return; }
   if ($('#card #nameIn')) { $('#profErr').textContent = code === 'name_cooldown' ? errText(code) : errText(code, m.why); return; }
   var msg = errText(code, m.why);
   if (code === 'rate' && m.retry) msg += ' (' + Math.ceil(m.retry / 1000) + 's)';
@@ -270,9 +298,10 @@ function startRooms() {
   var keys = Object.keys(S.rooms);
   if (S.wantJoin) { keys.push(S.wantJoin.key); }
   if (keys.indexOf('global') < 0) keys.unshift('global');
+  keys = keys.filter(function (k) { return k.indexOf('class:') !== 0; });
   keys.forEach(function (k) { if (k === 'global') wsend({ t: 'join', room: 'global' }); else if (k.indexOf('game:') === 0) wsend({ t: 'join', room: k, name: (S.wantJoin && S.wantJoin.key === k ? S.wantJoin.name : S.rooms[k] && S.rooms[k].name) || '' }); });
   if (S.wantJoin) { S.cur = S.wantJoin.key; S.wantJoin = null; } else if (!S.cur) S.cur = 'global';
-  wsend({ t: 'rooms' });
+  wsend({ t: 'rooms' }); wsend({ t: 'class.list' });
   clearInterval(startRooms.iv); startRooms.iv = setInterval(function () { wsend({ t: 'rooms' }); }, 30000);
   renderRooms(); renderTop(); renderMsgs(true);
   $('#in').disabled = false; $('#go').disabled = false;
@@ -288,6 +317,10 @@ function renderRooms() {
     b.addEventListener('click', function () { openRoom(key, name); }); box.appendChild(b);
   };
   add('global', T.global, '🌍', room('global').online);
+  box.appendChild(el('div', 'sec', T.classes));
+  S.classes.forEach(function (c) { add(c.key, c.name, '🏫', room(c.key).online); });
+  var nb = el('button', 'room'); nb.appendChild(el('span', null, '＋')); nb.appendChild(el('span', 'n', T.newClass)); nb.id = 'newClassBtn'; nb.addEventListener('click', function () { gate('classNew'); }); box.appendChild(nb);
+  var jb = el('button', 'room'); jb.appendChild(el('span', null, '🔑')); jb.appendChild(el('span', 'n', T.joinClass)); jb.id = 'joinClassBtn'; jb.addEventListener('click', function () { gate('classJoin'); }); box.appendChild(jb);
   box.appendChild(el('div', 'sec', T.games));
   var seen = {};
   S.gameRooms.forEach(function (g) { seen[g.key] = 1; add(g.key, g.name, '🎮', g.online); });
@@ -298,7 +331,34 @@ function renderTop() {
   var r = room(S.cur || 'global');
   $('#title').textContent = r.kind === 'game' ? T.gameRoom + ' ' + r.name : (r.key === 'global' ? T.global : r.name);
   $('#sub').textContent = r.online ? r.online + ' ' + T.online : '';
+  $('#manage').hidden = r.kind !== 'class';
 }
+function classMenuRender() {
+  var list = $('#memList'); if (!list || !S.cur) return;
+  var d = S.members[S.cur]; if (!d) return; list.textContent = '';
+  d.items.forEach(function (u) {
+    var row = el('div', 'h'); row.style.cssText = 'display:flex;gap:8px;align-items:center;color:#fff'; row.appendChild(avatar(u.avatar)); row.appendChild(el('span', null, (u.username || '?') + (u.uid === d.owner ? ' ⭐' : '')));
+    if (S.me && d.owner === S.me.uid && u.uid !== S.me.uid) { var k = el('button', null, T.kick); k.style.cssText = 'width:auto;margin-left:auto;padding:2px 8px;font-size:.75rem'; k.addEventListener('click', function (e) { e.stopPropagation(); wsend({ t: 'class.kick', room: S.cur, uid: u.uid }); row.parentNode.removeChild(row); }); row.appendChild(k); }
+    list.appendChild(row);
+  });
+}
+function classInfo(key) { return S.classes.filter(function (c) { return c.key === key; })[0] || null; }
+function shareLink(code) { return location.origin + '/chat/#/class/' + code; }
+function copy(text) { try { navigator.clipboard.writeText(text).then(function () { toast(T.copied); }, function () {}); } catch (e) {} }
+$('#manage').addEventListener('click', function (e) {
+  e.stopPropagation(); closeMenu();
+  var ci = classInfo(S.cur); if (!ci) return;
+  wsend({ t: 'class.members', room: ci.key });
+  var menu = el('div', 'menu'); menu.id = 'classMenu'; menu.style.minWidth = '240px';
+  menu.appendChild(el('div', 'h', T.code + ': ' + ci.code));
+  var add = function (t, fn) { var b = el('button', null, t); b.addEventListener('click', function () { closeMenu(); fn(); }); menu.appendChild(b); };
+  add('📋 ' + T.copyCode, function () { copy(ci.code); });
+  add('🔗 ' + T.copyLink, function () { copy(shareLink(ci.code)); });
+  menu.appendChild(el('div', 'h', T.members)); var list = el('div'); list.id = 'memList'; menu.appendChild(list);
+  add('🚪 ' + T.leave, function () { if (confirm(T.leaveAsk)) wsend({ t: 'class.leave', room: ci.key }); });
+  document.body.appendChild(menu);
+  var r = this.getBoundingClientRect(); menu.style.top = (r.bottom + 6) + 'px'; menu.style.left = Math.max(8, Math.min(window.innerWidth - 250, r.right - 240)) + 'px';
+});
 function renderMe() {
   var b = $('#me'); b.hidden = !S.me || !S.me.username; if (b.hidden) return;
   b.textContent = ''; b.appendChild(avatar(S.me.avatar)); b.appendChild(el('span', null, S.me.username));
@@ -361,13 +421,18 @@ $('#composer').addEventListener('submit', function (e) {
 
 $('#menuBtn').addEventListener('click', function () { $('#side').classList.toggle('open'); });
 $('#msgs').addEventListener('click', function () { $('#side').classList.remove('open'); });
-$('#in').placeholder = T.ph; $('#go').textContent = T.send;
+$('#in').placeholder = T.ph; $('#go').textContent = T.send; $('#manageT').textContent = T.manage;
 document.addEventListener('visibilitychange', function () { if (!document.hidden && S.user && !S.ws) { clearTimeout(S.reconnect); connect(); } });
 
 // #/game/<slug>/<nombre>: entra a la sala de ese juego (así enlazan los juegos)
 (function () {
   var m = /^#\/game\/([a-z0-9][a-z0-9-]{0,59})(?:\/(.*))?$/.exec(location.hash || '');
   if (m) { var name = ''; try { name = decodeURIComponent(m[2] || ''); } catch (e) {} S.wantJoin = { key: 'game:' + m[1], name: name }; }
+})();
+
+(function () {
+  var m = /^#\/class\/([A-Za-z0-9]{8})$/.exec(location.hash || '');
+  if (m) S.wantClass = m[1].toUpperCase();
 })();
 
 if (window.__BUDSIN_CHAT_TEST) { window.__chat = { S: S }; }

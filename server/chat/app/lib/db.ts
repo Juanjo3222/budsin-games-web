@@ -131,6 +131,44 @@ export class ChatDb {
     return (this.db.query("SELECT COUNT(*) n FROM rooms WHERE owner=? AND kind=? AND created>?").get(owner, kind, since) as { n: number }).n;
   }
 
+  // ---- members (class groups) ----
+  addMember(room: string, uid: string, now: number) {
+    this.db.query("INSERT OR IGNORE INTO members(room,uid,joined) VALUES(?,?,?)").run(room, uid, now);
+  }
+  removeMember(room: string, uid: string) {
+    this.db.query("DELETE FROM members WHERE room=? AND uid=?").run(room, uid);
+  }
+  isMember(room: string, uid: string): boolean {
+    return !!this.db.query("SELECT 1 x FROM members WHERE room=? AND uid=?").get(room, uid);
+  }
+  memberCount(room: string): number {
+    return (this.db.query("SELECT COUNT(*) n FROM members WHERE room=?").get(room) as { n: number }).n;
+  }
+  /** Rooms of a kind this person belongs to. */
+  roomsOf(uid: string, kind: string): Room[] {
+    return this.db
+      .query("SELECT r.key,r.kind,r.name,r.owner,r.created,r.last_msg FROM rooms r JOIN members m ON m.room=r.key WHERE m.uid=? AND r.kind=? ORDER BY r.name")
+      .all(uid, kind) as Room[];
+  }
+  countMemberships(uid: string, kind: string): number {
+    return (this.db.query("SELECT COUNT(*) n FROM members m JOIN rooms r ON r.key=m.room WHERE m.uid=? AND r.kind=?").get(uid, kind) as { n: number }).n;
+  }
+  ownedCount(uid: string, kind: string): number {
+    return (this.db.query("SELECT COUNT(*) n FROM rooms WHERE owner=? AND kind=?").get(uid, kind) as { n: number }).n;
+  }
+  members(room: string): { uid: string; username: string | null; avatar: string }[] {
+    return this.db.query("SELECT u.uid,u.username,u.avatar FROM members m JOIN users u ON u.uid=m.uid WHERE m.room=? ORDER BY m.joined").all(room) as { uid: string; username: string | null; avatar: string }[];
+  }
+  setOwner(room: string, uid: string) {
+    this.db.query("UPDATE rooms SET owner=? WHERE key=?").run(uid, room);
+  }
+  /** Frees the name too: another group may take it afterwards. */
+  deleteRoom(key: string) {
+    this.db.query("DELETE FROM messages WHERE room=?").run(key);
+    this.db.query("DELETE FROM members WHERE room=?").run(key);
+    this.db.query("DELETE FROM rooms WHERE key=?").run(key);
+  }
+
   // ---- messages ----
   addMessage(room: string, uid: string, text: string, now: number): number {
     const id = Number(this.db.query("INSERT INTO messages(room,uid,text,ts) VALUES(?,?,?,?)").run(room, uid, text, now).lastInsertRowid);

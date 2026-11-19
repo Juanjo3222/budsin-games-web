@@ -4,6 +4,7 @@ import type { ServerWebSocket } from "bun";
 import { verifyFirebaseToken, type KeyProvider, type Claims } from "./auth";
 import { ChatDb, type Room, type User } from "./db";
 import { checkMessage, checkRoomName, checkUsername, roomKey } from "./filter";
+import { randomInt } from "node:crypto";
 
 export const AVATARS = Array.from({ length: 24 }, (_, i) => `a${String(i + 1).padStart(2, "0")}`);
 export const REPORT_REASONS = ["spam", "insult", "sexual", "personal", "other"];
@@ -104,6 +105,7 @@ export function createChatServer(opts: ServerOptions) {
   function canAccess(ws: Sock, room: Room | null): boolean {
     if (!room) return false;
     if (room.kind === "global" || room.kind === "game") return true;
+    if (room.kind === "class") return db.isMember(room.key, ws.data.claims!.uid);
     return false;
   }
 
@@ -170,6 +172,22 @@ export function createChatServer(opts: ServerOptions) {
         return send(ws, { t: "rooms", game: db.activeRooms("game", 30).map((r) => ({ key: r.key, name: r.name, online: onlineCount(r.key) })) });
       case "report":
         return report(ws, m);
+      case "class.create":
+        return classCreate(ws, m);
+      case "class.join":
+        return classJoin(ws, m);
+      case "class.leave":
+        return classLeave(ws, m);
+      case "class.list":
+        return send(ws, { t: "classes", items: myClasses(ws.data.claims!.uid) });
+      case "class.kick":
+        return classKick(ws, m);
+      case "class.members": {
+        const key = String(m.room ?? "");
+        const r = db.room(key);
+        if (!r || r.kind !== "class" || !db.isMember(key, ws.data.claims!.uid)) return err(ws, "forbidden");
+        return send(ws, { t: "class.members", room: key, owner: r.owner, items: db.members(key) });
+      }
       default:
         if (t.startsWith("admin.")) return adminCmd(ws, t, m);
         return err(ws, "bad_request");
@@ -225,6 +243,76 @@ export function createChatServer(opts: ServerOptions) {
     }
     send(ws, { t: "joined", room: room.key, name: room.name, kind: room.kind, history: db.history(room.key, null, HISTORY).map(wire), online: onlineCount(room.key) });
     broadcast(room.key, { t: "online", room: room.key, n: onlineCount(room.key) }, ws);
+  }
+
+  // ---- grupos de clase ----
+  // Un grupo no es público: no aparece en ninguna lista y se entra solo con su código (los 8 caracteres del final de su clave).
+  // El nombre es único (sin importar mayúsculas, tildes, espacios ni símbolos) para que no haya dos «3A Matemáticas».
+  const CODE_ABC = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const MAX_CLASS_MEMBERS = 80, MAX_CLASSES_CREATED = 3, MAX_CLASSES_JOINED = 8;
+  const classCode = (key: string) => key.slice(6);
+  const myClasses = (uid: string) => db.roomsOf(uid, "class").map((r) => ({ key: r.key, name: r.name, code: classCode(r.key), owner: r.owner === uid, members: db.memberCount(r.key) }));
+
+  function classCreate(ws: Sock, m: Record<string, unknown>) {
+    const c = ws.data, uid = c.claims!.uid;
+    if (!c.user?.username) return err(ws, "need_username");
+    const name = clean(m.name, 40);
+    const bad = checkRoomName(name);
+    if (bad) return err(ws, bad === "length" ? "class_name_length" : "class_name_blocked", { why: bad });
+    if (db.ownedCount(uid, "class") >= MAX_CLASSES_CREATED) return err(ws, "class_limit_created");
+    if (db.countMemberships(uid, "class") >= MAX_CLASSES_JOINED) return err(ws, "class_limit_joined");
+    const unique = roomKey(name);
+    if (db.roomByNameKey("class", unique)) return err(ws, "class_exists");     // antes del límite: un intento repetido no gasta cupo
+    if (roomCreate.take(uid, now())) return err(ws, "rate");
+    let key = "";
+    for (let i = 0; i < 5; i++) {
+      key = "class:" + Array.from({ length: 8 }, () => CODE_ABC[randomInt(CODE_ABC.length)]).join("");
+      if (db.createRoom(key, "class", name, uid, now(), unique) === "ok") break;
+      if (db.roomByNameKey("class", unique)) return err(ws, "class_exists");   // otro creó el mismo nombre en este instante
+      key = "";
+    }
+    if (!key) return err(ws, "server_error");
+    db.addMember(key, uid, now());
+    send(ws, { t: "class.created", item: myClasses(uid).find((x) => x.key === key) });
+  }
+
+  function classJoin(ws: Sock, m: Record<string, unknown>) {
+    const c = ws.data, uid = c.claims!.uid;
+    if (!c.user?.username) return err(ws, "need_username");
+    const code = clean(m.code, 8).toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const key = "class:" + code;
+    const r = code.length === 8 ? db.room(key) : null;
+    // el mismo error si no existe o el código está mal escrito: no se puede "buscar" grupos
+    if (!r || r.kind !== "class") return err(ws, "class_not_found");
+    if (db.isMember(key, uid)) return send(ws, { t: "class.joined", item: myClasses(uid).find((x) => x.key === key) });
+    if (db.countMemberships(uid, "class") >= MAX_CLASSES_JOINED) return err(ws, "class_limit_joined");
+    if (db.memberCount(key) >= MAX_CLASS_MEMBERS) return err(ws, "class_full");
+    if (profileLimit.take("cj:" + uid, now())) return err(ws, "rate");     // 10 intentos por hora: frena adivinar códigos
+    db.addMember(key, uid, now());
+    send(ws, { t: "class.joined", item: myClasses(uid).find((x) => x.key === key) });
+    broadcast(key, { t: "sys", room: key, text: "join", u: c.user.username });
+  }
+
+  function classLeave(ws: Sock, m: Record<string, unknown>) {
+    const uid = ws.data.claims!.uid, key = String(m.room ?? "");
+    const r = db.room(key);
+    if (!r || r.kind !== "class" || !db.isMember(key, uid)) return err(ws, "bad_request");
+    db.removeMember(key, uid);
+    if (ws.data.rooms.delete(key)) { roomSockets.get(key)?.delete(ws); }
+    const left = db.members(key);
+    if (!left.length) db.deleteRoom(key);                         // último en salir: se borra el grupo y se libera el nombre
+    else if (r.owner === uid) db.setOwner(key, left[0].uid);       // el dueño se va: pasa al miembro más antiguo
+    broadcast(key, { t: "online", room: key, n: onlineCount(key) });
+    send(ws, { t: "class.left", room: key });
+  }
+
+  function classKick(ws: Sock, m: Record<string, unknown>) {
+    const uid = ws.data.claims!.uid, key = String(m.room ?? ""), target = String(m.uid ?? "");
+    const r = db.room(key);
+    if (!r || r.kind !== "class" || (r.owner !== uid && !ws.data.admin) || target === uid || !db.isMember(key, target)) return err(ws, "forbidden");
+    db.removeMember(key, target);
+    for (const s of roomSockets.get(key) ?? []) if (s.data.claims?.uid === target) { s.data.rooms.delete(key); roomSockets.get(key)?.delete(s); send(s, { t: "class.left", room: key, kicked: true }); }
+    send(ws, { t: "ok", cmd: "class.kick" });
   }
 
   const wire = (r: { id: number; uid: string; text: string; ts: number; username: string | null; avatar: string }) => ({ id: r.id, uid: r.uid, u: r.username ?? "?", a: r.avatar ?? "a01", text: r.text, ts: r.ts });
