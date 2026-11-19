@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/Games-87-blue" />
   <img src="https://img.shields.io/badge/Frontend-React-orange" />
-  <img src="https://img.shields.io/badge/Version-7.2-purple" />
+  <img src="https://img.shields.io/badge/Version-7.3-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -357,6 +357,12 @@ Admins (mismos correos que el panel): `juvaldiviam@gmail.com`, `juanjoseguravega
 ---
 
 ## 📝 Changelog
+
+### v7.3
+* **Budsin Chat** en el portal: tarjeta nueva (ES/EN/PT, categoría «Social») que abre `/chat/`, chat en tiempo real solo para cuentas de colegio o universidad (ver «Budsin Chat»).
+* **Popup de novedades** restaurado (`ChangelogModal`, una vez por versión; el botón de cerrar se activa a los 3 s), con enlaces directos a **Budsin Music** y **Budsin Chat**. Los textos viven en `app/src/data/changelog.js` (ES/EN/PT); subir `SITE_VERSION` lo vuelve a mostrar.
+* Budsin Music: botón **💬 Compartir en Budsin Chat** y la música sigue sonando en el chat; ver video oficial; Jam; Radio Focus y menú de música dentro de los juegos.
+* El portal se recompiló con `cd app && npm ci && npm run build` (genera `public/react-assets/` y reinyecta el prerender en `public/index.html`); la compilación sin cambios reproduce exactamente lo publicado.
 
 ### v7.2
 * **Pagos con PayPal**: suscripción Pro de $2.99 USD/mes desde Ajustes, con servicio propio en el VPS (`server/paypal/`). Se puede cancelar desde el sitio y el Pro sigue hasta el fin del periodo pagado. Ver la sección «Pagos con PayPal».

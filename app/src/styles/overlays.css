@@ -41,6 +41,9 @@
   justify-content: center;
 }
 .changelog-close:disabled { opacity: 0.4; cursor: not-allowed; }
+.changelog-countdown { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.changelog-countdown.is-done { opacity: 0.5; }
+.changelog-list a { color: var(--accent); font-weight: 600; text-decoration: underline; }
 .changelog-list { margin: 0; padding-left: 18px; font-size: 0.84rem; color: var(--muted); display: flex; flex-direction: column; gap: 6px; }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }

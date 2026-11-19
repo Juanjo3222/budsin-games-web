@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { GAMES } from "../data/games";
 import Topbar from "../components/Topbar";
 import Footer from "../components/Footer";
+import ChangelogModal from "../components/ChangelogModal";
 import ConsoleHome from "../components/console/ConsoleHome";
 import PromoVideo from "../components/PromoVideo";
 import HostingNotice from "../components/HostingNotice";
@@ -66,6 +67,7 @@ export default function HomePage() {
         {SHOW_LIBRARY && <LibrarySection popularity={popularity} onPlay={onPlay} />}
       </main>
       {SHOW_LIBRARY && <Footer />}
+      <ChangelogModal />
     </div>
   );
 }

@@ -2342,5 +2342,31 @@ export const GAMES = [
     "pro": false,
     "proRelease": null,
     "isNew": true
+  },
+  {
+    "id": "chat/index.html",
+    "name": "budsin chat",
+    "title": "Budsin Chat",
+    "href": "chat/",
+    "cover": "portadas/chat.svg",
+    "type": "tools",
+    "category": {
+      "es": "Social",
+      "en": "Social",
+      "pt": "Social"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Chat en tiempo real con salas por juego, grupos de clase y mensajes entre amigos. Solo para cuentas de colegio o universidad.",
+      "en": "Real-time chat with a room for each game, class groups and messages between friends. Only for school or university accounts.",
+      "pt": "Chat em tempo real com salas por jogo, turmas e mensagens entre amigos. Só para contas de escola ou universidade."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
   }
 ];
