@@ -3,7 +3,7 @@
 import type { ServerWebSocket } from "bun";
 import { verifyFirebaseToken, type KeyProvider, type Claims } from "./auth";
 import { ChatDb, type Room, type User } from "./db";
-import { checkMessage, checkRoomName, checkUsername, roomKey } from "./filter";
+import { checkMessage, checkRoomName, checkUsername, nameKey, roomKey } from "./filter";
 import { randomInt } from "node:crypto";
 
 export const AVATARS = Array.from({ length: 24 }, (_, i) => `a${String(i + 1).padStart(2, "0")}`);
@@ -106,8 +106,24 @@ export function createChatServer(opts: ServerOptions) {
     if (!room) return false;
     if (room.kind === "global" || room.kind === "game") return true;
     if (room.kind === "class") return db.isMember(room.key, ws.data.claims!.uid);
+    if (room.kind === "dm") return dmAllowed(room.key, ws.data.claims!.uid);
     return false;
   }
+  // ---- mensajes directos: solo entre amigos aceptados y sin bloqueos ----
+  const dmKey = (x: string, y: string) => (x < y ? `dm:${x}:${y}` : `dm:${y}:${x}`);
+  const DM = /^dm:([^:]{1,128}):([^:]{1,128})$/;
+  function dmPeer(key: string, uid: string): string | null {
+    const m = DM.exec(key);
+    if (!m || (m[1] !== uid && m[2] !== uid)) return null;
+    return m[1] === uid ? m[2] : m[1];
+  }
+  function dmAllowed(key: string, uid: string): boolean {
+    const peer = dmPeer(key, uid);
+    if (!peer || key !== dmKey(uid, peer)) return false;
+    const f = db.friendship(uid, peer);
+    return !!f && f.status === "accepted" && !db.isBlocked(uid, peer);
+  }
+  const isOnline = (uid: string) => { for (const s of sockets) if (s.data.claims?.uid === uid) return true; return false; };
 
   async function handle(ws: Sock, raw: string | Buffer) {
     if (typeof raw !== "string" || raw.length > 8192) return err(ws, "bad_request");
@@ -182,6 +198,19 @@ export function createChatServer(opts: ServerOptions) {
         return send(ws, { t: "classes", items: myClasses(ws.data.claims!.uid) });
       case "class.kick":
         return classKick(ws, m);
+      case "friend.list":
+        return send(ws, friendList(ws.data.claims!.uid));
+      case "friend.request":
+        return friendRequest(ws, m);
+      case "friend.accept":
+      case "friend.decline":
+      case "friend.remove":
+        return friendAct(ws, t, m);
+      case "block":
+      case "unblock":
+        return blockAct(ws, t, m);
+      case "dm.open":
+        return dmOpen(ws, m);
       case "class.members": {
         const key = String(m.room ?? "");
         const r = db.room(key);
@@ -233,16 +262,94 @@ export function createChatServer(opts: ServerOptions) {
       if (!db.room("global")) db.createRoom("global", "global", "Budsin", null, now());
       room = db.room("global");
     } else if (GAME.test(key)) room = ensureGameRoom(ws, key, String(m.name ?? ""));
-    else room = db.room(key);
+    else if (key.startsWith("dm:")) {
+      if (!dmAllowed(key, c.claims!.uid)) return err(ws, "dm_closed");
+      if (!db.room(key)) db.createRoom(key, "dm", "dm", null, now());
+      room = db.room(key);
+    } else room = db.room(key);
     if (!room) return err(ws, "no_room");
     if (!canAccess(ws, room)) return err(ws, "forbidden");
     if (!c.rooms.has(room.key)) {
-      if (c.rooms.size >= 12) return err(ws, "too_many_rooms");
+      if (c.rooms.size >= 30) return err(ws, "too_many_rooms");
       c.rooms.add(room.key);
       (roomSockets.get(room.key) ?? roomSockets.set(room.key, new Set()).get(room.key)!).add(ws);
     }
     send(ws, { t: "joined", room: room.key, name: room.name, kind: room.kind, history: db.history(room.key, null, HISTORY).map(wire), online: onlineCount(room.key) });
     broadcast(room.key, { t: "online", room: room.key, n: onlineCount(room.key) }, ws);
+  }
+
+  // ---- amigos y bloqueos ----
+  const MAX_FRIENDS = 30, MAX_OUTGOING = 20;
+  function friendList(uid: string) {
+    const rows = db.friendRows(uid);
+    return {
+      t: "friends",
+      friends: rows.filter((r) => r.status === "accepted").map((r) => ({ uid: r.uid, username: r.username, avatar: r.avatar, online: isOnline(r.uid), room: dmKey(uid, r.uid) })),
+      incoming: rows.filter((r) => r.status === "pending" && r.requester !== uid).map((r) => ({ uid: r.uid, username: r.username, avatar: r.avatar })),
+      outgoing: rows.filter((r) => r.status === "pending" && r.requester === uid).map((r) => ({ uid: r.uid, username: r.username, avatar: r.avatar })),
+      blocked: db.blockedBy(uid),
+    };
+  }
+  const pushFriends = (uid: string) => { for (const s of sockets) if (s.data.claims?.uid === uid) send(s, friendList(uid)); };
+
+  function friendRequest(ws: Sock, m: Record<string, unknown>) {
+    const c = ws.data, uid = c.claims!.uid;
+    if (!c.user?.username) return err(ws, "need_username");
+    if (profileLimit.take("fr:" + uid, now())) return err(ws, "rate");
+    const name = clean(m.username, 20);
+    const target = name ? db.userByName(name) : null;
+    // la misma respuesta si no existe, si te bloqueó o si no tiene nombre: no se puede "rastrear" gente
+    if (!target || !target.username || target.banned || db.isBlocked(uid, target.uid)) return err(ws, "friend_not_found");
+    if (target.uid === uid) return err(ws, "friend_self");
+    const f = db.friendship(uid, target.uid);
+    if (f?.status === "accepted") return err(ws, "friend_exists");
+    if (f?.status === "pending") {
+      if (f.requester === uid) return err(ws, "friend_exists");
+      db.acceptFriend(uid, target.uid);                          // la otra persona ya te había pedido: queda aceptada
+      pushFriends(uid); pushFriends(target.uid);
+      return;
+    }
+    if (db.countFriends(uid) >= MAX_FRIENDS) return err(ws, "friend_limit");
+    if (db.countOutgoing(uid) >= MAX_OUTGOING) return err(ws, "friend_pending_limit");
+    db.addFriendRequest(uid, target.uid, now());
+    pushFriends(uid); pushFriends(target.uid);
+  }
+
+  function friendAct(ws: Sock, t: string, m: Record<string, unknown>) {
+    const uid = ws.data.claims!.uid, other = String(m.uid ?? "");
+    const f = db.friendship(uid, other);
+    if (!f) return err(ws, "bad_request");
+    if (t === "friend.accept") {
+      if (f.status !== "pending" || f.requester === uid) return err(ws, "bad_request");
+      if (db.countFriends(uid) >= MAX_FRIENDS) return err(ws, "friend_limit");
+      db.acceptFriend(uid, other);
+    } else db.deleteFriendship(uid, other);                        // rechazar, cancelar o quitar amistad
+    if (t === "friend.remove") closeDm(uid, other);
+    pushFriends(uid); pushFriends(other);
+  }
+
+  /** The conversation is over for both: their sockets leave the room and are told. */
+  function closeDm(x: string, y: string) {
+    const key = dmKey(x, y);
+    for (const s of [...(roomSockets.get(key) ?? [])]) {
+      s.data.rooms.delete(key); roomSockets.get(key)?.delete(s);
+      send(s, { t: "dm.closed", room: key });
+    }
+  }
+
+  function blockAct(ws: Sock, t: string, m: Record<string, unknown>) {
+    const uid = ws.data.claims!.uid, other = String(m.uid ?? "");
+    if (!other || other === uid || !db.user(other)) return err(ws, "bad_request");
+    if (t === "block") { db.block(uid, other, now()); closeDm(uid, other); pushFriends(other); }
+    else db.unblock(uid, other);
+    pushFriends(uid);
+  }
+
+  function dmOpen(ws: Sock, m: Record<string, unknown>) {
+    const uid = ws.data.claims!.uid, other = String(m.uid ?? "");
+    const key = dmKey(uid, other);
+    if (!dmAllowed(key, uid)) return err(ws, "dm_closed");
+    join(ws, { room: key });
   }
 
   // ---- grupos de clase ----
@@ -340,8 +447,14 @@ export function createChatServer(opts: ServerOptions) {
     const last = lastText.get(u.uid);
     if (last && last.text === text.toLowerCase() && now() - last.at < 30_000) return err(ws, "duplicate", { cid: m.cid });
     lastText.set(u.uid, { text: text.toLowerCase(), at: now() });
+    if (key.startsWith("dm:") && !dmAllowed(key, u.uid)) return err(ws, "dm_closed", { cid: m.cid });
     const id = db.addMessage(key, u.uid, text, now());
     broadcast(key, { t: "msg", room: key, m: { id, uid: u.uid, u: u.username, a: u.avatar, text, ts: now() }, cid: m.cid });
+    if (key.startsWith("dm:")) {
+      // la otra persona puede no tener el chat abierto: se le avisa para que cargue la conversación
+      const peer = dmPeer(key, u.uid)!;
+      for (const s of sockets) if (s.data.claims?.uid === peer && !s.data.rooms.has(key)) send(s, { t: "dm.notify", room: key, from: u.uid, u: u.username });
+    }
   }
 
   function report(ws: Sock, m: Record<string, unknown>) {
@@ -353,7 +466,7 @@ export function createChatServer(opts: ServerOptions) {
     if (msg.uid === c.claims!.uid) return err(ws, "own_message");
     if (reportLimit.take(c.claims!.uid, now())) return err(ws, "rate");
     if (db.addReport(msg, c.claims!.uid, reason, now()) === "dup") return err(ws, "already_reported");
-    if (db.reportersOf(msg.id) >= AUTO_HIDE_REPORTS) {
+    if (db.reportersOf(msg.id) >= (msg.room.startsWith("dm:") ? 1 : AUTO_HIDE_REPORTS)) {   // en un directo solo hay una persona que pueda reportar
       db.deleteMessage(msg.id);
       broadcast(msg.room, { t: "del", room: msg.room, id: msg.id });
     }

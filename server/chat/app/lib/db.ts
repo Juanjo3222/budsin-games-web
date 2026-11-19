@@ -59,6 +59,11 @@ export class ChatDb {
       CREATE TABLE IF NOT EXISTS messages(
         id INTEGER PRIMARY KEY AUTOINCREMENT, room TEXT NOT NULL, uid TEXT NOT NULL, text TEXT NOT NULL, ts INTEGER NOT NULL, deleted INTEGER NOT NULL DEFAULT 0);
       CREATE INDEX IF NOT EXISTS messages_room ON messages(room, id);
+      CREATE TABLE IF NOT EXISTS friends(
+        a TEXT NOT NULL, b TEXT NOT NULL, requester TEXT NOT NULL, status TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY(a, b));
+      CREATE INDEX IF NOT EXISTS friends_b ON friends(b);
+      CREATE TABLE IF NOT EXISTS blocks(blocker TEXT NOT NULL, blocked TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY(blocker, blocked));
+      CREATE INDEX IF NOT EXISTS blocks_blocked ON blocks(blocked);
       CREATE TABLE IF NOT EXISTS reports(
         id INTEGER PRIMARY KEY AUTOINCREMENT, msg_id INTEGER NOT NULL, room TEXT NOT NULL, reported_uid TEXT NOT NULL, reporter_uid TEXT NOT NULL,
         reason TEXT NOT NULL, text TEXT NOT NULL, ts INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'open', UNIQUE(msg_id, reporter_uid));
@@ -167,6 +172,57 @@ export class ChatDb {
     this.db.query("DELETE FROM messages WHERE room=?").run(key);
     this.db.query("DELETE FROM members WHERE room=?").run(key);
     this.db.query("DELETE FROM rooms WHERE key=?").run(key);
+  }
+
+  // ---- friends and blocks (direct messages) ----
+  private pair(x: string, y: string): [string, string] {
+    return x < y ? [x, y] : [y, x];
+  }
+  friendship(x: string, y: string): { requester: string; status: string } | null {
+    const [a, b] = this.pair(x, y);
+    return (this.db.query("SELECT requester,status FROM friends WHERE a=? AND b=?").get(a, b) as { requester: string; status: string }) ?? null;
+  }
+  addFriendRequest(requester: string, target: string, now: number) {
+    const [a, b] = this.pair(requester, target);
+    this.db.query("INSERT OR IGNORE INTO friends(a,b,requester,status,created) VALUES(?,?,?,'pending',?)").run(a, b, requester, now);
+  }
+  acceptFriend(x: string, y: string) {
+    const [a, b] = this.pair(x, y);
+    this.db.query("UPDATE friends SET status='accepted' WHERE a=? AND b=?").run(a, b);
+  }
+  deleteFriendship(x: string, y: string) {
+    const [a, b] = this.pair(x, y);
+    this.db.query("DELETE FROM friends WHERE a=? AND b=?").run(a, b);
+  }
+  /** friends / incoming requests / outgoing requests of a person, with the other side's profile */
+  friendRows(uid: string): { uid: string; username: string | null; avatar: string; status: string; requester: string }[] {
+    return this.db
+      .query(
+        `SELECT u.uid,u.username,u.avatar,f.status,f.requester FROM friends f
+           JOIN users u ON u.uid = CASE WHEN f.a=? THEN f.b ELSE f.a END
+          WHERE f.a=? OR f.b=? ORDER BY u.username`,
+      )
+      .all(uid, uid, uid) as { uid: string; username: string | null; avatar: string; status: string; requester: string }[];
+  }
+  countFriends(uid: string): number {
+    return (this.db.query("SELECT COUNT(*) n FROM friends WHERE (a=? OR b=?) AND status='accepted'").get(uid, uid) as { n: number }).n;
+  }
+  countOutgoing(uid: string): number {
+    return (this.db.query("SELECT COUNT(*) n FROM friends WHERE requester=? AND status='pending'").get(uid) as { n: number }).n;
+  }
+  block(blocker: string, blocked: string, now: number) {
+    this.db.query("INSERT OR IGNORE INTO blocks(blocker,blocked,created) VALUES(?,?,?)").run(blocker, blocked, now);
+    this.deleteFriendship(blocker, blocked);
+  }
+  unblock(blocker: string, blocked: string) {
+    this.db.query("DELETE FROM blocks WHERE blocker=? AND blocked=?").run(blocker, blocked);
+  }
+  /** blocked in either direction */
+  isBlocked(x: string, y: string): boolean {
+    return !!this.db.query("SELECT 1 z FROM blocks WHERE (blocker=? AND blocked=?) OR (blocker=? AND blocked=?)").get(x, y, y, x);
+  }
+  blockedBy(uid: string): { uid: string; username: string | null }[] {
+    return this.db.query("SELECT u.uid,u.username FROM blocks b JOIN users u ON u.uid=b.blocked WHERE b.blocker=? ORDER BY u.username").all(uid) as { uid: string; username: string | null }[];
   }
 
   // ---- messages ----

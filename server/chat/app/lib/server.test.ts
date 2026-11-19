@@ -37,7 +37,7 @@ class Client {
       this.waiters.push((m) => { if (!pred(m)) return false; clearTimeout(t); this.inbox.splice(this.inbox.indexOf(m), 1); res(m); return true; });
     });
   }
-  async req(o: unknown, pred: (m: any) => boolean) { this.send(o); return this.next(pred); }
+  async req(o: unknown, pred: (m: any) => boolean) { this.inbox = this.inbox.filter((m) => !pred(m)); this.send(o); return this.next(pred); }   // solo cuenta lo que llega DESPUÉS de pedirlo
   async login(uid: string, email?: string) { this.send({ t: "auth", token: token(uid, email) }); return this.next((m) => m.t === "hello" || m.t === "err"); }
   close() { this.ws.close(); }
 }
@@ -295,5 +295,97 @@ describe("grupos de clase", () => {
     expect(db.room(key)).toBeNull();
     const again = await eve.req({ t: "class.create", name: "3A Matemáticas" }, (m) => m.t === "class.created" || m.t === "err");
     expect(again.t).toBe("class.created");
+  });
+});
+
+describe("amigos y mensajes directos", () => {
+  let ana: Client, beto: Client, eve: Client;
+  let dm = "";
+  beforeAll(async () => {
+    clock += 3600_000 * 20;
+    ana = await user("d1", "Ana_Dm"); beto = await user("d2", "Beto_Dm"); eve = await user("d3", "Eve_Dm");
+  });
+  afterAll(() => { for (const x of [ana, beto, eve]) x.close(); });
+  const friends = (c: Client) => c.req({ t: "friend.list" }, (m) => m.t === "friends");
+
+  test("sin ser amigos no hay mensajes directos, ni adivinando la clave", async () => {
+    const key = "dm:d1:d2";
+    expect((await ana.req({ t: "join", room: key }, (m) => m.t === "err")).code).toBe("dm_closed");
+    expect((await ana.req({ t: "dm.open", uid: "d2" }, (m) => m.t === "err")).code).toBe("dm_closed");
+    expect((await eve.req({ t: "join", room: key }, (m) => m.t === "err")).code).toBe("dm_closed");     // ni siendo de otra persona
+  });
+  test("solicitud: llega a la otra persona en vivo y no se puede repetir ni a uno mismo", async () => {
+    const note = beto.next((m) => m.t === "friends" && m.incoming.length === 1);
+    ana.send({ t: "friend.request", username: "Beto_Dm" });
+    expect((await note).incoming[0]).toMatchObject({ uid: "d1", username: "Ana_Dm" });
+    expect((await friends(ana)).outgoing.map((x: any) => x.username)).toEqual(["Beto_Dm"]);
+    expect((await ana.req({ t: "friend.request", username: "Beto_Dm" }, (m) => m.t === "err")).code).toBe("friend_exists");
+    expect((await ana.req({ t: "friend.request", username: "Ana_Dm" }, (m) => m.t === "err")).code).toBe("friend_self");
+    expect((await ana.req({ t: "friend.request", username: "NadieExiste" }, (m) => m.t === "err")).code).toBe("friend_not_found");
+  });
+  test("mientras es solo una solicitud sigue sin haber chat", async () => {
+    expect((await ana.req({ t: "dm.open", uid: "d2" }, (m) => m.t === "err")).code).toBe("dm_closed");
+  });
+  test("solo quien recibe puede aceptar", async () => {
+    expect((await ana.req({ t: "friend.accept", uid: "d2" }, (m) => m.t === "err")).code).toBe("bad_request");
+    await beto.req({ t: "friend.accept", uid: "d1" }, (m) => m.t === "friends" && m.friends.length === 1);
+    const f = await friends(ana);
+    expect(f.friends[0]).toMatchObject({ username: "Beto_Dm", online: true });
+    dm = f.friends[0].room;
+    expect(dm).toBe("dm:d1:d2");
+  });
+  test("ya amigos: chatean en privado, con el mismo filtro, y terceros no ven nada", async () => {
+    await ana.req({ t: "dm.open", uid: "d2" }, (m) => m.t === "joined");
+    // beto no tiene la sala abierta: recibe un aviso
+    const note = beto.next((m) => m.t === "dm.notify");
+    clock += 60_000;
+    ana.send({ t: "send", room: dm, text: "¿juegas esta tarde?" });
+    expect((await note)).toMatchObject({ room: dm, u: "Ana_Dm" });
+    await beto.req({ t: "dm.open", uid: "d1" }, (m) => m.t === "joined");
+    beto.send({ t: "send", room: dm, text: "dale" });
+    expect((await ana.next((m) => m.t === "msg" && m.m.text === "dale")).m.u).toBe("Beto_Dm");
+    clock += 60_000;
+    ana.send({ t: "send", room: dm, text: "mi whatsapp es 987654321" });
+    expect((await ana.next((m) => m.t === "err")).why).toBe("contact");
+    expect((await eve.req({ t: "join", room: dm }, (m) => m.t === "err")).code).toBe("dm_closed");
+    eve.send({ t: "send", room: dm, text: "intruso" });
+    expect((await eve.next((m) => m.t === "err")).code).toBe("not_joined");
+  });
+  test("reportar un mensaje directo lo oculta enseguida y llega al admin", async () => {
+    clock += 60_000;
+    ana.send({ t: "send", room: dm, text: "mensaje que molesta" });
+    const m = await beto.next((x) => x.t === "msg" && x.m.text === "mensaje que molesta");
+    const hidden = ana.next((x) => x.t === "del");
+    await beto.req({ t: "report", id: m.m.id, reason: "insult" }, (x) => x.t === "reported");
+    expect((await hidden).id).toBe(m.m.id);
+    expect(db.openReports().some((r) => r.text === "mensaje que molesta" && r.room === dm)).toBe(true);
+  });
+  test("bloquear corta la conversación, borra la amistad y no deja volver a pedirla", async () => {
+    const closed = ana.next((m) => m.t === "dm.closed");
+    await beto.req({ t: "block", uid: "d1" }, (m) => m.t === "friends" && m.blocked.length === 1);
+    expect((await closed).room).toBe(dm);
+    clock += 60_000;
+    ana.send({ t: "send", room: dm, text: "hola?" });
+    expect((await ana.next((m) => m.t === "err")).code).toBe("not_joined");
+    expect((await ana.req({ t: "dm.open", uid: "d2" }, (m) => m.t === "err")).code).toBe("dm_closed");
+    expect((await ana.req({ t: "friend.request", username: "Beto_Dm" }, (m) => m.t === "err")).code).toBe("friend_not_found");   // no revela que la bloquearon
+    expect((await friends(ana)).friends).toEqual([]);
+    await beto.req({ t: "unblock", uid: "d1" }, (m) => m.t === "friends" && m.blocked.length === 0);
+    expect((await ana.req({ t: "friend.request", username: "Beto_Dm" }, (m) => m.t === "friends" || m.t === "err")).t).toBe("friends");   // desbloqueada: puede pedir de nuevo
+  });
+  test("pedirse mutuamente acepta solo; quitar amigo cierra el chat", async () => {
+    // beto ya tiene una solicitud de ana; si beto también le pide, quedan amigos
+    await beto.req({ t: "friend.request", username: "Ana_Dm" }, (m) => m.t === "friends" && m.friends.length === 1);
+    await ana.req({ t: "dm.open", uid: "d2" }, (m) => m.t === "joined");
+    const closed = ana.next((m) => m.t === "dm.closed");
+    await beto.req({ t: "friend.remove", uid: "d1" }, (m) => m.t === "friends");
+    await closed;
+    expect((await friends(ana)).friends).toEqual([]);
+  });
+  test("límite de solicitudes por hora", async () => {
+    clock += 3600_000 * 3;
+    let last: any;
+    for (let i = 0; i < 11; i++) last = await eve.req({ t: "friend.request", username: "NoExiste" + i }, (m) => m.t === "err");
+    expect(last.code).toBe("rate");
   });
 });
