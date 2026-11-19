@@ -4,7 +4,12 @@ import type { ServerWebSocket } from "bun";
 import { verifyFirebaseToken, type KeyProvider, type Claims } from "./auth";
 import { ChatDb, type Room, type User } from "./db";
 import { checkMessage, checkRoomName, checkUsername, nameKey, roomKey } from "./filter";
-import { randomInt } from "node:crypto";
+import { randomBytes, randomInt } from "node:crypto";
+import { mkdirSync, promises as fsp } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { LIMITS, MediaError, NSFW_THRESHOLD, processAudio, processImage, type MediaKind, type Scanner, type Tools } from "./media";
+import { PRESET_IDS } from "./presets";
 
 export const AVATARS = Array.from({ length: 24 }, (_, i) => `a${String(i + 1).padStart(2, "0")}`);
 export const REPORT_REASONS = ["spam", "insult", "sexual", "personal", "other"];
@@ -22,6 +27,10 @@ export interface ServerOptions {
   hostname?: string;
   origins?: string[];
   now?: () => number;
+  mediaDir?: string;       // dónde se guardan imágenes, stickers y audios
+  scan?: Scanner;          // detector de contenido sexual; sin él NO se aceptan imágenes ni stickers (falla cerrado)
+  tools?: Tools;           // rutas de ffmpeg y ffprobe
+  scanHealth?: () => Promise<boolean>;   // ¿responde el detector? (solo para /api/chat/health)
 }
 
 interface Conn {
@@ -59,6 +68,14 @@ export function createChatServer(opts: ServerOptions) {
   const now = opts.now ?? Date.now;
   const admins = new Set(opts.adminEmails.map((e) => e.toLowerCase()));
   const origins = opts.origins ?? ["https://games.budsin.dev"];
+  const mediaDir = opts.mediaDir ?? path.join(tmpdir(), "budsin-chat-media");
+  mkdirSync(mediaDir, { recursive: true });
+  const tools: Tools = opts.tools ?? { ffmpeg: "ffmpeg", ffprobe: "ffprobe" };
+  const MAX_STICKERS = 24;
+  const MIN_AGE_MEDIA = 30 * 60_000, MIN_AGE_AUDIO = 10 * 60_000;     // una cuenta recién creada no sube nada todavía
+  const DAILY_BYTES = 25_000_000;
+  const imgBurst = new Limiter(1, 15_000), imgHour = new Limiter(20, 3600_000), audBurst = new Limiter(1, 8_000), audHour = new Limiter(30, 3600_000), stickHour = new Limiter(6, 3600_000);
+  const strikes = new Map<string, number[]>();
   const sockets = new Set<Sock>();
   const roomSockets = new Map<string, Set<Sock>>();
   const burst = new Limiter(5, 10_000);       // 5 mensajes cada 10 s
@@ -198,6 +215,10 @@ export function createChatServer(opts: ServerOptions) {
         return send(ws, { t: "classes", items: myClasses(ws.data.claims!.uid) });
       case "class.kick":
         return classKick(ws, m);
+      case "sticker.list":
+      case "sticker.remove":
+      case "sticker.save":
+        return stickerCmd(ws, t, m);
       case "friend.list":
         return send(ws, friendList(ws.data.claims!.uid));
       case "friend.request":
@@ -422,7 +443,12 @@ export function createChatServer(opts: ServerOptions) {
     send(ws, { t: "ok", cmd: "class.kick" });
   }
 
-  const wire = (r: { id: number; uid: string; text: string; ts: number; username: string | null; avatar: string }) => ({ id: r.id, uid: r.uid, u: r.username ?? "?", a: r.avatar ?? "a01", text: r.text, ts: r.ts });
+  const wire = (r: { id: number; uid: string; text: string; ts: number; username: string | null; avatar: string; media?: string | null; mkind?: string | null; mw?: number | null; mh?: number | null; mdur?: number | null; mstatus?: string | null }) => {
+    const o: Record<string, unknown> = { id: r.id, uid: r.uid, u: r.username ?? "?", a: r.avatar ?? "a01", text: r.text, ts: r.ts };
+    if (r.media?.startsWith("preset:")) o.sticker = r.media.slice(7);
+    else if (r.media && r.mkind) o.media = r.mstatus === "ok" ? { id: r.media, kind: r.mkind, w: r.mw ?? 0, h: r.mh ?? 0, dur: r.mdur ?? 0 } : { id: r.media, kind: r.mkind, hidden: true };
+    return o;
+  };
 
   function historyOf(ws: Sock, m: Record<string, unknown>) {
     const key = String(m.room ?? "");
@@ -440,16 +466,35 @@ export function createChatServer(opts: ServerOptions) {
     if (!c.rooms.has(key)) return err(ws, "not_joined");
     const text = clean(m.text, MAX_TEXT + 1);
     if (text.length > MAX_TEXT) return err(ws, "too_long");
-    const why = checkMessage(text);
+    const mediaRef = m.media == null ? null : String(m.media);
+    if (mediaRef && text.length > 120) return err(ws, "too_long");        // el pie de una imagen es corto
+    const why = text || !mediaRef ? checkMessage(text) : null;
     if (why) return err(ws, "blocked", { why, cid: m.cid });
+    // ---- medios: sticker predefinido, sticker propio, imagen o audio ya subido ----
+    let mediaId: string | null = null;
+    if (mediaRef) {
+      if (mediaRef.startsWith("preset:")) {
+        if (!PRESET_IDS.has(mediaRef.slice(7))) return err(ws, "bad_request");
+        mediaId = mediaRef;
+      } else {
+        const md = db.media(mediaRef);
+        if (!md || md.uid !== u.uid || md.status === "hidden") return err(ws, "bad_media", { cid: m.cid });
+        if (u.media_until > now()) return err(ws, "media_suspended", { cid: m.cid });
+        if (md.kind === "audio" && !(key.startsWith("dm:") || key.startsWith("class:"))) return err(ws, "audio_not_allowed", { cid: m.cid });
+        if (md.kind === "sticker") { if (!db.hasSticker(u.uid, md.id)) return err(ws, "bad_media", { cid: m.cid }); }
+        else if (!db.attachMedia(md.id, key)) return err(ws, "bad_media", { cid: m.cid });   // una imagen o audio se envía una sola vez
+        mediaId = md.id;
+      }
+    }
     const wait = Math.max(burst.take(u.uid, now()), 0) || minute.take(u.uid, now());
     if (wait) return err(ws, "rate", { retry: wait, cid: m.cid });
     const last = lastText.get(u.uid);
-    if (last && last.text === text.toLowerCase() && now() - last.at < 30_000) return err(ws, "duplicate", { cid: m.cid });
-    lastText.set(u.uid, { text: text.toLowerCase(), at: now() });
+    if (!mediaId && last && last.text === text.toLowerCase() && now() - last.at < 30_000) return err(ws, "duplicate", { cid: m.cid });
+    if (!mediaId) lastText.set(u.uid, { text: text.toLowerCase(), at: now() });
     if (key.startsWith("dm:") && !dmAllowed(key, u.uid)) return err(ws, "dm_closed", { cid: m.cid });
-    const id = db.addMessage(key, u.uid, text, now());
-    broadcast(key, { t: "msg", room: key, m: { id, uid: u.uid, u: u.username, a: u.avatar, text, ts: now() }, cid: m.cid });
+    const id = db.addMessage(key, u.uid, text, now(), mediaId);
+    const row = db.history(key, id + 1, 1)[0];
+    broadcast(key, { t: "msg", room: key, m: wire({ ...row, username: u.username, avatar: u.avatar }), cid: m.cid });
     if (key.startsWith("dm:")) {
       // la otra persona puede no tener el chat abierto: se le avisa para que cargue la conversación
       const peer = dmPeer(key, u.uid)!;
@@ -466,11 +511,135 @@ export function createChatServer(opts: ServerOptions) {
     if (msg.uid === c.claims!.uid) return err(ws, "own_message");
     if (reportLimit.take(c.claims!.uid, now())) return err(ws, "rate");
     if (db.addReport(msg, c.claims!.uid, reason, now()) === "dup") return err(ws, "already_reported");
+    // una imagen o audio reportado se oculta YA (hasta que un admin lo revise): es lo que más daño puede hacer
+    if (msg.media && !msg.media.startsWith("preset:") && db.media(msg.media)?.status === "ok") {
+      db.setMediaStatus(msg.media, "hidden");
+      broadcast(msg.room, { t: "media.hidden", room: msg.room, id: msg.media });
+      strike(msg.uid);
+    }
     if (db.reportersOf(msg.id) >= (msg.room.startsWith("dm:") ? 1 : AUTO_HIDE_REPORTS)) {   // en un directo solo hay una persona que pueda reportar
       db.deleteMessage(msg.id);
       broadcast(msg.room, { t: "del", room: msg.room, id: msg.id });
     }
     send(ws, { t: "reported", id: msg.id });
+  }
+
+  /** 3 strikes in 24 h (an image blocked by the scanner, or reported) take away the right to upload for a day. */
+  function strike(uid: string) {
+    const t = now();
+    const list = (strikes.get(uid) ?? []).filter((x) => t - x < 24 * 3600_000);
+    list.push(t);
+    strikes.set(uid, list);
+    if (list.length >= 3) { db.setMediaUntil(uid, t + 24 * 3600_000); strikes.delete(uid); notify(uid, { t: "me", me: undefined }); }
+  }
+
+  // ---- biblioteca de stickers ----
+  const stickerWire = (x: { id: string; w: number; h: number }) => ({ id: x.id, w: x.w, h: x.h });
+  function stickerCmd(ws: Sock, t: string, m: Record<string, unknown>) {
+    const uid = ws.data.claims!.uid;
+    if (t === "sticker.list") return send(ws, { t: "stickers", items: db.stickersOf(uid).map(stickerWire) });
+    const id = String(m.id ?? "");
+    if (t === "sticker.remove") { db.removeSticker(uid, id); return send(ws, { t: "stickers", items: db.stickersOf(uid).map(stickerWire) }); }
+    if (t === "sticker.save") {
+      // guardar el sticker de otra persona: solo si salió en una sala en la que estás
+      const md = db.media(id);
+      if (!md || md.kind !== "sticker" || md.status !== "ok") return err(ws, "bad_media");
+      if (md.uid !== uid && !db.mediaSeenIn(id, [...ws.data.rooms])) return err(ws, "bad_media");
+      if (db.countStickers(uid) >= MAX_STICKERS) return err(ws, "sticker_limit");
+      db.addSticker(uid, id, now());
+      return send(ws, { t: "stickers", items: db.stickersOf(uid).map(stickerWire) });
+    }
+  }
+
+  // ---- subida y descarga de archivos (HTTP) ----
+  const json = (o: unknown, status = 200) => new Response(JSON.stringify(o), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
+  const bearer = (req: Request) => /^Bearer (.+)$/.exec(req.headers.get("authorization") ?? "")?.[1] ?? "";
+
+  async function upload(req: Request): Promise<Response> {
+    const origin = req.headers.get("origin");
+    if (origin && !origins.includes(origin)) return json({ error: "forbidden" }, 403);
+    const url = new URL(req.url);
+    const kind = url.searchParams.get("kind") as MediaKind;
+    if (!["image", "sticker", "audio"].includes(kind)) return json({ error: "bad_request" }, 400);
+    const claims = await verifyFirebaseToken(bearer(req), projectId, keys, now());
+    if (!claims) return json({ error: "auth_failed" }, 401);
+    const user = db.touchUser(claims.uid, claims.email, now());
+    if (user.banned) return json({ error: "banned" }, 403);
+    if (!user.username) return json({ error: "need_username" }, 403);
+    if (user.muted_until > now()) return json({ error: "muted", until: user.muted_until }, 403);
+    if (user.media_until > now()) return json({ error: "media_suspended", until: user.media_until }, 403);
+    if (now() - user.created < (kind === "audio" ? MIN_AGE_AUDIO : MIN_AGE_MEDIA)) return json({ error: "media_new_account" }, 403);
+    // dónde se puede usar: el audio solo en privados y grupos de clase; la imagen, donde ya estés dentro
+    const room = url.searchParams.get("room") ?? "";
+    if (kind !== "sticker") {
+      const r = db.room(room) ?? (room === "global" ? { kind: "global" } : room.startsWith("dm:") ? { kind: "dm" } : null);   // un privado se crea al abrirlo: aún puede no tener fila
+      if (!r) return json({ error: "no_room" }, 400);
+      if (kind === "audio" && r.kind !== "dm" && r.kind !== "class") return json({ error: "audio_not_allowed" }, 403);
+      if (r.kind === "dm" && !dmAllowed(room, user.uid)) return json({ error: "dm_closed" }, 403);
+      if (r.kind === "class" && !db.isMember(room, user.uid)) return json({ error: "forbidden" }, 403);
+    }
+    // límites de ritmo y de volumen
+    const t = now();
+    const wait = kind === "audio" ? Math.max(audBurst.take(user.uid, t), audHour.take(user.uid, t)) : kind === "sticker" ? stickHour.take(user.uid, t) : Math.max(imgBurst.take(user.uid, t), imgHour.take(user.uid, t));
+    if (wait) return json({ error: "media_rate", retry: wait }, 429);
+    if (db.bytesSince(user.uid, t - 24 * 3600_000) > DAILY_BYTES) return json({ error: "media_quota" }, 429);
+    if (kind === "sticker" && db.countStickers(user.uid) >= MAX_STICKERS) return json({ error: "sticker_limit" }, 400);
+    const max = kind === "audio" ? LIMITS.audioIn : LIMITS.imageIn;
+    const declared = Number(req.headers.get("content-length"));
+    if (!declared || declared > max) return json({ error: "media_too_large" }, 413);
+    const body = new Uint8Array(await req.arrayBuffer());
+    if (body.length > max) return json({ error: "media_too_large" }, 413);
+    try {
+      const out = kind === "audio" ? await processAudio(body, tools) : await processImage(body, kind, tools);
+      if (kind !== "audio") {
+        if (!opts.scan) throw new MediaError("scan_unavailable");
+        let score: number;
+        try { score = await opts.scan(out.bytes); } catch { throw new MediaError("scan_unavailable"); }   // si el detector falla, NO se acepta
+        if (score >= NSFW_THRESHOLD) { strike(user.uid); return json({ error: "media_blocked" }, 422); }
+      }
+      const id = randomBytes(16).toString("hex");
+      await fsp.writeFile(path.join(mediaDir, `${id}.${out.ext}`), out.bytes);
+      db.addMedia({ id, uid: user.uid, kind, mime: out.mime, bytes: out.bytes.length, w: out.w, h: out.h, dur: out.dur, ts: t, room: null });
+      if (kind === "sticker") { db.addSticker(user.uid, id, t); db.setMediaStatus(id, "ok"); }
+      return json({ id, kind, w: out.w, h: out.h, dur: out.dur });
+    } catch (e) {
+      if (e instanceof MediaError) return json({ error: e.code }, e.code === "scan_unavailable" ? 503 : 400);
+      console.error("[chat] upload failed:", e instanceof Error ? e.message : e);
+      return json({ error: "server_error" }, 500);
+    }
+  }
+
+  async function serveMedia(req: Request, id: string): Promise<Response> {
+    if (!/^[a-f0-9]{32}$/.test(id)) return new Response("not found", { status: 404 });
+    const md = db.media(id);
+    if (!md) return new Response("not found", { status: 404 });
+    // un archivo oculto (reportado) solo lo ve un admin, que lo pide con su token
+    if (md.status === "hidden") {
+      const claims = await verifyFirebaseToken(bearer(req), projectId, keys, now());
+      if (!claims || !claims.emailVerified || !admins.has(claims.email)) return new Response("not found", { status: 404 });
+    }
+    const file = path.join(mediaDir, `${id}.${md.mime === "audio/mp4" ? "m4a" : "webp"}`);
+    let size: number;
+    try { size = (await fsp.stat(file)).size; } catch { return new Response("not found", { status: 404 }); }
+    const headers: Record<string, string> = {
+      "content-type": md.mime,
+      "accept-ranges": "bytes",
+      "cache-control": md.status === "hidden" ? "no-store" : "private, max-age=86400",
+      "x-content-type-options": "nosniff",
+      "content-security-policy": "default-src 'none'; sandbox",
+      "cross-origin-resource-policy": "same-origin",
+    };
+    const range = /^bytes=(\d*)-(\d*)$/.exec(req.headers.get("range") ?? "");
+    if (range) {
+      const start = Number(range[1] || 0), end = Math.min(Number(range[2] || size - 1), size - 1);
+      if (!(start <= end) || start >= size) return new Response(null, { status: 416, headers: { ...headers, "content-range": `bytes */${size}` } });
+      return new Response(Bun.file(file).slice(start, end + 1), { status: 206, headers: { ...headers, "content-range": `bytes ${start}-${end}/${size}`, "content-length": String(end - start + 1) } });
+    }
+    return new Response(Bun.file(file), { headers: { ...headers, "content-length": String(size) } });
+  }
+
+  async function deleteFiles(files: { id: string; mime: string }[]) {
+    for (const f of files) await fsp.rm(path.join(mediaDir, `${f.id}.${f.mime === "audio/mp4" ? "m4a" : "webp"}`), { force: true }).catch(() => {});
   }
 
   // ---- administración ----
@@ -480,7 +649,7 @@ export function createChatServer(opts: ServerOptions) {
       case "admin.reports":
         return send(ws, { t: "admin.reports", items: db.openReports(100) });
       case "admin.find":
-        return send(ws, { t: "admin.users", items: db.findUsers(String(m.q ?? "").slice(0, 40)).map((u) => ({ uid: u.uid, username: u.username, avatar: u.avatar, email: u.email, muted_until: u.muted_until, banned: u.banned, last_seen: u.last_seen })) });
+        return send(ws, { t: "admin.users", items: db.findUsers(String(m.q ?? "").slice(0, 40)).map((u) => ({ uid: u.uid, username: u.username, avatar: u.avatar, email: u.email, muted_until: u.muted_until, banned: u.banned, last_seen: u.last_seen, media_until: u.media_until })) });
       case "admin.delete": {
         const msg = db.message(Number(m.id));
         if (!msg) return err(ws, "bad_request");
@@ -501,6 +670,30 @@ export function createChatServer(opts: ServerOptions) {
         for (const s of [...(roomSockets.get(key) ?? [])]) { s.data.rooms.delete(key); send(s, { t: r.kind === "class" ? "class.left" : "dm.closed", room: key, kicked: true }); }
         roomSockets.delete(key);
         db.deleteRoom(key);
+        return send(ws, { t: "ok", cmd: t });
+      }
+      case "admin.media.restore": {
+        const md = db.media(String(m.id ?? ""));
+        if (!md) return err(ws, "bad_request");
+        db.setMediaStatus(md.id, "ok");
+        db.closeReportsOfMedia(md.id, "dismissed");
+        if (md.room) broadcast(md.room, { t: "media.restored", room: md.room, id: md.id, media: { id: md.id, kind: md.kind, w: md.w, h: md.h, dur: md.dur } });
+        return send(ws, { t: "ok", cmd: t });
+      }
+      case "admin.media.delete": {
+        const md = db.media(String(m.id ?? ""));
+        if (!md) return err(ws, "bad_request");
+        void deleteFiles([{ id: md.id, mime: md.mime }]);
+        db.deleteMedia(md.id);
+        db.closeReportsOfMedia(md.id, "deleted");
+        if (md.room) broadcast(md.room, { t: "media.hidden", room: md.room, id: md.id });
+        return send(ws, { t: "ok", cmd: t });
+      }
+      case "admin.nomedia": {
+        const target = db.user(String(m.uid ?? ""));
+        if (!target) return err(ws, "bad_request");
+        const hours = Math.max(0, Math.min(24 * 365, Number(m.hours) || 0));
+        db.setMediaUntil(target.uid, hours ? now() + hours * 3600_000 : 0);
         return send(ws, { t: "ok", cmd: t });
       }
       case "admin.dismiss":
@@ -545,9 +738,13 @@ export function createChatServer(opts: ServerOptions) {
   const server = Bun.serve<Conn>({
     port: opts.port ?? 0,
     hostname: opts.hostname ?? "127.0.0.1",
+    maxRequestBodySize: 6_000_000,
     fetch(req, srv) {
       const url = new URL(req.url);
-      if (url.pathname === "/api/chat/health") return Response.json({ ok: true, online: sockets.size });
+      if (url.pathname === "/api/chat/health") return opts.scanHealth ? opts.scanHealth().then((ok) => Response.json({ ok: true, online: sockets.size, scanner: ok })) : Response.json({ ok: true, online: sockets.size, scanner: !!opts.scan });
+      if (url.pathname === "/api/chat/upload" && req.method === "POST") return upload(req);
+      const mm = /^\/api\/chat\/media\/([a-f0-9]{32})$/.exec(url.pathname);
+      if (mm && (req.method === "GET" || req.method === "HEAD")) return serveMedia(req, mm[1]);
       if (url.pathname !== "/api/chat/ws") return new Response("not found", { status: 404 });
       const origin = req.headers.get("origin");
       if (origin && !origins.includes(origin)) return new Response("forbidden", { status: 403 });
@@ -582,12 +779,12 @@ export function createChatServer(opts: ServerOptions) {
 
   const sweepTimer = setInterval(() => {
     const t = now();
-    db.purgeOlderThan(t - RETENTION_MS);
-    for (const l of [burst, minute, reportLimit, roomCreate, profileLimit]) l.sweep(t);
+    void deleteFiles(db.purgeOlderThan(t - RETENTION_MS).files);
+    for (const l of [burst, minute, reportLimit, roomCreate, profileLimit, imgBurst, imgHour, audBurst, audHour, stickHour]) l.sweep(t);
     for (const [k, v] of lastText) if (t - v.at > 60_000) lastText.delete(k);
   }, 3600_000);
   sweepTimer.unref?.();
-  db.purgeOlderThan(now() - RETENTION_MS);
+  void deleteFiles(db.purgeOlderThan(now() - RETENTION_MS).files);
 
   return {
     server,

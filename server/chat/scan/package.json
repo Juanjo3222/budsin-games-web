@@ -1,0 +1,8 @@
+{
+  "name": "budsin-chat-scan",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": { "start": "bun scan.ts" },
+  "dependencies": { "onnxruntime-node": "1.31.1" }
+}

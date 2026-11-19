@@ -13,8 +13,8 @@ ExecStart=/usr/local/bin/bun index.ts
 Restart=on-failure
 RestartSec=3
 # Límites para que no pueda afectar a PayPal, a Music ni al sitio
-MemoryMax=384M
-CPUQuota=60%
+MemoryMax=512M
+CPUQuota=100%
 TasksMax=100
 NoNewPrivileges=true
 PrivateTmp=true

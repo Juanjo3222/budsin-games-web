@@ -12,6 +12,7 @@ export interface User {
   uname_changed: number;
   muted_until: number;
   banned: number;
+  media_until: number;
 }
 export interface Room {
   key: string;
@@ -28,6 +29,20 @@ export interface Msg {
   text: string;
   ts: number;
   deleted: number;
+  media: string | null;
+}
+export interface Media {
+  id: string;
+  uid: string;
+  kind: string;
+  mime: string;
+  bytes: number;
+  w: number;
+  h: number;
+  dur: number;
+  ts: number;
+  room: string | null;
+  status: string;
 }
 export interface Report {
   id: number;
@@ -39,6 +54,7 @@ export interface Report {
   text: string;
   ts: number;
   status: string;
+  media: string | null;
 }
 
 export class ChatDb {
@@ -64,16 +80,27 @@ export class ChatDb {
       CREATE INDEX IF NOT EXISTS friends_b ON friends(b);
       CREATE TABLE IF NOT EXISTS blocks(blocker TEXT NOT NULL, blocked TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY(blocker, blocked));
       CREATE INDEX IF NOT EXISTS blocks_blocked ON blocks(blocked);
+      CREATE TABLE IF NOT EXISTS media(
+        id TEXT PRIMARY KEY, uid TEXT NOT NULL, kind TEXT NOT NULL, mime TEXT NOT NULL, bytes INTEGER NOT NULL,
+        w INTEGER NOT NULL DEFAULT 0, h INTEGER NOT NULL DEFAULT 0, dur REAL NOT NULL DEFAULT 0, ts INTEGER NOT NULL,
+        room TEXT, status TEXT NOT NULL DEFAULT 'pending');
+      CREATE INDEX IF NOT EXISTS media_uid ON media(uid, ts);
+      CREATE TABLE IF NOT EXISTS user_stickers(uid TEXT NOT NULL, media_id TEXT NOT NULL, added INTEGER NOT NULL, PRIMARY KEY(uid, media_id));
       CREATE TABLE IF NOT EXISTS reports(
         id INTEGER PRIMARY KEY AUTOINCREMENT, msg_id INTEGER NOT NULL, room TEXT NOT NULL, reported_uid TEXT NOT NULL, reporter_uid TEXT NOT NULL,
         reason TEXT NOT NULL, text TEXT NOT NULL, ts INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'open', UNIQUE(msg_id, reporter_uid));
       CREATE INDEX IF NOT EXISTS reports_status ON reports(status, id);
     `);
+    // columnas añadidas después de la primera versión (bases ya existentes)
+    const has = (table: string, col: string) => (this.db.query(`PRAGMA table_info(${table})`).all() as { name: string }[]).some((c) => c.name === col);
+    if (!has("messages", "media")) this.db.exec("ALTER TABLE messages ADD COLUMN media TEXT");
+    if (!has("users", "media_until")) this.db.exec("ALTER TABLE users ADD COLUMN media_until INTEGER NOT NULL DEFAULT 0");
+    if (!has("reports", "media")) this.db.exec("ALTER TABLE reports ADD COLUMN media TEXT");
   }
 
   // ---- users ----
   user(uid: string): User | null {
-    return (this.db.query("SELECT uid,username,avatar,email,created,last_seen,uname_changed,muted_until,banned FROM users WHERE uid=?").get(uid) as User) ?? null;
+    return (this.db.query("SELECT uid,username,avatar,email,created,last_seen,uname_changed,muted_until,banned,media_until FROM users WHERE uid=?").get(uid) as User) ?? null;
   }
   touchUser(uid: string, email: string, now: number): User {
     this.db.query("INSERT INTO users(uid,email,created,last_seen) VALUES(?,?,?,?) ON CONFLICT(uid) DO UPDATE SET last_seen=excluded.last_seen, email=excluded.email").run(uid, email, now, now);
@@ -103,10 +130,10 @@ export class ChatDb {
   }
   findUsers(q: string, limit = 20): User[] {
     const like = `%${q.replace(/[\\%_]/g, "\\$&")}%`;          // % y _ de lo escrito valen como letras normales
-    return this.db.query("SELECT uid,username,avatar,email,created,last_seen,uname_changed,muted_until,banned FROM users WHERE username LIKE ? ESCAPE '\\' OR email LIKE ? ESCAPE '\\' ORDER BY last_seen DESC LIMIT ?").all(like, like, limit) as User[];
+    return this.db.query("SELECT uid,username,avatar,email,created,last_seen,uname_changed,muted_until,banned,media_until FROM users WHERE username LIKE ? ESCAPE '\\' OR email LIKE ? ESCAPE '\\' ORDER BY last_seen DESC LIMIT ?").all(like, like, limit) as User[];
   }
   userByName(name: string): User | null {
-    return (this.db.query("SELECT uid,username,avatar,email,created,last_seen,uname_changed,muted_until,banned FROM users WHERE name_key=?").get(nameKey(name)) as User) ?? null;
+    return (this.db.query("SELECT uid,username,avatar,email,created,last_seen,uname_changed,muted_until,banned,media_until FROM users WHERE name_key=?").get(nameKey(name)) as User) ?? null;
   }
 
   // ---- rooms ----
@@ -226,34 +253,94 @@ export class ChatDb {
   }
 
   // ---- messages ----
-  addMessage(room: string, uid: string, text: string, now: number): number {
-    const id = Number(this.db.query("INSERT INTO messages(room,uid,text,ts) VALUES(?,?,?,?)").run(room, uid, text, now).lastInsertRowid);
+  addMessage(room: string, uid: string, text: string, now: number, media: string | null = null): number {
+    const id = Number(this.db.query("INSERT INTO messages(room,uid,text,ts,media) VALUES(?,?,?,?,?)").run(room, uid, text, now, media).lastInsertRowid);
     this.db.query("UPDATE rooms SET last_msg=? WHERE key=?").run(now, room);
     return id;
   }
   message(id: number): Msg | null {
-    return (this.db.query("SELECT id,room,uid,text,ts,deleted FROM messages WHERE id=?").get(id) as Msg) ?? null;
+    return (this.db.query("SELECT id,room,uid,text,ts,deleted,media FROM messages WHERE id=?").get(id) as Msg) ?? null;
   }
-  history(room: string, before: number | null, limit = 50): (Msg & { username: string | null; avatar: string })[] {
+  history(room: string, before: number | null, limit = 50): (Msg & { username: string | null; avatar: string; mkind: string | null; mw: number | null; mh: number | null; mdur: number | null; mstatus: string | null })[] {
     const rows = this.db
       .query(
-        `SELECT m.id,m.room,m.uid,m.text,m.ts,m.deleted,u.username,u.avatar FROM messages m LEFT JOIN users u ON u.uid=m.uid
-         WHERE m.room=? AND m.deleted=0 AND (? IS NULL OR m.id<?) ORDER BY m.id DESC LIMIT ?`,
+        `SELECT m.id,m.room,m.uid,m.text,m.ts,m.deleted,m.media,u.username,u.avatar,d.kind mkind,d.w mw,d.h mh,d.dur mdur,d.status mstatus
+           FROM messages m LEFT JOIN users u ON u.uid=m.uid LEFT JOIN media d ON d.id=m.media
+          WHERE m.room=? AND m.deleted=0 AND (? IS NULL OR m.id<?) ORDER BY m.id DESC LIMIT ?`,
       )
-      .all(room, before, before, limit) as (Msg & { username: string | null; avatar: string })[];
+      .all(room, before, before, limit) as any[];
     return rows.reverse();
   }
   deleteMessage(id: number) {
     this.db.query("UPDATE messages SET deleted=1 WHERE id=?").run(id);
   }
-  purgeOlderThan(ts: number): number {
-    return this.db.query("DELETE FROM messages WHERE ts<?").run(ts).changes;
+  /** Deletes old messages and returns the media files that are no longer needed (stickers in someone's library and media of open reports stay). */
+  purgeOlderThan(ts: number): { messages: number; files: { id: string; mime: string }[] } {
+    const messages = this.db.query("DELETE FROM messages WHERE ts<?").run(ts).changes;
+    const old = this.db
+      .query(
+        `SELECT id,mime FROM media WHERE ts<? AND id NOT IN (SELECT media_id FROM user_stickers)
+            AND id NOT IN (SELECT media FROM reports WHERE media IS NOT NULL AND status='open')`,
+      )
+      .all(ts) as { id: string; mime: string }[];
+    for (const f of old) this.db.query("DELETE FROM media WHERE id=?").run(f.id);
+    return { messages, files: old };
+  }
+
+  // ---- media ----
+  addMedia(m: Omit<Media, "status"> & { status?: string }) {
+    this.db.query("INSERT INTO media(id,uid,kind,mime,bytes,w,h,dur,ts,room,status) VALUES(?,?,?,?,?,?,?,?,?,?,?)").run(m.id, m.uid, m.kind, m.mime, m.bytes, m.w, m.h, m.dur, m.ts, m.room, m.status ?? "pending");
+  }
+  media(id: string): Media | null {
+    return (this.db.query("SELECT id,uid,kind,mime,bytes,w,h,dur,ts,room,status FROM media WHERE id=?").get(id) as Media) ?? null;
+  }
+  setMediaStatus(id: string, status: string) {
+    this.db.query("UPDATE media SET status=? WHERE id=?").run(status, id);
+  }
+  /** a pending upload becomes part of a message (once) */
+  attachMedia(id: string, room: string): boolean {
+    return this.db.query("UPDATE media SET status='ok', room=? WHERE id=? AND status='pending'").run(room, id).changes === 1;
+  }
+  deleteMedia(id: string) {
+    this.db.query("DELETE FROM user_stickers WHERE media_id=?").run(id);
+    this.db.query("DELETE FROM media WHERE id=?").run(id);
+  }
+  bytesSince(uid: string, since: number): number {
+    return (this.db.query("SELECT COALESCE(SUM(bytes),0) n FROM media WHERE uid=? AND ts>?").get(uid, since) as { n: number }).n;
+  }
+  countMediaSince(uid: string, kind: string, since: number): number {
+    return (this.db.query("SELECT COUNT(*) n FROM media WHERE uid=? AND kind=? AND ts>?").get(uid, kind, since) as { n: number }).n;
+  }
+  setMediaUntil(uid: string, until: number) {
+    this.db.query("UPDATE users SET media_until=? WHERE uid=?").run(until, uid);
+  }
+  // sticker library
+  stickersOf(uid: string): Media[] {
+    return this.db.query("SELECT d.id,d.uid,d.kind,d.mime,d.bytes,d.w,d.h,d.dur,d.ts,d.room,d.status FROM user_stickers s JOIN media d ON d.id=s.media_id WHERE s.uid=? AND d.status='ok' ORDER BY s.added DESC").all(uid) as Media[];
+  }
+  /** was this media sent in one of these rooms? (to save somebody else's sticker you must have seen it) */
+  mediaSeenIn(mediaId: string, rooms: string[]): boolean {
+    if (!rooms.length) return false;
+    const q = rooms.map(() => "?").join(",");
+    return !!this.db.query(`SELECT 1 x FROM messages WHERE media=? AND deleted=0 AND room IN (${q}) LIMIT 1`).get(mediaId, ...rooms);
+  }
+  addSticker(uid: string, mediaId: string, now: number) {
+    this.db.query("INSERT OR IGNORE INTO user_stickers(uid,media_id,added) VALUES(?,?,?)").run(uid, mediaId, now);
+  }
+  removeSticker(uid: string, mediaId: string) {
+    this.db.query("DELETE FROM user_stickers WHERE uid=? AND media_id=?").run(uid, mediaId);
+  }
+  hasSticker(uid: string, mediaId: string): boolean {
+    return !!this.db.query("SELECT 1 x FROM user_stickers WHERE uid=? AND media_id=?").get(uid, mediaId);
+  }
+  countStickers(uid: string): number {
+    return (this.db.query("SELECT COUNT(*) n FROM user_stickers WHERE uid=?").get(uid) as { n: number }).n;
   }
 
   // ---- reports ----
   addReport(msg: Msg, reporter: string, reason: string, now: number): "ok" | "dup" {
     try {
-      this.db.query("INSERT INTO reports(msg_id,room,reported_uid,reporter_uid,reason,text,ts) VALUES(?,?,?,?,?,?,?)").run(msg.id, msg.room, msg.uid, reporter, reason, msg.text, now);
+      this.db.query("INSERT INTO reports(msg_id,room,reported_uid,reporter_uid,reason,text,ts,media) VALUES(?,?,?,?,?,?,?,?)").run(msg.id, msg.room, msg.uid, reporter, reason, msg.text, now, msg.media && !msg.media.startsWith("preset:") ? msg.media : null);
       return "ok";
     } catch (e) {
       if (/UNIQUE/i.test(String(e))) return "dup";
@@ -269,18 +356,21 @@ export class ChatDb {
   openReports(limit = 100) {
     return this.db
       .query(
-        `SELECT r.id,r.msg_id,r.room,r.reported_uid,r.reporter_uid,r.reason,r.text,r.ts,r.status,
-                a.username reported_name, b.username reporter_name
-           FROM reports r LEFT JOIN users a ON a.uid=r.reported_uid LEFT JOIN users b ON b.uid=r.reporter_uid
+        `SELECT r.id,r.msg_id,r.room,r.reported_uid,r.reporter_uid,r.reason,r.text,r.ts,r.status,r.media,
+                a.username reported_name, b.username reporter_name, d.kind media_kind, d.status media_status
+           FROM reports r LEFT JOIN users a ON a.uid=r.reported_uid LEFT JOIN users b ON b.uid=r.reporter_uid LEFT JOIN media d ON d.id=r.media
           WHERE r.status='open' ORDER BY r.id DESC LIMIT ?`,
       )
-      .all(limit) as (Report & { reported_name: string | null; reporter_name: string | null })[];
+      .all(limit) as (Report & { reported_name: string | null; reporter_name: string | null; media_kind: string | null; media_status: string | null })[];
   }
   report(id: number): Report | null {
-    return (this.db.query("SELECT id,msg_id,room,reported_uid,reporter_uid,reason,text,ts,status FROM reports WHERE id=?").get(id) as Report) ?? null;
+    return (this.db.query("SELECT id,msg_id,room,reported_uid,reporter_uid,reason,text,ts,status,media FROM reports WHERE id=?").get(id) as Report) ?? null;
   }
   closeReportsOfMessage(msgId: number, status: string) {
     this.db.query("UPDATE reports SET status=? WHERE msg_id=? AND status='open'").run(status, msgId);
+  }
+  closeReportsOfMedia(mediaId: string, status: string) {
+    this.db.query("UPDATE reports SET status=? WHERE media=? AND status='open'").run(status, mediaId);
   }
   closeReport(id: number, status: string) {
     this.db.query("UPDATE reports SET status=? WHERE id=?").run(status, id);

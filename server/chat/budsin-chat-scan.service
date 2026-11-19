@@ -1,0 +1,34 @@
+[Unit]
+Description=Budsin Chat - detector de contenido sexual para imagenes y stickers (ONNX)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=budsin-chat-scan
+Group=budsin-chat-scan
+WorkingDirectory=/opt/budsin-chat/scan
+Environment=HOME=/var/lib/budsin-chat-scan
+Environment=SCAN_PORT=3105
+Environment=SCAN_HOST=127.0.0.1
+Environment=SCAN_MODEL=/var/lib/budsin-chat-scan/model_int8.onnx
+Environment=SCAN_THREADS=2
+ExecStart=/usr/local/bin/bun scan.ts
+Restart=on-failure
+RestartSec=3
+# El modelo usa ~350 MB. Limites para que no pueda afectar a PayPal, a Music, al chat ni al sitio.
+MemoryMax=800M
+CPUQuota=100%
+TasksMax=100
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+ReadOnlyPaths=/var/lib/budsin-chat-scan
+IPAddressDeny=any
+IPAddressAllow=localhost
+
+[Install]
+WantedBy=multi-user.target
