@@ -437,3 +437,37 @@ describe("solo cuentas de colegio", () => {
     } finally { restricted.stop(); }
   });
 });
+
+describe("canciones compartidas desde Budsin Music", () => {
+  const song = { id: "dQw4w9WgXcQ", title: "Never Gonna Give You Up", artist: "Rick Astley", artwork: "https://i.ytimg.com/vi/dQw4w9WgXcQ/mqdefault.jpg", duration: 213, source: "ytm" };
+  test("se comparte una canción: llega como tarjeta con sus datos, sin texto", async () => {
+    clock += 3600_000 * 40;
+    const a = await user("t1", "Ana_Mus"), b = await user("t2", "Beto_Mus");
+    for (const c of [a, b]) await c.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    a.send({ t: "send", room: "global", track: song });
+    const got = await b.next((m) => m.t === "msg" && m.m.track);
+    expect(got.m.track).toMatchObject({ id: "dQw4w9WgXcQ", title: "Never Gonna Give You Up", artist: "Rick Astley", duration: 213, source: "ytm", artwork: song.artwork });
+    expect(got.m.text).toBe("");
+    // aparece también en el historial de quien entra después
+    const c = await user("t3", "Cami_Mus");
+    const j = await c.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    expect(j.history.some((x: any) => x.track?.title === "Never Gonna Give You Up")).toBe(true);
+    c.close();
+    // los datos raros se limpian o se rechazan
+    clock += 20_000;
+    a.send({ t: "send", room: "global", track: { ...song, id: "x".repeat(60) } });
+    expect((await a.next((m) => m.t === "err")).code).toBe("bad_request");
+    clock += 20_000;
+    a.send({ t: "send", room: "global", track: { ...song, id: "abc123", title: "visita www.malo.com ahora" } });
+    expect((await a.next((m) => m.t === "err")).code).toBe("blocked");
+    clock += 20_000;
+    a.send({ t: "send", room: "global", track: { id: "abc123", title: "Tema", artist: "Banda", artwork: "https://malo.example/x.png", isrc: "<script>", source: "otro", duration: -5 } });
+    const clean = await b.next((m) => m.t === "msg" && m.m.track?.id === "abc123");
+    expect(clean.m.track).toEqual({ id: "abc123", title: "Tema", artist: "Banda" });     // portada, isrc, fuente y duración inválidos se descartan
+    // un reporte de una canción compartida le llega al admin con el nombre de la canción
+    const rep = await b.req({ t: "report", id: clean.m.id, reason: "other" }, (m) => m.t === "reported");
+    expect(rep.t).toBe("reported");
+    expect(db.openReports().some((r) => r.text === "🎵 Tema — Banda")).toBe(true);
+    a.close(); b.close();
+  });
+});

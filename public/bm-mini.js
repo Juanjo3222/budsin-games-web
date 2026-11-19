@@ -533,6 +533,13 @@
   // Volver con "atrás" puede traer esta página de la caché (bfcache) sin ejecutar el script otra vez.
   window.addEventListener('pageshow', function (e) { if (e.persisted) { st.mode = st.mode === 'local' ? 'none' : st.mode; evaluate(); } });
 
+  // Pequeña API para páginas que muestran canciones (Budsin Chat): empezar a sonar desde un clic.
+  window.BmMini = {
+    play: function (tracks, i) {
+      var q = (tracks || []).filter(function (t) { return t && t.id; });
+      if (q.length) takeOver(q, Math.max(0, Math.min(i | 0, q.length - 1)), 0, false);
+    }
+  };
   evaluate();
   if (GAME) render();
 })();

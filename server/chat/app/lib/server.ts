@@ -69,6 +69,31 @@ class Limiter {
   }
 }
 
+// ---- canciones compartidas desde Budsin Music ----
+// Lo que llega es dato no confiable (el cliente podría inventarlo): se limpian los campos, el texto pasa por el mismo filtro
+// que un mensaje y la portada solo puede venir de los servidores de imágenes de Music.
+const ART_HOSTS = /^https:\/\/(resources\.tidal\.com|i\.ytimg\.com|yt3\.ggpht\.com|[a-z0-9-]+\.googleusercontent\.com)\/[^\s"'<>]{1,300}$/;
+export interface SharedTrack { id: string; title: string; artist: string; artwork?: string; duration?: number; isrc?: string; source?: string; album?: string }
+export function cleanTrack(raw: unknown): SharedTrack | "blocked" | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  // eslint-disable-next-line no-control-regex
+  const txt = (v: unknown, max: number) => String(v ?? "").replace(/[\u0000-\u001f\u007f\u200b-\u200f\u202a-\u202e\u2066-\u2069]+/g, " ").replace(/\s+/g, " ").trim().slice(0, max);
+  const id = String(r.id ?? "");
+  if (!/^[A-Za-z0-9_-]{1,40}$/.test(id)) return null;
+  const title = txt(r.title, 90), artist = txt(r.artist, 90), album = txt(r.album, 90);
+  if (!title || !artist) return null;
+  // un título que sea un enlace, un teléfono o una grosería no se comparte (mismo criterio que un mensaje)
+  for (const t of [title, artist, album]) if (t && checkMessage(t) && checkMessage(t) !== "empty") return "blocked";
+  const out: SharedTrack = { id, title, artist };
+  if (album) out.album = album;
+  if (typeof r.artwork === "string" && ART_HOSTS.test(r.artwork)) out.artwork = r.artwork;
+  const d = Number(r.duration); if (Number.isFinite(d) && d > 0 && d < 7200) out.duration = Math.round(d);
+  if (typeof r.isrc === "string" && /^[A-Za-z0-9]{12}$/.test(r.isrc)) out.isrc = r.isrc.toUpperCase();
+  if (r.source === "tidal" || r.source === "ytm") out.source = r.source;
+  return out;
+}
+
 export function createChatServer(opts: ServerOptions) {
   const { db, projectId, keys } = opts;
   const now = opts.now ?? Date.now;
@@ -459,7 +484,8 @@ export function createChatServer(opts: ServerOptions) {
 
   const wire = (r: { id: number; uid: string; text: string; ts: number; username: string | null; avatar: string; media?: string | null; mkind?: string | null; mw?: number | null; mh?: number | null; mdur?: number | null; mstatus?: string | null }) => {
     const o: Record<string, unknown> = { id: r.id, uid: r.uid, u: r.username ?? "?", a: r.avatar ?? "a01", text: r.text, ts: r.ts };
-    if (r.media?.startsWith("preset:")) o.sticker = r.media.slice(7);
+    if (r.media?.startsWith("track:")) { try { o.track = JSON.parse(r.media.slice(6)); } catch { /* corrupto: se ignora */ } }
+    else if (r.media?.startsWith("preset:")) o.sticker = r.media.slice(7);
     else if (r.media && r.mkind) o.media = r.mstatus === "ok" ? { id: r.media, kind: r.mkind, w: r.mw ?? 0, h: r.mh ?? 0, dur: r.mdur ?? 0 } : { id: r.media, kind: r.mkind, hidden: true };
     return o;
   };
@@ -480,12 +506,19 @@ export function createChatServer(opts: ServerOptions) {
     if (!c.rooms.has(key)) return err(ws, "not_joined");
     const text = clean(m.text, MAX_TEXT + 1);
     if (text.length > MAX_TEXT) return err(ws, "too_long");
-    const mediaRef = m.media == null ? null : String(m.media);
+    let sharedTrack: SharedTrack | null = null;
+    if (m.track != null) {
+      const tr = cleanTrack(m.track);
+      if (!tr) return err(ws, "bad_request", { cid: m.cid });
+      if (tr === "blocked") return err(ws, "blocked", { why: "profanity", cid: m.cid });
+      sharedTrack = tr;
+    }
+    const mediaRef = sharedTrack ? null : (m.media == null ? null : String(m.media));
     if (mediaRef && text.length > 120) return err(ws, "too_long");        // el pie de una imagen es corto
-    const why = text || !mediaRef ? checkMessage(text) : null;
+    const why = text || !(mediaRef || sharedTrack) ? checkMessage(text) : null;
     if (why) return err(ws, "blocked", { why, cid: m.cid });
     // ---- medios: sticker predefinido, sticker propio, imagen o audio ya subido ----
-    let mediaId: string | null = null;
+    let mediaId: string | null = sharedTrack ? "track:" + JSON.stringify(sharedTrack) : null;
     if (mediaRef) {
       if (mediaRef.startsWith("preset:")) {
         if (!PRESET_IDS.has(mediaRef.slice(7))) return err(ws, "bad_request");
@@ -527,7 +560,7 @@ export function createChatServer(opts: ServerOptions) {
     if (reportLimit.take(c.claims!.uid, now())) return err(ws, "rate");
     if (db.addReport(msg, c.claims!.uid, reason, now()) === "dup") return err(ws, "already_reported");
     // una imagen o audio reportado se oculta YA (hasta que un admin lo revise): es lo que más daño puede hacer
-    if (msg.media && !msg.media.startsWith("preset:") && db.media(msg.media)?.status === "ok") {
+    if (msg.media && !msg.media.startsWith("preset:") && !msg.media.startsWith("track:") && db.media(msg.media)?.status === "ok") {
       db.setMediaStatus(msg.media, "hidden");
       broadcast(msg.room, { t: "media.hidden", room: msg.room, id: msg.media });
       strike(msg.uid);

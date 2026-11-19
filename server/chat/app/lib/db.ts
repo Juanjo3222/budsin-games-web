@@ -57,6 +57,12 @@ export interface Report {
   media: string | null;
 }
 
+/** what an admin reads in a report about a shared song */
+function trackLabel(media: string | null): string {
+  if (!media?.startsWith("track:")) return "";
+  try { const t = JSON.parse(media.slice(6)); return `🎵 ${t.title} — ${t.artist}`; } catch { return "🎵"; }
+}
+
 export class ChatDb {
   readonly db: Database;
   constructor(file: string) {
@@ -340,7 +346,7 @@ export class ChatDb {
   // ---- reports ----
   addReport(msg: Msg, reporter: string, reason: string, now: number): "ok" | "dup" {
     try {
-      this.db.query("INSERT INTO reports(msg_id,room,reported_uid,reporter_uid,reason,text,ts,media) VALUES(?,?,?,?,?,?,?,?)").run(msg.id, msg.room, msg.uid, reporter, reason, msg.text, now, msg.media && !msg.media.startsWith("preset:") ? msg.media : null);
+      this.db.query("INSERT INTO reports(msg_id,room,reported_uid,reporter_uid,reason,text,ts,media) VALUES(?,?,?,?,?,?,?,?)").run(msg.id, msg.room, msg.uid, reporter, reason, msg.text || trackLabel(msg.media), now, msg.media && !msg.media.startsWith("preset:") && !msg.media.startsWith("track:") ? msg.media : null);
       return "ok";
     } catch (e) {
       if (/UNIQUE/i.test(String(e))) return "dup";

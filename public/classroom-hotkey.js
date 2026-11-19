@@ -485,7 +485,7 @@
   function ensureMusicMenu() {
     try {
       if (window.top !== window) return;
-      if (location.pathname.indexOf("/musica/") === 0) return;
+      if (location.pathname.indexOf("/musica/") === 0 || location.pathname.indexOf("/chat/") === 0) return;   // /chat/ carga su propio mini-reproductor
       if (!/(^|\.)budsin\.dev$/.test(location.hostname) && location.hostname !== "localhost" && location.hostname !== "127.0.0.1") return;
       if (/^\/(index\.html)?$/.test(location.pathname) || /\/(admin|settings)\.html$/.test(location.pathname)) return;   // the portal has its own card
       if (localStorage.getItem("bm_gamemenu") === "0") return;

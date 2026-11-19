@@ -896,6 +896,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <div class="seek"><span id="tCur">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Progreso"><span id="tDur">0:00</span></div>
     </div>
     <div class="right">
+      <button class="iconbtn hide-m" id="bChat" hidden><svg viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 00-2 2v18l4-4h14a2 2 0 002-2V4a2 2 0 00-2-2zm-3 11H7v-2h10v2zm0-3H7V8h10v2z"/></svg></button>
       <button class="iconbtn" id="bVid" hidden><svg viewBox="0 0 24 24"><path d="M17 10.5V7a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h12a1 1 0 001-1v-3.5l4 4v-11l-4 4z"/></svg></button>
       <button class="iconbtn" id="bLyr" data-ti="lyr"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg></button>
       <button class="iconbtn" id="bViz" data-ti="viz"><svg viewBox="0 0 24 24"><path d="M4 13h3v7H4zm5-6h3v13H9zm5 3h3v10h-3zm5-6h3v16h-3z"/></svg></button>
@@ -4632,6 +4633,28 @@ document.addEventListener('click', function (e) {
   var a = b.getAttribute('data-acct');
   if (a === 'in') cloudSignIn(); else if (a === 'out') cloudSignOut(); else if (a === 'wipe') cloudWipe();
 });
+
+/* ================= Compartir en Budsin Chat ================= */
+// Guarda la canción y abre el chat, que pregunta en qué sala mandarla. La música sigue sonando allí (mini-reproductor).
+var CT = {
+  es: { share: 'Compartir en Budsin Chat', toast: 'Abriendo Budsin Chat…' },
+  en: { share: 'Share on Budsin Chat', toast: 'Opening Budsin Chat…' },
+  pt: { share: 'Compartilhar no Budsin Chat', toast: 'Abrindo o Budsin Chat…' }
+};
+function CL(k) { return (CT[lang] && CT[lang][k]) || CT.es[k]; }
+function shareToChat() {
+  var c = cur(); if (!c) return;
+  var tr = { id: c.id, title: c.title, artist: c.artist, album: c.album || '', artwork: c.artwork || '', duration: c.duration || 0, isrc: c.isrc || '', source: c.source || '' };
+  try { localStorage.setItem('bc_share', JSON.stringify({ t: Date.now(), track: tr })); } catch (e) {}
+  try { sessionSave(false); } catch (e) {}              // la sesión queda guardada: el chat sigue la música
+  toast(CL('toast'));
+  setTimeout(function () { location.href = '/chat/#/share'; }, 150);
+}
+function shareBtnSync() { var b = $('#bChat'); if (!b) return; b.hidden = !cur(); b.title = b.ariaLabel = CL('share'); }
+$('#bChat').addEventListener('click', shareToChat);
+audio.addEventListener('loadedmetadata', shareBtnSync);
+MORE_EXTRA.push(function () { return cur() ? { label: '💬 ' + CL('share'), fn: shareToChat } : null; });
+shareBtnSync();
 
 /* ================= Video oficial ================= */
 // Si la canción tiene video musical oficial en YouTube Music (lo busca el backend: /api/music/video), aparece el botón 🎬
