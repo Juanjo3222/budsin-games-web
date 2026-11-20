@@ -201,7 +201,7 @@ GTA V está disponible en `https://games.budsin.dev/gta-5/` mediante un proxy de
 
 **Qué se perdió respecto a nuestro WebBlox anterior** (no existe en el de x8rr): «unirse a un amigo» por presencia, el indicador de «sesión detectada» y el lanzador con diseño propio. El de x8rr trae a cambio: un plugin de Scramjet 2 para interceptar el botón «Jugar» de roblox.com (**no está integrado aquí todavía**), `?gameInstanceId=` y pruebas.
 
-**Probado el 20-nov-2026** (Chromium, en local, con el host de Budsin y el Wisp de x8rr): la página queda aislada (`crossOriginIsolated`), carga el lanzador en español con los avisos, y el formulario de sesión rechaza la cookie sin la casilla y los valores que no son cookie. **No se pudo probar contra Roblox real** (el entorno de pruebas intercepta TLS y epoxy rechaza el certificado): búsqueda de juegos, aceptación de la sesión y entrada a un juego **están sin verificar** con este host. El de x8rr los documenta como funcionando.
+**Probado el 20-nov-2026 en producción** (`proxy.budsin.dev/webblox/`, Chromium, motor 0.748): la página queda aislada (`crossOriginIsolated`), el lanzador sale en español con los avisos, **la búsqueda de juegos funciona de verdad por el Wisp de InvisiProxy** (30 resultados), sin sesión sale el formulario de inicio, la cookie pegada exige la casilla de riesgo, **Roblox rechaza una cookie falsa** («Roblox rechazó esa sesión») y esa cookie **no se queda guardada**. Los dos motores (0.747 y 0.748) cargan y piden su lista de archivos con este host. **Sin verificar**: iniciar sesión con una cuenta real y **entrar a un juego** (hace falta una cuenta y WebTransport hacia `*.qdmux.roblox.com`; en redes con filtro como Fortinet es probable que ese tramo falle, porque no pasa por el Wisp).
 
 ---
 
