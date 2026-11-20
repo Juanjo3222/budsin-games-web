@@ -4,12 +4,13 @@
 El motor (~255 MB) NO va en git (public/webblox/engine/ está en .gitignore): se ejecuta esto en el VPS tras desplegar, solo la primera
 vez o cuando se quiera otra versión. La carpeta queda como la espera el host de x8rr/webblox-built (webblox/host.js + sw.js):
 
-  engine/WasmPlayer.js, WebClient.js, WebClient.wasm (+ .gz), WebClient.metadata.json, audio-processor-fast.js
+  engine/WasmPlayer.js, WebClient.js, WebClient.wasm (+ .gz), audio-processor-fast.js, y la lista de archivos
+  (WebClient.fsindex.txt desde la 0.748; WebClient.metadata.json hasta la 0.747)
   engine/<los ~2900 archivos de contenido que lista el metadata>
   engine/PinnedFlags.json   las flags de Roblox del momento de la descarga: una actualización de flags de Roblox no rompe este motor
   engine/version.json       versión, origen y si la descarga terminó
 
-  python3 app/scripts/webblox-fetch.py version-f807b21caba84809 la versión probada con WebBlox (0.747) <- usar esta
+  python3 app/scripts/webblox-fetch.py version-1ef59424f70d4932 la 0.748 (actual el 20-nov-2026); version-f807b21caba84809 es la 0.747 de respaldo
   python3 app/scripts/webblox-fetch.py                          la versión actual de producción de Roblox (puede no estar completa: ver abajo)
   python3 app/scripts/webblox-fetch.py --root DIR               carpeta webblox (por defecto: ../../public/webblox)
 
@@ -25,10 +26,13 @@ BINARY = "WebClientApp"
 VERSION_API = f"https://clientsettings.roblox.com/v2/client-version/{BINARY}"
 FLAGS_URL = f"https://clientsettingscdn.roblox.com/v2/settings/application/{BINARY}"
 CDN = "https://setup.rbxcdn.com/webclient"
-CORE = ["WasmPlayer.js", "WebClient.js", "WebClient.wasm", "WebClient.metadata.json", "audio-processor-fast.js"]
+CORE = ["WasmPlayer.js", "WebClient.js", "WebClient.wasm", "audio-processor-fast.js"]
+# Roblox cambió la lista de archivos del motor: hasta la 0.747 es WebClient.metadata.json (JSON); desde la 0.748 es WebClient.fsindex.txt
+# (texto «rbxfsindex 1», rutas con prefijo comprimido). El script prueba el formato nuevo primero y cae al viejo.
+INDEXES = ["WebClient.fsindex.txt", "WebClient.metadata.json"]
 GZIP = ["WebClient.wasm"]
 VERSION_RE = re.compile(r"^version-[0-9a-f]{16}$")
-KNOWN_GOOD = "version-f807b21caba84809"   # 0.747: la probada con WebBlox; cámbiala cuando pruebes otra
+KNOWN_GOOD = "version-f807b21caba84809"   # 0.747 (la lista de archivos era WebClient.metadata.json): la versión de respaldo; la 0.748 usa WebClient.fsindex.txt
 
 ap = argparse.ArgumentParser()
 ap.add_argument("version", nargs="?", help="version-<16 hex> (por defecto, la actual de Roblox)")
@@ -70,12 +74,48 @@ if os.path.isdir(out):
             shutil.rmtree(os.path.join(out, name))
             print("borrada la carpeta del formato anterior:", name)
 
-# Antes de borrar nada: la versión tiene que tener su metadata publicada (Roblox sube el motor y a veces la lista de archivos tarda o no sale: 403).
-try:
-    get(f"{base}/WebClient.metadata.json")
-except Exception as e:
-    sys.exit(f"La versión {upload} no tiene WebClient.metadata.json disponible ({e}). No se toca el motor actual. "
+# Antes de borrar nada: la versión tiene que tener su lista de archivos publicada (Roblox sube el motor y a veces la lista tarda: 403).
+index_name = None
+index_raw = None
+for name in INDEXES:
+    try:
+        index_raw, _ = get(f"{base}/{name}")
+        index_name = name
+        break
+    except Exception as e:
+        last = e
+if index_name is None:
+    sys.exit(f"La versión {upload} no tiene lista de archivos disponible ({last}). No se toca el motor actual. "
              f"Prueba una anterior que funcione, por ejemplo: python3 app/scripts/webblox-fetch.py {KNOWN_GOOD}")
+print("lista de archivos:", index_name)
+
+
+def parse_fsindex(raw):
+    """rbxfsindex 1: «<bytes que comparte con la ruta anterior>\t<resto de la ruta>\t<tamaño>\n» por línea (la misma lectura que hace WasmPlayer.js)."""
+    head = b"rbxfsindex 1\n"
+    if not raw.startswith(head):
+        raise ValueError("cabecera de fsindex no reconocida")
+    out, prev, pos = [], b"", len(head)
+
+    def take(sep):
+        nonlocal pos
+        end = raw.find(sep, pos)
+        if end < 0:
+            raise ValueError("fsindex truncado")
+        piece = raw[pos:end]
+        pos = end + 1
+        return piece
+
+    while pos < len(raw):
+        a = take(b"\t")
+        suffix = take(b"\t")
+        size = take(b"\n")
+        if not (a.isdigit() and size.isdigit()) or b"\n" in suffix or int(a) > len(prev):
+            raise ValueError("línea de fsindex mal formada")
+        prev = prev[: int(a)] + suffix
+        out.append({"path": prev.decode("utf-8"), "size": int(size)})
+    return out
+
 
 previous = None
 try:
@@ -88,7 +128,7 @@ if previous != upload:
         print("reemplazando", previous)
     shutil.rmtree(out, ignore_errors=True)
 os.makedirs(out, exist_ok=True)
-record = {"clientVersionUpload": upload, "version": live["version"] if live else None, "source": base, "complete": False}
+record = {"clientVersionUpload": upload, "version": live["version"] if live else None, "source": base, "index": index_name, "complete": False}
 with open(version_file, "w") as fh:
     json.dump(record, fh, indent=2)
     fh.write("\n")
@@ -116,7 +156,7 @@ def download(url, dest, size=None):
     return True
 
 
-for name in CORE:
+for name in CORE + [index_name]:
     print(("bajado " if download(f"{base}/{name}", os.path.join(out, name)) else "ya estaba ") + name)
 for name in GZIP:
     path = os.path.join(out, name)
@@ -126,10 +166,12 @@ for name in GZIP:
         os.replace(path + ".gz.part", path + ".gz")
         print(f"comprimido {name} ({os.path.getsize(path + '.gz') / 1e6:.1f} MB)")
 
-with open(os.path.join(out, "WebClient.metadata.json")) as fh:
-    metadata = json.load(fh)
+if index_name.endswith(".txt"):
+    metadata = parse_fsindex(index_raw)
+else:
+    metadata = json.loads(index_raw)
 if not isinstance(metadata, list):
-    sys.exit("WebClient.metadata.json no es una lista de archivos")
+    sys.exit(f"{index_name} no es una lista de archivos")
 files = []
 for e in metadata:
     ok = isinstance(e, dict) and isinstance(e.get("path"), str) and e["path"].startswith("/") and ".." not in e["path"].split("/") and isinstance(e.get("size"), int)
