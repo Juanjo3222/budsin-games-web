@@ -11,7 +11,8 @@
 
 .static-content { padding: 26px; border-radius: var(--radius-lg); }
 .static-content h2 { font-size: 1.1rem; margin: 22px 0 8px; }
-.static-content p { color: var(--muted); line-height: 1.7; font-size: 0.9rem; }
+.static-content p, .static-content li { color: var(--muted); line-height: 1.7; font-size: 0.9rem; }
+.static-content ul { margin: 6px 0 0; padding-left: 20px; }
 .static-content .text-link { color: var(--blue); }
 
 .not-found { text-align: center; padding: 60px 26px; }
