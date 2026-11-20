@@ -1,55 +1,88 @@
-// Service worker de WebBlox: las peticiones del motor (página y workers) a Roblox son de otro origen y el navegador las
-// bloquearía por CORS. Aquí se interceptan y se mandan a la página (puente en net.js), que las saca por Wisp.
-const HOST = /(^|\.)roblox\.com$|(^|\.)rbxcdn\.com$|(^|\.)robloxlabs\.com$/;
+// Service worker for /blox/. Roblox's web client talks to *.roblox.com and
+// *.rbxcdn.com with ordinary fetch/XHR, from the page and from its pthread
+// workers. Those hosts may be unreachable from here, so every cross-origin
+// request is handed to a page in this scope, which sends it over Wisp
+// (host.js) with the Roblox session attached, and the reply comes back here.
+// Same-origin requests are left alone: the server already sends the
+// cross-origin isolation headers the engine's SharedArrayBuffer needs.
+
+const SCOPE = new URL(self.registration.scope);
+const PINNED_FLAGS = new URL("engine/PinnedFlags.json", SCOPE).href;
+// WasmPlayer.js loads the engine's flags from here. The engine on disk is one
+// pinned version, so it gets the flags fetched alongside it, not whatever
+// Roblox's live flags are for a newer engine.
+const FLAGS_URL = /^https:\/\/clientsettingscdn\.roblox\.com\/v2\/settings\/application\/WebClientApp(?:\/bucket\/[^?#]*)?(?:[?#]|$)/;
+const NULL_BODY = new Set([101, 103, 204, 205, 304]);
+const RELAY_TIMEOUT_MS = 120_000;
 
 self.addEventListener("install", () => self.skipWaiting());
-self.addEventListener("activate", (e) => e.waitUntil(self.clients.claim()));
+self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()));
 
-// Solo la página del reproductor tiene el puente (el lanzador llama a proxyFetch directamente y no escucha mensajes).
-const isPlayer = (c) => /\/webblox\/player\.html/.test(c.url);
-async function bridgeClient(clientId) {
-  if (clientId) { const c = await self.clients.get(clientId); if (c && isPlayer(c)) return c; }   // petición de la propia página
-  return (await self.clients.matchAll({ type: "window", includeUncontrolled: true })).find(isPlayer);  // petición de un worker
-}
-
-async function forward(request, clientId) {
-  const client = await bridgeClient(clientId);
-  if (!client) return new Response("WebBlox: no hay página puente", { status: 503 });
-  const body = ["GET", "HEAD"].includes(request.method) ? null : await request.arrayBuffer();
-  const headers = [...request.headers];
-  const ch = new MessageChannel();
-  const origin = request.headers.get("origin") || new URL(request.referrer || self.location.href).origin || "*";
-  let expose = [];
-  const reply = new Promise((resolve, reject) => {
-    let controller;
-    const stream = new ReadableStream({ start(c) { controller = c; }, cancel() { ch.port1.close(); } });
-    ch.port1.onmessage = (ev) => {
-      const m = ev.data;
-      if (m.type === "head") {
-        const h = new Headers();
-        for (const [k, v] of m.headers) {
-          const lk = k.toLowerCase();
-          if (["content-encoding", "content-length", "transfer-encoding", "connection", "keep-alive"].includes(lk)) continue;
-          try { h.append(k, v); expose.push(k); } catch {}
-        }
-        h.set("Cross-Origin-Resource-Policy", "cross-origin");
-        h.set("Access-Control-Allow-Origin", origin);
-        h.set("Access-Control-Allow-Credentials", "true");
-        h.set("Access-Control-Expose-Headers", [...new Set(expose.map((x) => x.toLowerCase()))].join(", "));
-        const nullBody = [101, 204, 205, 304].includes(m.status) || request.method === "HEAD";
-        resolve(new Response(nullBody ? null : stream, { status: m.status, statusText: m.statusText, headers: h }));
-        if (nullBody) controller.close();
-      } else if (m.type === "chunk") controller.enqueue(new Uint8Array(m.buf));
-      else if (m.type === "end") { try { controller.close(); } catch {} }
-      else if (m.type === "error") { try { controller.error(new Error(m.message)); } catch {} reject(new TypeError(m.message)); }
-    };
-  });
-  client.postMessage({ type: "net-request", url: request.url, method: request.method, headers, body, redirect: request.redirect === "manual" ? "manual" : "follow" }, body ? [ch.port2, body] : [ch.port2]);
-  return reply;
-}
-
-self.addEventListener("fetch", (e) => {
-  const u = new URL(e.request.url);
-  if (u.origin === self.location.origin || !HOST.test(u.hostname)) return;   // lo demás, sin tocar (WebTransport no pasa por aquí)
-  e.respondWith(forward(e.request, e.clientId).catch((err) => new Response(String(err), { status: 502 })));
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  if (!/^https?:/.test(request.url) || new URL(request.url).origin === self.location.origin) return;
+  event.respondWith(crossOrigin(request, event.clientId));
 });
+
+async function crossOrigin(request, clientId) {
+  if (request.method === "GET" && FLAGS_URL.test(request.url)) {
+    const pinned = await fetch(PINNED_FLAGS, { cache: "no-cache" }).catch(() => null);
+    if (pinned?.ok) return reply(200, "", [["content-type", "application/json"]], await pinned.arrayBuffer());
+  }
+  try {
+    const body = request.method === "GET" || request.method === "HEAD" ? null : await request.arrayBuffer();
+    const result = await relay(clientId, {
+      url: request.url,
+      method: request.method,
+      headers: [...request.headers],
+      body,
+    });
+    return reply(result.status, result.statusText, result.headers, result.body);
+  } catch (error) {
+    return reply(502, "Bad Gateway", [["content-type", "application/json"]], JSON.stringify({ error: String(error?.message || error) }));
+  }
+}
+
+function reply(status, statusText, headers, body) {
+  const out = new Headers(headers);
+  // The page is cross-origin isolated (COEP require-corp): without this, any
+  // no-cors load (an <img>) of a relayed response would be blocked.
+  out.set("cross-origin-resource-policy", "cross-origin");
+  // The engine fetches with credentials and reads headers such as
+  // x-csrf-token, so answer as Roblox would to its own site.
+  out.set("access-control-allow-origin", self.location.origin);
+  out.set("access-control-allow-credentials", "true");
+  const names = [...new Set([...out.keys()])].join(", ");
+  if (names) out.set("access-control-expose-headers", names);
+  return new Response(NULL_BODY.has(status) ? null : body, { status, statusText, headers: out });
+}
+
+// A page of ours in this scope. Requests from the engine's workers carry the
+// worker's client id, so fall back to any window.
+async function relayPage(clientId) {
+  const own = clientId ? await self.clients.get(clientId) : null;
+  if (own?.type === "window") return own;
+  const pages = await self.clients.matchAll({ type: "window" });
+  const page = pages.find((client) => client.frameType === "top-level") ?? pages[0];
+  if (!page) throw new Error("no page to relay through");
+  return page;
+}
+
+async function relay(clientId, message) {
+  const page = await relayPage(clientId);
+  return new Promise((resolve, reject) => {
+    const channel = new MessageChannel();
+    const timer = setTimeout(() => {
+      channel.port1.close();
+      reject(new Error("relay timed out"));
+    }, RELAY_TIMEOUT_MS);
+    channel.port1.onmessage = ({ data }) => {
+      clearTimeout(timer);
+      channel.port1.close();
+      if (data.ok) resolve(data);
+      else reject(new Error(data.error));
+    };
+    const transfer = message.body ? [channel.port2, message.body] : [channel.port2];
+    page.postMessage({ type: "blox-fetch", ...message }, transfer);
+  });
+}

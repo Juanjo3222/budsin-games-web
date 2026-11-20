@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
+  <meta charset="utf-8">
 <link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
 <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -11,40 +11,45 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
 <!-- End Google Tag Manager -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="WebBlox: Roblox en tu navegador con el cliente web oficial, sin instalar nada.">
-<title>WebBlox — Budsin Games</title>
-<link rel="stylesheet" href="webblox.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="WebBlox: Roblox en tu navegador con el cliente web oficial, sin instalar nada.">
+  <title>WebBlox — Budsin Games</title>
+  <link rel="stylesheet" href="host.css">
 </head>
 <body>
 <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-<div class="wrap">
-  <p><a href="/">← Budsin Games</a></p>
-  <h1 data-t="title">WebBlox</h1>
-  <p class="sub" data-t="sub"></p>
-
-  <div class="card" id="signin">
-    <div class="status"><span class="dot" id="dot"></span><strong id="sess"></strong>
-      <a class="btn secondary" id="signin-btn" href="/" target="_blank" rel="noopener" data-t="signin" style="text-decoration:none"></a>
-      <button class="btn secondary" id="recheck" type="button" data-t="recheck"></button></div>
-    <p class="muted" data-t="signinHelp"></p>
-    <p class="muted" data-t="privacy"></p>
+  <!-- Base: x8rr/webblox-built (webblox/index.html). Every id below is looked up by Roblox's WasmPlayer.js: the IME inputs, the
+       canvas, the loading screen and the two hidden debug spans. -->
+  <div id="input-container">
+    <textarea id="input-textarea" autocapitalize="off"></textarea>
+    <input id="input-input" autocapitalize="off">
   </div>
-
-  <div class="card">
-    <div class="row"><input type="search" id="q" data-t-ph="search" autocomplete="off"><button class="btn" id="go" type="button" data-t="searchBtn"></button></div>
-    <div class="row" style="margin-top:8px"><input type="text" id="link" data-t-ph="paste" autocomplete="off"><button class="btn secondary" id="open" type="button" data-t="pasteBtn"></button></div>
-    <div class="row" style="margin-top:8px"><input type="text" id="friend" data-t-ph="friendPh" autocomplete="off"><button class="btn secondary" id="friendgo" type="button" data-t="friendBtn"></button></div>
-    <div class="msg" id="msg" role="status"></div>
-    <div class="grid" id="grid"></div>
+  <canvas id="canvas" tabindex="-1"></canvas>
+  <div id="loading-overlay" role="dialog" aria-label="WebBlox" aria-busy="true">
+    <img id="loading-background-image" alt="" crossorigin="anonymous">
+    <section class="loading-card" aria-labelledby="loading-experience-title">
+      <div id="loading-icon-shell"><img id="loading-experience-icon" alt="" crossorigin="anonymous"></div>
+      <h1 id="loading-experience-title">WebBlox</h1>
+      <p class="loading-creator">
+        <span id="loading-experience-creator" hidden></span>
+        <span id="loading-verified-badge" role="img" aria-label="Verified creator" hidden></span>
+      </p>
+      <p id="status" role="status" aria-live="polite">…</p>
+    </section>
+    <section class="loading-error-panel" role="alertdialog" aria-labelledby="loading-error-title" aria-describedby="loading-error-message loading-error-code" hidden>
+      <h1 id="loading-error-title">Join Error</h1>
+      <p id="loading-error-message"></p>
+      <p id="loading-error-code"></p>
+      <button id="loading-error-leave" type="button">Leave</button>
+    </section>
+    <button id="loading-cancel" type="button" aria-label="Cancel loading" title="Cancel">×</button>
   </div>
-
-  <p class="foot" data-t="notice"></p>
-</div>
-<script type="module" src="launcher.js"></script>
+  <div hidden><span id="server"></span><span id="proxyenabled"></span></div>
+  <script type="module" src="host.js"></script>
 <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
 </body>
 </html>
