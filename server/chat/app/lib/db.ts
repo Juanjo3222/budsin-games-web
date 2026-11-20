@@ -153,6 +153,33 @@ export class ChatDb {
   clearUsername(uid: string) {
     this.db.query("UPDATE users SET username=NULL, name_key=NULL, avatar='a01', uname_changed=0 WHERE uid=?").run(uid);
   }
+  /**
+   * Erases a person: profile (email, name, avatar), friends, blocks, memberships, reactions, pins, stickers, uploaded files and
+   * their messages (the rows stay, emptied, so replies keep working). What an open report still needs (the reported message
+   * and its file) is kept until a moderator closes it. Returns what the server must tell the rooms and delete from disk.
+   */
+  eraseUser(uid: string): { messages: { room: string; id: number }[]; files: { id: string; mime: string }[] } {
+    const tx = this.db.transaction(() => {
+      const messages = this.db.query("SELECT id,room FROM messages WHERE uid=? AND deleted=0 AND id NOT IN (SELECT msg_id FROM reports WHERE status='open')").all(uid) as { id: number; room: string }[];
+      for (const m of messages) {
+        this.db.query("DELETE FROM message_edits WHERE msg_id=?").run(m.id);
+        this.db.query("DELETE FROM reactions WHERE msg_id=?").run(m.id);
+        this.db.query("DELETE FROM pins WHERE msg_id=?").run(m.id);
+        this.db.query("UPDATE messages SET deleted=1, text='', media=NULL, uid='-' WHERE id=?").run(m.id);
+      }
+      this.db.query("DELETE FROM reactions WHERE uid=?").run(uid);
+      this.db.query("DELETE FROM pins WHERE by_uid=?").run(uid);
+      this.db.query("DELETE FROM friends WHERE a=? OR b=?").run(uid, uid);
+      this.db.query("DELETE FROM blocks WHERE blocker=? OR blocked=?").run(uid, uid);
+      this.db.query("DELETE FROM members WHERE uid=?").run(uid);
+      this.db.query("DELETE FROM user_stickers WHERE uid=?").run(uid);
+      const files = (this.db.query("SELECT id,mime FROM media WHERE uid=? AND id NOT IN (SELECT media FROM reports WHERE media IS NOT NULL AND status='open')").all(uid) as { id: string; mime: string }[]);
+      for (const f of files) this.deleteMedia(f.id);
+      this.db.query("DELETE FROM users WHERE uid=?").run(uid);
+      return { messages, files };
+    });
+    return tx();
+  }
   setMute(uid: string, until: number) {
     this.db.query("UPDATE users SET muted_until=? WHERE uid=?").run(until, uid);
   }

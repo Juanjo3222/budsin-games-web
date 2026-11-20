@@ -254,6 +254,8 @@ export function createChatServer(opts: ServerOptions) {
         return classJoin(ws, m);
       case "class.leave":
         return classLeave(ws, m);
+      case "account.delete":
+        return eraseAccount(ws, m);
       case "class.list":
         return send(ws, { t: "classes", items: myClasses(ws.data.claims!.uid) });
       case "class.kick":
@@ -498,6 +500,34 @@ export function createChatServer(opts: ServerOptions) {
     else if (r.owner === uid) db.setOwner(key, left[0].uid);       // el dueño se va: pasa al miembro más antiguo
     broadcast(key, { t: "online", room: key, n: onlineCount(key) });
     send(ws, { t: "class.left", room: key });
+  }
+
+  /** «Eliminar mi cuenta del chat»: la persona escribe su nombre para confirmar. Borra todo lo suyo (ver db.eraseUser). */
+  const eraseLimit = new Limiter(10, 3600_000);
+  function eraseAccount(ws: Sock, m: Record<string, unknown>) {
+    const c = ws.data, uid = c.claims!.uid, u = db.user(uid);
+    if (!u || !u.username) return err(ws, "bad_request");
+    if (eraseLimit.take(uid, now())) return err(ws, "rate");
+    if (String(m.confirm ?? "").trim().toLowerCase() !== u.username.toLowerCase()) return err(ws, "confirm_mismatch");
+    // una sanción activa no se «borra» eliminando la cuenta
+    if (u.muted_until > now() || u.media_until > now()) return err(ws, "delete_blocked_sanction");
+    const friends = db.friendRows(uid).map((r) => r.uid);
+    const classes = db.roomsOf(uid, "class");
+    for (const r of classes) {                                       // los grupos: el dueño pasa al miembro más antiguo; si era el último, se borra el grupo
+      db.removeMember(r.key, uid);
+      const left = db.members(r.key);
+      if (!left.length) db.deleteRoom(r.key);
+      else if (r.owner === uid) db.setOwner(r.key, left[0].uid);
+    }
+    const out = db.eraseUser(uid);
+    void deleteFiles(out.files);
+    for (const mm of out.messages) broadcast(mm.room, { t: "del", room: mm.room, id: mm.id });
+    for (const r of classes) { broadcast(r.key, { t: "online", room: r.key, n: onlineCount(r.key) }); }
+    for (const f of friends) { pushFriends(f); }
+    for (const s of [...sockets]) if (s.data.claims?.uid === uid) {
+      send(s, { t: "account_deleted" });
+      s.close(1000, "deleted");
+    }
   }
 
   function classKick(ws: Sock, m: Record<string, unknown>) {

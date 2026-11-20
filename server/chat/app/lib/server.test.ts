@@ -640,3 +640,68 @@ describe("editar, borrar, responder, reaccionar, fijar y modo lento", () => {
     eve.close();
   });
 });
+
+describe("eliminar mi cuenta del chat", () => {
+  let ana: Client, beto: Client;
+  let classKey = "";
+  beforeAll(async () => {
+    clock += 3600_000 * 40;
+    ana = await user("x1", "Ana_Del"); beto = await user("x2", "Beto_Del");
+    ana.send({ t: "friend.request", username: "Beto_Del" });
+    await beto.next((m) => m.t === "friends" && m.incoming.length === 1);
+    await beto.req({ t: "friend.accept", uid: "x1" }, (m) => m.t === "friends" && m.friends.length === 1);
+    for (const c of [ana, beto]) await c.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    ana.send({ t: "send", room: "global", text: "mensaje de ana para borrar", cid: "a1" });
+    await beto.next((m) => m.t === "msg" && m.m.text === "mensaje de ana para borrar");
+    const r = await ana.req({ t: "class.create", name: "Clase Borrable" }, (m) => m.t === "class.created");
+    classKey = r.item.key;
+    await beto.req({ t: "class.join", code: r.item.code }, (m) => m.t === "class.joined");
+  });
+  afterAll(() => { ana.close(); beto.close(); });
+
+  test("hay que escribir tu nombre exacto para confirmar", async () => {
+    expect((await ana.req({ t: "account.delete" }, (m) => m.t === "err")).code).toBe("confirm_mismatch");
+    expect((await ana.req({ t: "account.delete", confirm: "otro" }, (m) => m.t === "err")).code).toBe("confirm_mismatch");
+    expect(db.user("x1")).not.toBeNull();
+  });
+  test("una sanción activa no se borra eliminando la cuenta", async () => {
+    db.setMute("x1", clock + 600_000);
+    expect((await ana.req({ t: "account.delete", confirm: "ana_del" }, (m) => m.t === "err")).code).toBe("delete_blocked_sanction");
+    db.setMute("x1", 0);
+    expect(db.user("x1")).not.toBeNull();
+  });
+  test("borra todo lo suyo: cuenta, mensajes (en vivo para los demás), amistades y deja el nombre libre", async () => {
+    const gone = beto.next((m) => m.t === "del" && m.room === "global");
+    const bye = ana.next((m) => m.t === "account_deleted");
+    const fr = beto.next((m) => m.t === "friends" && m.friends.length === 0);
+    ana.send({ t: "account.delete", confirm: "  ANA_DEL " });                 // sin importar mayúsculas ni espacios
+    await bye; await gone; await fr;
+    expect(db.user("x1")).toBeNull();                                          // sin correo, nombre ni avatar
+    expect(db.friendRows("x2")).toEqual([]);
+    const eve = await user("x3", "Eve_Del");
+    const joined = await eve.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    expect(JSON.stringify(joined.history)).not.toContain("mensaje de ana");
+    expect(db.history("global", null, 50).some((m) => m.text.includes("mensaje de ana"))).toBe(false);
+    eve.close();
+    const again = await user("x4", "Ana_Del");                                 // el nombre quedó libre
+    again.close();
+  });
+  test("el grupo que tenía pasa a otro miembro (y se borra si era el último)", async () => {
+    expect(db.room(classKey)!.owner).toBe("x2");
+    await beto.req({ t: "class.leave", room: classKey }, (m) => m.t === "class.left");
+    expect(db.room(classKey)).toBeNull();
+  });
+  test("lo que tiene un reporte abierto se conserva hasta que un admin lo revise", async () => {
+    const carl = await user("x5", "Carl_Del");
+    await carl.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    clock += 60_000;
+    carl.send({ t: "send", room: "global", text: "mensaje reportado", cid: "c1" });
+    const msg = await beto.next((m) => m.t === "msg" && m.m.text === "mensaje reportado");
+    await beto.req({ t: "report", room: "global", id: msg.m.id, reason: "insult" }, (m) => m.t === "reported");
+    clock += 3600_000;
+    carl.send({ t: "account.delete", confirm: "carl_del" });
+    await carl.next((m) => m.t === "account_deleted");
+    expect(db.user("x5")).toBeNull();
+    expect(db.openReports(10).some((r: any) => r.text === "mensaje reportado")).toBe(true);
+  });
+});

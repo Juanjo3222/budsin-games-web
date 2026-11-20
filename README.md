@@ -540,3 +540,18 @@ El usuario ordenó activarlas y confirmó que usa la **Cloudflare CSAM Scanning 
 **Viven solo en budsin.dev** (repo `Juanjo3222/budsin.dev`: `terminos.html`, `privacidad.html`; textos nuevos en `hosting/lang/site-*.js`, claves `s301`+, en es/en/pt/fr/de). El portal ya no tiene páginas legales propias: los enlaces «Privacidad» y «Términos» del pie apuntan a `https://budsin.dev/privacidad` y `https://budsin.dev/terminos`, y las rutas antiguas `#/terms` y `#/privacidad` (y los stubs `terms.html`/`privacidad.html`) redirigen allí (`components/ExternalRedirect.jsx`); se quitaron del `sitemap.xml`. El inicio de sesión del chat enlaza a ambos y a las normas (`budsin.dev/terminos#normas`).
 
 Contenido: Budsin Chat, Budsin Music (Firestore, Jam), Budsin Pro (PayPal), fotos de perfil/imágenes (Cloudflare), publicidad, menores, retención de 14 días, derechos y contacto (`budsinjys@gmail.com`). **Al cambiar algo del sitio que afecte a datos personales (nuevo servicio, colección o proveedor), hay que actualizar esos textos y su fecha en budsin.dev.** **No son asesoría legal**: conviene que los revise un abogado, sobre todo la ley aplicable, la edad mínima y los datos de menores (Perú: Ley 29733; EE. UU.: COPPA; UE: RGPD).
+
+### 🗑️ Budsin Chat: eliminar mi cuenta del chat (20-nov-2026)
+
+Menú del perfil (clic en tu nombre abajo a la izquierda) → **«Eliminar mi cuenta del chat»** (rojo). Hay que escribir el nombre de usuario para activar el botón; el servidor lo vuelve a comprobar (`account.delete` con `confirm`). Qué hace (`ChatDb.eraseUser` + `eraseAccount` en `server.ts`):
+
+- Borra el usuario (**correo, nombre, avatar o foto**), sus amistades y bloqueos, reacciones, fijados, stickers y **todos sus archivos** (imágenes, notas de voz, fotos de perfil: se borran también del disco).
+- Sus **mensajes** quedan vacíos y marcados como borrados (las filas se mantienen para que las respuestas sigan funcionando) y desaparecen **en vivo** para los demás.
+- **Grupos de clase**: si era dueña, pasa a la persona más antigua; si era la última, se borra el grupo y se libera el nombre.
+- **Se conserva** únicamente lo que está en un **reporte abierto** (el mensaje reportado y su archivo) hasta que un admin lo cierre; luego lo borra la retención de 14 días.
+- **Una sanción activa no se borra así**: con silencio o suspensión de medios vigentes responde `delete_blocked_sanction`. Un baneado no puede conectarse, así que no puede borrarse.
+- La cuenta de Google **no se toca**; al volver a entrar se empieza de cero (cuenta nueva, con sus esperas para subir archivos).
+- Los otros dispositivos con la sesión abierta reciben `account_deleted` y vuelven a la pantalla de entrada. Borrar los datos locales `bc_*` es automático.
+- Esto cumple lo que prometen la Política de Privacidad (budsin.dev) y el derecho de supresión; para el chat ya no hace falta escribir al correo, aunque sigue disponible.
+
+Pruebas: 4 en `server.test.ts` («eliminar mi cuenta del chat») y la prueba de navegador `t71`.
