@@ -2394,5 +2394,57 @@ export const GAMES = [
     "pro": false,
     "proRelease": null,
     "isNew": true
+  },
+  {
+    "id": "meccha-chameleon/index.html",
+    "name": "meccha chameleon",
+    "title": "Meccha Chameleon",
+    "href": "meccha-chameleon/index.html",
+    "cover": "portadas/meccha-chameleon.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Escondite multijugador: los que se esconden se pintan para camuflarse con el escenario y los buscadores intentan encontrarlos antes de que se acabe el tiempo.",
+      "en": "Multiplayer hide-and-seek: hiders paint themselves to blend into the stage while seekers try to spot them before time runs out.",
+      "pt": "Esconde-esconde multijogador: quem se esconde se pinta para se misturar ao cenário e os caçadores tentam encontrá-los antes que o tempo acabe."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
+    "id": "the-stanley-parable-ultra-deluxe/index.html",
+    "name": "the stanley parable: ultra deluxe",
+    "title": "The Stanley Parable: Ultra Deluxe",
+    "href": "the-stanley-parable-ultra-deluxe/index.html",
+    "cover": "portadas/the-stanley-parable-ultra-deluxe.webp",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Una aventura narrada donde cada decisión cambia la historia, y el narrador tiene opiniones sobre lo que haces.",
+      "en": "A narrated adventure where every choice changes the story, and the narrator has opinions about what you do.",
+      "pt": "Uma aventura narrada onde cada escolha muda a história, e o narrador tem opiniões sobre o que você faz."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
   }
 ];

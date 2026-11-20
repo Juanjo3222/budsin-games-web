@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/Games-87-blue" />
   <img src="https://img.shields.io/badge/Frontend-React-orange" />
-  <img src="https://img.shields.io/badge/Version-7.4-purple" />
+  <img src="https://img.shields.io/badge/Version-7.5-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -141,6 +141,8 @@ PEAK carga directamente desde jsDelivr (`wasmdotrip/Peak-Port`, fijado al commit
 | Keep Talking And Nobody Explodes | Port | zay |
 | PEAK | Port | dasher |
 | Horsey Game | Port | crackers |
+| Meccha Chameleon | Port | crax |
+| The Stanley Parable: Ultra Deluxe | Port | apollo |
 
 ---
 
@@ -368,6 +370,9 @@ Admins (mismos correos que el panel): `juvaldiviam@gmail.com`, `juanjoseguravega
 ---
 
 ## 📝 Changelog
+
+### v7.5
+* **Dos ports nuevos de [wasm.rip](https://github.com/wasm-rip/wasmrip)**: **Meccha Chameleon** (port de crax; escondite multijugador: los que se esconden se pintan para camuflarse con el escenario) y **The Stanley Parable: Ultra Deluxe** (port de apollo; aventura con narrador). Carpetas `public/meccha-chameleon/` y `public/the-stanley-parable-ultra-deluxe/` (la página original de cada port con los assets obligatorios de Budsin; los archivos del juego los sirve jsDelivr desde los repos de los porters), portadas en `public/portadas/` y tarjetas en `app/src/data/games.js` (ES/EN/PT). **Meccha Chameleon reintenta solo por otros espejos** (`gcore`/`fastly` de jsDelivr y `raw.githubusercontent.com`) cuando `cdn.jsdelivr.net` responde 403, y habla con un relé externo (`aetheris.win`) para el multijugador. Probados el 20-nov-2026 en Chromium (arrancan: Stanley muestra su pantalla de idioma, Meccha su pantalla de título); **no se probó el multijugador ni jugar una partida**. Popup de novedades en la versión 7.5.
 
 ### v7.4
 * **Juego nuevo: That's Not My Neighbor** (Godot 4.5, sin hilos): eres el portero de un edificio en 1955 y tienes que descubrir a los dobles antes de que entren. Carpeta `public/thats-not-my-neighbor/`, portada `public/portadas/thats-not-my-neighbor.webp` (arte oficial de la página del juego en itch.io) y tarjeta en `app/src/data/games.js` (ES/EN/PT). Los archivos grandes (`ThatNot.pck` 448 MB y `ThatNot.wasm` 36 MB) **no van en git**: se descargan en el VPS con `python3 app/scripts/tnmn-fetch.py --root /var/www/budsin-games-web/public/thats-not-my-neighbor` (ver «That's Not My Neighbor» abajo). El popup de novedades pasó a la versión 7.4 con un enlace al juego. El Service Worker ya no guarda `.pck` para el modo sin conexión de Pro.
