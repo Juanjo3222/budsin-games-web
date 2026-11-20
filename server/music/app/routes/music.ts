@@ -26,6 +26,7 @@ import { lyricsById, lyricsFor, lyricVersions } from "../lib/lyrics";
 import { resolveLink } from "../lib/resolveLink";
 import { isKnownOfficialVideo, officialVideo } from "../lib/ytmVideo";
 import { cleanLines, TARGETS, translateLyrics } from "../lib/translate";
+import { InstantUnavailableError, instantFile, isInstantName, searchInstants } from "../lib/instants";
 import { cleanTtsInput, enginesAvailable, speak, TtsBudgetError } from "../lib/tts";
 import { cleanDjInput, cleanPickInput, DjBudgetError, DjBusyError, djAvailable, djComment, djEnabled, DjPausedError, djPick } from "../lib/dj";
 
@@ -1186,6 +1187,33 @@ export async function musicRoutes(fastify: FastifyInstance) {
       return musicError(reply, 502, "Video fetch failed", { detail: e instanceof Error ? e.message : String(e) });
     }
     return sendLocalAudio(req, reply, file, ytmVideoMimeType(file), "public, max-age=86400");
+  });
+
+  // Soundboard (games.budsin.dev/clsoundboard.html): MyInstants search and sounds, through this server because school
+  // networks block myinstants.com. See lib/instants.ts for what is and is not allowed.
+  fastify.get("/api/music/sb/search", perMinute(30), async (req, reply) => {
+    const q = String((req.query as Record<string, unknown>).q ?? "");
+    if (q.length > 60) return musicError(reply, 400, "q is 60 characters at most");
+    try {
+      const items = await searchInstants(q);
+      reply.header("cache-control", "public, max-age=300");
+      return reply.send({ items });
+    } catch (err) {
+      console.warn("[music] myinstants search failed:", err instanceof Error ? err.message : err);
+      return musicError(reply, 502, "MyInstants search failed");
+    }
+  });
+
+  fastify.get("/api/music/sb/mp3/:file", perMinute(180), async (req, reply) => {
+    const { file } = req.params as { file: string };
+    if (!isInstantName(file)) return musicError(reply, 404, "Unknown sound");
+    let p: string;
+    try {
+      p = await instantFile(file);
+    } catch (e) {
+      return musicError(reply, e instanceof InstantUnavailableError ? 404 : 502, "Sound not available");
+    }
+    return sendLocalAudio(req, reply, p, "audio/mpeg", "public, max-age=86400");
   });
 
   // Line-by-line translation of a song's lyrics (the lyrics panel's "Traducir"). One request per song, cached.

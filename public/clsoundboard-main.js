@@ -1,11 +1,18 @@
 // Copia de main.js de https://github.com/bubblfan/soundboard (servido por jsDelivr).
-// Cambios de Budsin: (1) el original tiene escrita a mano la dirección de otro repositorio (genizy/soundboard), que jsDelivr
+// Cambios de Budsin: (0) los sonidos salen de MyInstants vía /api/music/sb/* con la lista original como respaldo (ver abajo); (1) el original tiene escrita a mano la dirección de otro repositorio (genizy/soundboard), que jsDelivr
 // bloquea (403) y por eso no sonaba nada: aquí todo apunta a CDN; (2) sounds.js se importa con dirección absoluta porque
 // este archivo vive en games.budsin.dev. Si ese repositorio cambia o se bloquea, se corrige CDN aquí (un solo sitio).
 const CDN = "https://cdn.jsdelivr.net/gh/bubblfan/soundboard@main/";
 import {
     sounds
 } from 'https://cdn.jsdelivr.net/gh/bubblfan/soundboard@main/sounds.js';
+// ---- Budsin: los sonidos salen de MyInstants (a través de nuestro servidor, porque muchas redes de colegio bloquean
+// myinstants.com). Si MyInstants o el servidor fallan, vuelve la lista original (sounds.js) sin que se note más que una etiqueta.
+const API = 'https://games.budsin.dev/api/music/sb/';
+let miList = null;          // null: se usa la lista original
+let miDownUntil = 0;        // tras un fallo no se insiste durante 60 s
+let miSeq = 0;              // solo vale la última búsqueda
+const MI_TIMEOUT = 6000;
 let allowOverlap = false;
 let showFavorites = false;
 let currentAudios = [];
@@ -25,17 +32,17 @@ stopButton.onclick = () => {
 favoriteButton.onclick = () => {
     showFavorites = !showFavorites;
     favoriteButton.textContent = showFavorites ? '🌟 Favorites: ON' : '⭐ Favorites: OFF';
-    renderSounds(showFavorites ? "filter:favorite "+searchInput.value : searchInput.value);
+    if (showFavorites) renderSounds("filter:favorite "+searchInput.value); else refresh();
 }
 
-function renderSounds(filter = '') {
+function renderSounds(filter = '', list = null) {
     soundBoard.innerHTML = '';
     let finalSound;
     if (filter.startsWith("filter:favorite ")) {
         finalSound = (localStorage.getItem('favorites') ? JSON.parse(localStorage.getItem('favorites')) : [])
             .filter(s => s.name.toLowerCase().includes(filter.toLowerCase().replace('filter:favorite ', '')));
     } else {
-        finalSound = sounds.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
+        finalSound = list || sounds.filter(s => s.name.toLowerCase().includes(filter.toLowerCase()));
     }
     finalSound.forEach(sound => {
         const wrapper = document.createElement('div');
@@ -54,8 +61,8 @@ function renderSounds(filter = '') {
                 currentAudios.forEach(a => a.pause());
                 currentAudios = [];
             }
-            const audio = new Audio(CDN+sound.mp3);
-            audio.play();
+            const audio = new Audio(sound.url || CDN+sound.mp3);
+            audio.play().catch(() => {});
             currentAudios.push(audio);
             image.classList.add('pressed');
             setTimeout(() => image.classList.remove('pressed'), 150);
@@ -68,10 +75,53 @@ function renderSounds(filter = '') {
         soundBoard.appendChild(wrapper);
     });
 }
-renderSounds();
+const sourceTag = document.createElement('div');
+sourceTag.id = 'sbSource';
+sourceTag.style.cssText = 'text-align:center;font:12px system-ui,sans-serif;color:#aaa;margin:4px 0 0;min-height:16px';
+document.getElementById('controls').after(sourceTag);
+function setSource(kind) {
+    sourceTag.textContent = kind === 'mi' ? '🌐 MyInstants' : kind === 'loading' ? '⏳ Cargando MyInstants…' : '📁 Lista original (MyInstants no responde)';
+}
+async function miFetch(q) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), MI_TIMEOUT);
+    try {
+        const r = await fetch(API + 'search?q=' + encodeURIComponent(q), { signal: ctrl.signal });
+        if (!r.ok) throw new Error('http ' + r.status);
+        const j = await r.json();
+        if (!j || !Array.isArray(j.items)) throw new Error('bad answer');
+        return j.items
+            .filter(i => i && typeof i.name === 'string' && /^[A-Za-z0-9_.%-]{1,120}\.mp3$/.test(i.file))
+            .map(i => ({ name: i.name, color: /^#[0-9a-fA-F]{3,8}$/.test(i.color) ? i.color : '#888888', mp3: i.file, url: API + 'mp3/' + i.file }));
+    } finally { clearTimeout(timer); }
+}
+// Pinta lo que corresponde: MyInstants (tendencias o búsqueda) y, si falla o no hay nada, la lista original.
+async function refresh() {
+    const q = searchInput.value.trim();
+    if (showFavorites) { renderSounds('filter:favorite ' + searchInput.value); return; }
+    const seq = ++miSeq;
+    if (Date.now() >= miDownUntil) {
+        if (!miList) { soundBoard.innerHTML = ''; setSource('loading'); }
+        try {
+            const list = await miFetch(q);
+            if (seq !== miSeq) return;
+            if (list.length) { miList = list; setSource('mi'); renderSounds(q, list); return; }
+            // MyInstants contestó pero sin resultados: se busca en la lista original
+            miList = null; setSource('mi'); renderSounds(q); return;
+        } catch (e) {
+            if (seq !== miSeq) return;
+            miDownUntil = Date.now() + 60000;
+        }
+    }
+    miList = null; setSource('orig'); renderSounds(q);
+}
+let miTimer = 0;
 searchInput.addEventListener('input', () => {
-    renderSounds((showFavorites? "filter:favorite ": "")+searchInput.value);
+    clearTimeout(miTimer);
+    if (showFavorites) { renderSounds('filter:favorite ' + searchInput.value); return; }
+    miTimer = setTimeout(refresh, 350);
 });
+refresh();
 
 function rightClickPanel(event, button, sound) {
     document.querySelectorAll('.right-click-panel').forEach(p => p.remove());
@@ -111,7 +161,7 @@ function rightClickPanel(event, button, sound) {
     
     download.onclick = () => {
         const link = document.createElement('a');
-        link.href = CDN+sound.mp3;
+        link.href = sound.url || CDN+sound.mp3;
         link.download = sound.mp3.split("/").pop();
         document.body.appendChild(link);
         link.click();

@@ -9,6 +9,7 @@ import { startCacheSweep } from "./lib/cacheSweep";
 import { artCacheDir } from "./lib/artCache";
 import { r2 } from "./lib/r2";
 import { ytmBase, ytmCacheDir } from "./lib/ytm";
+import { instantsCacheDir } from "./lib/instants";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const fastify = Fastify({ logger: { level: "info" } });
@@ -43,6 +44,7 @@ async function startServer() {
     // rate-limits us, so the disk stays big.
     startCacheSweep("art", artCacheDir(), { maxBytes: gb(process.env.ART_CACHE_MAX_GB, r2 ? 5 : 20), maxAgeMs: 60 * day });
     startCacheSweep("ytm", ytmCacheDir(), { maxBytes: gb(process.env.YTM_CACHE_MAX_GB, 8), maxAgeMs: 30 * day });
+    startCacheSweep("instants", instantsCacheDir(), { maxBytes: gb(process.env.INSTANTS_CACHE_MAX_GB, 1), maxAgeMs: 90 * day });
 
     const base = ytmBase();
     if (base) console.log(`YouTube Music: ${base}`);
