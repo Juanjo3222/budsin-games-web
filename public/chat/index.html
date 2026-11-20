@@ -354,7 +354,7 @@ function legalNote() {
   var parts = T.legal.split(/\{(terms|privacy|rules)\}/);
   parts.forEach(function (x, i) {
     if (i % 2 === 0) { if (x) p.appendChild(document.createTextNode(x)); return; }
-    var a = el('a', null, x === 'terms' ? T.legalTerms : x === 'privacy' ? T.legalPrivacy : T.legalRules); a.href = 'https://games.budsin.dev/#/' + (x === 'privacy' ? 'privacidad' : 'terms'); a.target = '_blank'; a.rel = 'noopener'; a.style.color = 'var(--accent)'; p.appendChild(a);
+    var a = el('a', null, x === 'terms' ? T.legalTerms : x === 'privacy' ? T.legalPrivacy : T.legalRules); a.href = x === 'terms' ? 'https://budsin.dev/terminos' : x === 'privacy' ? 'https://budsin.dev/privacidad' : 'https://budsin.dev/terminos#normas'; a.target = '_blank'; a.rel = 'noopener'; a.style.color = 'var(--accent)'; p.appendChild(a);
   });
   return p;
 }
