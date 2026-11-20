@@ -360,6 +360,7 @@ Admins (mismos correos que el panel): `juvaldiviam@gmail.com`, `juanjoseguravega
 
 ### v7.4
 * **Juego nuevo: That's Not My Neighbor** (Godot 4.5, sin hilos): eres el portero de un edificio en 1955 y tienes que descubrir a los dobles antes de que entren. Carpeta `public/thats-not-my-neighbor/`, portada `public/portadas/thats-not-my-neighbor.webp` (arte oficial de la página del juego en itch.io) y tarjeta en `app/src/data/games.js` (ES/EN/PT). Los archivos grandes (`ThatNot.pck` 448 MB y `ThatNot.wasm` 36 MB) **no van en git**: se descargan en el VPS con `python3 app/scripts/tnmn-fetch.py --root /var/www/budsin-games-web/public/thats-not-my-neighbor` (ver «That's Not My Neighbor» abajo). El popup de novedades pasó a la versión 7.4 con un enlace al juego. El Service Worker ya no guarda `.pck` para el modo sin conexión de Pro.
+* **Soundboard**: ahora carga sus archivos de `bubblfan/soundboard` en jsDelivr (el repo anterior, `genizy/soundboard`, devolvía 403 y la página no funcionaba). Trae más de 1 800 sonidos y un panel de **texto a voz** (`#ttsToggle`/`#ttsPanel`, que el `main.js` nuevo exige: sin ese HTML falla). Se conservan los assets de Budsin y el panel de información.
 
 ### v7.3
 * **Budsin Chat** en el portal: tarjeta nueva (ES/EN/PT, categoría «Social») que abre `/chat/`, chat en tiempo real solo para cuentas de colegio o universidad (ver «Budsin Chat»).
