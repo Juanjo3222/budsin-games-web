@@ -57,7 +57,7 @@ const TEXT = {
     connecting: "Conectando…", checking: "Comprobando tu sesión de Roblox…", starting: "Iniciando…",
     needIsolation: "Esta página no tiene aislamiento entre orígenes (COOP/COEP) y el motor no puede usar memoria compartida. Recárgala; si sigue igual, usa un Chrome o Edge actualizado.",
     noSW: "Tu navegador no admite service workers (¿modo privado?).",
-    swNoControl: "El service worker no tomó el control de la página. Recarga para intentarlo de nuevo.",
+    swNoControl: "El service worker no tomó el control de la página. Recarga con F5 (no con Ctrl+Shift+R, que lo desactiva) o cierra la pestaña y ábrela de nuevo.",
     noAnswer: (host, wisp, s) => `Sin respuesta de ${host} por el servidor Wisp ${wisp} en ${s} s`,
     rateLimit: (wisp) => `Roblox está limitando al servidor Wisp (${wisp}). Espera un minuto e inténtalo otra vez.`,
     httpErr: (n) => `Roblox respondió HTTP ${n}`,
@@ -85,7 +85,7 @@ const TEXT = {
     connecting: "Connecting…", checking: "Checking your Roblox session…", starting: "Starting…",
     needIsolation: "This page is not cross-origin isolated (COOP/COEP), so the engine cannot use shared memory. Reload it; if it persists, use an up-to-date Chrome or Edge.",
     noSW: "This browser has no service worker support (private mode?).",
-    swNoControl: "The service worker did not take control of this page. Reload to try again.",
+    swNoControl: "The service worker did not take control of this page. Reload with F5 (not Ctrl+Shift+R, which turns it off) or close the tab and open it again.",
     noAnswer: (host, wisp, s) => `No answer from ${host} through the Wisp server ${wisp} in ${s}s`,
     rateLimit: (wisp) => `Roblox is rate-limiting the Wisp server (${wisp}). Try again in a minute.`,
     httpErr: (n) => `Roblox answered HTTP ${n}`,
@@ -113,7 +113,7 @@ const TEXT = {
     connecting: "Conectando…", checking: "Verificando sua sessão do Roblox…", starting: "Iniciando…",
     needIsolation: "Esta página não tem isolamento entre origens (COOP/COEP) e o motor não pode usar memória compartilhada. Recarregue; se persistir, use um Chrome ou Edge atualizado.",
     noSW: "Seu navegador não suporta service workers (modo privado?).",
-    swNoControl: "O service worker não assumiu o controle da página. Recarregue para tentar de novo.",
+    swNoControl: "O service worker não assumiu o controle da página. Recarregue com F5 (não com Ctrl+Shift+R, que o desativa) ou feche a aba e abra de novo.",
     noAnswer: (host, wisp, s) => `Sem resposta de ${host} pelo servidor Wisp ${wisp} em ${s} s`,
     rateLimit: (wisp) => `O Roblox está limitando o servidor Wisp (${wisp}). Espere um minuto e tente de novo.`,
     httpErr: (n) => `O Roblox respondeu HTTP ${n}`,
@@ -680,17 +680,33 @@ function showLauncher() {
 
 // ---- Boot ---------------------------------------------------------------------
 
+const RELOAD_KEY = "webblox.reloaded";
 async function controlled() {
   if (!("serviceWorker" in navigator)) throw new Error(t("noSW"));
   await navigator.serviceWorker.register(new URL("sw.js", ROOT), { scope: ROOT.pathname });
   await navigator.serviceWorker.ready;
-  if (navigator.serviceWorker.controller) return;
+  if (navigator.serviceWorker.controller) {
+    sessionStorage.removeItem(RELOAD_KEY);
+    return;
+  }
   // First visit: the worker claims this page once it activates.
   await new Promise((resolve) => {
     navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true });
     setTimeout(resolve, 3000);
   });
-  if (!navigator.serviceWorker.controller) throw new Error(t("swNoControl"));
+  if (navigator.serviceWorker.controller) {
+    sessionStorage.removeItem(RELOAD_KEY);
+    return;
+  }
+  // Budsin: una recarga forzada (Ctrl+Shift+R) carga la página SIN service worker aunque ya esté activo, y nadie lo "reclama" otra
+  // vez. Una recarga normal hecha desde el script sí pasa por él: se intenta una vez antes de rendirse.
+  if (!sessionStorage.getItem(RELOAD_KEY)) {
+    sessionStorage.setItem(RELOAD_KEY, "1");
+    location.reload();
+    return new Promise(() => {});
+  }
+  sessionStorage.removeItem(RELOAD_KEY);
+  throw new Error(t("swNoControl"));
 }
 
 function loadScript(src) {
