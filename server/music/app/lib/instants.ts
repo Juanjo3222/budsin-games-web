@@ -23,8 +23,12 @@ const MAX_MP3 = Number(process.env.INSTANTS_MAX_BYTES) || 3 * 1024 * 1024;
 export const NAME_RE = /^[A-Za-z0-9_.%-]{1,120}\.mp3$/;
 export const isInstantName = (n: string) => NAME_RE.test(n) && !n.includes("..");
 
+/** The service can only write under its state directory (systemd ProtectSystem=strict), so without an explicit
+ * INSTANTS_CACHE_DIR the cache sits next to the art cache (…/art-cache -> …/instants-cache), which is configured to live there. */
 export function instantsCacheDir(): string {
-  return process.env.INSTANTS_CACHE_DIR || path.join(process.cwd(), "data", "instants-cache");
+  if (process.env.INSTANTS_CACHE_DIR) return process.env.INSTANTS_CACHE_DIR;
+  if (process.env.ART_CACHE_DIR) return path.join(path.dirname(process.env.ART_CACHE_DIR), "instants-cache");
+  return path.join(process.cwd(), "data", "instants-cache");
 }
 
 export interface Instant {
@@ -97,10 +101,14 @@ async function download(name: string, final: string): Promise<string> {
   if (declared && declared > MAX_MP3) throw new InstantUnavailableError("too large");
   const body = await readBodyAtMost(res.body, MAX_MP3);
   if (!body || body.length < 200) throw new InstantUnavailableError("empty or too large");
-  await fsp.mkdir(path.dirname(final), { recursive: true });
-  const tmp = `${final}.${crypto.randomBytes(4).toString("hex")}.tmp`;
-  await fsp.writeFile(tmp, body);
-  await fsp.rename(tmp, final);
+  try {
+    await fsp.mkdir(path.dirname(final), { recursive: true });
+    const tmp = `${final}.${crypto.randomBytes(4).toString("hex")}.tmp`;
+    await fsp.writeFile(tmp, body);
+    await fsp.rename(tmp, final);
+  } catch (e) {
+    throw new InstantUnavailableError(`cannot write the cache (${instantsCacheDir()}): ${e instanceof Error ? e.message : e}`);
+  }
   return final;
 }
 

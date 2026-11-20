@@ -79,3 +79,17 @@ test("refuses what is not a small audio file, and remembers the failure for a wh
   for (const name of ["html.mp3", "huge.mp3", "missing.mp3"]) await expect(mod.instantFile(name)).rejects.toBeInstanceOf(mod.InstantUnavailableError);
   await expect(mod.instantFile("../etc/passwd")).rejects.toBeInstanceOf(mod.InstantUnavailableError);
 });
+
+test("without INSTANTS_CACHE_DIR the cache goes next to the art cache (the only place the service can write)", () => {
+  const keep = { i: process.env.INSTANTS_CACHE_DIR, a: process.env.ART_CACHE_DIR };
+  try {
+    delete process.env.INSTANTS_CACHE_DIR;
+    process.env.ART_CACHE_DIR = "/var/lib/budsin-music/art-cache";
+    expect(mod.instantsCacheDir()).toBe("/var/lib/budsin-music/instants-cache");
+    process.env.INSTANTS_CACHE_DIR = "/elsewhere";
+    expect(mod.instantsCacheDir()).toBe("/elsewhere");
+  } finally {
+    if (keep.i === undefined) delete process.env.INSTANTS_CACHE_DIR; else process.env.INSTANTS_CACHE_DIR = keep.i;
+    if (keep.a === undefined) delete process.env.ART_CACHE_DIR; else process.env.ART_CACHE_DIR = keep.a;
+  }
+});

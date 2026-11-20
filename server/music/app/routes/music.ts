@@ -1211,6 +1211,7 @@ export async function musicRoutes(fastify: FastifyInstance) {
     try {
       p = await instantFile(file);
     } catch (e) {
+      console.warn("[music] myinstants sound failed:", file, e instanceof Error ? e.message : e);
       return musicError(reply, e instanceof InstantUnavailableError ? 404 : 502, "Sound not available");
     }
     return sendLocalAudio(req, reply, p, "audio/mpeg", "public, max-age=86400");
