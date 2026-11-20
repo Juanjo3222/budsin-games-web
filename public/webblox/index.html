@@ -50,6 +50,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
   <div hidden><span id="server"></span><span id="proxyenabled"></span></div>
   <script type="module" src="host.js"></script>
-<script src="https://games.budsin.dev/classroom-hotkey.js"></script>
+<!-- async: si la red deja colgado este script, no debe bloquear host.js (un módulo no corre hasta que termina de leerse la página) -->
+<script async src="https://games.budsin.dev/classroom-hotkey.js"></script>
 </body>
 </html>

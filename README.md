@@ -180,7 +180,7 @@ GTA V está disponible en `https://games.budsin.dev/gta-5/` mediante un proxy de
 
 | Archivo | Función |
 |---|---|
-| `index.html` + `host.css` | Página host (de x8rr) con los assets obligatorios de Budsin. **Todos los `id` los busca `WasmPlayer.js`: no se tocan.** Sirve de lanzador (buscar o pegar un enlace) y, con `?placeId=`, de reproductor. Debe abrirse en su propia pestaña, nunca en un iframe. |
+| `index.html` + `host.css` | Página host (de x8rr) con los assets obligatorios de Budsin. **`classroom-hotkey.js` va con `async`**: `host.js` es un módulo y no corre hasta terminar de leer la página; en una red que deja colgados GTM/AdSense/classroom-hotkey (Fortinet) la pantalla se quedaba en «…» para siempre. **Todos los `id` los busca `WasmPlayer.js`: no se tocan.** Sirve de lanzador (buscar o pegar un enlace) y, con `?placeId=`, de reproductor. Debe abrirse en su propia pestaña, nunca en un iframe. |
 | `host.js` | Relé (service worker → epoxy → Wisp), jar de cookies en `localStorage`, sesión, lanzador y arranque del motor. Adaptado: Wisp desde `proxy.json`, textos ES/EN/PT, cookie pegada marcada como **insegura**. |
 | `sw.js` | Service worker (scope `/webblox/`, de x8rr): entrega a la página toda petición cross-origin del motor (`*.roblox.com`, `*.rbxcdn.com`) y sirve las flags fijadas. |
 | `epoxy.js` | Cliente epoxy (nuestro, UMD): el TLS termina en el navegador, así el Wisp no ve la sesión. |
