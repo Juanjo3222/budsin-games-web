@@ -77,3 +77,8 @@ public/webblox/engine/
 
 # WebBlox: ruta del Wisp de InvisiProxy (la genera app/scripts/invisiproxy-info.sh en el VPS)
 public/webblox/proxy.json
+
+# That's Not My Neighbor: archivos grandes que se bajan con app/scripts/tnmn-fetch.py (no van en git)
+public/thats-not-my-neighbor/ThatNot.pck
+public/thats-not-my-neighbor/ThatNot.wasm
+public/thats-not-my-neighbor/*.part

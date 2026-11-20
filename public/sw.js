@@ -225,7 +225,8 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request)
       .then((res) => {
-        if (res.ok && isPro) {
+        // los .pck de motores como Godot pesan cientos de MB (That's Not My Neighbor: 448 MB): no se guardan sin conexión
+        if (res.ok && isPro && !/\.pck$/.test(url.pathname)) {
           const clone = res.clone();
           caches.open(PRO_CACHE).then((c) => {
             try { c.put(event.request, clone); } catch {}

@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/Status-Active-brightgreen" />
   <img src="https://img.shields.io/badge/Games-87-blue" />
   <img src="https://img.shields.io/badge/Frontend-React-orange" />
-  <img src="https://img.shields.io/badge/Version-7.3-purple" />
+  <img src="https://img.shields.io/badge/Version-7.4-purple" />
   <img src="https://img.shields.io/badge/License-MIT-lightgrey" />
 </p>
 
@@ -358,6 +358,9 @@ Admins (mismos correos que el panel): `juvaldiviam@gmail.com`, `juanjoseguravega
 
 ## 📝 Changelog
 
+### v7.4
+* **Juego nuevo: That's Not My Neighbor** (Godot 4.5, sin hilos): eres el portero de un edificio en 1955 y tienes que descubrir a los dobles antes de que entren. Carpeta `public/thats-not-my-neighbor/`, portada `public/portadas/thats-not-my-neighbor.webp` (arte oficial de la página del juego en itch.io) y tarjeta en `app/src/data/games.js` (ES/EN/PT). Los archivos grandes (`ThatNot.pck` 448 MB y `ThatNot.wasm` 36 MB) **no van en git**: se descargan en el VPS con `python3 app/scripts/tnmn-fetch.py --root /var/www/budsin-games-web/public/thats-not-my-neighbor` (ver «That's Not My Neighbor» abajo). El popup de novedades pasó a la versión 7.4 con un enlace al juego. El Service Worker ya no guarda `.pck` para el modo sin conexión de Pro.
+
 ### v7.3
 * **Budsin Chat** en el portal: tarjeta nueva (ES/EN/PT, categoría «Social») que abre `/chat/`, chat en tiempo real solo para cuentas de colegio o universidad (ver «Budsin Chat»).
 * **Popup de novedades** restaurado (`ChangelogModal`, una vez por versión; el botón de cerrar se activa a los 3 s), con enlaces directos a **Budsin Music** y **Budsin Chat**. Los textos viven en `app/src/data/changelog.js` (ES/EN/PT); subir `SITE_VERSION` lo vuelve a mostrar.
@@ -555,3 +558,17 @@ Menú del perfil (clic en tu nombre abajo a la izquierda) → **«Eliminar mi cu
 - Esto cumple lo que prometen la Política de Privacidad (budsin.dev) y el derecho de supresión; para el chat ya no hace falta escribir al correo, aunque sigue disponible.
 
 Pruebas: 4 en `server.test.ts` («eliminar mi cuenta del chat») y la prueba de navegador `t71`.
+
+### 👤 That's Not My Neighbor (nuevo, 20-nov-2026)
+
+Juego de terror y deducción hecho con Godot 4.5 (exportación web **sin hilos**, así que **no necesita** las cabeceras COOP/COEP). La página `public/thats-not-my-neighbor/index.html` es la original del juego con los assets obligatorios de Budsin (favicon, GTM, AdSense, `classroom-hotkey.js`) y sin el Rocket Loader de Cloudflare. El motor (`ThatNot.js`, 272 KB) y los worklets de audio sí están en git; **`ThatNot.pck` y `ThatNot.wasm` están en `.gitignore`**.
+
+**Instalar o actualizar en el VPS** (como el usuario que despliega, p. ej. `github-runner`; solo la primera vez o si el juego cambia):
+
+```bash
+python3 app/scripts/tnmn-fetch.py --root /var/www/budsin-games-web/public/thats-not-my-neighbor
+```
+
+El script baja los dos archivos de la fuente original, comprueba el tamaño exacto (448 327 748 y 36 145 869 bytes) y renombra solo al terminar. Si el juego se actualiza, cambian los tamaños: se corrigen en `FILES` del script (los declara `GODOT_CONFIG.fileSizes` de la página original). Cloudflare cachea archivos de hasta 512 MB en el plan gratuito, así que el `.pck` entra. Probado el 20-nov-2026 en Chromium: descarga, carga y llega a la pantalla de título.
+
+Contenido de terceros: pertenece a sus creadores (Nacho Collective); si lo piden, se retira (ver Términos, derechos de autor).

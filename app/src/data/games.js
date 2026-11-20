@@ -2368,5 +2368,31 @@ export const GAMES = [
     "pro": false,
     "proRelease": null,
     "isNew": true
+  },
+  {
+    "id": "thats-not-my-neighbor/index.html",
+    "name": "that's not my neighbor",
+    "title": "That's Not My Neighbor",
+    "href": "thats-not-my-neighbor/",
+    "cover": "portadas/thats-not-my-neighbor.webp",
+    "type": "action",
+    "category": {
+      "es": "Acción",
+      "en": "Action",
+      "pt": "Ação"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Eres el portero de un edificio en 1955: revisa a cada vecino y descubre a los dobles antes de que entren. Terror y deducción.",
+      "en": "You are the doorman of a building in 1955: check every neighbor and spot the doppelgangers before they get in. Horror and deduction.",
+      "pt": "Você é o porteiro de um prédio em 1955: confira cada vizinho e descubra os sósias antes que entrem. Terror e dedução."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
   }
 ];
