@@ -428,43 +428,71 @@ async function sessionAccepted() {
   return result.status === 200;
 }
 
-// A Scramjet 2 browser on this origin (its controller) keeps its cookie jar in
-// IndexedDB, so signing in to roblox.com there leaves .ROBLOSECURITY where
-// this page can read it. Never creates the database when it is missing.
-function proxySession() {
+// Budsin: lee la sesión de Roblox del navegador integrado (Scramjet) de ESTE origen. Su jar de cookies es un volcado JSON con claves
+// "dominio@ruta@nombre". Dónde lo guarda:
+//   · Scramjet 1.x:                    base "$scramjet", almacén "cookies", clave "cookies"
+//   · Scramjet 2.x (x8rr):             base "__scramjet_controller", almacén "state", clave "cookies", valor {updatedAt, cookies: "<JSON>"}
+//   · InvisiProxy (el nuestro): igual que el anterior PERO el nombre de la base se ofusca en cada compilación (p. ej. "v2faww7t"),
+//     así que además de los nombres conocidos se recorren las bases que YA existen buscando la estructura (almacén "state", clave "cookies").
+// IMPORTANTE: es solo lectura y solo sobre bases que ya existen. Nunca se crea una base ajena: Scramjet la abre luego en versión 1 y espera sus
+// almacenes, y una base vacía hace fallar al proxy con «'config' is not a known object store name».
+const COOKIE_DBS = [["$scramjet", "cookies", "cookies"], ["__scramjet_controller", "state", "cookies"]];
+
+function openExisting(name, store, key) {
   return new Promise((resolve) => {
-    const open = indexedDB.open("__scramjet_controller");
-    open.onupgradeneeded = () => open.transaction.abort();
-    open.onerror = () => resolve(null);
-    open.onsuccess = () => {
-      const db = open.result;
-      const finish = (value) => {
-        db.close();
-        resolve(value);
-      };
+    let req;
+    try { req = indexedDB.open(name); } catch { return resolve(null); }
+    req.onerror = req.onblocked = () => resolve(null);
+    // No existía: se aborta para no crearla.
+    req.onupgradeneeded = () => { try { req.transaction.abort(); } catch {} resolve(null); };
+    req.onsuccess = () => {
+      const db = req.result;
       try {
-        const get = db.transaction("state", "readonly").objectStore("state").get("cookies");
-        get.onsuccess = () => finish(sessionFromDump(get.result?.cookies));
-        get.onerror = () => finish(null);
-      } catch {
-        finish(null);
-      }
+        if (!db.objectStoreNames.contains(store)) { db.close(); return resolve(null); }
+        const get = db.transaction(store, "readonly").objectStore(store).get(key);
+        get.onsuccess = () => { db.close(); resolve(get.result ?? null); };
+        get.onerror = () => { db.close(); resolve(null); };
+      } catch { db.close(); resolve(null); }
     };
   });
 }
 
-// The controller stores CookieJar.dump(): JSON of { [key]: { name, value, domain, … } }.
-function sessionFromDump(dump) {
-  if (typeof dump !== "string") return null;
-  let cookies;
-  try {
-    cookies = JSON.parse(dump);
-  } catch {
-    return null;
+// El valor es el jar directo, un JSON, o {updatedAt, cookies: "<JSON del jar>"}; las entradas pueden ser objetos {name, value, domain} o
+// cadenas con la clave "dominio@ruta@nombre".
+function extractSession(raw) {
+  let jar = raw;
+  if (typeof jar === "string") { try { jar = JSON.parse(jar); } catch { return null; } }
+  if (jar && typeof jar === "object" && "cookies" in jar && typeof jar.cookies === "string") {
+    try { jar = JSON.parse(jar.cookies); } catch { return null; }
+  } else if (jar && typeof jar === "object" && jar.cookies && typeof jar.cookies === "object") {
+    jar = jar.cookies;
   }
-  for (const cookie of Object.values(cookies ?? {})) {
-    if (cookie?.name !== SESSION || typeof cookie.value !== "string" || !cookie.value) continue;
-    if (/^\.?(?:[^.]+\.)*roblox\.com$/i.test(String(cookie.domain))) return cookie.value;
+  if (!jar || typeof jar !== "object") return null;
+  for (const [k, v] of Object.entries(jar)) {
+    const [keyDomain, , keyName] = k.split("@");
+    const name = v?.name ?? keyName;
+    const domain = String(v?.domain ?? keyDomain ?? "");
+    if (name !== SESSION || !/^\.?(?:[^.]+\.)*roblox\.com$/i.test(domain)) continue;
+    let value = typeof v === "string" ? v : (v?.value ?? v?.val ?? v?.cookie ?? "");
+    if (typeof value === "string" && value.startsWith(`${SESSION}=`)) value = value.slice(SESSION.length + 1).split(";")[0];
+    if (typeof value === "string" && value) return value;
+  }
+  return null;
+}
+
+async function proxySession() {
+  for (const [name, store, key] of COOKIE_DBS) {
+    const found = extractSession(await openExisting(name, store, key));
+    if (found) return found;
+  }
+  if (indexedDB.databases) {
+    try {
+      for (const { name } of await indexedDB.databases()) {
+        if (!name || COOKIE_DBS.some(([known]) => known === name)) continue;
+        const found = extractSession(await openExisting(name, "state", "cookies"));
+        if (found) return found;
+      }
+    } catch {}
   }
   return null;
 }
