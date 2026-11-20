@@ -11,7 +11,7 @@ import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-export type MediaKind = "image" | "sticker" | "audio";
+export type MediaKind = "image" | "sticker" | "audio" | "avatar";
 
 export const LIMITS = {
   imageIn: 5_000_000,       // bytes que se aceptan de entrada
@@ -93,7 +93,7 @@ async function withTemp<T>(input: Uint8Array, fn: (dir: string, inFile: string) 
   }
 }
 
-export async function processImage(input: Uint8Array, kind: "image" | "sticker", tools: Tools): Promise<Processed> {
+export async function processImage(input: Uint8Array, kind: "image" | "sticker" | "avatar", tools: Tools): Promise<Processed> {
   if (input.length > LIMITS.imageIn) throw new MediaError("media_too_large");
   const type = sniff(input);
   if (!type || !["jpeg", "png", "gif", "webp"].includes(type)) throw new MediaError("bad_media");
@@ -101,7 +101,9 @@ export async function processImage(input: Uint8Array, kind: "image" | "sticker",
     const p = await probe(inFile, tools.ffprobe);
     if (!p.hasVideo || p.w < 1 || p.h < 1 || p.w * p.h > LIMITS.maxPixels) throw new MediaError("bad_media");
     const out = path.join(dir, "out.webp");
-    const vf = kind === "sticker"
+    const vf = kind === "avatar"
+      ? "scale=256:256:force_original_aspect_ratio=increase:flags=lanczos,crop=256:256"   // foto de perfil: cuadrada, recortada al centro
+      : kind === "sticker"
       ? "scale=256:256:force_original_aspect_ratio=decrease:flags=lanczos,format=rgba,pad=256:256:(ow-iw)/2:(oh-ih)/2:color=0x00000000"
       : "scale='min(1280,iw)':'min(1280,ih)':force_original_aspect_ratio=decrease:flags=lanczos";
     const r = await run(tools.ffmpeg, ["-nostdin", "-v", "error", "-y", "-threads", "1", "-i", inFile, "-frames:v", "1", "-vf", vf, "-map_metadata", "-1", "-c:v", "libwebp", "-quality", "82", "-f", "webp", out], 20_000);

@@ -296,6 +296,67 @@ d("stickers", () => {
   });
 });
 
+d("fotos de perfil", () => {
+  let ana: Client, beto: Client;
+  beforeAll(async () => {
+    clock += 3600_000 * 3;
+    ana = await user("p1", "Ana_Pfp"); beto = await user("p2", "Beto_Pfp");
+    clock += 31 * 60_000;
+  });
+  afterAll(() => { ana.close(); beto.close(); });
+
+  test("la foto se recorta cuadrada (256x256), pasa por el detector y se usa como avatar", async () => {
+    const before = scanned.length;
+    const r = await up("p1", "avatar", png, "");
+    expect(r.status).toBe(200);
+    expect(r.json).toMatchObject({ kind: "avatar", w: 256, h: 256 });
+    expect(scanned.length).toBe(before + 1);
+    const me = await ana.req({ t: "profile", avatar: "m:" + r.json.id }, (m) => m.t === "me" || m.t === "err");
+    expect(me.t).toBe("me");
+    expect(me.me.avatar).toBe("m:" + r.json.id);
+    // se sirve con y sin «.webp», y es cacheable por Cloudflare (para su escaneo CSAM)
+    for (const suffix of ["", ".webp"]) {
+      const res = await fetch(`${base}/api/chat/media/${r.json.id}${suffix}`);
+      expect(res.status).toBe(200);
+      expect(res.headers.get("cache-control")).toContain("public");
+    }
+  });
+  test("una foto bloqueada por el detector no se acepta", async () => {
+    nsfw = 0.9; clock += 60_000;
+    expect((await up("p1", "avatar", png, "")).json.error).toBe("media_blocked");
+    nsfw = 0.01;
+  });
+  test("no se puede usar la foto de otra persona, ni un id inventado, ni una imagen que no es de perfil", async () => {
+    const mine = await up("p1", "avatar", png, ""); clock += 60_000;
+    expect((await beto.req({ t: "profile", avatar: "m:" + mine.json.id }, (m) => m.t === "me" || m.t === "err")).code).toBe("bad_avatar");
+    expect((await beto.req({ t: "profile", avatar: "m:" + "0".repeat(32) }, (m) => m.t === "me" || m.t === "err")).code).toBe("bad_avatar");
+    expect((await beto.req({ t: "profile", avatar: "m:../../x" }, (m) => m.t === "me" || m.t === "err")).code).toBe("bad_avatar");
+    clock += 60_000;
+    await beto.req({ t: "join", room: "global" }, (m) => m.t === "joined");
+    const img = await up("p2", "image", png, "global");
+    expect((await beto.req({ t: "profile", avatar: "m:" + img.json.id }, (m) => m.t === "me" || m.t === "err")).code).toBe("bad_avatar");
+  });
+  test("al cambiar de foto la anterior se borra, y volver a un avatar prediseñado también", async () => {
+    clock += 3600_000;
+    const old = (await up("p1", "avatar", png, "")).json.id; clock += 60_000;
+    await ana.req({ t: "profile", avatar: "m:" + old }, (m) => m.t === "me");
+    clock += 3600_000;
+    const next = (await up("p1", "avatar", png, "")).json.id; clock += 60_000;
+    await ana.req({ t: "profile", avatar: "m:" + next }, (m) => m.t === "me");
+    expect(db.media(old)).toBeNull();
+    expect((await fetch(`${base}/api/chat/media/${old}`)).status).toBe(404);
+    await ana.req({ t: "profile", avatar: "a03" }, (m) => m.t === "me");
+    expect(db.media(next)).toBeNull();
+  });
+  test("la retención de 14 días no borra la foto de perfil en uso", async () => {
+    clock += 3600_000;
+    const id = (await up("p2", "avatar", png, "")).json.id; clock += 60_000;
+    await beto.req({ t: "profile", avatar: "m:" + id }, (m) => m.t === "me");
+    expect(db.purgeOlderThan(clock + 1000).files.some((f) => f.id === id)).toBe(false);
+    expect(db.media(id)).not.toBeNull();
+  });
+});
+
 d("retención", () => {
   test("a los 14 días se borran imágenes y audios, pero no los stickers de una biblioteca ni lo reportado sin revisar", async () => {
     clock += 3600_000;
@@ -326,7 +387,7 @@ d("imágenes apagadas (valor por defecto)", () => {
       const got: any[] = []; ws.onmessage = (e) => got.push(JSON.parse(String(e.data)));
       await new Promise((r) => (ws.onopen = r));
       ws.send(JSON.stringify({ t: "auth", token: token("x1") })); await Bun.sleep(150);
-      expect(got.find((m) => m.t === "hello").features).toEqual({ images: false, audio: true, links: [] });
+      expect(got.find((m) => m.t === "hello").features).toEqual({ images: false, avatars: false, audio: true, links: [] });
       ws.send(JSON.stringify({ t: "profile", username: "Off_Test", avatar: "a01" })); await Bun.sleep(150);
       ws.send(JSON.stringify({ t: "join", room: "global" })); await Bun.sleep(150);
       ws.send(JSON.stringify({ t: "send", room: "global", media: "preset:rocket" })); await Bun.sleep(200);

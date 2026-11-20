@@ -377,6 +377,7 @@ export class ChatDb {
     const old = this.db
       .query(
         `SELECT id,mime FROM media WHERE ts<? AND id NOT IN (SELECT media_id FROM user_stickers)
+            AND id NOT IN (SELECT substr(avatar,3) FROM users WHERE avatar LIKE 'm:%')
             AND id NOT IN (SELECT media FROM reports WHERE media IS NOT NULL AND status='open')`,
       )
       .all(ts) as { id: string; mime: string }[];

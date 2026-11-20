@@ -107,7 +107,7 @@ export function createChatServer(opts: ServerOptions) {
   const MAX_STICKERS = 24;
   const MIN_AGE_MEDIA = opts.mediaMinAgeMs ?? 30 * 60_000, MIN_AGE_AUDIO = Math.round(MIN_AGE_MEDIA / 3);     // una cuenta recién creada no sube nada todavía
   const DAILY_BYTES = 25_000_000;
-  const imgBurst = new Limiter(1, 15_000), imgHour = new Limiter(20, 3600_000), audBurst = new Limiter(1, 8_000), audHour = new Limiter(30, 3600_000), stickHour = new Limiter(6, 3600_000);
+  const imgBurst = new Limiter(1, 15_000), imgHour = new Limiter(20, 3600_000), audBurst = new Limiter(1, 8_000), audHour = new Limiter(30, 3600_000), stickHour = new Limiter(6, 3600_000), avatarHour = new Limiter(5, 3600_000);
   const strikes = new Map<string, number[]>();
   const lastInRoom = new Map<string, number>();
   const editLimit = new Limiter(6, 60_000), reactLimit = new Limiter(30, 60_000), typingLimit = new Limiter(1, 2_000);
@@ -218,7 +218,7 @@ export function createChatServer(opts: ServerOptions) {
         err(ws, "too_many_tabs");
         return ws.close(1008, "tabs");
       }
-      return send(ws, { t: "hello", me: me(ws), avatars: AVATARS, features: { images: !!opts.imagesEnabled, audio: true, links: opts.allowedLinks ?? [] } });
+      return send(ws, { t: "hello", me: me(ws), avatars: AVATARS, features: { images: !!opts.imagesEnabled, avatars: !!opts.imagesEnabled, audio: true, links: opts.allowedLinks ?? [] } });
     }
     if (!c.claims) return err(ws, "not_authed");
     refresh(ws);
@@ -304,7 +304,11 @@ export function createChatServer(opts: ServerOptions) {
     const c = ws.data;
     if (profileLimit.take(c.claims!.uid, now())) return err(ws, "rate");
     const avatar = String(m.avatar ?? c.user!.avatar);
-    if (!AVATARS.includes(avatar)) return err(ws, "bad_avatar");
+    if (/^m:/.test(avatar)) {
+      // foto propia: tiene que ser una subida tuya, ya revisada por el detector, y solo con las imágenes activadas
+      const md = opts.imagesEnabled ? db.media(avatar.slice(2)) : null;
+      if (!md || md.kind !== "avatar" || md.uid !== c.claims!.uid || md.status !== "ok") return err(ws, "bad_avatar");
+    } else if (!AVATARS.includes(avatar)) return err(ws, "bad_avatar");
     const wanted = m.username === undefined ? c.user!.username : clean(m.username, 21);
     if (!wanted) return err(ws, "name_length");
     if (/\s/.test(wanted)) return err(ws, "name_chars");
@@ -315,8 +319,14 @@ export function createChatServer(opts: ServerOptions) {
       if (bad) return err(ws, `name_${bad}`);
       if (db.setProfile(c.claims!.uid, wanted, avatar, now()) === "taken") return err(ws, "name_taken");
     } else db.setAvatar(c.claims!.uid, avatar);
+    if (c.user!.avatar !== avatar) dropAvatarFile(c.user!.avatar);   // la foto anterior se borra
     refresh(ws);
     send(ws, { t: "me", me: me(ws) });
+  }
+  function dropAvatarFile(old: string) {
+    if (!/^m:[a-f0-9]{32}$/.test(old)) return;
+    const md = db.media(old.slice(2));
+    if (md && md.kind === "avatar") { db.deleteMedia(md.id); void deleteFiles([{ id: md.id, mime: md.mime }]); }
   }
 
   function ensureGameRoom(ws: Sock, key: string, name: string): Room | null {
@@ -744,7 +754,7 @@ export function createChatServer(opts: ServerOptions) {
     if (origin && !origins.includes(origin)) return json({ error: "forbidden" }, 403);
     const url = new URL(req.url);
     const kind = url.searchParams.get("kind") as MediaKind;
-    if (!["image", "sticker", "audio"].includes(kind)) return json({ error: "bad_request" }, 400);
+    if (!["image", "sticker", "audio", "avatar"].includes(kind)) return json({ error: "bad_request" }, 400);
     if (kind !== "audio" && !opts.imagesEnabled) return json({ error: "images_disabled" }, 403);
     const claims = await verifyFirebaseToken(bearer(req), projectId, keys, now());
     if (!claims) return json({ error: "auth_failed" }, 401);
@@ -757,7 +767,7 @@ export function createChatServer(opts: ServerOptions) {
     if (now() - user.created < (kind === "audio" ? MIN_AGE_AUDIO : MIN_AGE_MEDIA)) return json({ error: "media_new_account" }, 403);
     // dónde se puede usar: el audio solo en privados y grupos de clase; la imagen, donde ya estés dentro
     const room = url.searchParams.get("room") ?? "";
-    if (kind !== "sticker") {
+    if (kind !== "sticker" && kind !== "avatar") {
       const r = db.room(room) ?? (room === "global" ? { kind: "global" } : room.startsWith("dm:") ? { kind: "dm" } : null);   // un privado se crea al abrirlo: aún puede no tener fila
       if (!r) return json({ error: "no_room" }, 400);
       if (kind === "audio" && r.kind !== "dm" && r.kind !== "class") return json({ error: "audio_not_allowed" }, 403);
@@ -766,7 +776,7 @@ export function createChatServer(opts: ServerOptions) {
     }
     // límites de ritmo y de volumen
     const t = now();
-    const wait = kind === "audio" ? Math.max(audBurst.take(user.uid, t), audHour.take(user.uid, t)) : kind === "sticker" ? stickHour.take(user.uid, t) : Math.max(imgBurst.take(user.uid, t), imgHour.take(user.uid, t));
+    const wait = kind === "audio" ? Math.max(audBurst.take(user.uid, t), audHour.take(user.uid, t)) : kind === "sticker" ? stickHour.take(user.uid, t) : kind === "avatar" ? avatarHour.take(user.uid, t) : Math.max(imgBurst.take(user.uid, t), imgHour.take(user.uid, t));
     if (wait) return json({ error: "media_rate", retry: wait }, 429);
     if (db.bytesSince(user.uid, t - 24 * 3600_000) > DAILY_BYTES) return json({ error: "media_quota" }, 429);
     if (kind === "sticker" && db.countStickers(user.uid) >= MAX_STICKERS) return json({ error: "sticker_limit" }, 400);
@@ -787,6 +797,7 @@ export function createChatServer(opts: ServerOptions) {
       await fsp.writeFile(path.join(mediaDir, `${id}.${out.ext}`), out.bytes);
       db.addMedia({ id, uid: user.uid, kind, mime: out.mime, bytes: out.bytes.length, w: out.w, h: out.h, dur: out.dur, ts: t, room: null });
       if (kind === "sticker") { db.addSticker(user.uid, id, t); db.setMediaStatus(id, "ok"); }
+      if (kind === "avatar") db.setMediaStatus(id, "ok");   // solo sirve como foto de perfil; se usa al guardar el perfil
       return json({ id, kind, w: out.w, h: out.h, dur: out.dur });
     } catch (e) {
       if (e instanceof MediaError) return json({ error: e.code }, e.code === "scan_unavailable" ? 503 : 400);
@@ -810,7 +821,8 @@ export function createChatServer(opts: ServerOptions) {
     const headers: Record<string, string> = {
       "content-type": md.mime,
       "accept-ranges": "bytes",
-      "cache-control": md.status === "hidden" ? "no-store" : "private, max-age=86400",
+      // las imágenes son «public»: así pasan por la caché de Cloudflare, donde su herramienta de escaneo CSAM (comparación por hashes) las ve. El audio sigue privado.
+      "cache-control": md.status === "hidden" ? "no-store" : md.mime === "image/webp" ? "public, max-age=86400" : "private, max-age=86400",
       "x-content-type-options": "nosniff",
       "content-security-policy": "default-src 'none'; sandbox",
       "cross-origin-resource-policy": "same-origin",
@@ -909,6 +921,7 @@ export function createChatServer(opts: ServerOptions) {
         // nombre o avatar inapropiado: se borra y la persona debe elegir otro
         const target = db.user(String(m.uid ?? ""));
         if (!target) return err(ws, "bad_request");
+        dropAvatarFile(target.avatar);
         db.clearUsername(target.uid);
         notify(target.uid, { t: "reset_profile" });
         return send(ws, { t: "ok", cmd: t });
@@ -934,7 +947,7 @@ export function createChatServer(opts: ServerOptions) {
       const url = new URL(req.url);
       if (url.pathname === "/api/chat/health") return opts.scanHealth ? opts.scanHealth().then((ok) => Response.json({ ok: true, online: sockets.size, scanner: ok })) : Response.json({ ok: true, online: sockets.size, scanner: !!opts.scan });
       if (url.pathname === "/api/chat/upload" && req.method === "POST") return upload(req);
-      const mm = /^\/api\/chat\/media\/([a-f0-9]{32})$/.exec(url.pathname);
+      const mm = /^\/api\/chat\/media\/([a-f0-9]{32})(?:\.webp)?$/.exec(url.pathname);
       if (mm && (req.method === "GET" || req.method === "HEAD")) return serveMedia(req, mm[1]);
       if (url.pathname !== "/api/chat/ws") return new Response("not found", { status: 404 });
       const origin = req.headers.get("origin");
