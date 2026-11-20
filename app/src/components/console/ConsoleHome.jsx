@@ -297,8 +297,8 @@ export default function ConsoleHome({ popularity, favorites, recently, onLaunch,
         {!hasLibrary ? (
           <nav className="console-legal" aria-label="Legal">
             <a href="#/about">{t("footerAbout", "Acerca de")}</a>
-            <a href="#/privacidad">{t("footerPrivacy", "Privacidad")}</a>
-            <a href="#/terms">{t("footerTerms", "Términos")}</a>
+            <a href="https://budsin.dev/privacidad" target="_blank" rel="noopener">{t("footerPrivacy", "Privacidad")}</a>
+            <a href="https://budsin.dev/terminos" target="_blank" rel="noopener">{t("footerTerms", "Términos")}</a>
             <a href="#/contacto">{t("footerContact", "Contacto")}</a>
           </nav>
         ) : (

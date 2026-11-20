@@ -252,11 +252,6 @@
 	<priority>1.0</priority>
 </url>
 <url>
-	<loc>https://games.budsin.dev/terms</loc>
-	<lastmod>2026-05-10T23:15:44+01:00</lastmod>
-	<priority>1.0</priority>
-</url>
-<url>
 	<loc>https://games.budsin.dev/vex7</loc>
 	<lastmod>2026-05-10T23:15:47+01:00</lastmod>
 	<priority>1.0</priority>
@@ -268,11 +263,6 @@
 </url>
 <url>
 	<loc>https://games.budsin.dev/Brawl%20Simulator%203D</loc>
-	<lastmod>2026-05-10T23:15:51+01:00</lastmod>
-	<priority>1.0</priority>
-</url>
-<url>
-	<loc>https://games.budsin.dev/privacidad</loc>
 	<lastmod>2026-05-10T23:15:51+01:00</lastmod>
 	<priority>1.0</priority>
 </url>
