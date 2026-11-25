@@ -632,7 +632,7 @@ export const GAMES = [
     "name": "budsin ai",
     "title": "Budsin AI",
     "href": "budsinai.html",
-    "cover": "ai.jpeg",
+    "cover": "portadas/budsin-ai.svg",
     "type": "classic",
     "category": {
       "es": "Clásicos",
