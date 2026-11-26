@@ -1,313 +1,317 @@
+/*!
+ * Budsin · modo oculto (classroom-hotkey.js) — v2
+ *
+ * Tapa el juego con un «disfraz» (título + ícono + una página que sí se deja incrustar) con una tecla, un gesto o un botón.
+ *
+ * Qué hace
+ *   · Varios disfraces (Documentos, Classroom, Drive, Presentaciones, Desmos, Khan Academy, GeoGebra o tus propias URL).
+ *   · Tecla de ocultar (por defecto ` / <>), Ctrl+Shift+< o Ctrl+Shift+> y doble clic/toque en la esquina superior derecha.
+ *   · Tecla de pánico: te saca de inmediato a otra URL.
+ *   · Ocultar al cambiar de pestaña y auto-ocultar tras N segundos sin actividad.
+ *   · Carga el mini-reproductor de Budsin Music y el botón de chat dentro de los juegos.
+ *
+ * Compatibilidad (no cambiar sin revisar site.js, SettingsPage.jsx, musica/index.html y ConsoleHome.jsx):
+ *   · Llaves de localStorage: budsin_hotkey, budsin_url_list, budsin_classroom_url, budsin_quick_toggle_visible,
+ *     budsin_auto_disguise_ms (antigua: la página de Ajustes la guardaba en SEGUNDOS) y budsin_language.
+ *   · Nuevas: budsin_cover (JSON con el resto de opciones) y budsin_auto_disguise_s (segundos).
+ *   · Ids/clases: #juanjo-classroom-overlay, #juanjo-classroom-quick-toggle, body.juanjo-classroom-open.
+ *   · API: window.BudsinClassroomHotkey y el evento «juanjo:toggle-classroom».
+ */
 (function () {
   "use strict";
+  if (window.__budsinCoverLoaded) return;      // la página puede incluir el script dos veces
+  window.__budsinCoverLoaded = true;
 
-  // ─────────────────────────────────────────────
-  //  Storage keys  (shared with settings.html)
-  // ─────────────────────────────────────────────
+  // ───────────────────────────── llaves y constantes ─────────────────────────────
   var KEYS = {
-    LANGUAGE:        "budsin_language",
-    CLASSROOM_URL:   "budsin_classroom_url",   // legacy single-URL key (kept for back-compat)
-    URL_LIST:        "budsin_url_list",         // JSON array of { id, name, url, active }
-    HOTKEY:          "budsin_hotkey",           // stored key code string, e.g. "Backquote"
-    QUICK_TOGGLE:    "budsin_quick_toggle_visible", // "1" | "0"
-    AUTO_DISGUISE:   "budsin_auto_disguise_ms", // number as string, 0 = disabled
+    LANGUAGE:      "budsin_language",
+    CLASSROOM_URL: "budsin_classroom_url",
+    URL_LIST:      "budsin_url_list",
+    HOTKEY:        "budsin_hotkey",
+    QUICK_TOGGLE:  "budsin_quick_toggle_visible",
+    AUTO_DISGUISE: "budsin_auto_disguise_ms",
+    AUTO_SECONDS:  "budsin_auto_disguise_s",
+    COVER:         "budsin_cover",
   };
-
-  var DEFAULT_URL  = "https://docs.google.com/document/d/1gwlAb1OGRGyBkAvdOzILU-i9UquM4nauJ6X3uSnyUXE/edit?usp=sharing";
-  var DEFAULT_AUTO_MS = 0;
-
-  // DOM IDs
   var IDS = {
-    OVERLAY:      "juanjo-classroom-overlay",
-    FRAME:        "juanjo-classroom-frame",
-    CLOSE:        "juanjo-classroom-close",
-    QUICK:        "juanjo-classroom-quick-toggle",
-    FOCUS_TRAP:   "juanjo-classroom-focus-trap",
-    THEME_BTN:    "budsin-theme-toggle",
-    FULLSCREEN_BTN: "budsin-fullscreen-toggle",
+    OVERLAY: "juanjo-classroom-overlay", FRAME: "juanjo-classroom-frame", CLOSE: "juanjo-classroom-close",
+    QUICK: "juanjo-classroom-quick-toggle", CORNER: "juanjo-classroom-corner", FOCUS_TRAP: "juanjo-classroom-focus-trap",
+    THEME_BTN: "budsin-theme-toggle", FULLSCREEN_BTN: "budsin-fullscreen-toggle",
+  };
+  var DEFAULT_DOC = "https://docs.google.com/document/d/1gwlAb1OGRGyBkAvdOzILU-i9UquM4nauJ6X3uSnyUXE/preview";
+  var DEFAULT_CODES = ["Backquote", "IntlBackslash"];
+  var DEFAULT_KEYS = ["|", "°", "º"];
+  var DEFAULT_PANIC_URL = "https://classroom.google.com/";
+
+  // Disfraces. Classroom y Drive no se pueden incrustar (X-Frame-Options), así que muestran su título/ícono pero el contenido
+  // es una página que sí se deja incrustar.
+  var PRESETS = {
+    docs:      { label: { es: "Documentos de Google", en: "Google Docs", pt: "Documentos Google" },
+                 title: { es: "Documento sin título - Documentos de Google", en: "Untitled document - Google Docs", pt: "Documento sem título - Documentos Google" },
+                 icon: "docs.google.com", url: DEFAULT_DOC },
+    classroom: { label: { es: "Google Classroom", en: "Google Classroom", pt: "Google Sala de Aula" },
+                 title: { es: "Clases", en: "Classes", pt: "Turmas" }, icon: "classroom.google.com", url: DEFAULT_DOC },
+    drive:     { label: { es: "Google Drive", en: "Google Drive", pt: "Google Drive" },
+                 title: { es: "Mi unidad - Google Drive", en: "My Drive - Google Drive", pt: "Meu Drive - Google Drive" }, icon: "drive.google.com", url: DEFAULT_DOC },
+    slides:    { label: { es: "Presentaciones de Google", en: "Google Slides", pt: "Apresentações Google" },
+                 title: { es: "Presentación sin título - Presentaciones de Google", en: "Untitled presentation - Google Slides", pt: "Apresentação sem título - Apresentações Google" },
+                 icon: "docs.google.com", url: DEFAULT_DOC },
+    desmos:    { label: { es: "Desmos", en: "Desmos", pt: "Desmos" },
+                 title: { es: "Desmos | Calculadora gráfica", en: "Desmos | Graphing Calculator", pt: "Desmos | Calculadora gráfica" },
+                 icon: "desmos.com", url: "https://www.desmos.com/calculator" },
+    khan:      { label: { es: "Khan Academy", en: "Khan Academy", pt: "Khan Academy" },
+                 title: { es: "Khan Academy", en: "Khan Academy", pt: "Khan Academy" }, icon: "khanacademy.org", url: "https://www.khanacademy.org/" },
+    geogebra:  { label: { es: "GeoGebra", en: "GeoGebra", pt: "GeoGebra" },
+                 title: { es: "Calculadora gráfica - GeoGebra", en: "Graphing Calculator - GeoGebra", pt: "Calculadora gráfica - GeoGebra" },
+                 icon: "geogebra.org", url: "https://www.geogebra.org/graphing" },
+    custom:    { label: { es: "Mi propia URL", en: "My own URL", pt: "Minha própria URL" }, title: null, icon: null, url: null },
   };
 
-  var LOADED_ATTR  = "data-loaded";
+  // ───────────────────────────── almacenamiento ─────────────────────────────
+  function lsGet(k) { try { return window.localStorage.getItem(k); } catch (_) { return null; } }
+  function lsSet(k, v) { try { window.localStorage.setItem(k, v); } catch (_) {} }
+  function parseJson(s) { try { return JSON.parse(s); } catch (_) { return null; } }
 
-  // Runtime state
-  var originalTitle        = document.title;
-  var originalFaviconHref  = getFaviconHref();
-  var disguisedTitle       = "Google Docs";
-  var disguisedFaviconHref = "https://www.google.com/favicon.ico";
-  var fullscreenHotkeyInterval = null;
-  var forceHotkeyFocusFromIframe = false;
-  var autoDisguiseTimer    = null;
-
-  // ─────────────────────────────────────────────
-  //  Config helpers
-  // ─────────────────────────────────────────────
-  function store(key, value) {
-    try { window.localStorage.setItem(key, value); } catch (_) {}
-  }
-
-  function load(key, fallback) {
-    try { return window.localStorage.getItem(key) || fallback; } catch (_) { return fallback; }
-  }
-
-  /** Returns the active URL from the list, falling back to legacy single key, then default. */
-  function getActiveUrl() {
+  function lang() {
     try {
-      var raw = window.localStorage.getItem(KEYS.URL_LIST);
-      if (raw) {
-        var list = JSON.parse(raw);
-        if (Array.isArray(list) && list.length) {
-          var active = list.find(function (e) { return e.active; }) || list[0];
-          return active.url || DEFAULT_URL;
-        }
-      }
+      var p = new URL(window.location.href).searchParams.get("lang");
+      if (p) { var r = p === "en" || p === "pt" ? p : "es"; lsSet(KEYS.LANGUAGE, r); return r; }
     } catch (_) {}
-    // Fallback: legacy single key
-    var legacy = load(KEYS.CLASSROOM_URL, "");
-    return legacy || DEFAULT_URL;
+    var l = (lsGet(KEYS.LANGUAGE) || "").slice(0, 2);
+    return l === "en" || l === "pt" ? l : "es";
+  }
+  var TEXT = {
+    es: { close: "Cerrar modo oculto", hide: "Ocultar", hideAria: "Activar modo ocultar" },
+    en: { close: "Close cover mode", hide: "Hide", hideAria: "Toggle hidden mode" },
+    pt: { close: "Fechar modo oculto", hide: "Ocultar", hideAria: "Ativar modo oculto" },
+  };
+  function tx() { return TEXT[lang()]; }
+
+  /** URL activa de la lista del usuario → clave antigua → null. */
+  function customUrl() {
+    var list = parseJson(lsGet(KEYS.URL_LIST));
+    if (Array.isArray(list) && list.length) {
+      var a = list.filter(function (e) { return e && e.active; })[0] || list[0];
+      if (a && a.url) return a.url;
+    }
+    return lsGet(KEYS.CLASSROOM_URL) || "";
   }
 
-  /** Returns the configured hotkey code(s). Always returns an object with `codes` and `keys` arrays. */
-  function getHotkeyConfig() {
-    var stored = load(KEYS.HOTKEY, "");
-    if (stored) {
-      // stored is a JSON array of code strings, or a plain code string
-      try {
-        var parsed = JSON.parse(stored);
-        if (Array.isArray(parsed)) return { codes: parsed, keys: [] };
-      } catch (_) {}
-      return { codes: [stored], keys: [] };
-    }
-    // Default: backtick family
+  /** Configuración completa con valores por defecto. */
+  function config() {
+    var c = parseJson(lsGet(KEYS.COVER)) || {};
+    var preset = PRESETS[c.preset] ? c.preset : (customUrl() ? "custom" : "docs");   // quien ya tenía URL propia la conserva
+    if (preset === "custom" && !customUrl()) preset = "docs";
     return {
-      codes: ["Backquote", "IntlBackslash"],
-      keys:  ["|", "\u00b0", "\u00ba"],
+      preset: preset,
+      panicKeys: Array.isArray(c.panicKeys) ? c.panicKeys : [],
+      panicUrl: /^https?:\/\//i.test(c.panicUrl || "") ? c.panicUrl : DEFAULT_PANIC_URL,
+      hideOnTabSwitch: !!c.hideOnTabSwitch,
+      comboGesture: c.comboGesture !== false,
+      cornerGesture: !!c.cornerGesture,
     };
   }
-
-  function isQuickToggleVisible() {
-    return load(KEYS.QUICK_TOGGLE, "1") !== "0";
+  function setConfig(patch) {
+    var c = parseJson(lsGet(KEYS.COVER)) || {};
+    for (var k in patch) if (Object.prototype.hasOwnProperty.call(patch, k)) c[k] = patch[k];
+    lsSet(KEYS.COVER, JSON.stringify(c));
+    applyConfigChange();
   }
 
-  function getAutoDisguiseMs() {
-    var v = parseInt(load(KEYS.AUTO_DISGUISE, String(DEFAULT_AUTO_MS)), 10);
-    return isNaN(v) ? 0 : v;
+  /** Segundos de auto-ocultar. La clave antigua «_ms» la llenaba la página de Ajustes con SEGUNDOS: <1000 se lee como segundos. */
+  function autoSeconds() {
+    var s = parseInt(lsGet(KEYS.AUTO_SECONDS), 10);
+    if (!isNaN(s)) return Math.max(0, s);
+    var old = parseInt(lsGet(KEYS.AUTO_DISGUISE), 10);
+    if (isNaN(old) || old <= 0) return 0;
+    return old < 1000 ? old : Math.round(old / 1000);
+  }
+  function quickVisible() { return lsGet(KEYS.QUICK_TOGGLE) !== "0"; }
+
+  /** Teclas de ocultar: JSON con códigos o un código suelto (formato de site.js); si no hay nada, las de siempre. */
+  function toggleKeys() {
+    var s = lsGet(KEYS.HOTKEY);
+    if (s) {
+      var p = parseJson(s);
+      return { codes: Array.isArray(p) ? p : [s], keys: [] };
+    }
+    return { codes: DEFAULT_CODES, keys: DEFAULT_KEYS };
   }
 
-  // ─────────────────────────────────────────────
-  //  Language
-  // ─────────────────────────────────────────────
-  function getCurrentLanguage() {
+  // ───────────────────────────── teclas ─────────────────────────────
+  /** «Ctrl+Shift+KeyX» → ¿coincide con el evento? Sin «+», se compara solo el código o la tecla. */
+  function matchSpec(e, spec) {
+    if (!spec) return false;
+    var parts = String(spec).split("+"), last = parts.pop(), need = { ctrl: 0, alt: 0, shift: 0, meta: 0 };
+    for (var i = 0; i < parts.length; i++) { var m = parts[i].toLowerCase(); if (m === "control") m = "ctrl"; if (m in need) need[m] = 1; }
+    if (parts.length && (!!e.ctrlKey !== !!need.ctrl || !!e.altKey !== !!need.alt || !!e.shiftKey !== !!need.shift || !!e.metaKey !== !!need.meta)) return false;
+    return e.code === last || e.key === last;
+  }
+  function isToggleKey(e) {
+    var t = toggleKeys(), i;
+    for (i = 0; i < t.codes.length; i++) if (matchSpec(e, t.codes[i])) return true;
+    for (i = 0; i < t.keys.length; i++) if (e.key === t.keys[i]) return true;
+    return false;
+  }
+  /** Ctrl+Shift+< o Ctrl+Shift+> (en teclados con «<>» propia es IntlBackslash; en US, Shift+coma/punto). */
+  function isComboGesture(e) {
+    if (!e.ctrlKey || !e.shiftKey || e.altKey || e.metaKey) return false;
+    return e.key === "<" || e.key === ">" || e.code === "IntlBackslash" || e.code === "Comma" || e.code === "Period";
+  }
+  function isPanicKey(e) {
+    var keys = config().panicKeys;
+    for (var i = 0; i < keys.length; i++) if (matchSpec(e, keys[i])) return true;
+    return false;
+  }
+  function isEditable(el) {
+    var t = el && el.tagName ? el.tagName.toLowerCase() : "";
+    return t === "input" || t === "textarea" || t === "select" || (el && el.isContentEditable);
+  }
+
+  /** Un solo manejador para la página y para los iframes del mismo origen. Devuelve true si consumió la tecla. */
+  function onKeydown(e) {
+    if (e.defaultPrevented || window.__budsinCapturingKey) return false;   // Ajustes está capturando una tecla nueva
+    if (isPanicKey(e)) { e.preventDefault(); e.stopPropagation(); panic(); return true; }
+    if (isToggleKey(e) || (config().comboGesture && isComboGesture(e))) {
+      e.preventDefault(); e.stopPropagation(); toggle(); return true;
+    }
+    return false;
+  }
+
+  // ───────────────────────────── favicon y título ─────────────────────────────
+  var origTitle = document.title, origIcons = null, createdIcon = null;
+  function iconLinks() { return Array.prototype.slice.call(document.querySelectorAll("link[rel~='icon']")); }
+  function applyFavicon(href) {
+    var links = iconLinks();
+    if (origIcons === null) origIcons = links.map(function (l) { return { el: l, href: l.getAttribute("href") }; });
+    if (!links.length) { createdIcon = document.createElement("link"); createdIcon.rel = "icon"; document.head.appendChild(createdIcon); links = [createdIcon]; }
+    links.forEach(function (l) { l.setAttribute("href", href); });
+  }
+  function restoreFavicon() {
+    if (origIcons) origIcons.forEach(function (o) { if (o.href === null) o.el.removeAttribute("href"); else o.el.setAttribute("href", o.href); });
+    if (createdIcon && createdIcon.parentNode) createdIcon.parentNode.removeChild(createdIcon);
+    origIcons = null; createdIcon = null;
+  }
+  function faviconFor(domain) { return "https://www.google.com/s2/favicons?sz=64&domain=" + encodeURIComponent(domain); }
+
+  function hostOf(u) { try { return new URL(u).hostname.replace(/^www\./, ""); } catch (_) { return ""; } }
+  function titleFromUrl(u) {
     try {
-      var url   = new URL(window.location.href);
-      var param = url.searchParams.get("lang");
-      if (param) {
-        var r = param === "en" ? "en" : "es";
-        window.localStorage.setItem(KEYS.LANGUAGE, r);
-        return r;
-      }
-      return window.localStorage.getItem(KEYS.LANGUAGE) === "en" ? "en" : "es";
-    } catch (_) { return "es"; }
-  }
-
-  function getLocaleText() {
-    if (getCurrentLanguage() === "en") {
-      return { closeLabel: "Close cover mode", quickToggle: "Hide", quickToggleAria: "Toggle hidden mode" };
-    }
-    return { closeLabel: "Cerrar modo oculto", quickToggle: "Ocultar", quickToggleAria: "Activar modo ocultar" };
-  }
-
-  // ─────────────────────────────────────────────
-  //  Favicon helpers
-  // ─────────────────────────────────────────────
-  function getFaviconElement() {
-    return document.querySelector("link[rel~='icon']") || null;
-  }
-
-  function getFaviconHref() {
-    var el = getFaviconElement();
-    return el ? (el.href || el.getAttribute("href") || "") : "";
-  }
-
-  function setFaviconHref(href) {
-    if (!href) return;
-    var el = getFaviconElement();
-    if (el) { el.href = href; return; }
-    var link = document.createElement("link");
-    link.rel  = "icon";
-    link.href = href;
-    document.head.appendChild(link);
-  }
-
-  // ─────────────────────────────────────────────
-  //  Disguise metadata (title + favicon from URL)
-  // ─────────────────────────────────────────────
-
-  var FAVICON_SERVICES = [
-    function(u) { return u.origin + "/favicon.ico"; },
-    function(u) { return "https://www.google.com/s2/favicons?sz=64&domain=" + encodeURIComponent(u.hostname); },
-    function(u) { return "https://www.google.com/s2/favicons?sz=64&domain=" + encodeURIComponent(u.hostname.replace(/^www\./, "")); },
-    function(u) { return "https://icon.duckduckgo.com/ip3/" + u.hostname + ".ico"; },
-    function(u) { return "https://t2.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=" + encodeURIComponent(u.origin) + "&size=64"; },
-  ];
-
-  function tryLoadFavicon(url, fallback) {
-    var img = new Image();
-    img.onload = function() { setFaviconHref(url); };
-    img.onerror = function() { setFaviconHref(fallback); };
-    img.src = url;
-  }
-
-  function getFaviconViaService(url) {
-    var u;
-    try { u = new URL(url); } catch (_) { return "https://www.google.com/favicon.ico"; }
-    for (var i = 0; i < FAVICON_SERVICES.length; i++) {
-      try { var result = FAVICON_SERVICES[i](u); if (result) return result; } catch (_) { continue; }
-    }
-    return "https://www.google.com/favicon.ico";
-  }
-
-  function getDisplayTitleFromUrl(url) {
-    var u, path;
-    try {
-      u = new URL(url);
-      path = u.pathname.replace(/^\/+/, "").replace(/\/+$/, "");
-    } catch (_) { return "Documento"; }
-    if (!path || path.length < 2) {
-      return u.hostname.replace(/^www\./, "");
-    }
-    var lastSegment = path.split("/").pop() || "";
-    var name = lastSegment.replace(/[-_]/g, " ").replace(/\.[^.]+$/, "");
-    if (!name) return u.hostname.replace(/^www\./, "");
-    return name.charAt(0).toUpperCase() + name.slice(1);
-  }
-
-  function refreshDisguiseMetadata() {
-    var url = getActiveUrl();
-    try {
-      var u = new URL(url);
-      disguisedFaviconHref = getFaviconViaService(url);
-      disguisedTitle = getDisplayTitleFromUrl(url);
-    } catch (_) {
-      disguisedTitle = "Google Docs";
-      disguisedFaviconHref = "https://www.google.com/favicon.ico";
-    }
-    var overlay = document.getElementById(IDS.OVERLAY);
-    if (overlay && overlay.classList.contains("is-open")) {
-      document.title = disguisedTitle;
-      setFaviconHref(disguisedFaviconHref);
-    }
-  }
-
-  function tryExtractIframeMetadata(frame) {
-    if (!frame || !frame.src) return;
-    try {
-      var doc = frame.contentDocument || frame.contentWindow.document;
-      if (doc && doc.title && doc.title.length > 0) {
-        disguisedTitle = doc.title;
-        if (document.getElementById(IDS.OVERLAY) && document.getElementById(IDS.OVERLAY).classList.contains("is-open")) {
-          document.title = disguisedTitle;
-        }
-      }
+      var url = new URL(u), seg = url.pathname.replace(/^\/+|\/+$/g, "").split("/").pop() || "";
+      var name = decodeURIComponent(seg).replace(/[-_]/g, " ").replace(/\.[^.]+$/, "");
+      if (name && name.length > 1) return name.charAt(0).toUpperCase() + name.slice(1);
     } catch (_) {}
-    try {
-      var doc = frame.contentDocument || frame.contentWindow.document;
-      if (doc) {
-        var iconLink = doc.querySelector("link[rel~='icon'], link[rel~='shortcut icon']");
-        if (iconLink) {
-          var href = iconLink.href || iconLink.getAttribute("href") || "";
-          if (href) {
-            var absHref = new URL(href, frame.src).href;
-            disguisedFaviconHref = absHref;
-            if (document.getElementById(IDS.OVERLAY) && document.getElementById(IDS.OVERLAY).classList.contains("is-open")) {
-              setFaviconHref(absHref);
-            }
-            return;
-          }
-        }
-      }
-    } catch (_) {}
-    try {
-      var url = frame.src;
-      fetch(url, { method: "GET", mode: "cors", signal: AbortSignal.timeout ? AbortSignal.timeout(5000) : undefined })
-        .then(function(r) { return r.ok ? r.text() : null; })
-        .then(function(html) {
-          if (!html) return;
-          var m;
-          m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-          if (m && m[1]) {
-            disguisedTitle = m[1].trim().replace(/&#?\w+;/g, "").replace(/\s+/g, " ").substring(0, 128);
-            if (document.getElementById(IDS.OVERLAY) && document.getElementById(IDS.OVERLAY).classList.contains("is-open")) {
-              document.title = disguisedTitle;
-            }
-          }
-          m = html.match(/<link[^>]+rel\s*=\s*["']?(?:icon|shortcut icon|apple-touch-icon)["' >][^>]*href\s*=\s*["']([^"']+)["'][^>]*\/?\s*>/i);
-          if (!m) m = html.match(/<link[^>]+href\s*=\s*["']([^"']+)["'][^>]*rel\s*=\s*["']?(?:icon|shortcut icon|apple-touch-icon)["' >][^>]*\/?\s*>/i);
-          if (m && m[1]) {
-            var href = m[1].trim();
-            try {
-              href = new URL(href, url).href;
-            } catch (_) {}
-            disguisedFaviconHref = href;
-            if (document.getElementById(IDS.OVERLAY) && document.getElementById(IDS.OVERLAY).classList.contains("is-open")) {
-              tryLoadFavicon(href, disguisedFaviconHref);
-            }
-          }
-        })
-        .catch(function() {});
-    } catch (_) {}
+    return hostOf(u) || "Documento";
+  }
+  /** Lo que se va a mostrar ahora mismo: { title, icon, url }. */
+  function disguise() {
+    var c = config(), p = PRESETS[c.preset], L = lang();
+    if (c.preset === "custom") {
+      var u = frameable(customUrl());
+      return { title: titleFromUrl(u), icon: faviconFor(hostOf(u) || "google.com"), url: u };
+    }
+    return { title: p.title[L], icon: faviconFor(p.icon), url: p.url };
+  }
+  /** Los Documentos de Google solo se dejan incrustar con /preview. */
+  function frameable(u) {
+    var m = /^(https:\/\/docs\.google\.com\/(?:document|spreadsheets|presentation)\/d\/[^/?#]+)\/(?:edit|view)?/.exec(u || "");
+    return m ? m[1] + "/preview" : u;
   }
 
-  // ─────────────────────────────────────────────
-  //  Overlay / UI creation
-  // ─────────────────────────────────────────────
-  function createOverlay() {
-    if (document.getElementById(IDS.OVERLAY)) return document.getElementById(IDS.OVERLAY);
+  // ───────────────────────────── cubierta ─────────────────────────────
+  var overlay = null, frame = null, closeBtn = null;
+  function isOpen() { return !!(overlay && overlay.classList.contains("is-open")); }
 
-    var style = document.createElement("style");
-    style.textContent = [
-      "#" + IDS.OVERLAY + "{position:fixed;inset:0;z-index:999999;display:none;background:#0b1220;}",
-      "#" + IDS.OVERLAY + ".is-open{display:block;}",
-      "#" + IDS.OVERLAY + " iframe{width:100%;height:100%;border:0;display:block;background:#fff;}",
-      // Solid-color flash layer (immediate feedback before iframe paints)
-      "#" + IDS.OVERLAY + "::before{content:'';position:absolute;inset:0;background:#fff;z-index:1;pointer-events:none;}",
-      "#" + IDS.OVERLAY + " iframe{position:relative;z-index:2;}",
-      "#" + IDS.CLOSE + "{position:fixed;top:14px;right:14px;z-index:1000000;width:44px;height:44px;border:0;border-radius:999px;background:rgba(15,23,42,.82);color:#fff;font:700 28px/1 Arial,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);}",
-      "#" + IDS.CLOSE + ":hover{background:rgba(30,41,59,.92);}",
-      "#" + IDS.QUICK + "{position:fixed;left:14px;bottom:14px;z-index:1000001;min-height:40px;padding:0 14px;border:0;border-radius:999px;background:rgba(15,23,42,.82);color:#fff;font:700 12px/1 Arial,sans-serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);}",
-      "#" + IDS.QUICK + ":hover{background:rgba(30,41,59,.92);}",
-      "body.juanjo-classroom-open{overflow:hidden;}",
+  function injectStyles() {
+    if (document.getElementById("juanjo-classroom-style")) return;
+    var st = document.createElement("style");
+    st.id = "juanjo-classroom-style";
+    st.textContent = [
+      "#" + IDS.OVERLAY + "{position:fixed;inset:0;z-index:999999;display:none;background:#fff}",
+      "#" + IDS.OVERLAY + ".is-open{display:block}",
+      "#" + IDS.OVERLAY + " iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:#fff}",
+      // el botón de cerrar casi no se ve (para que parezca un documento normal): aparece al acercar el mouse a la esquina
+      "#" + IDS.CLOSE + "{position:fixed;top:10px;right:10px;z-index:1000000;width:38px;height:38px;border:0;border-radius:50%;background:rgba(32,33,36,.86);color:#fff;font:600 22px/1 Arial,sans-serif;cursor:pointer;display:grid;place-items:center;opacity:.04;transition:opacity .15s}",
+      "#" + IDS.CLOSE + ":hover,#" + IDS.CLOSE + ":focus-visible{opacity:.95}",
+      "@media (hover:none){#" + IDS.CLOSE + "{opacity:.35}}",
+      "#" + IDS.QUICK + "{position:fixed;left:12px;bottom:12px;z-index:1000001;height:34px;min-width:34px;padding:0 12px;border:0;border-radius:999px;background:rgba(17,24,39,.72);color:#fff;font:600 12px/1 system-ui,Arial,sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;backdrop-filter:blur(8px);opacity:.55;transition:opacity .15s,background .15s}",
+      "#" + IDS.QUICK + ":hover,#" + IDS.QUICK + ":focus-visible{opacity:1;background:rgba(17,24,39,.92)}",
+      "#" + IDS.CORNER + "{position:fixed;top:0;right:0;width:56px;height:56px;z-index:1000002;background:transparent}",
+      "body.juanjo-classroom-open{overflow:hidden}",
     ].join("\n");
-    document.head.appendChild(style);
+    document.head.appendChild(st);
+  }
 
-    var overlay = document.createElement("div");
+  function ensureOverlay() {
+    if (overlay) return overlay;
+    injectStyles();
+    overlay = document.createElement("div");
     overlay.id = IDS.OVERLAY;
     overlay.setAttribute("aria-hidden", "true");
 
-    var close = document.createElement("button");
-    close.id   = IDS.CLOSE;
-    close.type = "button";
-    close.setAttribute("aria-label", getLocaleText().closeLabel);
-    close.textContent = "\u00d7";  // ×
-    close.addEventListener("click", toggleClassroom);
+    closeBtn = document.createElement("button");
+    closeBtn.id = IDS.CLOSE; closeBtn.type = "button";
+    closeBtn.setAttribute("aria-label", tx().close);
+    closeBtn.textContent = "×";
+    closeBtn.addEventListener("click", function () { toggle(); });
 
-    var frame = document.createElement("iframe");
-    frame.id  = IDS.FRAME;
+    frame = document.createElement("iframe");
+    frame.id = IDS.FRAME;
     frame.setAttribute("allow", "fullscreen");
     frame.setAttribute("allowfullscreen", "");
+    // La página disfrazada es de terceros (otro origen), así que allow-same-origin solo le deja usar su propio almacenamiento.
+    // Si algún día se apunta a una URL del mismo dominio, QUITAR allow-same-origin.
     frame.setAttribute("sandbox", "allow-forms allow-modals allow-pointer-lock allow-popups allow-popups-to-escape-sandbox allow-presentation allow-same-origin allow-scripts");
-    frame.addEventListener("load", function () {
-      tryExtractIframeMetadata(frame);
-    });
 
-    overlay.appendChild(close);
+    overlay.appendChild(closeBtn);
     overlay.appendChild(frame);
     document.body.appendChild(overlay);
     return overlay;
   }
 
-  // ─────────────────────────────────────────────
-  //  Friday Night Funkin' escape helpers
-  // ─────────────────────────────────────────────
+  function loadFrame(url) {
+    if (!frame) return;
+    if (frame.getAttribute("data-url") !== url) { frame.src = url; frame.setAttribute("data-url", url); }
+  }
+
+  function syncControls(disable) {
+    [IDS.THEME_BTN, IDS.FULLSCREEN_BTN].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      if (disable) { el.dataset.juanjoWasDisabled = el.disabled ? "1" : "0"; el.disabled = true; el.setAttribute("aria-disabled", "true"); }
+      else { el.disabled = el.dataset.juanjoWasDisabled === "1"; el.removeAttribute("aria-disabled"); delete el.dataset.juanjoWasDisabled; }
+    });
+  }
+
+  function paint(open) {
+    var ov = ensureOverlay();
+    if (open) {
+      var d = disguise();
+      loadFrame(d.url);
+      if (!isOpen()) origTitle = document.title;     // lo que había antes de disfrazar
+      document.title = d.title;
+      applyFavicon(d.icon);
+    } else {
+      document.title = origTitle;
+      restoreFavicon();
+    }
+    ov.classList.toggle("is-open", open);
+    document.body.classList.toggle("juanjo-classroom-open", open);
+    ov.setAttribute("aria-hidden", open ? "false" : "true");
+    syncControls(open);
+  }
+
+  // pantalla completa: hay que salir antes de tapar
+  function fsElement() { return document.fullscreenElement || document.webkitFullscreenElement || null; }
+  function exitFs() { try { if (document.exitFullscreen) return document.exitFullscreen(); if (document.webkitExitFullscreen) document.webkitExitFullscreen(); } catch (_) {} return null; }
+  function afterFsExit(cb) {
+    var done = false;
+    function finish() { if (done) return; done = true; document.removeEventListener("fullscreenchange", on); document.removeEventListener("webkitfullscreenchange", on); cb(); }
+    function on() { if (!fsElement()) finish(); }
+    document.addEventListener("fullscreenchange", on); document.addEventListener("webkitfullscreenchange", on);
+    setTimeout(finish, 400);
+  }
+
   function createFunkinTimestamp() {
     var fromFloat = window.haxe_Int64Helper && window.haxe_Int64Helper.fromFloat;
     var now = (window.performance && typeof window.performance.now === "function")
@@ -331,157 +335,123 @@
     if (win.onKeyUpPrecise)    win.onKeyUpPrecise.dispatch(key, mod, createFunkinTimestamp());
   }
 
-  // ─────────────────────────────────────────────
-  //  Fullscreen helpers
-  // ─────────────────────────────────────────────
-  function getFullscreenElement() {
-    return document.fullscreenElement || document.webkitFullscreenElement || null;
-  }
-
-  function exitFullscreen() {
-    if (document.exitFullscreen)        return document.exitFullscreen();
-    if (document.webkitExitFullscreen)  { document.webkitExitFullscreen(); return null; }
-    return null;
-  }
-
-  function waitForFullscreenExit(callback) {
-    var done = false;
-    function finish() {
-      if (done) return;
-      done = true;
-      document.removeEventListener("fullscreenchange", onChange);
-      document.removeEventListener("webkitfullscreenchange", onChange);
-      callback();
-    }
-    function onChange() { if (!getFullscreenElement()) finish(); }
-    document.addEventListener("fullscreenchange", onChange);
-    document.addEventListener("webkitfullscreenchange", onChange);
-    window.setTimeout(finish, 400);
-  }
-
-  // ─────────────────────────────────────────────
-  //  Frame URL management
-  // ─────────────────────────────────────────────
-  function ensureFrameUrl(frame) {
-    if (!frame) return;
-    var url = getActiveUrl();
-    if (!frame.getAttribute(LOADED_ATTR) || frame.src !== url) {
-      frame.src = url;
-      frame.setAttribute(LOADED_ATTR, "true");
-    }
-  }
-
-  // ─────────────────────────────────────────────
-  //  Overlay state
-  // ─────────────────────────────────────────────
-  function syncControlDisable(willOpen) {
-    [IDS.THEME_BTN, IDS.FULLSCREEN_BTN].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (!el) return;
-      if (willOpen) {
-        el.dataset.juanjoWasDisabled = el.disabled ? "1" : "0";
-        el.disabled = true;
-        el.setAttribute("aria-disabled", "true");
-      } else {
-        el.disabled = el.dataset.juanjoWasDisabled === "1";
-        el.removeAttribute("aria-disabled");
-        delete el.dataset.juanjoWasDisabled;
-      }
-    });
-  }
-
-  function applyOverlayState(overlay, willOpen) {
-    overlay.classList.toggle("is-open", willOpen);
-    document.body.classList.toggle("juanjo-classroom-open", willOpen);
-    syncControlDisable(willOpen);
-    overlay.setAttribute("aria-hidden", willOpen ? "false" : "true");
-    document.title = willOpen ? disguisedTitle : originalTitle;
-    setFaviconHref(willOpen ? disguisedFaviconHref : originalFaviconHref);
-  }
-
-  // ─────────────────────────────────────────────
-  //  Toggle
-  // ─────────────────────────────────────────────
-  function toggleClassroom() {
-    var overlay  = createOverlay();
-    var frame    = document.getElementById(IDS.FRAME);
-    var isOpen   = overlay.classList.contains("is-open");
-    var willOpen = !isOpen;
-    var fsEl     = getFullscreenElement();
-
-    if (!isOpen && frame) {
-      var prevSrc = frame.src;
-      ensureFrameUrl(frame);
-      if (frame.src !== prevSrc) refreshDisguiseMetadata();
-      window.setTimeout(function () { tryExtractIframeMetadata(frame); }, 800);
-      window.setTimeout(function () { tryExtractIframeMetadata(frame); }, 3000);
-    }
+  function setOpen(open) {
+    if (open === isOpen() && overlay) return;
     triggerFunkinEscape();
-    resetAutoDisguiseTimer();
+    resetAutoTimer();
+    if (open && fsElement()) { afterFsExit(function () { paint(true); }); exitFs(); return; }
+    paint(open);
+  }
+  function toggle() { setOpen(!isOpen()); }
 
-    if (willOpen && fsEl) {
-      waitForFullscreenExit(function () { applyOverlayState(overlay, true); });
-      exitFullscreen();
-      return;
-    }
-
-    applyOverlayState(overlay, willOpen);
+  /** Tecla de pánico: fuera, ya, a otra URL (sin dejar el juego en el historial). */
+  function panic() {
+    var url = config().panicUrl;
+    try { window.location.replace(url); } catch (_) { window.location.href = url; }
   }
 
-  // ─────────────────────────────────────────────
-  //  Auto-disguise on inactivity
-  // ─────────────────────────────────────────────
-  function clearAutoDisguiseTimer() {
-    if (autoDisguiseTimer) { window.clearTimeout(autoDisguiseTimer); autoDisguiseTimer = null; }
+  // ───────────────────────────── auto-ocultar por inactividad ─────────────────────────────
+  var autoTimer = null;
+  function resetAutoTimer() {
+    if (autoTimer) { clearTimeout(autoTimer); autoTimer = null; }
+    var s = autoSeconds();
+    if (!s) return;
+    autoTimer = setTimeout(function () { if (!isOpen()) setOpen(true); }, s * 1000);
   }
-
-  function resetAutoDisguiseTimer() {
-    clearAutoDisguiseTimer();
-    var ms = getAutoDisguiseMs();
-    if (!ms) return;
-    autoDisguiseTimer = window.setTimeout(function () {
-      var overlay = document.getElementById(IDS.OVERLAY);
-      if (!overlay || overlay.classList.contains("is-open")) return; // already disguised
-      toggleClassroom();
-    }, ms);
-  }
-
-  function onUserActivity() {
-    // If overlay is open user interaction should NOT close it — that's the hotkey/button's job
-    resetAutoDisguiseTimer();
-  }
-
   function startActivityListeners() {
-    ["mousemove", "keydown", "pointerdown", "scroll", "touchstart"].forEach(function (ev) {
-      window.addEventListener(ev, onUserActivity, { passive: true, capture: true });
+    ["mousemove", "keydown", "pointerdown", "wheel", "touchstart"].forEach(function (ev) {
+      window.addEventListener(ev, resetAutoTimer, { passive: true, capture: true });
     });
-    resetAutoDisguiseTimer();
+    resetAutoTimer();
   }
 
-  // ─────────────────────────────────────────────
-  //  Quick-toggle button
-  // ─────────────────────────────────────────────
-  function ensureQuickToggleButton() {
-    if (document.getElementById(IDS.QUICK)) return;
-    if (!isQuickToggleVisible()) return;
-
-    var btn = document.createElement("button");
-    btn.id   = IDS.QUICK;
-    btn.type = "button";
-    btn.textContent = getLocaleText().quickToggle;
-    btn.setAttribute("aria-label", getLocaleText().quickToggleAria);
-    btn.addEventListener("click", function (e) {
-      e.preventDefault();
-      e.stopPropagation();
-      toggleClassroom();
-    });
-    document.body.appendChild(btn);
+  // ───────────────────────────── ocultar al cambiar de pestaña ─────────────────────────────
+  function onVisibility() {
+    if (document.visibilityState === "hidden" && config().hideOnTabSwitch && !isOpen()) paint(true);
   }
 
-  // ─────────────────────────────────────────────
-  //  Budsin Music menu inside games (floating button + panel, Picture-in-Picture interchangeable). Loaded from bm-mini.js
-  //  in "game" mode. Not in the music page itself, not inside iframes, and it can be turned off in Music settings.
-  // ─────────────────────────────────────────────
+  // ───────────────────────────── botón rápido y esquina ─────────────────────────────
+  function ensureQuickButton() {
+    var el = document.getElementById(IDS.QUICK);
+    if (!quickVisible()) { if (el) el.remove(); return; }
+    if (el) return;
+    injectStyles();
+    el = document.createElement("button");
+    el.id = IDS.QUICK; el.type = "button";
+    el.setAttribute("aria-label", tx().hideAria);
+    el.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><path d="m1 1 22 22"/></svg><span>' + tx().hide + "</span>";
+    el.addEventListener("click", function (e) { e.preventDefault(); e.stopPropagation(); toggle(); });
+    document.body.appendChild(el);
+  }
+
+  /** Doble clic / doble toque en la esquina superior derecha. Es un cuadro transparente de 56×56 px (así también capta toques sobre un iframe). */
+  var lastCornerTap = 0;
+  function ensureCorner() {
+    var el = document.getElementById(IDS.CORNER);
+    if (!config().cornerGesture) { if (el) el.remove(); return; }
+    if (el) return;
+    injectStyles();
+    el = document.createElement("div");
+    el.id = IDS.CORNER;
+    el.setAttribute("aria-hidden", "true");
+    el.addEventListener("pointerdown", function (e) {
+      var now = Date.now();
+      if (now - lastCornerTap < 450) { lastCornerTap = 0; e.preventDefault(); toggle(); } else lastCornerTap = now;
+    });
+    document.body.appendChild(el);
+  }
+
+  function applyConfigChange() {
+    ensureQuickButton(); ensureCorner(); resetAutoTimer();
+    if (isOpen()) { var d = disguise(); loadFrame(d.url); document.title = d.title; applyFavicon(d.icon); }
+  }
+
+  // ───────────────────────────── foco del teclado con juegos en iframe ─────────────────────────────
+  // Una tecla pulsada dentro de un iframe de OTRO origen no llega a esta página. Cuando el usuario toca un juego, se recupera el foco
+  // para que la tecla de ocultar siga funcionando (comportamiento heredado de la versión 1).
+  var focusLoop = null, forceFocusFromIframe = false;
+  function ensureFocusTrap() {
+    var el = document.getElementById(IDS.FOCUS_TRAP);
+    if (el) return el;
+    el = document.createElement("button");
+    el.id = IDS.FOCUS_TRAP; el.type = "button"; el.tabIndex = -1; el.setAttribute("aria-hidden", "true");
+    el.style.cssText = "position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;pointer-events:none";
+    document.body.appendChild(el);
+    return el;
+  }
+  function recoverFocus() { var el = ensureFocusTrap(); try { el.focus({ preventScroll: true }); } catch (_) { el.focus(); } }
+  function isGameIframe(el) { return !!(el && el.tagName && el.tagName.toLowerCase() === "iframe" && el.id !== IDS.FRAME); }
+  function needFocusLoop() { return isGameIframe(fsElement()) || forceFocusFromIframe || isGameIframe(document.activeElement); }
+  function stopFocusLoop() { if (focusLoop) { clearInterval(focusLoop); focusLoop = null; } }
+  function syncFocusLoop() {
+    if (!needFocusLoop()) { stopFocusLoop(); return; }
+    recoverFocus();
+    if (!focusLoop) focusLoop = setInterval(function () { if (!needFocusLoop()) stopFocusLoop(); else recoverFocus(); }, 350);
+  }
+  function bindIframe(iframe) {
+    if (!iframe || iframe.__budsinCoverBound) return;
+    iframe.__budsinCoverBound = true;
+    function bindNow() {
+      try {
+        var w = iframe.contentWindow, d = iframe.contentDocument;
+        if (!w || !d) return;
+        w.addEventListener("keydown", onKeydown, true);
+        d.addEventListener("keydown", onKeydown, true);
+      } catch (_) {}                                   // otro origen: no se puede, se usa el truco del foco
+    }
+    iframe.addEventListener("load", bindNow);
+    iframe.addEventListener("pointerdown", function () {
+      if (iframe.id === IDS.FRAME) return;
+      if (!fsElement()) forceFocusFromIframe = true;
+      setTimeout(syncFocusLoop, 0);
+    });
+    bindNow();
+  }
+  function bindAllIframes() { Array.prototype.forEach.call(document.getElementsByTagName("iframe"), bindIframe); }
+
+  // ───────────────────────────── Budsin Music y Budsin Chat dentro de los juegos ─────────────────────────────
+  // Música: mini-reproductor (bm-mini.js, modo «game»). Chat: botón que abre la sala de este juego. Ninguno en /musica/, /chat/,
+  // el portal, admin/settings ni dentro de iframes; se apagan desde sus propios menús (bm_gamemenu / bc_gamebtn).
   function ensureMusicMenu() {
     try {
       if (window.top !== window) return;
@@ -532,159 +502,38 @@
     } catch (e) {}
   }
 
-  // ─────────────────────────────────────────────
-  //  Focus trap (keeps hotkey responsive when iframe is focused)
-  // ─────────────────────────────────────────────
-  function ensureFocusTrap() {
-    var el = document.getElementById(IDS.FOCUS_TRAP);
-    if (el) return el;
-    el = document.createElement("button");
-    el.id   = IDS.FOCUS_TRAP;
-    el.type = "button";
-    el.setAttribute("aria-hidden", "true");
-    el.tabIndex = -1;
-    Object.assign(el.style, { position:"fixed", left:"-9999px", top:"-9999px", width:"1px", height:"1px", opacity:"0", pointerEvents:"none" });
-    document.body.appendChild(el);
-    return el;
-  }
+  // ───────────────────────────── arranque ─────────────────────────────
+  window.addEventListener("keydown", onKeydown, true);
+  window.addEventListener("focus", syncFocusLoop, true);
+  document.addEventListener("focusin", syncFocusLoop, true);
+  document.addEventListener("fullscreenchange", syncFocusLoop);
+  document.addEventListener("webkitfullscreenchange", syncFocusLoop);
+  document.addEventListener("pointerdown", function (e) { if (isGameIframe(e.target)) return; forceFocusFromIframe = false; syncFocusLoop(); }, true);
+  document.addEventListener("visibilitychange", onVisibility);
+  window.addEventListener("juanjo:toggle-classroom", function () { toggle(); });
+  window.addEventListener("storage", function (e) { if (e.key && e.key.indexOf("budsin_") === 0) applyConfigChange(); });   // ajustes cambiados en otra pestaña
 
-  function recoverPageHotkeyFocus() {
-    var el = ensureFocusTrap();
-    if (!el || typeof el.focus !== "function") return;
-    try { el.focus({ preventScroll: true }); } catch (_) { el.focus(); }
-  }
-
-  function clearHotkeyFocusLoop() {
-    if (!fullscreenHotkeyInterval) return;
-    window.clearInterval(fullscreenHotkeyInterval);
-    fullscreenHotkeyInterval = null;
-  }
-
-  function isGameIframe(el) {
-    return el && el.tagName && el.tagName.toLowerCase() === "iframe" && el.id !== IDS.FRAME;
-  }
-
-  function shouldForceHotkeyFocus() {
-    if (isGameIframe(getFullscreenElement())) return true;
-    if (forceHotkeyFocusFromIframe)           return true;
-    return isGameIframe(document.activeElement);
-  }
-
-  function syncHotkeyFocusLoop() {
-    if (!shouldForceHotkeyFocus()) { clearHotkeyFocusLoop(); return; }
-    recoverPageHotkeyFocus();
-    if (!fullscreenHotkeyInterval) {
-      fullscreenHotkeyInterval = window.setInterval(function () {
-        if (!shouldForceHotkeyFocus()) { clearHotkeyFocusLoop(); return; }
-        recoverPageHotkeyFocus();
-      }, 350);
-    }
-  }
-
-  // ─────────────────────────────────────────────
-  //  Hotkey detection
-  // ─────────────────────────────────────────────
-  function isToggleHotkey(event) {
-    var cfg   = getHotkeyConfig();
-    var code  = event.code || "";
-    var key   = event.key  || "";
-    if (cfg.codes.indexOf(code) !== -1) return true;
-    if (cfg.keys.length && cfg.keys.indexOf(key) !== -1) return true;
-    // Default fallbacks when nothing is configured
-    if (!cfg.codes.length && !cfg.keys.length) {
-      return code === "Backquote" || code === "IntlBackslash" || key === "|" || key === "\u00b0" || key === "\u00ba";
-    }
-    return false;
-  }
-
-  function shouldIgnoreTarget(target) {
-    if (!target) return false;
-    var tag = (target.tagName || "").toLowerCase();
-    return tag === "input" || tag === "textarea" || tag === "select" || target.isContentEditable;
-  }
-
-  function handleHotkeyKeydown(event) {
-    if (event.defaultPrevented) return;
-    if (isToggleHotkey(event)) {
-      event.preventDefault();
-      event.stopPropagation();
-      toggleClassroom();
-      return;
-    }
-    if (shouldIgnoreTarget(event.target)) return;
-  }
-
-  // ─────────────────────────────────────────────
-  //  Iframe hotkey binding
-  // ─────────────────────────────────────────────
-  function attachHotkeyToIframe(iframe) {
-    if (!iframe || iframe.__juanjoHotkeyBound) return;
-
-    function onFrameKeydown(event) {
-      if (event.defaultPrevented) return;
-      if (isToggleHotkey(event)) {
-        event.preventDefault();
-        event.stopPropagation();
-        toggleClassroom();
-      }
-    }
-
-    function bindNow() {
-      try {
-        if (!iframe.contentWindow || !iframe.contentDocument) return;
-        iframe.contentWindow.addEventListener("keydown", onFrameKeydown, true);
-        iframe.contentDocument.addEventListener("keydown", onFrameKeydown, true);
-        iframe.__juanjoHotkeyBound = true;
-      } catch (_) { iframe.__juanjoHotkeyBound = true; }
-    }
-
-    iframe.addEventListener("load", bindNow);
-    iframe.addEventListener("pointerdown", function () {
-      if (iframe.id === IDS.FRAME) return;
-      if (!getFullscreenElement()) forceHotkeyFocusFromIframe = true;
-      window.setTimeout(syncHotkeyFocusLoop, 0);
-    });
-    bindNow();
-  }
-
-  function bindIframeHotkeys() {
-    var iframes = document.getElementsByTagName("iframe");
-    for (var i = 0; i < iframes.length; i++) attachHotkeyToIframe(iframes[i]);
-  }
-
-  // ─────────────────────────────────────────────
-  //  Global event listeners
-  // ─────────────────────────────────────────────
-  window.addEventListener("keydown", handleHotkeyKeydown, true);
-  window.addEventListener("focus",   syncHotkeyFocusLoop, true);
-  document.addEventListener("focusin", syncHotkeyFocusLoop, true);
-  document.addEventListener("fullscreenchange",       syncHotkeyFocusLoop);
-  document.addEventListener("webkitfullscreenchange", syncHotkeyFocusLoop);
-  document.addEventListener("pointerdown", function (event) {
-    if (isGameIframe(event.target)) return;
-    forceHotkeyFocusFromIframe = false;
-    syncHotkeyFocusLoop();
-  }, true);
-  window.addEventListener("juanjo:toggle-classroom", function () { toggleClassroom(); });
-
-  // ─────────────────────────────────────────────
-  //  Public API (for settings.html and other pages)
-  // ─────────────────────────────────────────────
   window.BudsinClassroomHotkey = {
-    toggle:       toggleClassroom,
-    getActiveUrl: getActiveUrl,
-    KEYS:         KEYS,
+    toggle: toggle,
+    open: function () { setOpen(true); },
+    close: function () { setOpen(false); },
+    isOpen: isOpen,
+    panic: panic,
+    getActiveUrl: function () { return disguise().url; },
+    getConfig: config,
+    setConfig: setConfig,
+    presets: PRESETS,
+    KEYS: KEYS,
+    version: 2,
   };
 
-  // ─────────────────────────────────────────────
-  //  Init
-  // ─────────────────────────────────────────────
-  createOverlay();
-  refreshDisguiseMetadata();
-  ensureQuickToggleButton();
-  ensureMusicMenu();
-  ensureChatButton();
-  bindIframeHotkeys();
-  startActivityListeners();
-
+  function init() {
+    ensureQuickButton();
+    ensureCorner();
+    ensureMusicMenu();
+    ensureChatButton();
+    bindAllIframes();
+    startActivityListeners();
+  }
+  if (document.body) init(); else document.addEventListener("DOMContentLoaded", init);
 })();

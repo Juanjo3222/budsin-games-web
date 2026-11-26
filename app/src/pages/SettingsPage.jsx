@@ -20,10 +20,79 @@ const URL_LIST_KEY = "budsin_url_list";
 const CLASSROOM_URL_KEY = "budsin_classroom_url";
 const HOTKEY_KEY = "budsin_hotkey";
 const QUICK_TOGGLE_KEY = "budsin_quick_toggle_visible";
-const AUTO_DISGUISE_KEY = "budsin_auto_disguise_ms";
+const AUTO_DISGUISE_KEY = "budsin_auto_disguise_ms";   // antigua: aquí se guardaban SEGUNDOS por error
+const AUTO_SECONDS_KEY = "budsin_auto_disguise_s";
+const COVER_KEY = "budsin_cover";
+
+// Textos del modo oculto (es/en/pt) y lista de disfraces. Las claves coinciden con PRESETS de public/classroom-hotkey.js.
+const COVER_PRESETS = ["docs", "classroom", "drive", "slides", "desmos", "khan", "geogebra", "custom"];
+const COVER_TEXT = {
+  es: {
+    title: "Modo oculto", sub: "Tapa el juego con un disfraz al instante.",
+    preset: "Disfraz", presets: { docs: "Documentos de Google", classroom: "Google Classroom", drive: "Google Drive", slides: "Presentaciones de Google", desmos: "Desmos", khan: "Khan Academy", geogebra: "GeoGebra", custom: "Mi propia URL" },
+    presetNote: "Classroom y Drive no se pueden incrustar: usan su título e ícono, pero muestran un documento. «Mi propia URL» usa la lista de abajo.",
+    hotkey: "Tecla para ocultar", change: "Cambiar", press: "Pulsa una tecla… (Esc cancela)", reset: "Restablecer", def: "` o la tecla < >",
+    panic: "Tecla de pánico", panicUrl: "URL de pánico", panicNone: "Sin asignar", panicNote: "Te saca de inmediato a esa página (sin dejar el juego en el historial). Usa una combinación rara, por ejemplo Ctrl+Shift+X.",
+    combo: "Ctrl+Shift+< o >", comboSub: "Ocultar también con este atajo.",
+    corner: "Doble clic en la esquina superior derecha", cornerSub: "Un cuadro invisible de 56×56 px: dos toques seguidos ocultan (sirve en Chromebook táctil).",
+    tab: "Ocultar al cambiar de pestaña", tabSub: "Si cambias de pestaña, al volver ya estará tapado.",
+    auto: "Auto-ocultar tras inactividad (segundos, 0 = apagado)", test: "Probar ahora", urlHint: "Solo se usa con «Mi propia URL».",
+  },
+  en: {
+    title: "Cover mode", sub: "Cover the game with a disguise instantly.",
+    preset: "Disguise", presets: { docs: "Google Docs", classroom: "Google Classroom", drive: "Google Drive", slides: "Google Slides", desmos: "Desmos", khan: "Khan Academy", geogebra: "GeoGebra", custom: "My own URL" },
+    presetNote: "Classroom and Drive can't be embedded: they use their title and icon but show a document. “My own URL” uses the list below.",
+    hotkey: "Hide key", change: "Change", press: "Press a key… (Esc cancels)", reset: "Reset", def: "` or the < > key",
+    panic: "Panic key", panicUrl: "Panic URL", panicNone: "Not set", panicNote: "Takes you to that page immediately (without leaving the game in your history). Use an unusual combo, e.g. Ctrl+Shift+X.",
+    combo: "Ctrl+Shift+< or >", comboSub: "Also hide with this shortcut.",
+    corner: "Double-click the top-right corner", cornerSub: "An invisible 56×56 px square: two quick taps hide (works on touch Chromebooks).",
+    tab: "Hide when switching tabs", tabSub: "If you switch tabs, it will already be covered when you come back.",
+    auto: "Auto-hide after inactivity (seconds, 0 = off)", test: "Try it now", urlHint: "Only used with “My own URL”.",
+  },
+  pt: {
+    title: "Modo oculto", sub: "Cubra o jogo com um disfarce na hora.",
+    preset: "Disfarce", presets: { docs: "Documentos Google", classroom: "Google Sala de Aula", drive: "Google Drive", slides: "Apresenta\u00e7\u00f5es Google", desmos: "Desmos", khan: "Khan Academy", geogebra: "GeoGebra", custom: "Minha pr\u00f3pria URL" },
+    presetNote: "Classroom e Drive n\u00e3o podem ser incorporados: usam o t\u00edtulo e o \u00edcone, mas mostram um documento. \u00abMinha pr\u00f3pria URL\u00bb usa a lista abaixo.",
+    hotkey: "Tecla para ocultar", change: "Alterar", press: "Pressione uma tecla\u2026 (Esc cancela)", reset: "Restaurar", def: "` ou a tecla < >",
+    panic: "Tecla de p\u00e2nico", panicUrl: "URL de p\u00e2nico", panicNone: "N\u00e3o definida", panicNote: "Leva voc\u00ea imediatamente a essa p\u00e1gina (sem deixar o jogo no hist\u00f3rico). Use uma combina\u00e7\u00e3o rara, por exemplo Ctrl+Shift+X.",
+    combo: "Ctrl+Shift+< ou >", comboSub: "Tamb\u00e9m ocultar com este atalho.",
+    corner: "Duplo clique no canto superior direito", cornerSub: "Um quadrado invis\u00edvel de 56\u00d756 px: dois toques seguidos ocultam (funciona em Chromebook com toque).",
+    tab: "Ocultar ao trocar de aba", tabSub: "Se voc\u00ea trocar de aba, ao voltar j\u00e1 estar\u00e1 coberto.",
+    auto: "Auto-ocultar ap\u00f3s inatividade (segundos, 0 = desligado)", test: "Testar agora", urlHint: "S\u00f3 \u00e9 usada com \u00abMinha pr\u00f3pria URL\u00bb.",
+  },
+};
+const keyLabel = (spec) => String(spec || "").replace(/Key([A-Z])/g, "$1").replace(/Digit(\d)/g, "$1").replace("Backquote", "`").replace("IntlBackslash", "< >").replace("Backslash", "\\");
+
+/** Botón que captura la siguiente tecla (con Ctrl/Alt/Shift/Meta) y devuelve algo como «Ctrl+Shift+KeyX». */
+function KeyCapture({ value, onCapture, onReset, idle, press, change, reset }) {
+  const [listening, setListening] = useState(false);
+  useEffect(() => {
+    if (!listening) return undefined;
+    window.__budsinCapturingKey = true;     // classroom-hotkey.js ignora las teclas mientras tanto
+    const handler = (e) => {
+      if (["Control", "Shift", "Alt", "Meta"].includes(e.key)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.key === "Escape") { setListening(false); return; }
+      const mods = [e.ctrlKey && "Ctrl", e.altKey && "Alt", e.shiftKey && "Shift", e.metaKey && "Meta"].filter(Boolean);
+      onCapture(mods.concat(e.code).join("+"));
+      setListening(false);
+    };
+    window.addEventListener("keydown", handler, true);
+    return () => { window.removeEventListener("keydown", handler, true); window.__budsinCapturingKey = false; };
+  }, [listening]); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+      <code style={{ display: "inline-flex", alignItems: "center", minWidth: 120, height: 40, padding: "0 14px", margin: 0, borderRadius: 12, border: "1px solid rgba(120,130,150,.35)", fontFamily: "inherit", fontWeight: 700, fontSize: 14 }}>{listening ? press : (value ? keyLabel(value) : idle)}</code>
+      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setListening((v) => !v)}>{change}</button>
+      {value ? <button type="button" className="btn btn-ghost btn-sm" onClick={onReset}>{reset}</button> : null}
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const { t, lang } = useI18n();
+  const cv = COVER_TEXT[lang] || COVER_TEXT.es;
   const { user, loading, login, logout } = useAuth();
   const { isPro, paidUntil, trialUsed, paypalActive, paypalState, refreshPro, startTrial } = usePro();
   const { theme, applyTheme, custom, updateCustom } = useTheme();
@@ -57,7 +126,24 @@ export default function SettingsPage() {
   const [hotkey, setHotkey] = useState(() => localStorage.getItem(HOTKEY_KEY) || "Backquote");
   const [quickToggle, setQuickToggle] = useState(() => localStorage.getItem(QUICK_TOGGLE_KEY) === "1");
   const [sounds, setSounds] = useState(soundsEnabled);
-  const [autoDisguise, setAutoDisguise] = useState(() => Number(localStorage.getItem(AUTO_DISGUISE_KEY) || 0));
+  const [autoDisguise, setAutoDisguise] = useState(() => {
+    const s = parseInt(localStorage.getItem(AUTO_SECONDS_KEY), 10);
+    if (!Number.isNaN(s)) return Math.max(0, s);
+    const old = parseInt(localStorage.getItem(AUTO_DISGUISE_KEY), 10);     // clave antigua: <1000 eran segundos
+    return Number.isNaN(old) || old <= 0 ? 0 : (old < 1000 ? old : Math.round(old / 1000));
+  });
+  const readCover = () => readJson(COVER_KEY, {}) || {};
+  const [cover, setCoverState] = useState(readCover);
+  const setCover = (patch) => {
+    setCoverState((prev) => ({ ...prev, ...patch }));
+    const api = window.BudsinClassroomHotkey;
+    if (api && api.setConfig) api.setConfig(patch);      // guarda y aplica al instante
+    else save(COVER_KEY, JSON.stringify({ ...readCover(), ...patch }));
+  };
+  const [hideKey, setHideKey] = useState(() => {
+    try { const v = JSON.parse(localStorage.getItem(HOTKEY_KEY) || "null"); return Array.isArray(v) ? v[0] || "" : (typeof v === "string" ? v : ""); } catch (e) { return localStorage.getItem(HOTKEY_KEY) || ""; }
+  });
+  const coverPreset = cover.preset || (classroomUrl || urlList.length ? "custom" : "docs");
 
   const save = (key, value) => {
     try {
@@ -356,14 +442,97 @@ export default function SettingsPage() {
             </label>
           </div>
 
-          <label className="field-label" style={{ marginTop: 14 }}>{t("autoDisguiseLabel", "Auto-disfraz (segundos, 0 = off)")}</label>
+          <label className="field-label" style={{ marginTop: 14 }}>{cv.auto}</label>
           <input
             type="number"
             className="field-input"
             min="0"
             value={autoDisguise}
-            onChange={(e) => { setAutoDisguise(Number(e.target.value) || 0); save(AUTO_DISGUISE_KEY, String(Number(e.target.value) || 0)); }}
+            onChange={(e) => {
+              const n = Math.max(0, Number(e.target.value) || 0);
+              setAutoDisguise(n);
+              save(AUTO_SECONDS_KEY, String(n));
+              try { localStorage.removeItem(AUTO_DISGUISE_KEY); } catch (err) {}
+              if (window.BudsinClassroomHotkey && window.BudsinClassroomHotkey.setConfig) window.BudsinClassroomHotkey.setConfig({});   // reinicia el temporizador
+            }}
           />
+        </section>
+
+        {/* ── Modo oculto: disfraz, teclas y gestos ── */}
+        <section className="settings-card glass" id="coverCard">
+          <div className="card-header">
+            <div className="card-icon purple">🕶️</div>
+            <div>
+              <h2>{cv.title}</h2>
+              <p>{cv.sub}</p>
+            </div>
+          </div>
+
+          <label className="field-label">{cv.preset}</label>
+          <select className="field-input" value={coverPreset} onChange={(e) => setCover({ preset: e.target.value })}>
+            {COVER_PRESETS.map((id) => <option key={id} value={id}>{cv.presets[id]}</option>)}
+          </select>
+          <p className="toggle-sub" style={{ marginTop: 6 }}>{cv.presetNote}{coverPreset === "custom" ? " " + cv.urlHint : ""}</p>
+
+          <label className="field-label" style={{ marginTop: 14 }}>{cv.hotkey}</label>
+          <KeyCapture
+            value={hideKey} idle={cv.def} press={cv.press} change={cv.change} reset={cv.reset}
+            onCapture={(spec) => { setHideKey(spec); save(HOTKEY_KEY, JSON.stringify([spec])); }}
+            onReset={() => { setHideKey(""); try { localStorage.removeItem(HOTKEY_KEY); } catch (e) {} }}
+          />
+
+          <div className="toggle-row">
+            <div>
+              <div className="toggle-label">{cv.combo}</div>
+              <div className="toggle-sub">{cv.comboSub}</div>
+            </div>
+            <label className="toggle">
+              <input type="checkbox" checked={cover.comboGesture !== false} onChange={(e) => setCover({ comboGesture: e.target.checked })} />
+              <span className="toggle-track"></span>
+            </label>
+          </div>
+
+          <div className="toggle-row">
+            <div>
+              <div className="toggle-label">{cv.corner}</div>
+              <div className="toggle-sub">{cv.cornerSub}</div>
+            </div>
+            <label className="toggle">
+              <input type="checkbox" checked={!!cover.cornerGesture} onChange={(e) => setCover({ cornerGesture: e.target.checked })} />
+              <span className="toggle-track"></span>
+            </label>
+          </div>
+
+          <div className="toggle-row">
+            <div>
+              <div className="toggle-label">{cv.tab}</div>
+              <div className="toggle-sub">{cv.tabSub}</div>
+            </div>
+            <label className="toggle">
+              <input type="checkbox" checked={!!cover.hideOnTabSwitch} onChange={(e) => setCover({ hideOnTabSwitch: e.target.checked })} />
+              <span className="toggle-track"></span>
+            </label>
+          </div>
+
+          <label className="field-label" style={{ marginTop: 14 }}>{cv.panic}</label>
+          <KeyCapture
+            value={(cover.panicKeys || [])[0] || ""} idle={cv.panicNone} press={cv.press} change={cv.change} reset={cv.reset}
+            onCapture={(spec) => setCover({ panicKeys: [spec] })}
+            onReset={() => setCover({ panicKeys: [] })}
+          />
+          <label className="field-label" style={{ marginTop: 10 }}>{cv.panicUrl}</label>
+          <input
+            type="url"
+            className="field-input"
+            value={cover.panicUrl || ""}
+            placeholder="https://classroom.google.com/"
+            onChange={(e) => setCover({ panicUrl: e.target.value })}
+          />
+          <p className="toggle-sub" style={{ marginTop: 6 }}>{cv.panicNote}</p>
+
+          <button type="button" className="btn btn-primary btn-sm" style={{ marginTop: 14 }} onClick={() => window.BudsinClassroomHotkey && window.BudsinClassroomHotkey.toggle()}>
+            {cv.test}
+          </button>
         </section>
 
         {/* ── Exportar datos ── */}
