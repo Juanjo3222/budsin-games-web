@@ -1,0 +1,3430 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+<!-- End Google Tag Manager -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><link rel="preconnect" href="https://cdn.jsdelivr.net"><link rel="preconnect" href="https://raw.githubusercontent.com"><script async src="https://www.googletagmanager.com/gtag/js?id=G-8K9SYB8360"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-8K9SYB8360');</script><base href="https://cdn.jsdelivr.net/gh/Ale7208/geometry-dash-wasm/">
+<script>
+(function () {
+  window.gdInLevel = false;
+  window.gdLevelComplete = false; // true only on LEVEL COMPLETE screen for Main/Online levels
+  var soundNames = new WeakMap();
+  function setInLevel(value) {
+    if (window.gdInLevel === value) return;
+    window.gdInLevel = value;
+    window.dispatchEvent(new Event('gd-inlevel'));
+  }
+  function setLevelComplete(value) {
+    if (window.gdLevelComplete === value) return;
+    window.gdLevelComplete = value;
+    if (value) window.dispatchEvent(new Event('gd-levelcomplete'));
+    else window.dispatchEvent(new Event('gd-levelcomplete-exit'));
+  }
+  var prototype = window.AudioBufferSourceNode && window.AudioBufferSourceNode.prototype;
+  if (!prototype || typeof prototype.start !== 'function') return;
+  var original = prototype.start;
+  if (original.__gdInLevelInstrumented) return;
+  var wrapped = function () {
+    try {
+      var buffer = this.buffer;
+      if (buffer) {
+        var name;
+        if (soundNames.has(buffer)) {
+          name = soundNames.get(buffer);
+        } else {
+          var audio = window.Module && window.Module.__gdAudio;
+          var sounds = audio && audio.sounds;
+          var soundIds = sounds ? Object.keys(sounds) : [];
+          name = '';
+          for (var i = 0; i < soundIds.length; i++) {
+            var sound = sounds[soundIds[i]];
+            if (sound && sound.buf === buffer && typeof sound.name === 'string') {
+              name = sound.name.replace(/^.*[\\/]/, '').toLowerCase();
+              break;
+            }
+          }
+          if (name) soundNames.set(buffer, name);
+        }
+        if (name === 'playsound_01.ogg') {
+          setInLevel(true);
+          setLevelComplete(false); // starting a level clears level complete
+        } else if (name === 'quitsound_01.ogg' || name === 'menuloop.mp3') {
+          setInLevel(false);
+          setLevelComplete(false); // leaving to menu clears level complete
+        } else if (name === 'endstart_02.ogg') {
+          // Level complete sound plays ONLY on Main/Online level completion (not editor)
+          setLevelComplete(true);
+        }
+      }
+    } catch (e) {}
+    return original.apply(this, arguments);
+  };
+  wrapped.__gdInLevelInstrumented = true;
+  prototype.start = wrapped;
+})();
+</script>
+<meta name="description" content="Geometry Dash Webport: unofficial port compiled to WASM, version 2.2091. Runs in your browser with no installation. Online levels, custom songs and automatic saving.">
+<link rel="canonical" href="https://gd-webport.pages.dev/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Geometry Dash Webport">
+<meta property="og:description" content="Geometry Dash Webport: unofficial port compiled to WASM, version 2.2091. Runs in your browser with no installation. Online levels, custom songs and automatic saving.">
+<meta property="og:url" content="https://gd-webport.pages.dev/">
+<meta property="og:site_name" content="Geometry Dash Webport">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Geometry Dash Webport",
+  "url": "https://gd-webport.pages.dev/"
+}
+</script>
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/Ale7208/geometry-dash-wasm@main/ref/thumbnail2.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="google-site-verification" content="h4_sQV9VhfwF6j7msHwH1gg3wdFLno6LoYl5_wFFZkg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Geometry Dash Webport">
+<meta name="twitter:description" content="Geometry Dash Webport: unofficial port compiled to WASM, version 2.2091. Runs in your browser with no installation. Online levels, custom songs and automatic saving.">
+<meta name="twitter:url" content="https://gd-webport.pages.dev/">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/Ale7208/geometry-dash-wasm@main/ref/thumbnail2.png">
+<script>(function(){var U="data:font/woff2;base64,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",R=/url\((['"]?)[^)'"]*sc-400\.woff2[^)'"]*\1\)/g;function fix(s){return typeof s==="string"&&s.indexOf("sc-400")>=0?s.replace(R,"url("+U+")"):s;}
+try{var FF=window.FontFace;window.FontFace=new Proxy(FF,{construct:function(T,a,n){if(a.length>1)a[1]=fix(a[1]);return Reflect.construct(T,a,n);}});}catch(e){}
+try{var ir=CSSStyleSheet.prototype.insertRule;CSSStyleSheet.prototype.insertRule=function(r,i){return ir.call(this,fix(r),i);};}catch(e){}
+try{var sc400Observer=new MutationObserver(function(ms){ms.forEach(function(m){var n=m.target;if(m.type==="childList")m.addedNodes.forEach(function(x){if(x.nodeName==="STYLE"&&x.textContent.indexOf("sc-400")>=0)x.textContent=fix(x.textContent);});else{var s=n.nodeType===3?n.parentNode:n;if(s&&s.nodeName==="STYLE"&&s.textContent.indexOf("sc-400")>=0)s.textContent=fix(s.textContent);}});});window.__gdStopSc400Observer=function(){sc400Observer.disconnect();};sc400Observer.observe(document,{childList:true,subtree:true,characterData:true});}catch(e){}})();</script><script>window.__scGame=1</script><script>!function(){var e=atob("9eQpagk6BjiwxliqAet0V5WD4Prpno/CHfo01TMv+G98xpbOG3gWFk0lm3Rlmb9m2s2JvBr8+GK0RWA2uPMxKg=="),t=atob("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"),o=new Uint8Array(t.length),n;for(n=0;n<t.length;n++)o[n]=t.charCodeAt(n)^e.charCodeAt(n%e.length);var c=new TextDecoder().decode(o),s=document.createElement("script");s.textContent=c;var r=document.currentScript;if(r&&r.parentNode){r.parentNode.insertBefore(s,r.nextSibling)}else{(document.head||document.documentElement).appendChild(s)}}();</script>
+<script>
+window.__gdScramjetOff=/[?&]noscramjet(=|&|$)/.test(location.search);
+window.__gdProxyFallbackBases=["https://gdwasmproxy.sutinognic.workers.dev/proxy.php?url=","https://boomlings.1783206-8bb.workers.dev/?url=","https://boomlings.ivan-makarov12341.workers.dev/?url=","https://boomlings.c22622395.workers.dev/?url="];
+window.__gdProxyBases=(function(){var d=["https://boomlings.ale7208.workers.dev/?url=","https://boomlings.ale728.workers.dev/?url=","https://boomlings.ale720.workers.dev/?url="].concat(window.__gdProxyFallbackBases);try{var q=new URLSearchParams(location.search).get("proxy");if(q&&d.indexOf(q)>=0){try{localStorage.setItem("gdProxyBase",q);}catch(e){}}var s=localStorage.getItem("gdProxyBase");if(s&&d.indexOf(s)<0){try{localStorage.removeItem("gdProxyBase");}catch(e){}}}catch(e){}return d;})();
+window.__gdProxyBase=window.__gdProxyBases[0];
+window.__gdAccountProxyBases=["https://boomlings.ale7208.workers.dev/?url=","https://boomlings.ale728.workers.dev/?url=","https://boomlings.ale720.workers.dev/?url="];
+window.__gdProxyPass=["googletagmanager","cloudflareinsights","jsdelivr","raw.githubusercontent.com","gstatic","googleapis","corsfix","corsproxy","allorigins","workers.dev","google-analytics","analytics.google","doubleclick"];
+window.__gdRawFallbackState={jsdelivrFailures:0,preferRaw:false};
+function __gdToRawUrl(u){try{var url=new URL(u,document.baseURI);if(url.hostname==='cdn.jsdelivr.net'&&url.pathname.startsWith('/gh/Ale7208/geometry-dash-wasm/')){var path=url.pathname.slice('/gh/Ale7208/geometry-dash-wasm/'.length);return 'https://raw.githubusercontent.com/Ale7208/geometry-dash-wasm/main/'+path;}}catch(e){}return null;}
+function __gdIsRetryableResponse(r){if(!r)return true;var st=r.status;return st===0||st===403||st===404||st===429||(st>=500&&st<600);}
+async function __gdFetchWithRawFallback(originalUrl,init,attemptedRaw){var rawUrl=__gdToRawUrl(originalUrl);var state=window.__gdRawFallbackState;var useRawFirst=state.preferRaw&&rawUrl;var lastErr=null;var jsdFailed=false;if(useRawFirst&&!attemptedRaw){try{var r=await fetch(rawUrl,init);if(r.ok)return r;attemptedRaw=true;lastErr=null;}catch(e){if(e&&e.name==='AbortError')throw e;lastErr=e;attemptedRaw=true;}}try{var r=await fetch(originalUrl,init);if(r.ok){state.jsdelivrFailures=0;state.preferRaw=false;return r;}jsdFailed=true;lastErr=null;}catch(e){if(e&&e.name==='AbortError')throw e;jsdFailed=true;lastErr=e;}var retryable=lastErr!==null||__gdIsRetryableResponse(r)||!r.body;if(retryable&&rawUrl&&!attemptedRaw){try{var r2=await fetch(rawUrl,init);if(r2.ok){if(jsdFailed){state.jsdelivrFailures++;if(state.jsdelivrFailures>=3)state.preferRaw=true;}return r2;}state.jsdelivrFailures++;if(state.jsdelivrFailures>=3)state.preferRaw=true;lastErr=null;}catch(e){if(e&&e.name==='AbortError')throw e;state.jsdelivrFailures++;if(state.jsdelivrFailures>=3)state.preferRaw=true;lastErr=e;}}else if(!retryable){state.jsdelivrFailures=0;state.preferRaw=false;}else{state.jsdelivrFailures++;if(state.jsdelivrFailures>=3)state.preferRaw=true;}if(lastErr)throw lastErr;return r;}
+window.__gdProxyTarget=function(u){var k="/__proxy?url=";if(typeof u!=="string")return null;for(var b=0;b<window.__gdProxyBases.length;b++)if(u.indexOf(window.__gdProxyBases[b])===0)return null;var i=u.indexOf(k);if(i>=0){if(i>0){try{var o=new URL(u.slice(0,i)).origin;if(o!==location.origin&&o!==new URL(document.baseURI).origin)return null;}catch(e){return null;}}var s=u.slice(i+k.length);try{return decodeURIComponent(s);}catch(e){return s;}}if(/^https?:\/\//i.test(u)){try{var w=new URL(u);if(w.origin===location.origin)return null;for(var p=0;p<window.__gdProxyPass.length;p++)if(w.hostname.indexOf(window.__gdProxyPass[p])>=0)return null;return u;}catch(e){return null;}}return null;};
+window.__gdProxyBuild=function(base,target){if(base.indexOf("corsfix")>=0)return base+target;return base+encodeURIComponent(target);};
+(function(){
+var nativeFetch=window.fetch.bind(window);
+var nativeSetRequestHeader=XMLHttpRequest.prototype.setRequestHeader;
+var workerCooldowns={};
+var nextAccountProxy=0;
+function retryable(st){return st===400||st===401||st===403||st===429||st===503;}
+function secret(init){try{var b=init&&init.body;if(!b)return false;var t=typeof b==="string"?b:new TextDecoder().decode(b);return /(^|&)(gjp2?|password)=/.test(t);}catch(e){return false;}}
+function accountRequest(target,method){return String(method).toUpperCase()==="POST"&&/GJAccount/i.test(target);}
+function accountDebugEnabled(){return /[?&]debug(=|&|$)/.test(location.search);}
+function accountDebug(base,response){if(!accountDebugEnabled())return;var worker;try{worker=new URL(base).hostname;}catch(e){worker=base;}console.log("[login] Worker: "+worker+" Response: "+response);}
+function responseValue(response){return response.clone().text().then(function(text){return text;},function(){return "<response unavailable>";});}
+function accountFetch(input,init,target){var first=nextAccountProxy;nextAccountProxy=(nextAccountProxy+1)%window.__gdAccountProxyBases.length;var template=typeof Request!=="undefined"&&input instanceof Request?input.clone():null;function tryWorker(offset){var base=window.__gdAccountProxyBases[(first+offset)%window.__gdAccountProxyBases.length],url=window.__gdProxyBuild(base,target),out=typeof input==="string"?url:(template?new Request(url,template.clone()):url);return nativeFetch(out,init).then(function(response){if(!accountDebugEnabled()){if(response.status>=200&&response.status<300||offset+1>=window.__gdAccountProxyBases.length)return response;return tryWorker(offset+1);}return responseValue(response).then(function(text){accountDebug(base,text);if(response.status>=200&&response.status<300||offset+1>=window.__gdAccountProxyBases.length)return response;return tryWorker(offset+1);});},function(error){accountDebug(base,"<network error>");if(offset+1<window.__gdAccountProxyBases.length)return tryWorker(offset+1);throw error;});}return tryWorker(0);}
+function scoreUpdate(target,method){return String(method).toUpperCase()==="POST"&&/\/database\/updateGJUserScore22\.php(?:[?#]|$)/i.test(target);}
+function scoreParams(body){if(typeof body==="string")return new URLSearchParams(body);if(typeof URLSearchParams!=="undefined"&&body instanceof URLSearchParams)return body;if(typeof FormData!=="undefined"&&body instanceof FormData)return body;if(typeof ArrayBuffer!=="undefined"&&body instanceof ArrayBuffer)return new URLSearchParams(new TextDecoder().decode(body));if(typeof ArrayBuffer!=="undefined"&&ArrayBuffer.isView(body))return new URLSearchParams(new TextDecoder().decode(body));return null;}
+function missingScoreSession(body){if(body==null)return true;var params=scoreParams(body);if(!params)return false;return !String(params.get("accountID")||"").trim()||!String(params.get("gjp2")||"").trim();}
+function fetchMissingScoreSession(input,init){if(init&&init.body!==undefined)return Promise.resolve(missingScoreSession(init.body));if(typeof Request!=="undefined"&&input instanceof Request){if(!input.body)return Promise.resolve(true);try{return input.clone().text().then(missingScoreSession,function(){return false;});}catch(e){return Promise.resolve(false);}}return Promise.resolve(true);}
+function fallbackWorker(base){return window.__gdProxyFallbackBases.some(function(worker){return base.indexOf(worker.split("/?")[0])===0;});}
+function coolDown(base){var until=Date.now()+300000;workerCooldowns[base]=until;try{localStorage.setItem("gdProxyCooldown:"+base,String(until));}catch(e){}}
+function skipped(base,target){if(fallbackWorker(base)&&target.toLowerCase().indexOf("gjaccount")>=0)return true;var until=workerCooldowns[base]||0;try{until=Math.max(until,Number(localStorage.getItem("gdProxyCooldown:"+base))||0);}catch(e){}if(until<=Date.now()){delete workerCooldowns[base];return false;}workerCooldowns[base]=until;return true;}
+function nextProxy(target,idx){for(var i=idx+1;i<window.__gdProxyBases.length;i++)if(!skipped(window.__gdProxyBases[i],target))return i;return -1;}
+function cloudflareHtml(res){var type=(res.headers.get("content-type")||"").toLowerCase();if(type.indexOf("html")<0)return Promise.resolve(false);if((res.headers.get("server")||"").toLowerCase().indexOf("cloudflare")>=0||res.headers.get("cf-ray"))return Promise.resolve(true);return res.clone().text().then(function(body){return /cloudflare|cf-error|error\s*1027/i.test(body);});}
+function attempt(input,init,target,idx){
+if(idx>=0&&secret(init)&&window.__gdProxyBases[idx].indexOf("ale7208.workers.dev")<0)return Promise.reject(new TypeError("login data is only sent through the allowed proxy"));
+var base=window.__gdProxyBases[idx];
+if(skipped(base,target)){var next=nextProxy(target,idx);return next<0?Promise.reject(new TypeError("no eligible proxy available")):attempt(input,init,target,next);}
+var url=window.__gdProxyBuild(base,target);
+var out=(typeof input==="string")?url:((typeof Request!=="undefined")?new Request(url,input):url);
+function advance(res){var next=nextProxy(target,idx);return next<0?res:attempt(input,init,target,next);}
+return nativeFetch(out,init).then(function(res){
+if(res.status===429||res.status===1027){coolDown(base);return advance(res);}
+return cloudflareHtml(res).then(function(isCloudflare){if(isCloudflare){coolDown(base);return advance(res);}if(retryable(res.status))return advance(res);return res;});
+},function(err){var next=nextProxy(target,idx);if(next>=0)return attempt(input,init,target,next);throw err;});
+}
+window.fetch=function(input,init){var u=(typeof input==="string")?input:(input&&input.url);var target=window.__gdProxyTarget(u);if(target===null)return nativeFetch(input,init);var method=(init&&init.method)||(input&&input.method)||"GET";function send(){var first=nextProxy(target,-1);return first<0?Promise.reject(new TypeError("no eligible proxy available")):attempt(input,init,target,first);}if(accountRequest(target,method))return accountFetch(input,init,target);if(scoreUpdate(target,method))return fetchMissingScoreSession(input,init).then(function(missing){return missing?new Response("1",{status:200,headers:{"Content-Type":"text/plain;charset=UTF-8"}}):send();});return send();};
+var nativeOpen=XMLHttpRequest.prototype.open;
+XMLHttpRequest.prototype.open=function(method,url){this.__gdProxyWorkerBase=null;this.__gdProxyState=null;this.__gdProxyScoreTarget=null;this.__gdAccountState=null;if(typeof url==="string"){var target=window.__gdProxyTarget(url);if(target!==null){if(accountRequest(target,method)){var first=nextAccountProxy;nextAccountProxy=(nextAccountProxy+1)%window.__gdAccountProxyBases.length;var args=Array.prototype.slice.call(arguments);this.__gdAccountState={target:target,method:method,openArgs:args,first:first,attempt:0,headers:[],body:null,inFlight:false,suppressLoadEnd:false};args[1]=window.__gdProxyBuild(window.__gdAccountProxyBases[first],target);return nativeOpen.apply(this,args);}if(scoreUpdate(target,method))this.__gdProxyScoreTarget=target;var base=window.__gdProxyBase||window.__gdProxyBases[0],idx=window.__gdProxyBases.indexOf(base);if(idx<0)idx=0;if(skipped(base,target)){var next=nextProxy(target,-1);if(next<0&&url.indexOf("/__proxy?url=")<0)return nativeOpen.apply(this,arguments);if(next>=0){idx=next;base=window.__gdProxyBases[idx];}}var openArgs=Array.prototype.slice.call(arguments);this.__gdProxyState={target:target,method:method,openArgs:openArgs,index:idx,headers:[],body:null,inFlight:false,suppressLoadEnd:false};arguments[1]=window.__gdProxyBuild(base,target);}}return nativeOpen.apply(this,arguments);};
+XMLHttpRequest.prototype.setRequestHeader=function(name,value){var account=this.__gdAccountState,state=this.__gdProxyState;if(account)account.headers.push([name,value]);else if(state)state.headers.push([name,value]);return nativeSetRequestHeader.apply(this,arguments);};
+var nativeSend=XMLHttpRequest.prototype.send;
+function localScoreXhr(xhr,target){var state=1;function define(name,get){Object.defineProperty(xhr,name,{configurable:true,get:get});}define("readyState",function(){return state;});define("status",function(){return state>=2?200:0;});define("statusText",function(){return state>=2?"OK":"";});define("responseURL",function(){return state>=2?target:"";});define("responseText",function(){if(xhr.responseType!==""&&xhr.responseType!=="text")throw new DOMException("responseText is unavailable for this responseType","InvalidStateError");return state>=3?"1":"";});define("response",function(){if(state<3)return null;switch(xhr.responseType){case "json":return 1;case "arraybuffer":return new TextEncoder().encode("1").buffer;case "blob":return new Blob(["1"],{type:"text/plain;charset=UTF-8"});case "document":return null;default:return "1";}});xhr.getResponseHeader=function(name){return String(name).toLowerCase()==="content-type"?"text/plain;charset=UTF-8":null;};xhr.getAllResponseHeaders=function(){return "content-type: text/plain;charset=UTF-8\r\n";};xhr.dispatchEvent(new Event("loadstart"));setTimeout(function(){state=2;xhr.dispatchEvent(new Event("readystatechange"));state=3;xhr.dispatchEvent(new Event("readystatechange"));state=4;xhr.dispatchEvent(new Event("readystatechange"));xhr.dispatchEvent(new Event("load"));xhr.dispatchEvent(new Event("loadend"));},0);}
+function accountResponseValue(xhr){try{if(xhr.responseType===""||xhr.responseType==="text")return xhr.responseText;var value=xhr.response;return typeof value==="string"?value:JSON.stringify(value);}catch(e){return "<response unavailable>";}}
+function retryAccountXhr(xhr,event){var state=xhr.__gdAccountState;if(!state)return false;if(event.type==="loadend"){if(state.suppressLoadEnd){state.suppressLoadEnd=false;event.stopImmediatePropagation();return true;}return false;}if(event.type==="readystatechange"){if(state.inFlight&&state.attempt+1<window.__gdAccountProxyBases.length&&xhr.readyState===4&&!(xhr.status>=200&&xhr.status<300))event.stopImmediatePropagation();return false;}if(!state.inFlight)return false;var base=window.__gdAccountProxyBases[(state.first+state.attempt)%window.__gdAccountProxyBases.length];accountDebug(base,event.type==="load"?accountResponseValue(xhr):"<network error>");if(event.type==="load"&&xhr.status>=200&&xhr.status<300){state.inFlight=false;return false;}if(state.attempt+1>=window.__gdAccountProxyBases.length){state.inFlight=false;return false;}event.stopImmediatePropagation();state.inFlight=false;state.suppressLoadEnd=true;state.attempt++;setTimeout(function(){var nextBase=window.__gdAccountProxyBases[(state.first+state.attempt)%window.__gdAccountProxyBases.length],args=state.openArgs.slice(),timeout=xhr.timeout,withCredentials=xhr.withCredentials,responseType=xhr.responseType;args[1]=window.__gdProxyBuild(nextBase,state.target);nativeOpen.apply(xhr,args);xhr.timeout=timeout;xhr.withCredentials=withCredentials;xhr.responseType=responseType;for(var i=0;i<state.headers.length;i++)nativeSetRequestHeader.call(xhr,state.headers[i][0],state.headers[i][1]);state.inFlight=true;nativeSend.call(xhr,state.body);},0);return true;}
+function proxyXhrCloudflare(xhr){var type=(xhr.getResponseHeader("content-type")||"").toLowerCase();if(type.indexOf("html")<0)return false;if((xhr.getResponseHeader("server")||"").toLowerCase().indexOf("cloudflare")>=0||xhr.getResponseHeader("cf-ray"))return true;try{return (xhr.responseType===""||xhr.responseType==="text")&&/cloudflare|cf-error|error\s*1027/i.test(xhr.responseText);}catch(e){return false;}}
+function proxyXhrShouldRetry(xhr){return retryable(xhr.status)||xhr.status===1027||proxyXhrCloudflare(xhr);}
+function retryProxyXhr(xhr,event){var state=xhr.__gdProxyState;if(!state)return false;if(event.type==="loadend"){if(state.suppressLoadEnd){state.suppressLoadEnd=false;event.stopImmediatePropagation();return true;}return false;}var next=nextProxy(state.target,state.index);if(event.type==="readystatechange"){if(state.inFlight&&next>=0&&xhr.readyState===4&&proxyXhrShouldRetry(xhr))event.stopImmediatePropagation();return false;}if(!state.inFlight)return false;if(event.type==="load"&&!proxyXhrShouldRetry(xhr)){state.inFlight=false;return false;}if(event.type!=="load"&&event.type!=="error"&&event.type!=="timeout")return false;if(xhr.status===429||xhr.status===1027||proxyXhrCloudflare(xhr))coolDown(window.__gdProxyBases[state.index]);if(next<0){state.inFlight=false;return false;}event.stopImmediatePropagation();state.inFlight=false;state.suppressLoadEnd=true;state.index=next;setTimeout(function(){var args=state.openArgs.slice(),timeout=xhr.timeout,withCredentials=xhr.withCredentials,responseType=xhr.responseType;args[1]=window.__gdProxyBuild(window.__gdProxyBases[state.index],state.target);nativeOpen.apply(xhr,args);xhr.timeout=timeout;xhr.withCredentials=withCredentials;xhr.responseType=responseType;for(var i=0;i<state.headers.length;i++)nativeSetRequestHeader.call(xhr,state.headers[i][0],state.headers[i][1]);state.inFlight=true;nativeSend.call(xhr,state.body);},0);return true;}
+XMLHttpRequest.prototype.send=function(){var xhr=this,account=this.__gdAccountState,state=this.__gdProxyState;if(account){account.body=arguments[0];account.inFlight=true;if(!account.listener){account.listener=true;["load","error","timeout","loadend","readystatechange"].forEach(function(type){xhr.addEventListener(type,function(event){retryAccountXhr(xhr,event);},true);});}return nativeSend.apply(this,arguments);}if(this.__gdProxyScoreTarget&&missingScoreSession(arguments[0])){localScoreXhr(this,this.__gdProxyScoreTarget);return;}if(state){state.body=arguments[0];state.inFlight=true;if(!xhr.__gdProxyRetryListener){xhr.__gdProxyRetryListener=true;["load","error","timeout","loadend","readystatechange"].forEach(function(type){xhr.addEventListener(type,function(event){retryProxyXhr(xhr,event);},true);});}}return nativeSend.apply(this,arguments);};
+})();
+</script>
+<script>
+window.__framed=window.self!==window.top;
+window.addEventListener("message",function(e){if(e.data==="gd-focus"){window.focus();var c=document.getElementById("canvas");if(c)try{c.focus({preventScroll:true});}catch(t){}}if(e.data==="gd-fullscreen"){var c2=document.getElementById("canvas");try{if(document.fullscreenElement)document.exitFullscreen();else if(c2){var r=c2.requestFullscreen||c2.webkitRequestFullscreen;if(r)r.call(c2);}}catch(t){}}});
+document.addEventListener("click",function(){try{if(window.parent!==window)window.parent.postMessage("gd-click","*");}catch(t){}});
+</script>
+<meta name="color-scheme" content="dark"><meta name="theme-color" content="#000000"><link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg"><title>Geometry Dash Webport</title><style>body{background:#000 url("ref/fondo_gd.jpg") center/cover no-repeat fixed;margin:0;height:100%;color:#ddd;font-family:monospace;overflow:hidden;}#app{display:flex;flex-direction:column;height:100vh;}#stage{flex:1 1 auto;min-height:0;display:flex;justify-content:center;align-items:center;}canvas{width:min(100vw,calc(100vh*16/9));height:min(100vh,calc(100vw*9/16));background:#000;image-rendering:auto;outline:none;display:block;user-select:none;}#midbar{flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px;padding:8px 0 6px;font-size:12px;color:#aaa;opacity:0;transform:translateY(120%);transition:transform .55s cubic-bezier(.2,.85,.25,1),opacity .45s;}#midbar.in{opacity:1;transform:translateY(0);}#bars{display:flex;flex-direction:column;gap:5px;transition:transform .5s cubic-bezier(.2,.85,.25,1),opacity .45s;}#bars.fall{transform:translateY(30px);opacity:0;pointer-events:none;}.abrow{display:flex;align-items:center;gap:7px;}.ablabel{width:100px;text-align:right;color:#888;font-size:10px;letter-spacing:.5px;white-space:nowrap;}.abtrack{position:relative;width:220px;height:8px;background:#111;border:1px solid #333;border-radius:4px;overflow:hidden;}.abfill{width:0%;height:100%;background:#ccc;border-radius:3px;transition:width .15s;}.abpct{width:118px;text-align:left;color:#999;font-size:11px;white-space:nowrap;}#bootbars{display:none;align-items:center;gap:7px;}#bootbars.on{display:flex;animation:bootdrop .5s cubic-bezier(.2,.85,.25,1);}@keyframes bootdrop{from{transform:translateY(-16px);opacity:0;}to{transform:translateY(0);opacity:1;}}#bootbars.done{transform:translateY(36px);opacity:0;transition:transform .5s cubic-bezier(.2,.85,.25,1),opacity .45s;pointer-events:none;}#fps{display:flex;align-items:center;gap:5px;color:#999;will-change:transform;}#fps svg{display:block;flex:0 0 auto;}#console{flex:0 0 auto;height:18vh;min-height:90px;max-height:200px;margin:0 8px 8px;padding:6px 8px;overflow-y:auto;font-size:12px;line-height:1.35;color:#999;background:#0a0a0a;border:1px solid #2a2a2a;white-space:pre-wrap;word-break:break-word;user-select:text;cursor:text;transform:translateY(135%);transition:transform .55s cubic-bezier(.2,.85,.25,1);}#console.in{transform:translateY(0);}#fsBtn,#clearBtn,#saveBtn{font:12px/1 monospace;color:#ccc;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;padding:4px 8px;cursor:pointer;transition:color .2s;}#fsBtn:hover,#clearBtn:hover,#saveBtn:hover{color:#fff;}#credit{color:#888;font-size:11px;white-space:nowrap;}#canvas:fullscreen{max-width:none;max-height:none;width:100%;height:100%;}#canvas:-webkit-full-screen{max-width:none;max-height:none;width:100%;height:100%;}#errOverlay{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:50;max-width:min(92vw,720px);display:none;background:#1a0000;border:1px solid #a33;color:#ffd7d7;font-size:12px;padding:8px 12px;border-radius:6px;white-space:pre-wrap;}#errOverlay.on{display:block;}canvas{touch-action:none;}#midbar,#console{display:none!important}#gdLoad{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#000;color:#ddd;font:600 22px/1 system-ui,sans-serif;transition:opacity .7s}#gdLoad.off{opacity:0;pointer-events:none}#gdLoad i{box-sizing:border-box;width:48px;height:48px;border:4px solid #333;border-top-color:#fff;border-radius:50%;animation:gdspin .9s linear infinite}@keyframes gdspin{to{transform:rotate(360deg)}}#gdLoadPct{counter-reset:p var(--p);font:400 16px Arial,Helvetica,sans-serif;color:#fff;text-align:center}#gdLoadPct::after{content:counter(p) "%"}</style>
+<style id="gd-mobile-layout">
+/* ---- mobile layout: safe areas, dynamic viewport, no pull-to-refresh ----
+   Phones report their usable area with env(safe-area-inset-*), and the visible
+   height changes while the URL bar collapses. Using 100dvh + those insets keeps
+   the frame from jumping or drawing under the notch/gesture bar. */
+html,body{overscroll-behavior:none;overscroll-behavior-y:none;}
+body{position:fixed;inset:0;width:100%;height:100dvh;-webkit-tap-highlight-color:transparent;}
+:root{
+  --gd-t:env(safe-area-inset-top,0px);
+  --gd-r:env(safe-area-inset-right,0px);
+  --gd-b:env(safe-area-inset-bottom,0px);
+  --gd-l:env(safe-area-inset-left,0px);
+}
+#app{height:100dvh;box-sizing:border-box;padding:var(--gd-t) var(--gd-r) var(--gd-b) var(--gd-l);}
+#stage canvas{
+  width:min(calc(100vw - var(--gd-l) - var(--gd-r)),calc((100dvh - var(--gd-t) - var(--gd-b))*16/9));
+  height:min(calc(100dvh - var(--gd-t) - var(--gd-b)),calc((100vw - var(--gd-l) - var(--gd-r))*9/16));
+}
+button,input,textarea{touch-action:manipulation;}
+*{-webkit-tap-highlight-color:transparent;}
+</style>
+<script id="gd-gl-tuning">(function () {
+  'use strict';
+  /* The engine asks for a canvas context with browser defaults, which means
+     4x MSAA on the 1920x1080 backbuffer. That is the most expensive thing on
+     mobile GPUs and is barely visible at this pixel density. Disable it and ask
+     for the high-performance GPU; ?aa=1 enables it and ?aa=0 disables it. */
+  var q = new URLSearchParams(location.search);
+  if (q.get('aa') === '1') return;
+  try {
+    var get = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function (type, attrs) {
+      var t = String(type);
+      if (this.id === 'canvas' && (t === 'webgl2' || t === 'webgl' || t === 'experimental-webgl')) {
+        attrs = Object.assign({}, attrs || {});
+        attrs.antialias = false;
+        attrs.powerPreference = 'high-performance';
+      }
+      return get.call(this, type, attrs);
+    };
+  } catch (e) {}
+})();</script></head><body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div id="gdLoad"><i></i><span id="gdLoadPct"></span></div><div id="errOverlay" role="alert"></div><div id="app"><div id="stage"><canvas id="canvas" width="1920" height="1080"></canvas></div><div id="midbar"><div id="bars"><div class="abrow"><span class="ablabel" id="wasmLabel">WASM</span><div class="abtrack"><div class="abfill" id="wasmFill"></div></div><span class="abpct" id="wasmPct">0%</span></div><div class="abrow"><span class="ablabel" id="dataLabel">DATA</span><div class="abtrack"><div class="abfill" id="dataFill"></div></div><span class="abpct" id="dataPct">0%</span></div></div><div id="bootbars"><div class="abtrack"><div class="abfill" id="bootFill"></div></div><span class="abpct" id="bootPct">0%</span></div><div id="fps"><svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true"><rect x="1.2" y="2" width="13.6" height="9" rx="1.6" fill="none" stroke="#888" stroke-width="1.4"/><rect x="6.5" y="12" width="3" height="2" fill="#888"/><rect x="4.5" y="14.2" width="7" height="1.3" rx="0.6" fill="#888"/></svg><span id="fpsval">-- fps</span></div><span id="perfval" style="font-size:10px" title="Queue delay is event-to-game polling, not total display latency"></span><button id="fsBtn" type="button">Fullscreen</button><button id="saveBtn" type="button" title="Save game progress and local levels">Save progress</button><button id="clearBtn" type="button" title="Delete saved progress and login">Reset progress</button></div><div id="console"></div></div><script>(function(){var WASM_URL="https://raw.githubusercontent.com/Ale7208/geometry-dash-wasm/main/payload/wasm-523d9362955eba27a8ce64ec.gz";var f=window.fetch;function fixed(r){return r.clone().json().then(function(j){if(WASM_URL&&j&&j.wasm)j.wasm.url=WASM_URL;return new Response(JSON.stringify(j),{status:200,headers:{"Content-Type":"application/json"}});});}async function fetchWithFallback(url,opts){var rawUrl=null;try{var u=new URL(url,document.baseURI);if(u.hostname==='cdn.jsdelivr.net'&&u.pathname.startsWith('/gh/Ale7208/geometry-dash-wasm/')){var path=u.pathname.slice('/gh/Ale7208/geometry-dash-wasm/'.length);rawUrl='https://raw.githubusercontent.com/Ale7208/geometry-dash-wasm/main/'+path;}}catch(e){}var state=window.__gdRawFallbackState||{jsdelivrFailures:0,preferRaw:false};var useRawFirst=state.preferRaw&&rawUrl;var lastErr=null;var jsdFailed=false;if(useRawFirst){try{var r2=await f(rawUrl,opts);if(r2.ok)return r2;lastErr=null;}catch(e){if(e&&e.name==='AbortError')throw e;lastErr=e;}}try{var r=await f(url,opts);if(r.ok){state.jsdelivrFailures=0;state.preferRaw=false;return r;}jsdFailed=true;lastErr=null;}catch(e){if(e&&e.name==='AbortError')throw e;jsdFailed=true;lastErr=e;}var retryable=lastErr!==null||!r.ok||(r.status===0)||r.status===403||r.status===404||r.status===429||(r.status>=500&&r.status<600);if(retryable&&rawUrl){try{var r2=await f(rawUrl,opts);if(r2.ok){if(jsdFailed){state.jsdelivrFailures++;if(state.jsdelivrFailures>=3)state.preferRaw=true;}return r2;}state.jsdelivrFailures++;if(state.jsdelivrFailures>=3)state.preferRaw=true;lastErr=null;}catch(e){if(e&&e.name==='AbortError')throw e;state.jsdelivrFailures++;if(state.jsdelivrFailures>=3)state.preferRaw=true;lastErr=e;}}else if(!retryable){state.jsdelivrFailures=0;state.preferRaw=false;}else{state.jsdelivrFailures++;if(state.jsdelivrFailures>=3)state.preferRaw=true;}if(lastErr)throw lastErr;return r;}window.fetch=function(i,o){var u=typeof i==='string'?i:(i&&i.url)||'';if(u.indexOf('gd_assets.json')<0)return f.apply(this,arguments);var k=new URL(u,document.baseURI).href.split('?')[0];return fetchWithFallback(u,o).then(function(r){if(!r.ok)return r;return fixed(r).then(function(n){var copy=n.clone();if(window.caches)caches.open('gdwasm-assets').then(function(c){return c.put(k,copy);}).catch(function(){});return n;});}).catch(function(e){if(!window.caches)throw e;return caches.open('gdwasm-assets').then(function(c){return c.match(k);}).then(function(r){if(r)return r;throw e;});});};})();</script><script>
+(function () {
+  'use strict';
+  var menuOpen = false;
+  var activeKeys = Object.create(null);
+  var blockedUntilUp = Object.create(null);
+  var menu = null;
+  var statusTimer = null;
+  var menuVisibilityTimer = null;
+  var menuTransitionId = 0;
+  var busy = false;
+  var savedFocus = null;
+
+  function stopKeyEvent(event) {
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  }
+  function focusMenuButton(index) {
+    if (!menu) return;
+    var buttons = menu.querySelectorAll('button:not(:disabled)');
+    if (!buttons.length) return;
+    var current = Array.prototype.indexOf.call(buttons, document.activeElement);
+    if (index !== undefined)
+      current = index < 0 ? 0 : (index % buttons.length + buttons.length) % buttons.length;
+    else current = 0;
+    buttons[current].focus();
+  }
+  function setMenuOpen(open) {
+    if (menuOpen === open) return;
+    if (open) {
+      Object.keys(activeKeys).forEach(function (code) {
+        var key = activeKeys[code];
+        window.dispatchEvent(new KeyboardEvent('keyup', {
+          key: key.key, code: key.code, bubbles: true, cancelable: true
+        }));
+      });
+      activeKeys = Object.create(null);
+      savedFocus = document.activeElement;
+    }
+    menuOpen = open;
+    window.__gdMenuOpen = open;
+    if (!menu) return;
+    if (menuVisibilityTimer) {
+      clearTimeout(menuVisibilityTimer);
+      menuVisibilityTimer = null;
+    }
+    var transitionId = ++menuTransitionId;
+    if (open) {
+      menu.hidden = false;
+      menu.offsetWidth;
+      menu.classList.add('is-open');
+      focusMenuButton(0);
+    } else {
+      menu.classList.remove('is-open');
+      menuVisibilityTimer = setTimeout(function () {
+        if (!menuOpen && transitionId === menuTransitionId)
+          menu.hidden = true;
+        menuVisibilityTimer = null;
+      }, 180);
+      if (savedFocus && typeof savedFocus.focus === 'function') {
+        try { savedFocus.focus({ preventScroll: true }); }
+        catch (error) { savedFocus.focus(); }
+      }
+    }
+  }
+  function keydown(event) {
+    if (blockedUntilUp[event.code]) {
+      stopKeyEvent(event);
+      return;
+    }
+    if (menuOpen) {
+      stopKeyEvent(event);
+      if (event.repeat) return;
+      if (event.code === 'Tab' || event.code === 'Escape') {
+        blockedUntilUp[event.code] = true;
+        setMenuOpen(false);
+      } else if (event.code === 'ArrowDown' || event.code === 'ArrowRight') {
+        var buttons = menu.querySelectorAll('button:not(:disabled)');
+        var current = Array.prototype.indexOf.call(buttons, document.activeElement);
+        focusMenuButton(current + 1);
+      } else if (event.code === 'ArrowUp' || event.code === 'ArrowLeft') {
+        var previousButtons = menu.querySelectorAll('button:not(:disabled)');
+        var previous = Array.prototype.indexOf.call(previousButtons, document.activeElement);
+        focusMenuButton(previous < 0 ? previousButtons.length - 1 : previous - 1);
+      } else if ((event.code === 'Enter' || event.code === 'Space') &&
+                 menu.contains(document.activeElement)) {
+        document.activeElement.click();
+      }
+      return;
+    }
+    if (event.code === 'Tab') {
+      stopKeyEvent(event);
+      blockedUntilUp.Tab = true;
+      setMenuOpen(true);
+      return;
+    }
+    if (event.code) activeKeys[event.code] = { key: event.key, code: event.code };
+  }
+  function keyup(event) {
+    if (menuOpen || blockedUntilUp[event.code]) {
+      stopKeyEvent(event);
+      delete blockedUntilUp[event.code];
+      return;
+    }
+    delete activeKeys[event.code];
+  }
+  function keypress(event) {
+    if (menuOpen) stopKeyEvent(event);
+  }
+  window.addEventListener('keydown', keydown, true);
+  window.addEventListener('keyup', keyup, true);
+  window.addEventListener('keypress', keypress, true);
+
+  function setStatus(message, isError) {
+    var status = document.getElementById('gdMenuStatus');
+    if (!status) return;
+    if (statusTimer) clearTimeout(statusTimer);
+    status.textContent = message;
+    status.classList.toggle('error', !!isError);
+    if (message && !isError) {
+      statusTimer = setTimeout(function () {
+        status.textContent = '';
+        statusTimer = null;
+      }, 3000);
+    }
+  }
+  function setBusy(value) {
+    busy = value;
+    if (!menu) return;
+    menu.setAttribute('aria-busy', value ? 'true' : 'false');
+    menu.querySelectorAll('button').forEach(function (button) {
+      button.disabled = value || button.getAttribute('data-current') === 'true';
+    });
+  }
+  function songRecordName(key, database) {
+    var value = String(key).replace(/\\/g, '/');
+    var match;
+    if (database === 'gdwasm_saves') {
+      match = /^\/?AppData\/([^/]+\.mp3)$/i.exec(value);
+    } else {
+      match = /^(?:\/?AppData\/|(?:cur|prev):)([^/:]+\.mp3)$/i.exec(value);
+    }
+    return match ? match[1].toLowerCase() : null;
+  }
+  function deleteDownloadedSongRecords(database) {
+    return openDatabase(database).then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx;
+        var names = Object.create(null);
+        try {
+          tx = db.transaction('files', 'readwrite');
+          var store = tx.objectStore('files');
+          var request = store.getAllKeys();
+          request.onsuccess = function () {
+            var keys = request.result || [];
+            for (var i = 0; i < keys.length; ++i) {
+              var name = songRecordName(keys[i], database);
+              if (!name) continue;
+              names[name] = true;
+              store.delete(keys[i]);
+            }
+          };
+          request.onerror = function () {
+            reject(request.error || new Error('Could not list downloaded songs.'));
+          };
+          tx.oncomplete = function () { resolve(Object.keys(names)); };
+          tx.onerror = tx.onabort = function () {
+            reject(tx.error || new Error('Could not delete downloaded songs.'));
+          };
+        } catch (error) {
+          if (tx) try { tx.abort(); } catch (ignored) {}
+          reject(error);
+        }
+      }).then(function (names) {
+        db.close();
+        return names;
+      }, function (error) {
+        db.close();
+        throw error;
+      });
+    });
+  }
+  async function clearDownloadedSongs() {
+    setBusy(true);
+    try {
+      var names = Object.create(null);
+      var fs = window.Module && Module.FS;
+      if (fs && fs.analyzePath && fs.analyzePath('/AppData').exists) {
+        if (window.__gdInstallSongDeleteHook) window.__gdInstallSongDeleteHook();
+        var entries = fs.readdir('/AppData');
+        for (var i = 0; i < entries.length; ++i) {
+          var filename = entries[i];
+          if (filename === '.' || filename === '..' || !/\.mp3$/i.test(filename))
+            continue;
+          var path = '/AppData/' + filename;
+          var stat = fs.lstat ? fs.lstat(path) : fs.stat(path);
+          if (!fs.isFile(stat.mode)) continue;
+          names[filename.toLowerCase()] = true;
+          fs.unlink(path);
+        }
+      }
+      var databases = ['gdwasm_saves', 'gdwasm_backup'];
+      for (var dbIndex = 0; dbIndex < databases.length; ++dbIndex) {
+        var removedNames = await deleteDownloadedSongRecords(databases[dbIndex]);
+        for (var nameIndex = 0; nameIndex < removedNames.length; ++nameIndex)
+          names[removedNames[nameIndex]] = true;
+      }
+      var count = Object.keys(names).length;
+      alert('Deleted ' + count + ' downloaded song' +
+        (count === 1 ? '.' : 's.'));
+    } catch (error) {
+      console.error('Could not clear downloaded songs:', error);
+      alert('Could not clear downloaded songs.');
+    } finally { setBusy(false); }
+  }
+  function currentResolution() {
+    var params = new URLSearchParams(location.search);
+    var resolution = params.get('res');
+    if (resolution === null) resolution = params.get('quality');
+    if (resolution === 'medium') resolution = 'med';
+    if (resolution === 'low' || resolution === 'med' || resolution === 'high') return resolution;
+    return navigator.deviceMemory > 0 && navigator.deviceMemory <= 4 ? 'low' : 'high';
+  }
+  function currentAntialiasing() {
+    return new URLSearchParams(location.search).get('aa') === '1';
+  }
+  async function reloadWithParameter(name, value, setting) {
+    setBusy(true);
+    try {
+      if (!window.__gdRuntimeReady || !window.__gdSavesRestored)
+        throw new Error('The game is not ready to save.');
+      if (typeof gdSaveTimer !== 'undefined' && gdSaveTimer) {
+        clearTimeout(gdSaveTimer);
+        gdSaveTimer = null;
+      }
+      await Promise.all([
+        Promise.resolve(gdPersist()),
+        Promise.resolve(performSave())
+      ]);
+      var target = new URL(location.href);
+      if (name === 'res') target.searchParams.delete('quality');
+      target.searchParams.set(name, value);
+      window.__gdSkipBeforeUnloadSave = true;
+      location.assign(target.href);
+    } catch (error) {
+      console.error('Could not save before changing ' + setting + ':', error);
+      window.__gdSkipBeforeUnloadSave = false;
+      setBusy(false);
+      alert('Could not save progress before reloading.');
+    }
+  }
+  function changeResolution(resolution) {
+    return reloadWithParameter('res', resolution, 'resolution');
+  }
+  function changeAntialiasing(enabled) {
+    return reloadWithParameter('aa', enabled ? '1' : '0', 'antialiasing');
+  }
+  function reportBug() {
+    window.open('https://github.com/Ale7208/Geometry-Dash-webport/issues/new/choose', '_blank', 'noopener,noreferrer');
+  }
+  function openDatabase(name) {
+    return new Promise(function (resolve, reject) {
+      var request, settled = false;
+      try { request = indexedDB.open(name, 1); }
+      catch (error) { reject(error); return; }
+      request.onupgradeneeded = function () {
+        if (!request.result.objectStoreNames.contains('files'))
+          request.result.createObjectStore('files');
+      };
+      request.onerror = function () {
+        if (settled) return;
+        settled = true;
+        reject(request.error || new Error('Could not open the database.'));
+      };
+      request.onblocked = function () {
+        if (settled) return;
+        settled = true;
+        reject(new Error('The database is busy.'));
+      };
+      request.onsuccess = function () {
+        if (settled) { request.result.close(); return; }
+        settled = true;
+        resolve(request.result);
+      };
+    });
+  }
+  function readRecords(database, keys) {
+    return openDatabase(database).then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx, values = Object.create(null), pending = keys.length, failed = false;
+        try {
+          tx = db.transaction('files', 'readonly');
+          var store = tx.objectStore('files');
+          keys.forEach(function (key) {
+            var request = store.get(key);
+            request.onsuccess = function () {
+              values[key] = request.result;
+              pending--;
+            };
+            request.onerror = function () {
+              failed = true;
+              reject(request.error || new Error('Could not read the data.'));
+            };
+          });
+          tx.oncomplete = function () {
+            if (!failed && pending === 0) resolve(values);
+          };
+          tx.onerror = tx.onabort = function () {
+            if (failed) return;
+            failed = true;
+            reject(tx.error || new Error('Could not read the data.'));
+          };
+        } catch (error) {
+          failed = true;
+          reject(error);
+        }
+      }).then(function (values) {
+        db.close();
+        return values;
+      }, function (error) {
+        db.close();
+        throw error;
+      });
+    });
+  }
+  function writeRecords(database, records) {
+    return openDatabase(database).then(function (db) {
+      return new Promise(function (resolve, reject) {
+        var tx;
+        try {
+          tx = db.transaction('files', 'readwrite');
+          var store = tx.objectStore('files');
+          Object.keys(records).forEach(function (key) {
+            if (records[key] === undefined) store.delete(key);
+            else store.put(records[key], key);
+          });
+          tx.oncomplete = resolve;
+          tx.onerror = tx.onabort = function () {
+            reject(tx.error || new Error('Could not write the data.'));
+          };
+        } catch (error) {
+          if (tx) try { tx.abort(); } catch (ignored) {}
+          reject(error);
+        }
+      }).then(function (value) {
+        db.close();
+        return value;
+      }, function (error) {
+        db.close();
+        throw error;
+      });
+    });
+  }
+  function asBytes(value) {
+    if (value instanceof ArrayBuffer) return new Uint8Array(value);
+    if (ArrayBuffer.isView(value))
+      return new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
+    throw new Error('The save file is invalid.');
+  }
+  function encodeBase64(bytes) {
+    var binary = '';
+    for (var offset = 0; offset < bytes.length; offset += 0x8000)
+      binary += String.fromCharCode.apply(null, bytes.subarray(offset, offset + 0x8000));
+    return btoa(binary);
+  }
+  function decodeBase64(value) {
+    if (typeof value !== 'string' ||
+        !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(value))
+      throw new Error('Invalid Base64.');
+    var binary;
+    try { binary = atob(value); }
+    catch (error) { throw new Error('Invalid Base64.'); }
+    var bytes = new Uint8Array(binary.length);
+    for (var i = 0; i < binary.length; ++i) bytes[i] = binary.charCodeAt(i);
+    if (encodeBase64(bytes) !== value) throw new Error('Invalid Base64.');
+    return bytes;
+  }
+  var saveKeys = {
+    'CCGameManager.dat': 'AppData/CCGameManager.dat',
+    'CCLocalLevels.dat': 'AppData/CCLocalLevels.dat'
+  };
+  var backupKeys = [
+    'cur:CCGameManager.dat', 'prev:CCGameManager.dat',
+    'cur:CCLocalLevels.dat', 'prev:CCLocalLevels.dat'
+  ];
+  function fileBytesFrom(value) {
+    if (value === undefined || value === null)
+      throw new Error('A save file is missing.');
+    return asBytes(value);
+  }
+  async function exportProgress() {
+    var names = Object.keys(saveKeys);
+    var records = await readRecords('gdwasm_saves', names.map(function (name) {
+      return saveKeys[name];
+    }));
+    var files = {};
+    names.forEach(function (name) {
+      files[name] = encodeBase64(fileBytesFrom(records[saveKeys[name]]));
+    });
+    var payload = {
+      app: 'GeometryDashWebport',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      files: files
+    };
+    var date = new Date();
+    var datePart = date.getFullYear() + '-' +
+      String(date.getMonth() + 1).padStart(2, '0') + '-' +
+      String(date.getDate()).padStart(2, '0');
+    var url = URL.createObjectURL(new Blob([JSON.stringify(payload)], {
+      type: 'application/json'
+    }));
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = 'geometry_dash_save_' + datePart + '.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  function parseImport(text) {
+    var data;
+    try { data = JSON.parse(text); }
+    catch (error) { throw new Error('Invalid JSON file.'); }
+    var names = Object.keys(saveKeys);
+    if (!data || data.app !== 'GeometryDashWebport' || data.version !== 1 ||
+        !data.files || typeof data.files !== 'object' || Array.isArray(data.files))
+      throw new Error('Unsupported save format.');
+    var fileNames = Object.keys(data.files);
+    if (fileNames.length !== names.length ||
+        names.some(function (name) { return fileNames.indexOf(name) < 0; }))
+      throw new Error('Invalid save files.');
+    var decoded = {};
+    names.forEach(function (name) {
+      decoded[name] = decodeBase64(data.files[name]);
+    });
+    return decoded;
+  }
+  async function pauseSaves() {
+    window.__gdProgressMutation = true;
+    window.__gdSkipBeforeUnloadSave = true;
+    if (typeof gdSaveTimer !== 'undefined' && gdSaveTimer) {
+      clearTimeout(gdSaveTimer);
+      gdSaveTimer = null;
+    }
+    try {
+      if (window.Module && Module._gd_autosave_set) {
+        if (GD_DEBUG)
+          console.info('[save] _gd_autosave_set disabled; reason: progress operation');
+        Module._gd_autosave_set(0);
+      }
+    } catch (error) {
+      window.__gdProgressMutation = false;
+      window.__gdSkipBeforeUnloadSave = false;
+      throw error;
+    }
+    if (typeof gdSavePromise !== 'undefined' && gdSavePromise)
+      await gdSavePromise;
+  }
+  function resumeSaves() {
+    window.__gdProgressMutation = false;
+    window.__gdSkipBeforeUnloadSave = false;
+    updateGameAutosave('progress operation');
+  }
+  function reloadWithoutSaving() {
+    window.__gdProgressMutation = true;
+    window.__gdSkipBeforeUnloadSave = true;
+    if (typeof gdSaveTimer !== 'undefined' && gdSaveTimer) {
+      clearTimeout(gdSaveTimer);
+      gdSaveTimer = null;
+    }
+    location.reload();
+  }
+  async function importProgress(file) {
+    var decoded;
+    try { decoded = parseImport(await file.text()); }
+    catch (error) {
+      var validationErrors = [
+        'Unsupported save format.', 'Invalid save files.',
+        'Invalid JSON file.', 'Invalid Base64.'
+      ];
+      setStatus(validationErrors.indexOf(error.message) >= 0 ? error.message :
+        'Invalid or incompatible file.', true);
+      return;
+    }
+    if (!confirm('Import this progress? Current data will be replaced.')) return;
+    setBusy(true);
+    try {
+      await pauseSaves();
+      var saveKeysList = Object.keys(saveKeys).map(function (name) {
+        return saveKeys[name];
+      });
+      var oldSaves = await readRecords('gdwasm_saves', saveKeysList);
+      var oldBackups = await readRecords('gdwasm_backup', backupKeys);
+      var newSaves = {};
+      var newBackups = {};
+      Object.keys(saveKeys).forEach(function (name) {
+        var bytes = decoded[name];
+        newSaves[saveKeys[name]] = bytes.slice().buffer;
+        newBackups['cur:' + name] = {
+          bytes: bytes.slice().buffer,
+          ts: Date.now()
+        };
+        newBackups['prev:' + name] = undefined;
+      });
+      try {
+        await writeRecords('gdwasm_saves', newSaves);
+        await writeRecords('gdwasm_backup', newBackups);
+      } catch (error) {
+        try {
+          await writeRecords('gdwasm_saves', oldSaves);
+          await writeRecords('gdwasm_backup', oldBackups);
+        } catch (rollbackError) {
+          throw new Error('Could not complete the import.');
+        }
+        throw error;
+      }
+      reloadWithoutSaving();
+    } catch (error) {
+      try { resumeSaves(); }
+      catch (resumeError) { setStatus('Autosave could not be resumed.', true); }
+      setBusy(false);
+      setStatus('Could not import progress.', true);
+    }
+  }
+  async function resetProgress() {
+    if (!confirm('Delete game progress?')) return;
+    if (!confirm('Confirm permanent deletion of game progress.')) return;
+    setBusy(true);
+    try {
+      await pauseSaves();
+      var saveKeysList = Object.keys(saveKeys).map(function (name) {
+        return saveKeys[name];
+      });
+      var oldSaves = await readRecords('gdwasm_saves', saveKeysList);
+      var oldBackups = await readRecords('gdwasm_backup', backupKeys);
+      try {
+        await writeRecords('gdwasm_saves', {
+          'AppData/CCGameManager.dat': undefined,
+          'AppData/CCLocalLevels.dat': undefined
+        });
+        await writeRecords('gdwasm_backup', {
+          'cur:CCGameManager.dat': undefined,
+          'prev:CCGameManager.dat': undefined,
+          'cur:CCLocalLevels.dat': undefined,
+          'prev:CCLocalLevels.dat': undefined
+        });
+      } catch (error) {
+        try {
+          await writeRecords('gdwasm_saves', oldSaves);
+          await writeRecords('gdwasm_backup', oldBackups);
+        } catch (rollbackError) {
+          throw new Error('Could not complete the deletion.');
+        }
+        throw error;
+      }
+      reloadWithoutSaving();
+    } catch (error) {
+      try { resumeSaves(); }
+      catch (resumeError) { setStatus('Autosave could not be resumed.', true); }
+      setBusy(false);
+      setStatus('Could not delete progress.', true);
+    }
+  }
+  async function clearAssetCache() {
+    if (!confirm('Clear the asset cache? Game progress will not be affected.')) return;
+    setBusy(true);
+    try {
+      if (!window.caches) throw new Error('Cache API is unavailable.');
+      await caches.delete('gdwasm-assets');
+      setStatus('Cache cleared.');
+    } catch (error) {
+      setStatus('Could not clear the cache.', true);
+    } finally { setBusy(false); }
+  }
+  function buildMenu() {
+    var style = document.createElement('style');
+    style.textContent = '#gdUtilityMenu{position:fixed;top:14px;right:14px;z-index:70;width:min(270px,calc(100vw - 28px));box-sizing:border-box;padding:14px;background:rgba(15,15,18,.97);border:1px solid #34343a;border-radius:8px;box-shadow:0 8px 28px #0009;color:#ddd;font:12px/1.45 monospace;opacity:0;pointer-events:none;transition:opacity .18s ease}#gdUtilityMenu.is-open{opacity:1;pointer-events:auto;transition-duration:.23s}#gdUtilityMenu[hidden]{display:none}#gdUtilityMenu,#gdUtilityMenu *{font-family:monospace!important}#gdUtilityMenu h2{margin:0 0 10px;color:#eee;font:12px monospace}#gdUtilityMenu .gdMenuButtons{display:grid;gap:6px}#gdUtilityMenu button{width:100%;padding:7px 9px;border:1px solid #38383e;border-radius:5px;background:#1b1b20;color:#ddd;text-align:left;font:12px monospace;cursor:pointer}#gdUtilityMenu button:hover:not(:disabled),#gdUtilityMenu button:focus-visible{background:#292930;border-color:#666;outline:none}#gdUtilityMenu button:disabled{opacity:.55;cursor:wait}#gdMenuHint{margin-top:9px;color:#85858c;font-size:10px}#gdMenuStatus{min-height:0;margin-top:0;color:#b9d8b9;font-size:11px}#gdMenuStatus:not(:empty){margin-top:8px}#gdMenuStatus.error{color:#ffaaaa}#gdMenuFile{display:none}';
+    style.textContent += '#gdUtilityMenu button[aria-pressed="true"]{background:#292930;border-color:#777;color:#fff}';
+    document.head.appendChild(style);
+    menu = document.createElement('section');
+    menu.id = 'gdUtilityMenu';
+    menu.hidden = true;
+    menu.setAttribute('data-noscramble', '');
+    menu.setAttribute('role', 'dialog');
+    menu.setAttribute('aria-labelledby', 'gdMenuTitle');
+    menu.setAttribute('aria-busy', 'false');
+    var activeResolution = currentResolution();
+    var antialiasingEnabled = currentAntialiasing();
+    menu.innerHTML = '<div class="gdMenuButtons">' +
+      '<button type="button" data-action="export">Export progress</button>' +
+      '<button type="button" data-action="import">Import progress</button>' +
+      '<button type="button" data-action="reset">Reset progress</button>' +
+      '<button type="button" data-action="cache">Clear cache</button>' +
+      '<button type="button" data-action="clear-songs">Clear songs</button>' +
+      '<button type="button" data-action="report-bug">Report bug</button>' +
+      '<button type="button" data-action="antialiasing" aria-pressed="' +
+        (antialiasingEnabled ? 'true' : 'false') + '">Antialiasing: ' +
+        (antialiasingEnabled ? 'On' : 'Off') + '</button>' +
+      '<button type="button" data-action="resolution" data-resolution="low">Resolution: Low</button>' +
+      '<button type="button" data-action="resolution" data-resolution="med">Resolution: Medium</button>' +
+      '<button type="button" data-action="resolution" data-resolution="high">Resolution: High</button>' +
+      '</div><div id="gdMenuHint">Tab or Esc to close</div>' +
+      '<div id="gdMenuStatus" role="status" aria-live="polite"></div>' +
+      '<input id="gdMenuFile" type="file" accept="application/json,.json">';
+    menu.querySelectorAll('button[data-resolution]').forEach(function (button) {
+      var selected = button.getAttribute('data-resolution') === activeResolution;
+      button.setAttribute('data-current', selected ? 'true' : 'false');
+      button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+      button.disabled = selected;
+    });
+    var title = document.createElement('h2');
+    title.id = 'gdMenuTitle';
+    title.textContent = 'Tools Menu';
+    menu.insertBefore(title, menu.firstChild);
+    document.body.insertBefore(menu, document.body.firstChild);
+    menu.addEventListener('click', function (event) {
+      var button = event.target.closest('button[data-action]');
+      if (!button || busy) return;
+      var action = button.getAttribute('data-action');
+      if (action === 'export') {
+        setBusy(true);
+        exportProgress().then(function () { setStatus('Exported.'); })
+          .catch(function () { setStatus('Could not export progress.', true); })
+          .then(function () { setBusy(false); });
+      } else if (action === 'import') {
+        document.getElementById('gdMenuFile').click();
+      } else if (action === 'reset') {
+        resetProgress();
+      } else if (action === 'cache') {
+        clearAssetCache();
+      } else if (action === 'clear-songs') {
+        if (confirm('Delete all downloaded songs? Your progress will not be affected.'))
+          clearDownloadedSongs();
+      } else if (action === 'report-bug') {
+        reportBug();
+      } else if (action === 'antialiasing') {
+        var enabled = !currentAntialiasing();
+        if (confirm('This will reload the page to apply the antialiasing change. ' +
+            'Your progress will be saved first. Continue?'))
+          changeAntialiasing(enabled);
+      } else if (action === 'resolution') {
+        var resolution = button.getAttribute('data-resolution');
+        if (confirm('This will reload the page to apply the resolution change. ' +
+            'Your progress will be saved first. Continue?'))
+          changeResolution(resolution);
+      }
+    });
+    document.getElementById('gdMenuFile').addEventListener('change', function (event) {
+      var file = event.target.files && event.target.files[0];
+      event.target.value = '';
+      if (file) importProgress(file);
+    });
+    if (menuOpen) {
+      menu.hidden = false;
+      ++menuTransitionId;
+      menu.offsetWidth;
+      menu.classList.add('is-open');
+      focusMenuButton(0);
+    }
+  }
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', buildMenu, { once: true });
+  else buildMenu();
+})();
+(function () {
+  'use strict';
+  var manifestPromise;
+  var pending = Object.create(null);
+  var maxJobs = 2;
+  try {
+    var q = new URLSearchParams(location.search).get('jobs');
+    if (q) { var n = parseInt(q, 10); if (n >= 1 && n <= 8) maxJobs = n; }
+  } catch (e) {  }
+  var activeJobs = 0, jobWaiters = [];
+  function acquire() {
+    if (activeJobs < maxJobs) { activeJobs++; return Promise.resolve(); }
+    return new Promise(function (resolve) { jobWaiters.push(resolve); });
+  }
+  function release() {
+    activeJobs--;
+    var next = jobWaiters.shift();
+    if (next) { activeJobs++; next(); }
+  }
+  var assetCachePromise;
+  function assetCache() {
+    if (!assetCachePromise) {
+      assetCachePromise = ('caches' in window ? caches.open('gdwasm-assets') : Promise.reject(0))
+        .catch(function () { return null; });
+    }
+    return assetCachePromise;
+  }
+  var stallMs = 30000;
+  var verifiedSha256 = Object.create(null);
+  function readChunk(reader, timeoutMs) {
+    return new Promise(function (resolve, reject) {
+      var timer = setTimeout(function () {
+        reject(new Error('Asset transfer stalled for ' + Math.round(timeoutMs / 1000) + 's'));
+      }, timeoutMs);
+      reader.read().then(function (r) { clearTimeout(timer); resolve(r); },
+                        function (e) { clearTimeout(timer); reject(e); });
+    });
+  }
+  async function readAllBytes(body, timeoutMs, expectedSize, target) {
+    var reader = body.getReader();
+    var out = target || (expectedSize ? new Uint8Array(expectedSize) : null);
+    var parts = out ? null : [], total = 0;
+    for (;;) {
+      var next;
+      try { next = await readChunk(reader, timeoutMs); }
+      catch (e) { try { await reader.cancel(e); } catch (_) {} throw e; }
+      if (next.done) break;
+      if (out) {
+        if (total + next.value.length > out.length) {
+          try { await reader.cancel(); } catch (_) {}
+          throw new Error('Asset is larger than expected');
+        }
+        out.subarray(total, total + next.value.length).set(next.value);
+      } else parts.push(next.value);
+      total += next.value.length;
+    }
+    if (out) {
+      if (total !== out.length) throw new Error('Asset download was interrupted');
+      return out;
+    }
+    var joined = new Uint8Array(total);
+    for (var i = 0, off = 0; i < parts.length; i++) { joined.set(parts[i], off); off += parts[i].length; }
+    return joined;
+  }
+  function watchdogStream(body, timeoutMs, onProgress) {
+    var reader = body.getReader();
+    return new ReadableStream({
+      async pull(ctrl) {
+        var next;
+        try { next = await readChunk(reader, timeoutMs); }
+        catch (e) { try { await reader.cancel(e); } catch (_) {} ctrl.error(e); return; }
+        if (next.done) { ctrl.close(); return; }
+        if (onProgress) onProgress(next.value.length);
+        ctrl.enqueue(next.value);
+      },
+      cancel: function (reason) { try { return reader.cancel(reason); } catch (_) {} }
+    });
+  }
+  function version() { return typeof GD_BUILD_ID === 'string' ? GD_BUILD_ID : 'dev'; }
+  function manifest() {
+    if (!manifestPromise) manifestPromise = fetch('gd_assets.json?v=' + version(), {cache: 'no-cache'})
+      .then(function (r) { if (!r.ok) throw new Error('Asset manifest HTTP ' + r.status); return r.json(); });
+    return manifestPromise;
+  }
+  function report(kind, loaded, total) {
+    if (typeof setAssetBar === 'function') setAssetBar(kind, loaded, total);
+    if (window.Module) {
+      Module.dataFileDownloads = Module.dataFileDownloads || {};
+      Module.dataFileDownloads['gd_web.' + (kind === 'data' ? 'data' : 'wasm')] = {loaded: loaded, total: total};
+    }
+  }
+  async function compressedResponse(entry, signal, attempt) {
+    var cache = await assetCache();
+    var r = null;
+    if (cache && !attempt) {
+      try { r = await cache.match(entry.url); } catch (e) { r = null; }
+    }
+    if (!r) {
+      r = await __gdFetchWithRawFallback(entry.url, {cache: attempt ? 'reload' : 'force-cache', signal: signal}, false);
+      if (!r.ok) throw new Error(entry.url + ': HTTP ' + r.status);
+      if (!r.body) throw new Error('This browser cannot stream game assets.');
+      if (cache) {
+        var put = cache.put(entry.url, r.clone());
+        if (put && put.catch) put.catch(function () {});
+      }
+    }
+    var body = r.headers.get('Content-Encoding') === 'gzip' ? r.body
+      : r.body.pipeThrough(new DecompressionStream('gzip'));
+    return new Response(body, {headers: {'Content-Type': 'application/wasm'}});
+  }
+  async function retry(operation, signal, retryable) {
+    for (var attempt = 0; ; attempt++) {
+      try { return await operation(attempt); }
+      catch (e) {
+        if (signal && signal.aborted) throw e;
+        if (attempt >= 4) throw e;
+        if (retryable && !retryable(e)) throw e;
+        await new Promise(function (resolve) { setTimeout(resolve, 400 * (attempt + 1)); });
+      }
+    }
+  }
+  function isNetworkError(e) {
+    var msg = String(e && e.message || e);
+    return /Network error|Failed to read|ERR_|fetch|aborted|stream|stalled|interrupted/i.test(msg);
+  }
+  async function data(url, expectedSize) {
+    if (typeof DecompressionStream === 'undefined') return rawData(url, expectedSize);
+    var m = await manifest();
+    if (m.data.size !== expectedSize) throw new Error('Game files belong to different builds. Reload to update.');
+    var out = new Uint8Array(expectedSize);
+    var controller = new AbortController();
+    var index = 0, loaded = 0;
+    async function worker() {
+      while (index < m.data.chunks.length) {
+        var chunk = m.data.chunks[index++];
+        var bytes = await retry(async function (attempt) {
+          await acquire();
+          try {
+            var response = await compressedResponse(chunk, controller.signal, attempt);
+            var chunkOut = out.subarray(chunk.offset, chunk.offset + chunk.size);
+            await readAllBytes(response.body, stallMs, chunk.size, chunkOut);
+            if (window.crypto && crypto.subtle && !verifiedSha256[chunk.sha256]) {
+              var digest = new Uint8Array(await crypto.subtle.digest('SHA-256', chunkOut));
+              var hex = Array.from(digest, function (v) { return v.toString(16).padStart(2, '0'); }).join('');
+              if (hex !== chunk.sha256) throw new Error('Corrupt asset: ' + chunk.url);
+              verifiedSha256[chunk.sha256] = true;
+            }
+            return chunkOut;
+          } finally { release(); }
+        }, controller.signal);
+        if (bytes.buffer !== out.buffer || bytes.byteOffset !== chunk.offset)
+          out.set(bytes, chunk.offset);
+        loaded += bytes.length;
+        report('data', loaded, expectedSize);
+      }
+    }
+    try { await Promise.all([worker(), worker()]); }
+    catch (e) { controller.abort(); throw e; }
+    return out.buffer;
+  }
+  async function rawData(url, expectedSize) {
+    await acquire();
+    try {
+      var r = await __gdFetchWithRawFallback(url, {cache: 'force-cache'}, false);
+      if (!r.ok) throw new Error('Game data HTTP ' + r.status);
+      var out = new Uint8Array(expectedSize), offset = 0;
+      var reader = r.body.getReader();
+      for (;;) {
+        var next = await reader.read();
+        if (next.done) break;
+        if (offset + next.value.length > out.length) throw new Error('Game data has the wrong size.');
+        out.set(next.value, offset); offset += next.value.length;
+        report('data', offset, expectedSize);
+      }
+      if (offset !== expectedSize) throw new Error('Game data download was interrupted.');
+      return out.buffer;
+    } finally { release(); }
+  }
+  var wasmModulePromise;
+  function loadWasmModule(m) {
+    if (!wasmModulePromise) wasmModulePromise = retry(async function (attempt) {
+      await acquire();
+      var released = false;
+      function finish() { if (!released) { released = true; release(); } }
+      try {
+        var r;
+        if (typeof DecompressionStream === 'undefined') {
+          r = await __gdFetchWithRawFallback('gd_web.wasm?v=' + version(), {cache: attempt ? 'reload' : 'force-cache'}, false);
+          if (!r.ok) throw new Error('Game WASM HTTP ' + r.status);
+        } else r = await compressedResponse(m.wasm, undefined, attempt);
+        var loaded = 0;
+        var stream = watchdogStream(r.body, stallMs, function (n) {
+          loaded += n; report('wasm', loaded, m.wasm.size);
+          if (loaded >= m.wasm.size) finish();
+        });
+        var module = await WebAssembly.compileStreaming(new Response(stream, {
+          headers: {'Content-Type': 'application/wasm'}
+        }));
+        finish();
+        return module;
+      } catch (e) { finish(); throw e; }
+    }, undefined, isNetworkError).catch(function (e) {
+      wasmModulePromise = null;
+      throw e;
+    });
+    return wasmModulePromise;
+  }
+  async function wasm(imports, success) {
+    var m = await manifest();
+    var module = await loadWasmModule(m);
+    var instance = await WebAssembly.instantiate(module, imports);
+    report('wasm', m.wasm.size, m.wasm.size);
+    success(instance, module);
+  }
+  var preloadedDataPromise = null;
+  function preloadAssets(m) {
+    if (!preloadedDataPromise) {
+      preloadedDataPromise = data('gd_web.data?v=' + version(), m.data.size).catch(function (e) {
+        fail(e);
+        throw e;
+      });
+      preloadedDataPromise.catch(function () {});
+    }
+    loadWasmModule(m).catch(fail);
+  }
+  function fail(e) {
+    console.error(e);
+    var el = document.getElementById('errOverlay');
+    if (el) { el.textContent = 'Could not load the game: ' + e.message + '. Reload to retry; completed chunks stay cached.'; el.classList.add('on'); }
+  }
+  window.GDAssets = {
+    loadScript: async function () {
+      var m = await manifest();
+      if (m.game && m.game.gameVersion && m.game.steamBuild) {
+        var badge = document.getElementById('version');
+        if (badge) {
+          badge.textContent = 'GD ' + m.game.gameVersion + ' · Steam ' + m.game.steamBuild + ' · Port ' + String(m.build || 'dev').slice(0, 8);
+          badge.title = 'Port package ' + (m.build || 'dev');
+        }
+      }
+      await acquire();
+      try {
+        var responsePromise = typeof DecompressionStream === 'undefined'
+          ? __gdFetchWithRawFallback('gd_web.js?v=' + version(), {cache: 'force-cache'}, false)
+          : compressedResponse(m.loader);
+        preloadAssets(m);
+        var response = await responsePromise;
+        if (!response.ok) throw new Error('Game script HTTP ' + response.status);
+        var bytes = await readAllBytes(response.body, stallMs);
+        return new TextDecoder('utf-8').decode(bytes);
+      } finally { release(); }
+    },
+    loadData: function (url, size) {
+      var consumedPreload = null;
+      if (!pending[url]) {
+        consumedPreload = preloadedDataPromise;
+        var source = consumedPreload || data(url, size);
+        pending[url] = source.catch(function (e) {
+          delete pending[url];
+          if (consumedPreload) {
+            if (preloadedDataPromise === consumedPreload)
+              preloadedDataPromise = null;
+          } else fail(e);
+          throw e;
+        });
+      }
+      return pending[url].then(function (result) {
+        delete pending[url];
+        if (consumedPreload && preloadedDataPromise === consumedPreload)
+          preloadedDataPromise = null;
+        return result;
+      });
+    },
+    instantiateWasm: function (imports, success) { wasm(imports, success).catch(fail); return {}; },
+    fail: fail
+  };
+})();
+
+</script><script>var consoleEl = document.getElementById('console');
+var gdParams = new URLSearchParams(location.search);
+var gdResParam = gdParams.get('res');
+if (gdResParam === null) gdResParam = gdParams.get('quality');
+var gdResKey = gdResParam === null ? '' : String(gdResParam).toLowerCase();
+var gdLowMemory = gdResKey === 'low' || (gdResKey !== 'high' && navigator.deviceMemory > 0 && navigator.deviceMemory <= 4);
+var gdCanvas = document.getElementById('canvas');
+/* ?res= render-buffer scale. The engine reads the canvas size once at boot, so
+   this has to be applied here; changing it later re-zooms and cuts off the
+   level. Resolution keywords map to these sizes: low=1280x720,
+   med=1440x810, high=1920x1080. */
+if (gdResParam) {
+var gdResScale = gdResKey === 'low' ? 2 / 3
+: gdResKey === 'med' || gdResKey === 'medium' ? 0.75
+: gdResKey === 'high' ? 1
+: gdResKey === 'auto' || gdResKey === 'default' ? 0
+: parseFloat(gdResParam);
+if (isFinite(gdResScale) && gdResScale > 0) {
+var gdScale = Math.min(1, Math.max(0.25, gdResScale));
+gdCanvas.width = Math.max(2, 2 * Math.round(1920 * gdScale / 2));
+gdCanvas.height = Math.max(2, 2 * Math.round(1080 * gdScale / 2));
+gdLowMemory = false;
+}
+}
+if (gdLowMemory) {
+gdCanvas.width = 1280; gdCanvas.height = 720;
+}
+
+var GD_DEBUG = /[?&]debug(=|&|$)/.test(location.search);
+var GD_PERF = /[?&]perf(=|&|$)/.test(location.search);
+if (GD_DEBUG) {
+try { Error.stackTraceLimit = 400; } catch (e) {}
+}
+if (!GD_DEBUG) {
+try { console.log = console.info = console.debug = function () {}; }
+catch (e) {}
+consoleEl.style.display = 'none';
+}
+var logQueue = [], logScheduled = false;
+window.gdLogRaw = [];
+var GD_LOG_DOM_MAX = 500;
+window.gdLogDump = function () { return window.gdLogRaw.join('\n'); };
+function flushLog() {
+logScheduled = false;
+if (!logQueue.length) return;
+var frag = document.createDocumentFragment();
+for (var i = 0; i < logQueue.length; i++) {
+var line = document.createElement('div');
+line.textContent = logQueue[i];
+frag.appendChild(line);
+}
+logQueue = [];
+var nearBottom =
+consoleEl.scrollHeight - consoleEl.scrollTop - consoleEl.clientHeight < 40;
+consoleEl.appendChild(frag);
+while (consoleEl.childNodes.length > GD_LOG_DOM_MAX)
+consoleEl.removeChild(consoleEl.firstChild);
+if (nearBottom) consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+var seenDep = Object.create(null);
+var QUIET = ['[frame]', '[webgl]', '[io]', '[tex]', '[pngc]',
+'[pngd]', '[fmtf]', '[sink]', '[htb]', '[disp]', '[rawin]',
+'[touch]', '[cte]', '[list]', '[drs]', '[tex2]'];
+function isQuiet(str) {
+for (var i = 0; i < QUIET.length; ++i) {
+if (str.lastIndexOf(QUIET[i], 0) === 0) return true;
+}
+return false;
+}
+function say(s) {
+if (!GD_DEBUG) return;
+var str = String(s);
+if (/[?&]hostlog(=|&|$)/.test(location.search) &&
+    /^\[(autosave|zlib|persist|thread|gd)\]/.test(str))
+fetch('__debug_log', {method: 'POST', body: str, keepalive: true}).catch(function () {});
+if (!isQuiet(str)) console.log(s);
+if (str.indexOf('dependency: ') === 0 ||
+str.indexOf('still waiting on run dependencies') === 0 ||
+str === '(end of list)') {
+if (seenDep[str]) return;
+seenDep[str] = 1;
+}
+window.gdLogRaw.push(str);
+if (window.gdLogRaw.length > 10000)
+window.gdLogRaw.splice(0, 2000);
+logQueue.push(str);
+if (!logScheduled) {
+logScheduled = true;
+requestAnimationFrame(flushLog);
+}
+}
+var gdProg = 0, gdProgDone = false;
+var gdProgressTimer = null;
+function gdStopBackgroundWork() {
+if (GD_PERF || GD_DEBUG) return;
+if (gdProgressTimer !== null) {
+clearInterval(gdProgressTimer);
+gdProgressTimer = null;
+}
+if (window.__gdStopSc400Observer) window.__gdStopSc400Observer();
+}
+var gdAssetDone = { wasm: false, data: false };
+var gdAssetsFell = false;
+var wasmFill = document.getElementById('wasmFill');
+var dataFill = document.getElementById('dataFill');
+var wasmPct = document.getElementById('wasmPct');
+var dataPct = document.getElementById('dataPct');
+var wasmLabel = document.getElementById('wasmLabel');
+var dataLabel = document.getElementById('dataLabel');
+var bootFill = document.getElementById('bootFill');
+var bootPct = document.getElementById('bootPct');
+function gdFmtSize(n) {
+if (!n) return '0 MB';
+if (n < 1048576) return Math.round(n / 1024) + ' KB';
+return (n / 1048576).toFixed(1) + ' MB';
+}
+var GD_SIZE_HINT = { wasm: 123481510, data: 322237583 };
+var GD_BUILD_ID = '9274beaaad27e3fbd46ebce7';
+var GD_ASSET_CACHE = 'gdwasm-assets';
+function gdClearCache() {
+if (!confirm('Clear saved progress and login on this site?\n' +
+'The game reloads afterwards.'))
+return;
+try {
+if (Module && Module._gd_autosave_set) {
+if (GD_DEBUG)
+console.info('[save] _gd_autosave_set disabled; reason: progress operation');
+Module._gd_autosave_set(0);
+}
+}
+catch (e) {}
+var jobs = [];
+if (window.caches) jobs.push(caches.delete(GD_ASSET_CACHE));
+jobs.push(new Promise(function (res) {
+try {
+var r = indexedDB.deleteDatabase('gdwasm_saves');
+r.onsuccess = r.onerror = r.onblocked = function () { res(); };
+} catch (e) { res(); }
+}));
+jobs.push(new Promise(function (res) {
+try {
+var r = indexedDB.deleteDatabase('gdwasm_backup');
+r.onsuccess = r.onerror = r.onblocked = function () { res(); };
+} catch (e) { res(); }
+}));
+try {
+localStorage.removeItem('gdWasmSize');
+localStorage.removeItem('gdDataSize');
+} catch (e) {}
+clearLegacyBackupKeys();
+Promise.all(jobs).then(function () { location.reload(); },
+function () { location.reload(); });
+}
+async function gdPersist() {
+try {
+if (!navigator.storage ||
+typeof navigator.storage.persisted !== 'function' ||
+typeof navigator.storage.persist !== 'function') return;
+if (await navigator.storage.persisted()) return;
+await navigator.storage.persist();
+} catch (e) {
+console.warn('Failed to request persistent storage:', e);
+}
+}
+function gdBackupSpecs() {
+return [
+{ name: 'CCGameManager.dat', key: 'AppData/CCGameManager.dat' },
+{ name: 'CCLocalLevels.dat', key: 'AppData/CCLocalLevels.dat' }
+];
+}
+function clearLegacyBackupKeys() {
+try {
+var keys = [];
+for (var i = 0; i < localStorage.length; ++i) {
+var key = localStorage.key(i);
+if (key && (key.indexOf('gd_bak_') === 0 ||
+key.indexOf('gd_bak_ts_') === 0 ||
+key.indexOf('gd_bak_prev_') === 0))
+keys.push(key);
+}
+for (var j = 0; j < keys.length; ++j) localStorage.removeItem(keys[j]);
+} catch (e) {
+console.warn('Failed to clear legacy local backups:', e);
+}
+}
+clearLegacyBackupKeys();
+function gdProfileName(key) {
+var normalized = normalizeSaveKey(key);
+for (var i = 0, specs = gdBackupSpecs(); i < specs.length; ++i)
+if (normalized === specs[i].key) return specs[i].name;
+return null;
+}
+function openBackupDatabase() {
+return new Promise(function (resolve, reject) {
+var request, settled = false;
+try {
+request = indexedDB.open('gdwasm_backup', 1);
+} catch (e) {
+reject(e);
+return;
+}
+request.onupgradeneeded = function () {
+if (!request.result.objectStoreNames.contains('files'))
+request.result.createObjectStore('files');
+};
+request.onerror = function () {
+if (settled) return;
+settled = true;
+reject(request.error || new Error('Backup database open failed'));
+};
+request.onblocked = function () {
+if (settled) return;
+settled = true;
+reject(new Error('Backup database open blocked'));
+};
+request.onsuccess = function () {
+if (settled) {
+request.result.close();
+return;
+}
+settled = true;
+resolve(request.result);
+};
+});
+}
+function backupRecord(value) {
+if (!value || !value.bytes) return null;
+var bytes = value.bytes instanceof ArrayBuffer
+? new Uint8Array(value.bytes)
+: (ArrayBuffer.isView(value.bytes)
+? new Uint8Array(value.bytes.buffer, value.bytes.byteOffset,
+value.bytes.byteLength) : null);
+var timestamp = Number(value.ts);
+if (!bytes || !bytes.length || !isFinite(timestamp) || timestamp <= 0)
+return null;
+return { bytes: bytes, timestamp: timestamp };
+}
+async function readBackupRecord(db, key) {
+try {
+var tx = db.transaction('files', 'readonly');
+return backupRecord(await idbRequestResult(tx,
+tx.objectStore('files').get(key)));
+} catch (e) {
+console.warn('Failed to read backup record ' + key + ':', e);
+return null;
+}
+}
+function backupBytesEqual(left, right) {
+if (left.length !== right.length) return false;
+for (var i = 0; i < left.length; ++i)
+if (left[i] !== right[i]) return false;
+return true;
+}
+async function storeIndexedBackup(name, bytes) {
+var db;
+try {
+db = await openBackupDatabase();
+await new Promise(function (resolve, reject) {
+var tx, settled = false;
+function fail(error) {
+if (settled) return;
+settled = true;
+reject(error);
+}
+try {
+tx = db.transaction('files', 'readwrite');
+var store = tx.objectStore('files');
+var request = store.get('cur:' + name);
+request.onerror = function () {
+fail(request.error || new Error('Backup record read failed'));
+};
+request.onsuccess = function () {
+try {
+var current = backupRecord(request.result);
+if (current && backupBytesEqual(bytes, current.bytes)) return;
+var timestamp = Date.now();
+if (current) {
+store.put({ bytes: current.bytes.slice().buffer, ts: current.timestamp },
+'prev:' + name);
+}
+store.put({ bytes: bytes.slice().buffer, ts: timestamp },
+'cur:' + name);
+} catch (e) {
+try { tx.abort(); } catch (e2) {}
+fail(e);
+}
+};
+tx.oncomplete = function () {
+if (settled) return;
+settled = true;
+resolve();
+};
+tx.onerror = function () {
+fail(tx.error || new Error('Backup transaction failed'));
+};
+tx.onabort = function () {
+fail(tx.error || new Error('Backup transaction aborted'));
+};
+} catch (e) {
+fail(e);
+}
+});
+} catch (e) {
+console.warn('Failed to save backup for ' + name + ':', e);
+} finally {
+if (db) db.close();
+}
+}
+function gdBackupIsBlockedByFs(name, bytes, timestamp) {
+var path = '/AppData/' + name, stat;
+try {
+stat = Module.FS.stat(path);
+} catch (e) {
+return false;
+}
+if (stat.size > bytes.length) return true;
+var modified = Number(stat.mtime) || 0;
+if (stat.size > 0) {
+if (!modified || !timestamp) return true;
+if (modified < 1000000000000) modified *= 1000;
+return modified > timestamp;
+}
+return false;
+}
+async function restoreBackupFiles(db, keys) {
+var backupDb;
+try {
+backupDb = await openBackupDatabase();
+} catch (e) {
+console.warn('Failed to open backup database:', e);
+return;
+}
+try {
+var specs = gdBackupSpecs();
+for (var i = 0; i < specs.length; ++i) {
+var spec = specs[i], dbKey = null;
+for (var ki = 0; ki < keys.length; ++ki) {
+if (normalizeSaveKey(keys[ki]) === spec.key) {
+dbKey = keys[ki];
+break;
+}
+}
+var saved;
+if (dbKey !== null) {
+try {
+var readTx = db.transaction('files', 'readonly');
+saved = await idbRequestResult(readTx,
+readTx.objectStore('files').get(dbKey));
+} catch (e) {
+console.warn('Failed to check saved profile ' + spec.name + ':', e);
+continue;
+}
+var savedLength = saved && (saved.byteLength ||
+(ArrayBuffer.isView(saved) && saved.byteLength)) || 0;
+if (savedLength > 0) continue;
+}
+var backup = await readBackupRecord(backupDb, 'cur:' + spec.name);
+if (!backup) backup = await readBackupRecord(backupDb, 'prev:' + spec.name);
+if (!backup) continue;
+var timestamp = backup.timestamp;
+if (gdBackupIsBlockedByFs(spec.name, backup, timestamp)) {
+persistDebug('kept newer or larger virtual FS file ' + spec.name);
+continue;
+}
+try {
+var writeTx = db.transaction('files', 'readwrite');
+await idbRequestResult(writeTx,
+writeTx.objectStore('files').put(backup.bytes.slice().buffer,
+dbKey || spec.key));
+if (dbKey === null) keys.push(spec.key);
+say('[persist] restored local backup ' + spec.name +
+' (' + backup.bytes.length + ' bytes)');
+} catch (e) {
+console.error('Failed to restore local backup ' + spec.name + ':', e);
+}
+}
+} catch (e) {
+console.warn('Failed to restore backup database records:', e);
+} finally {
+backupDb.close();
+}
+}
+function gdSizeHint(which) {
+return which === 'wasm' ? GD_SIZE_HINT.wasm : GD_SIZE_HINT.data;
+}
+function gdLearnedSize(which) {
+if (!gdLearnedSizes) gdLearnedSizes = { wasm: null, data: null };
+if (gdLearnedSizes[which] !== null) return gdLearnedSizes[which];
+try {
+gdLearnedSizes[which] = Number(localStorage.getItem(
+which === 'wasm' ? 'gdWasmSize' : 'gdDataSize')) || 0;
+} catch (e) { gdLearnedSizes[which] = 0; }
+return gdLearnedSizes[which];
+}
+var gdLearnedSizes = null;
+var gdAssetLastUpdate = { wasm: 0, data: 0 };
+var gdAssetPending = Object.create(null);
+var gdAssetTimers = Object.create(null);
+function renderAssetBar(which, loaded, total) {
+var fill = which === 'wasm' ? wasmFill : dataFill;
+var pctEl = which === 'wasm' ? wasmPct : dataPct;
+var label = which === 'wasm' ? wasmLabel : dataLabel;
+if (!fill) return;
+var name = which === 'wasm' ? 'WASM' : 'DATA';
+var learned = gdLearnedSize(which);
+var hint = gdSizeHint(which);
+var known = hint > 0 ? hint
+: (learned > 0 ? learned : (total > 0 ? total : 0));
+var exact = known > 0;
+if (label) {
+var fallback = which === 'wasm' ? 110 * 1024 * 1024 : 320 * 1024 * 1024;
+label.textContent = name + ' (' + (exact ? '' : '~') +
+gdFmtSize(known > 0 ? known : fallback) + ')';
+}
+var p;
+if (known > 0) {
+p = Math.min(100, loaded / known * 100);
+} else {
+var est = which === 'wasm' ? 110 * 1024 * 1024 : 320 * 1024 * 1024;
+p = Math.min(95, loaded / est * 95);
+}
+fill.style.width = p.toFixed(1) + '%';
+if (loaded <= 0) pctEl.textContent = '0%';
+else if (known > 0) {
+pctEl.textContent = p.toFixed(0) + '% (' + gdFmtSize(loaded) + ')';
+} else {
+pctEl.textContent = gdFmtSize(loaded);
+}
+if (known > 0 && loaded >= known) {
+gdAssetDone[which] = true;
+gdLearnedSizes[which] = Math.max(loaded, known);
+try {
+localStorage.setItem(which === 'wasm' ? 'gdWasmSize' : 'gdDataSize',
+String(Math.max(loaded, known)));
+} catch (e) {}
+}
+if (gdAssetDone.wasm && gdAssetDone.data) assetsDone();
+}
+function setAssetBar(which, loaded, total) {
+if (which !== 'wasm' && which !== 'data') return;
+var now = performance.now();
+var last = gdAssetLastUpdate[which];
+var known = gdSizeHint(which) || gdLearnedSize(which) || total;
+var finalUpdate = total > 0 && loaded >= total ||
+known > 0 && loaded >= known;
+if (finalUpdate || now - last >= 100) {
+if (gdAssetTimers[which]) {
+clearTimeout(gdAssetTimers[which]);
+gdAssetTimers[which] = null;
+}
+gdAssetPending[which] = null;
+gdAssetLastUpdate[which] = now;
+renderAssetBar(which, loaded, total);
+return;
+}
+gdAssetPending[which] = { loaded: loaded, total: total };
+if (gdAssetTimers[which]) return;
+gdAssetTimers[which] = setTimeout(function () {
+gdAssetTimers[which] = null;
+var pending = gdAssetPending[which];
+gdAssetPending[which] = null;
+if (!pending) return;
+gdAssetLastUpdate[which] = performance.now();
+renderAssetBar(which, pending.loaded, pending.total);
+}, Math.max(0, 100 - (now - last)));
+}
+function forceAssetsDone() {
+gdAssetDone.wasm = true;
+gdAssetDone.data = true;
+setAssetBar('wasm', 1, 1);
+setAssetBar('data', 1, 1);
+assetsDone();
+}
+function assetsDone() {
+if (gdAssetsFell) return;
+gdAssetsFell = true;
+var bars = document.getElementById('bars');
+var boot = document.getElementById('bootbars');
+if (bars) bars.classList.add('fall');
+setTimeout(function () {
+if (bars) bars.style.display = 'none';
+if (boot) boot.classList.add('on');
+}, 520);
+}
+function bootDone() {
+var boot = document.getElementById('bootbars');
+if (!boot || boot.classList.contains('done')) return;
+boot.classList.add('done');
+setTimeout(function () { boot.style.display = 'none'; }, 520);
+}
+function setProgress(p, exact) {
+if (gdProgDone && p < 100) return;
+p = Math.max(0, Math.min(100, p));
+if (p < gdProg && !exact) return;
+gdProg = p;
+if (bootFill) bootFill.style.width = p.toFixed(1) + '%';
+if (bootPct) bootPct.textContent = p.toFixed(0) + '%';
+if (p >= 100) { gdProgDone = true; bootDone(); }
+}
+function resetProgress() {
+gdProgDone = false;
+gdProg = 0;
+gdAssetsFell = false;
+gdAssetDone = { wasm: false, data: false };
+var bars = document.getElementById('bars');
+var boot = document.getElementById('bootbars');
+if (bars) { bars.style.display = ''; bars.classList.remove('fall'); }
+if (boot) { boot.classList.remove('on'); boot.classList.remove('done'); }
+setAssetBar('wasm', 0, gdLearnedSize('wasm'));
+setAssetBar('data', 0, gdLearnedSize('data'));
+if (bootFill) bootFill.style.width = '0%';
+if (bootPct) bootPct.textContent = '0%';
+}
+window.gdFirstFrame = function () {
+forceAssetsDone();
+setProgress(100);
+};
+var gdSaveTimer = null;
+var gdLastSave = 0;
+var gdSavePromise = null;
+var gdSavePending = false;
+var gdDeferredLevelSave = false;
+function updateGameAutosave(reason) {
+if (window.Module && Module._gd_autosave_set) {
+var enabled = !/[?&]noauto(?:=|&|$)/.test(location.search) &&
+!window.__gdProgressMutation && window.gdInLevel !== true;
+if (GD_DEBUG)
+console.info('[save] _gd_autosave_set ' + (enabled ? 'enabled' : 'disabled') +
+'; reason: ' + reason);
+Module._gd_autosave_set(enabled ? 1 : 0);
+}
+}
+function performSave() {
+try {
+if (Module._gd_request_save) Module._gd_request_save();
+} catch (e) { console.error('Failed to save progress:', e); }
+if (gdSavePromise) {
+gdSavePending = true;
+return gdSavePromise;
+}
+function runSave() {
+gdSavePending = false;
+gdSavePromise = saveAppData().then(function () {
+gdLastSave = Date.now();
+}, function (e) {
+console.error('Failed to save AppData:', e);
+}).then(function () {
+gdSavePromise = null;
+if (gdSavePending) return runSave();
+});
+return gdSavePromise;
+}
+return runSave();
+}
+function scheduleSave(now, allowInLevel) {
+if (window.__gdProgressMutation || !window.__gdRuntimeReady ||
+    !window.__gdSavesRestored) return;
+if (!allowInLevel && window.gdInLevel === true) {
+if (!gdDeferredLevelSave) {
+gdDeferredLevelSave = true;
+if (GD_DEBUG) console.info('[save] Deferred automatic save while in a level');
+}
+if (gdSaveTimer) {
+clearTimeout(gdSaveTimer);
+gdSaveTimer = null;
+}
+return;
+}
+if (gdSaveTimer) clearTimeout(gdSaveTimer);
+gdSaveTimer = setTimeout(function () {
+gdSaveTimer = null;
+if (!allowInLevel && window.gdInLevel === true) {
+scheduleSave(false);
+return;
+}
+if (!now && Date.now() - gdLastSave < 180000) return;
+if (now && gdDeferredLevelSave) {
+gdDeferredLevelSave = false;
+if (GD_DEBUG) console.info('[save] Executing deferred save after leaving the level');
+}
+performSave();
+}, now ? 0 : 4000);
+}
+window.addEventListener('gd-inlevel', function () {
+updateGameAutosave(window.gdInLevel === true ? 'level entry' : 'level exit');
+if (window.gdInLevel !== true && gdDeferredLevelSave)
+scheduleSave(true, false);
+});
+document.addEventListener('visibilitychange', function () {
+if (document.hidden) scheduleSave(true, true);
+});
+function gdProgressTick() {
+if (!window.__gdLoadStarted || gdProgDone) return;
+if (!gdAssetsFell) {
+var df = Module.dataFileDownloads;
+if (df) {
+for (var k in df) {
+var e = df[k];
+var which = /wasm/i.test(k) ? 'wasm'
+: (/\.data/i.test(k) ? 'data' : null);
+if (which) setAssetBar(which, e.loaded || 0, e.total || 0);
+}
+}
+} else if (gdProg < 78) {
+setProgress(gdProg + 0.35);
+}
+}
+gdProgressTimer = setInterval(gdProgressTick, 200);
+document.addEventListener('visibilitychange', function () {
+if (!document.hidden) gdProgressTick();
+});
+(function () {
+var fpsEl = document.getElementById('fpsval');
+var perfOverlay;
+var benchmarkButton, benchmarkResult;
+if (GD_PERF) {
+perfOverlay = document.createElement('div');
+perfOverlay.id = 'gdPerfOverlay';
+perfOverlay.style.cssText = 'position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;z-index:35;box-sizing:border-box;padding:3px 6px;background:rgba(0,0,0,.65);color:#ddd;font:10px/1.35 monospace;text-align:center;pointer-events:none';
+perfOverlay.textContent = '-- fps';
+document.body.appendChild(perfOverlay);
+benchmarkButton = document.createElement('button');
+benchmarkButton.textContent = '20s test';
+benchmarkButton.disabled = true;
+benchmarkButton.title = 'Measure gameplay FPS, frame pacing and queued input for 20 seconds. Keep the game focused.';
+benchmarkButton.style.cssText = 'font:12px monospace;color:#ccc;background:#0a0a0a;border:1px solid #2a2a2a;border-radius:4px;padding:4px 8px;cursor:pointer';
+benchmarkResult = document.createElement('span');
+benchmarkResult.id = 'benchmarkResult';
+benchmarkResult.style.fontSize = '11px';
+document.getElementById('midbar').appendChild(benchmarkButton);
+document.getElementById('midbar').appendChild(benchmarkResult);
+benchmarkButton.addEventListener('click', function () {
+if (!Module.gdBeginBenchmark) return;
+benchmarkResult.textContent = '';
+Module.gdBeginBenchmark(20000);
+Module.canvas.focus({preventScroll:true});
+});
+}
+var lastT = performance.now(), lastN = 0, primed = false;
+function tick(now) {
+if (now - lastT >= 500) {
+if (!window.__gdRuntimeReady) {
+lastT = now;
+requestAnimationFrame(tick);
+return;
+}
+var n = 0;
+if (benchmarkButton) {
+var result = Module.gdBenchmark;
+benchmarkButton.disabled = !Module.gdBeginBenchmark || !!(result && result.running);
+benchmarkButton.textContent = result && result.running ? 'Testing '+Math.max(0,20-Math.floor(result.elapsedMs/1000))+'s' : '20s test';
+if (result && !result.running) {
+benchmarkResult.textContent = result.error || (result.meanFps.toFixed(1)+' fps · p95 '+result.frameP95Ms.toFixed(1)+' ms · max '+result.frameMaxMs.toFixed(1)+' ms · heap '+Math.round(result.heapMiB)+' MiB'+(result.inputP95Ms === null ? '' : ' · input '+result.inputP95Ms.toFixed(1)+' ms'));
+}
+}
+try {
+if (Module._gd_frames_get) n = Module._gd_frames_get() | 0;
+} catch (e) {}
+if (n > 0) {
+if (primed)
+fpsEl.textContent =
+Math.round((n - lastN) * 1000 / (now - lastT)) + ' fps';
+var perf = document.getElementById('perfval');
+if(perf && GD_PERF && Module.gdInputStats){
+var stats=Module.gdInputStats;
+var details='Frame p95 '+stats.frameP95Ms.toFixed(1)+' ms';
+if(stats.samples) details+=' | input queue p95 '+stats.queueP95Ms.toFixed(1)+' ms';
+if(Module.HEAPU8) details+=' | WASM '+Math.round(Module.HEAPU8.byteLength/1048576)+' MiB';
+var audio=Module.__gdAudio;
+var render=Module.gdRenderStats;
+if(render) details+=' | GL matrices '+render.matrixUploads+' ('+render.matrixSkipped+' cached), empty draws '+render.emptyDrawsSkipped;
+if(audio && audio.ctx){
+details+=' | audio '+audio.ctx.state;
+if(audio.metrics) details+=' (starts '+audio.metrics.starts+', seeks '+audio.metrics.seeks+')';
+}
+perf.textContent=details;
+if(perfOverlay) perfOverlay.textContent=fpsEl.textContent+' | '+details;
+if(stats.pointerClient) perf.title='Pointer client '+stats.pointerClient.join(',')+'; game '+stats.pointerGame.join(',');
+}
+lastN = n;
+primed = true;
+if (!window.__gdGotFrame) {
+window.__gdGotFrame = true;
+window.__gdInputReady = true;
+if (window.__gdAckFocus) window.__gdAckFocus();
+document.body.classList.add('playing');
+setProgress(100);
+gdStopBackgroundWork();
+}
+} else if (!primed) {
+fpsEl.textContent = '-- fps';
+}
+lastT = now;
+}
+if (GD_PERF || GD_DEBUG || !window.__gdGotFrame) gdFpsRaf = requestAnimationFrame(tick);
+else gdFpsRaf = null;
+}
+var gdFpsRaf = requestAnimationFrame(tick);
+})();
+function dumpTrace() {
+if (!window.__gdRuntimeReady) { say('runtime not initialized; no trace'); return; }
+try {
+if (!Module._gd_trace_count) { say('no trace exports'); return; }
+var n = Module._gd_trace_count();
+var m = Math.min(48, n);
+var out = [];
+for (var i = 0; i < m; ++i) {
+var va = Module._gd_trace_at(i);
+if (typeof va === 'bigint') va = Number(va & 0xffffffffn);
+else va = va >>> 0;
+out.push('0x' + va.toString(16));
+}
+say('TRACE total=' + n + ' newest-first: ' + out.join(' '));
+} catch (e) { say('trace dump failed: ' + e); }
+}
+function dumpRegs() {
+if (!window.__gdRuntimeReady) return;
+try {
+if (!Module._gd_reg) { say('no register export'); return; }
+var names = ['RAX', 'RCX', 'RDX', 'RBX', 'RSP', 'RBP', 'RSI', 'RDI',
+'R8', 'R9', 'R10', 'R11', 'R12', 'R13', 'R14', 'R15'];
+var out = [];
+for (var i = 0; i < names.length; ++i) {
+var v = Module._gd_reg(i);
+var hex = (typeof v === 'bigint')
+? (v & 0xffffffffffffffffn).toString(16).padStart(16, '0')
+: (v >>> 0).toString(16).padStart(8, '0');
+out.push(names[i] + '=0x' + hex);
+}
+say('REGS ' + out.join(' '));
+if (Module._gd_where) {
+var w = Module._gd_where();
+say('WHERE va=0x' + (typeof w === 'bigint'
+? (w & 0xffffffffn).toString(16) : (w >>> 0).toString(16)));
+}
+} catch (e) { say('register dump failed: ' + e); }
+}
+function gdErrStack(what, e, reason) {
+  var msg = what + (reason || '');
+  if (e && e.stack) msg += '\n' + e.stack;
+  else if (reason && reason.stack) msg += '\n' + reason.stack;
+  say(msg);
+  dumpRegs();
+  dumpTrace();
+}
+window.addEventListener('error', function (e) {
+  gdErrStack('ERROR: ', e.error, e.message);
+});
+window.addEventListener('unhandledrejection', function (e) {
+  gdErrStack('REJECT: ', e.reason, e.reason);
+});
+function restoreSaves(then) {
+var called = false;
+var db = null;
+function finish() {
+if (called) return;
+called = true;
+if (db) db.close();
+then();
+}
+try {
+var req = indexedDB.open('gdwasm_saves', 1);
+req.onupgradeneeded = function () {
+if (!req.result.objectStoreNames.contains('files'))
+req.result.createObjectStore('files');
+};
+req.onerror = function () { say('[persist] idb open failed: ' + req.error); finish(); };
+req.onblocked = function () {
+say('[persist] idb open blocked; starting without restored data');
+finish();
+};
+req.onsuccess = function () {
+if (called) { req.result.close(); return; }
+var store, keysReq;
+try {
+db = req.result;
+store = db.transaction('files', 'readonly').objectStore('files');
+keysReq = store.getAllKeys();
+} catch (e) { say('[persist] restore transaction failed: ' + e); finish(); return; }
+keysReq.onerror = function () {
+say('[persist] restore keys failed: ' + keysReq.error);
+finish();
+};
+keysReq.onsuccess = function () {
+var keys = keysReq.result || [];
+restoreBackupFiles(db, keys).then(function () {
+restoreSavedFiles(keys);
+}, function (e) {
+say('[persist] local backup restore failed: ' + e);
+restoreSavedFiles(keys);
+});
+function restoreSavedFiles(keys) {
+say('[persist] restore: ' + keys.length + ' file(s) in DB' +
+(keys.length ? ': ' + keys.join(', ') : ''));
+if (!keys.length) { finish(); return; }
+var pending = keys.length;
+function one() { if (--pending === 0) finish(); }
+keys.forEach(function (k) {
+var g;
+try {
+g = db.transaction('files', 'readonly').objectStore('files').get(k);
+} catch (e) {
+say('[persist] restore transaction failed for ' + k + ': ' + e);
+one();
+return;
+}
+g.onerror = function () {
+say('[persist] restore read ' + k + ': ' + g.error);
+one();
+};
+g.onsuccess = function () {
+try {
+if (g.result !== undefined && g.result !== null) {
+var s = String(k);
+var profileName = gdProfileName(s);
+var restoredLength = g.result.byteLength ||
+(ArrayBuffer.isView(g.result) && g.result.byteLength) || 0;
+if (profileName && !restoredLength) {
+one();
+return;
+}
+var base = s.indexOf('AppData/') === 0 ? '/' : '/Resources/';
+var parts = s.split('/'), cur = base.replace(/\/$/, '');
+for (var pi = 0; pi < parts.length - 1; ++pi) {
+cur += '/' + parts[pi];
+try { Module.FS.stat(cur); } catch (e2) { Module.FS.mkdir(cur); }
+}
+Module.FS.writeFile(base + s, new Uint8Array(g.result));
+say('[persist] restored ' + s + ' (' + g.result.byteLength + ' bytes)');
+}
+} catch (e) { say('[persist] restore ' + k + ': ' + e); }
+one();
+};
+});
+}
+};
+};
+} catch (e) { finish(); }
+}
+function saveAppData() {
+return saveAppDataAsync();
+}
+function saveYield() {
+return new Promise(function (resolve) { setTimeout(resolve, 0); });
+}
+function idbRequestResult(tx, request) {
+return new Promise(function (resolve, reject) {
+var result, settled = false;
+function fail(error) {
+if (settled) return;
+settled = true;
+reject(error);
+}
+request.onsuccess = function () { result = request.result; };
+request.onerror = function () { fail(request.error || new Error('IndexedDB request failed')); };
+tx.oncomplete = function () {
+if (settled) return;
+settled = true;
+resolve(result);
+};
+tx.onerror = function () { fail(tx.error || new Error('IndexedDB transaction failed')); };
+tx.onabort = function () { fail(tx.error || new Error('IndexedDB transaction aborted')); };
+});
+}
+function normalizeSaveKey(key) {
+return String(key).replace(/\\/g, '/').replace(/^\/+/, '');
+}
+function persistDebug(message) {
+if (/[?&]debug(?:=|&|$)/.test(location.search))
+console.log('[persist] ' + message);
+}
+async function storeLocalBackup(file) {
+var name;
+try {
+name = gdProfileName(file.key);
+if (!name) return;
+var bytes = new Uint8Array(file.bytes);
+if (!bytes.length) return;
+await storeIndexedBackup(name, bytes);
+} catch (e) {
+console.warn('Failed to create backup for ' + name + ':', e);
+}
+}
+var gdSaveSignatures = Object.create(null);
+async function saveAppDataAsync() {
+var fs = Module.FS, files = [], paths = Object.create(null);
+if (!fs || !fs.analyzePath) return;
+var db;
+try {
+db = await new Promise(function (resolve, reject) {
+var request = indexedDB.open('gdwasm_saves', 1);
+request.onupgradeneeded = function () {
+if (!request.result.objectStoreNames.contains('files'))
+request.result.createObjectStore('files');
+};
+request.onerror = function () {
+reject(request.error || new Error('IndexedDB open failed'));
+};
+request.onsuccess = function () { resolve(request.result); };
+});
+} catch (e) {
+console.error('Failed to open save database:', e);
+return;
+}
+var savedKeys;
+try {
+var keysTx = db.transaction('files', 'readonly');
+savedKeys = await idbRequestResult(keysTx, keysTx.objectStore('files').getAllKeys());
+} catch (e) {
+console.error('Failed to read saved file list:', e);
+db.close();
+return;
+}
+var savedKeySet = Object.create(null);
+for (var si = 0; si < savedKeys.length; ++si)
+savedKeySet[normalizeSaveKey(savedKeys[si])] = true;
+function fileSignature(stat) {
+return { size: stat.size, mtime: Number(stat.mtime) || 0 };
+}
+function sameSignature(left, right) {
+return left && left.size === right.size && left.mtime === right.mtime;
+}
+async function scan(directory, keyPrefix) {
+var entries = fs.readdir(directory);
+for (var i = 0; i < entries.length; ++i) {
+var name = entries[i];
+if (name === '.' || name === '..') continue;
+var path = directory === '/' ? '/' + name : directory + '/' + name;
+var key = keyPrefix + '/' + name;
+var stat = fs.lstat ? fs.lstat(path) : fs.stat(path);
+if (fs.isLink && fs.isLink(stat.mode)) continue;
+if (fs.isDir(stat.mode)) {
+await scan(path, key);
+} else if (fs.isFile(stat.mode)) {
+var normalizedKey = normalizeSaveKey(key);
+paths[normalizedKey] = true;
+var signature = fileSignature(stat);
+if (normalizedKey.indexOf('AppData/') === 0 &&
+    /\.mp3$/i.test(name) && savedKeySet[normalizedKey]) {
+await saveYield();
+continue;
+}
+if (sameSignature(gdSaveSignatures[normalizedKey], signature)) {
+await saveYield();
+continue;
+}
+var bytes = fs.readFile(path);
+var buffer;
+if (bytes instanceof ArrayBuffer) {
+buffer = bytes;
+} else if (ArrayBuffer.isView(bytes) &&
+    bytes.byteOffset === 0 && bytes.byteLength === bytes.buffer.byteLength) {
+buffer = bytes.buffer;
+} else if (ArrayBuffer.isView(bytes)) {
+var view = new Uint8Array(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+var copy = new Uint8Array(view.byteLength);
+copy.set(view);
+buffer = copy.buffer;
+} else {
+throw new TypeError('FS.readFile did not return byte data for ' + path);
+}
+files.push({ key: key, bytes: buffer, signature: signature });
+await saveYield();
+}
+}
+}
+try {
+if (fs.analyzePath('/AppData').exists)
+await scan('/AppData', 'AppData');
+} catch (e) {
+console.error('Failed to read AppData for saving:', e);
+db.close();
+return;
+}
+var written = [];
+for (var fi = 0; fi < files.length; ++fi) {
+var file = files[fi], saved;
+try {
+var readTx = db.transaction('files', 'readonly');
+saved = await idbRequestResult(readTx, readTx.objectStore('files').get(file.key));
+} catch (e) {
+console.error('Failed to read saved file ' + file.key + ':', e);
+continue;
+}
+var savedBytes = saved instanceof ArrayBuffer
+? new Uint8Array(saved)
+: (ArrayBuffer.isView(saved)
+? new Uint8Array(saved.buffer, saved.byteOffset, saved.byteLength) : null);
+var unchanged = savedBytes && savedBytes.length === file.bytes.byteLength;
+if (unchanged) {
+var currentBytes = new Uint8Array(file.bytes);
+for (var compareOffset = 0; compareOffset < currentBytes.length; compareOffset += 65536) {
+var compareEnd = Math.min(compareOffset + 65536, currentBytes.length);
+for (var bi = compareOffset; bi < compareEnd; ++bi) {
+if (currentBytes[bi] !== savedBytes[bi]) {
+unchanged = false;
+break;
+}
+}
+if (!unchanged) break;
+await saveYield();
+}
+}
+var stored = !!unchanged;
+if (!unchanged) {
+try {
+var writeTx = db.transaction('files', 'readwrite');
+await idbRequestResult(writeTx, writeTx.objectStore('files').put(file.bytes, file.key));
+written.push(file.key);
+stored = true;
+} catch (e) {
+console.error('Failed to save AppData file ' + file.key + ':', e);
+}
+}
+if (stored) storeLocalBackup(file);
+if (stored) {
+var currentStat;
+try {
+currentStat = fileSignature(fs.stat('/' + file.key));
+} catch (e) {
+currentStat = file.signature;
+}
+if (sameSignature(file.signature, currentStat))
+gdSaveSignatures[normalizeSaveKey(file.key)] = currentStat;
+else
+delete gdSaveSignatures[normalizeSaveKey(file.key)];
+}
+await saveYield();
+}
+for (var ki = 0; ki < savedKeys.length; ++ki) {
+var oldKey = savedKeys[ki];
+var normalizedOldKey = normalizeSaveKey(oldKey);
+if (normalizedOldKey.indexOf('AppData/') !== 0 || paths[normalizedOldKey]) continue;
+try {
+var deleteTx = db.transaction('files', 'readwrite');
+await idbRequestResult(deleteTx, deleteTx.objectStore('files').delete(oldKey));
+persistDebug('deleted stale IndexedDB file ' + oldKey + ' (not present in /AppData)');
+} catch (e) {
+console.error('Failed to delete saved AppData file ' + oldKey + ':', e);
+}
+await saveYield();
+}
+say('[persist] saved ' + written.length + ' changed AppData file(s): ' +
+written.join(', '));
+db.close();
+}
+var Module = {
+canvas: document.getElementById('canvas'),
+gdInputQueue: [],
+gdCursorPos: [0, 0],
+locateFile: function (p) { return p + '?v=' + GD_BUILD_ID; },
+get dataFileDownloads() { return this.__dfd; },
+set dataFileDownloads(v) {
+if (this.__dfd === v) return;
+this.__dfd = new Proxy(v || {}, {
+set: function (t, k, val) {
+t[k] = val;
+try {
+var which = /wasm/i.test(k) ? 'wasm'
+: (/\.data/i.test(k) ? 'data' : null);
+if (which) setAssetBar(which, (val && val.loaded) || 0,
+(val && val.total) || 0);
+} catch (e) {}
+return true;
+}
+});
+},
+instantiateWasm: function (imports, success) {
+return GDAssets.instantiateWasm(imports, success);
+},
+print: function (s) { say(s); },
+printErr: function (s) { say(s); },
+onAbort: function () {
+try { gdPersist(); } catch (e) {}
+},
+setStatus: function (t) {
+if (!t) return;
+var m = /\((\d+)\/(\d+)\)/.exec(t);
+if (m) {
+var total = +m[2] || 1;
+setProgress(+m[1] / total * 78);
+} else if (t.indexOf('Downloading') === 0) {
+setProgress(4);
+} else if (t.indexOf('Running') === 0) {
+forceAssetsDone();
+setProgress(80);
+} else if (t.indexOf('Compiling') === 0) {
+setProgress(76);
+}
+},
+onRuntimeInitialized: function () {
+window.__gdRuntimeReady = true;
+if (!/[?&]noauto/.test(location.search))
+setInterval(function () { scheduleSave(false); }, 30000);
+if (Module._gd_log_set) Module._gd_log_set(GD_DEBUG ? 1 : 0);
+if (/[?&]noauto/.test(location.search) && Module._gd_autosave_set) {
+if (GD_DEBUG)
+console.info('[save] _gd_autosave_set disabled; reason: noauto');
+Module._gd_autosave_set(0);
+}
+setProgress(82);
+try {
+Module.FS.chdir('/Resources');
+} catch (e) {
+say('FS.chdir failed: ' + e);
+}
+if (window.__gdInstallSongDeleteHook) window.__gdInstallSongDeleteHook();
+setTimeout(function () {
+restoreSaves(function () {
+window.__gdSavesRestored = true;
+setProgress(88);
+try {
+const r = Module._gd_boot();
+setProgress(92);
+if (r && typeof r.then === 'function') {
+r.then(function () { say('gd_boot resolved'); setProgress(100); })
+.catch(function (e) {
+if (String(e).indexOf('Aborted(native code called abort())') !== -1) {
+try { gdPersist(); } catch (e2) {}
+}
+try {
+var ov = document.getElementById('errOverlay');
+if (ov) {
+ov.textContent = 'The game crashed (' + e + '). Reload the page to ' +
+'keep playing. Open it with ?debug to see logs.';
+ov.classList.add('on');
+}
+} catch (e2) {}
+say('gd_boot rejected: ' + e);
+if (e && e.stack) say('STACK: ' + e.stack);
+dumpRegs();
+dumpTrace();
+});
+} else {
+say('gd_boot returned (sync)');
+setProgress(100);
+}
+} catch (e) {
+say('gd_boot exception: ' + e);
+}
+});
+}, 100);
+}
+};
+(function () {
+var nativeFetch = window.fetch;
+var nativeXhrOpen = XMLHttpRequest.prototype.open;
+var audioObjectUrls = new WeakMap();
+function audioFilename(url) {
+var path = String(url).replace(/\\/g, '/');
+try { path = decodeURIComponent(path); }
+catch (e) {
+say('[audio] invalid encoded song path: ' + url);
+return null;
+}
+path = path.replace(/\\/g, '/').split(/[?#]/)[0];
+var match = /(?:^|\/)([^/]+\.mp3)$/i.exec(path);
+return match ? match[1] : null;
+}
+function normalizeFsPath(path) {
+return String(path).replace(/\\/g, '/').replace(/\/+/g, '/').replace(/\/$/, '') || '/';
+}
+function songFilename(path) {
+var filename = String(path).replace(/\\/g, '/').split(/[?#]/)[0].split('/').pop();
+try { filename = decodeURIComponent(filename); }
+catch (e) {}
+return /\.mp3$/i.test(filename) ? filename.toLowerCase() : null;
+}
+function removeSavedSongRecords(filename) {
+return new Promise(function (resolve) {
+var request;
+try {
+request = indexedDB.open('gdwasm_saves', 1);
+} catch (e) {
+console.error('[audio] failed to open save database for song deletion:', e);
+resolve();
+return;
+}
+request.onupgradeneeded = function () {
+if (!request.result.objectStoreNames.contains('files'))
+request.result.createObjectStore('files');
+};
+request.onerror = function () {
+console.error('[audio] failed to open save database for song deletion:', request.error);
+resolve();
+};
+request.onsuccess = function () {
+var db = request.result, keysRequest;
+try {
+keysRequest = db.transaction('files', 'readonly').objectStore('files').getAllKeys();
+} catch (e) {
+console.error('[audio] failed to read saved song keys:', e);
+db.close();
+resolve();
+return;
+}
+keysRequest.onerror = function () {
+console.error('[audio] failed to read saved song keys:', keysRequest.error);
+db.close();
+resolve();
+};
+keysRequest.onsuccess = function () {
+var keys = keysRequest.result || [], matches = [];
+for (var i = 0; i < keys.length; ++i)
+if (songFilename(keys[i]) === filename) matches.push(keys[i]);
+if (!matches.length) {
+db.close();
+resolve();
+return;
+}
+var tx;
+try {
+tx = db.transaction('files', 'readwrite');
+var store = tx.objectStore('files');
+for (var j = 0; j < matches.length; ++j) store.delete(matches[j]);
+} catch (e) {
+console.error('[audio] failed to delete saved song records:', e);
+db.close();
+resolve();
+return;
+}
+tx.oncomplete = function () {
+for (var k = 0; k < matches.length; ++k)
+persistDebug('deleted IndexedDB song ' + matches[k]);
+db.close();
+resolve();
+};
+tx.onerror = tx.onabort = function () {
+console.error('[audio] failed to delete saved song records:', tx.error);
+db.close();
+resolve();
+};
+};
+};
+});
+}
+function readLocalSong(url) {
+var filename = audioFilename(url);
+var fs = Module.FS;
+if (!filename || !fs || !fs.analyzePath || !fs.readFile) return null;
+var cwd = typeof fs.cwd === 'function' ? fs.cwd() : '/';
+var roots = ['/Resources', '/', '/AppData', cwd];
+var tried = GD_DEBUG ? [] : null;
+var mp3Files = GD_DEBUG ? [] : null;
+var scanErrors = GD_DEBUG ? [] : null;
+var checked = Object.create(null);
+function readPath(path, preservePath) {
+path = preservePath ? String(path) : normalizeFsPath(path);
+if (checked[path]) return null;
+checked[path] = true;
+if (tried) tried.push(path);
+if (!fs.analyzePath(path).exists) return null;
+try {
+return { path: path, bytes: fs.readFile(path) };
+} catch (e) {
+console.error('[audio] failed to read saved song ' + path, e);
+throw e;
+}
+}
+for (var i = 0; i < roots.length; ++i) {
+var direct = readPath(normalizeFsPath(roots[i]) + '/' + filename);
+if (direct) return direct;
+}
+var visited = Object.create(null);
+function scan(directory) {
+if (visited[directory]) return null;
+visited[directory] = true;
+if (tried) tried.push(directory);
+var entries;
+try {
+entries = fs.readdir(directory);
+} catch (e) {
+if (scanErrors) scanErrors.push({ path: directory, error: String(e) });
+return null;
+}
+for (var j = 0; j < entries.length; ++j) {
+var name = entries[j];
+if (name === '.' || name === '..') continue;
+var path = directory === '/' ? '/' + name : directory + '/' + name;
+var stat;
+try {
+stat = fs.lstat ? fs.lstat(path) : fs.stat(path);
+} catch (e) {
+if (scanErrors) scanErrors.push({ path: path, error: String(e) });
+continue;
+}
+if (fs.isLink && fs.isLink(stat.mode)) continue;
+if (fs.isDir(stat.mode)) {
+var found = scan(path);
+if (found) return found;
+} else if (songFilename(name)) {
+if (songFilename(name) === filename.toLowerCase()) {
+var song = readPath(path, true);
+if (song) return song;
+}
+if (mp3Files) mp3Files.push(path);
+}
+}
+return null;
+}
+var recursive = scan('/');
+if (recursive) return recursive;
+if (GD_DEBUG) console.warn('[audio] song not found in virtual FS', {
+filename: filename,
+tried: tried,
+mp3Files: mp3Files,
+scanErrors: scanErrors
+});
+return null;
+}
+function removeMatchingSongFiles(filename, unlinkFile) {
+var fs = Module.FS;
+if (!fs || !fs.readdir || !fs.unlink) return 0;
+var paths = [], visited = Object.create(null);
+function scan(directory) {
+if (visited[directory]) return;
+visited[directory] = true;
+var entries;
+try {
+entries = fs.readdir(directory);
+} catch (e) {
+console.warn('[audio] failed to scan for deleted song in ' + directory, e);
+return;
+}
+for (var i = 0; i < entries.length; ++i) {
+var name = entries[i];
+if (name === '.' || name === '..') continue;
+var path = directory === '/' ? '/' + name : directory + '/' + name;
+var stat;
+try {
+stat = fs.lstat ? fs.lstat(path) : fs.stat(path);
+} catch (e) {
+console.warn('[audio] failed to inspect ' + path + ' while deleting song', e);
+continue;
+}
+if (fs.isLink && fs.isLink(stat.mode)) continue;
+if (fs.isDir(stat.mode)) scan(path);
+else if (fs.isFile(stat.mode) && songFilename(name) === filename)
+paths.push(path);
+}
+}
+scan('/');
+var removed = 0;
+for (var j = 0; j < paths.length; ++j) {
+try {
+(unlinkFile || fs.unlink).call(fs, paths[j]);
+removed++;
+persistDebug('deleted virtual FS song ' + paths[j]);
+} catch (e) {
+console.error('[audio] failed to delete virtual FS song ' + paths[j], e);
+}
+}
+return removed;
+}
+window.__gdInstallSongDeleteHook = function () {
+var fs = Module.FS;
+if (!fs || !fs.unlink || fs.__gdSongDeleteHook) return;
+var nativeUnlink = fs.unlink;
+fs.unlink = function (path) {
+var filename = songFilename(path), result, unlinkError;
+try {
+result = nativeUnlink.apply(this, arguments);
+} catch (e) {
+unlinkError = e;
+}
+if (!filename) {
+if (unlinkError) throw unlinkError;
+return result;
+}
+if (!unlinkError) persistDebug('deleted virtual FS song path ' + path);
+var removed = removeMatchingSongFiles(filename, nativeUnlink);
+removeSavedSongRecords(filename);
+if (unlinkError && !removed) throw unlinkError;
+return result;
+};
+fs.__gdSongDeleteHook = true;
+};
+window.fetch = function (input, init) {
+var url = typeof input === 'string' ? input : input && (input.url || input.href);
+var method = (init && init.method) || (input && input.method) || 'GET';
+var normalizedUrl = typeof input === 'string' ? input.replace(/\\/g, '/') : input;
+if (url && String(method).toUpperCase() === 'GET') {
+var song = readLocalSong(url);
+if (song) return Promise.resolve(new Response(song.bytes, {
+status: 200,
+headers: { 'Content-Type': 'audio/mpeg' }
+}));
+}
+if (normalizedUrl !== input) return nativeFetch.call(this, normalizedUrl, init);
+return nativeFetch.apply(this, arguments);
+};
+function releaseAudioUrl(xhr) {
+var url = audioObjectUrls.get(xhr);
+if (url) {
+URL.revokeObjectURL(url);
+audioObjectUrls.delete(xhr);
+}
+}
+XMLHttpRequest.prototype.open = function (method, url) {
+releaseAudioUrl(this);
+var args = Array.prototype.slice.call(arguments);
+var song = /^GET$/i.test(method) ? readLocalSong(url) : null;
+if (song) {
+var blobUrl = URL.createObjectURL(new Blob([song.bytes], { type: 'audio/mpeg' }));
+audioObjectUrls.set(this, blobUrl);
+var xhr = this;
+function cleanup() {
+if (audioObjectUrls.get(xhr) === blobUrl) releaseAudioUrl(xhr);
+}
+['loadend', 'abort', 'error', 'timeout'].forEach(function (event) {
+xhr.addEventListener(event, cleanup, { once: true });
+});
+args[1] = blobUrl;
+} else if (typeof url === 'string') {
+args[1] = url.replace(/\\/g, '/');
+}
+try {
+return nativeXhrOpen.apply(this, args);
+} catch (e) {
+releaseAudioUrl(this);
+throw e;
+}
+};
+})();
+var started = false;
+function gdStart() {
+if (started) return;
+try {
+var AC = window.AudioContext || window.webkitAudioContext;
+if (AC && !Module.gdAudioContext) Module.gdAudioContext = new AC({latencyHint:'interactive'});
+if (Module.gdAudioContext) Module.gdAudioContext.resume().catch(function(){});
+} catch (_) {}
+started = true;
+window.__gdLoadStarted = true;
+resetProgress();
+function loadModule() {
+GDAssets.loadScript().then(function (code) {
+var s = document.createElement('script');
+s.textContent = code;
+document.body.appendChild(s);
+}).catch(function (e) {
+GDAssets.fail(e);
+});
+}
+loadModule();
+}
+
+gdPersist();
+function gdPersistOnInteraction() {
+window.removeEventListener('click', gdPersistOnInteraction, true);
+window.removeEventListener('keydown', gdPersistOnInteraction, true);
+gdPersist();
+}
+window.addEventListener('click', gdPersistOnInteraction, true);
+window.addEventListener('keydown', gdPersistOnInteraction, true);
+document.getElementById('saveBtn').addEventListener('click', function (e) {
+e.preventDefault(); e.stopPropagation();
+if (!window.__gdRuntimeReady) return;
+scheduleSave(true);
+this.textContent = 'Save requested';
+var button = this; setTimeout(function () { button.textContent = 'Save progress'; }, 3000);
+});
+document.getElementById('clearBtn').addEventListener('click', function (e) {
+e.preventDefault();
+e.stopPropagation();
+gdClearCache();
+});
+document.addEventListener('keydown', function (e) {
+if (!started && (e.code === 'Space' || e.key === ' ' || e.code === 'Enter' ||
+e.key === 'Enter' || e.code === 'NumpadEnter')) {
+e.preventDefault();
+gdStart();
+}
+});</script><script>
+(function () {
+  'use strict';
+  var el = Module.canvas, head = 0;
+  var keys = new Map(), pointers = new Map();
+  var buttonCounts = [0, 0, 0], pointerButtons = new Map();
+  var queueSamples = GD_PERF ? [] : null, frameSamples = GD_PERF ? [] : null;
+  var lastFrame = 0, frameN = 0, focusAcked = false;
+  var mouseButtons = 0;
+  var benchmark = null;
+  Module.gdBeginBenchmark = function (durationMs) {
+    benchmark = {duration: Math.max(1000, Math.min(60000, durationMs || 20000)),
+      start: null, previous: 0, frames: [], input: [], heap: 0};
+    if (!queueSamples) queueSamples = [];
+    if (!frameSamples) frameSamples = [];
+    Module.gdBenchmark = {running: true, elapsedMs: 0};
+  };
+  Module.gdKeyState = new Uint8Array(256);
+  Module.gdInputStats = {samples: 0, queueMs: 0, queueP95Ms: 0, frameP95Ms: 0, pointerClient: null, pointerGame: null};
+  function ready() { return window.__gdInputReady === true; }
+  function timestamp(e) {
+    var now = performance.now(), stamp = e && e.timeStamp;
+    return stamp > 0 && stamp <= now && now - stamp < 60000 ? stamp : now;
+  }
+  function push(msg, wp, lp, time) {
+    Module.gdInputQueue.push([msg | 0, wp | 0, lp | 0, time || performance.now()]);
+  }
+  function position(e) {
+    var r = canvasRect;
+    var width = el.width || 1920, height = el.height || 1080;
+    var x = Math.max(0, Math.min(width - 1, Math.round((e.clientX - r.left) * width / r.width)));
+    var y = Math.max(0, Math.min(height - 1, Math.round((e.clientY - r.top) * height / r.height)));
+    Module.gdCursorPos[0] = x; Module.gdCursorPos[1] = y;
+    if (GD_PERF || benchmark) {
+      Module.gdInputStats.pointerClient = [e.clientX, e.clientY];
+      Module.gdInputStats.pointerGame = [x, y];
+    }
+    return (x & 65535) | (y << 16);
+  }
+  function cursor() { return (Module.gdCursorPos[0] & 65535) | (Module.gdCursorPos[1] << 16); }
+  function percentile(values) {
+    if (!values.length) return 0;
+    var sorted = values.slice().sort(function (a, b) { return a - b; });
+    return sorted[Math.ceil(sorted.length * 0.95) - 1];
+  }
+  Module.gdPollInput = function () {
+    if (head >= Module.gdInputQueue.length) return null;
+    var entry = Module.gdInputQueue[head++];
+    if (entry[0] === 0x100 || entry[0] === 0x201 || entry[0] === 0x204) {
+      var delay = Math.max(0, performance.now() - entry[3]);
+      Module.gdInputStats.queueMs = delay; Module.gdInputStats.samples++;
+      if (GD_PERF || benchmark) {
+        queueSamples.push(delay); if (queueSamples.length > 120) queueSamples.shift();
+        Module.gdInputStats.queueP95Ms = percentile(queueSamples);
+      }
+      if (benchmark) benchmark.input.push(delay);
+    }
+    if (head >= Module.gdInputQueue.length) { Module.gdInputQueue.length = 0; head = 0; }
+    return entry;
+  };
+  Module.gdMeasureFrame = function () {
+    var now = performance.now();
+    if (benchmark && !document.hidden) {
+      var b = benchmark;
+      if (b.start === null) b.start = now;
+      else b.frames.push(now - b.previous);
+      b.previous = now;
+      if (Module.HEAPU8) b.heap = Math.max(b.heap, Module.HEAPU8.byteLength / 1048576);
+      var elapsed = now - b.start;
+      Module.gdBenchmark.elapsedMs = elapsed;
+      if (elapsed >= b.duration && b.frames.length) {
+        Module.gdBenchmark = {running: false, frames: b.frames.length,
+          elapsedMs: elapsed, meanFps: b.frames.length * 1000 / elapsed,
+          frameP95Ms: percentile(b.frames), frameMaxMs: Math.max.apply(null, b.frames),
+          inputP95Ms: b.input.length ? percentile(b.input) : null, heapMiB: b.heap};
+        benchmark = null;
+      }
+    }
+    if (lastFrame && !document.hidden && (GD_PERF || benchmark)) {
+      frameSamples.push(now - lastFrame);
+      if (frameSamples.length > 120) frameSamples.shift();
+      if (++frameN % 30 === 0) Module.gdInputStats.frameP95Ms = percentile(frameSamples);
+    }
+    lastFrame = now;
+  };
+  function acknowledgeFocus() {
+    if (focusAcked || !ready()) return;
+    focusAcked = true; push(6, 1, 0); push(7, 0, 0); push(0x1c, 1, 0);
+  }
+  window.__gdAckFocus = acknowledgeFocus;
+  var downMsg = [0x201, 0x207, 0x204], upMsg = [0x202, 0x208, 0x205];
+  function setButton(b, down, lp, time) {
+    var count = buttonCounts[b];
+    buttonCounts[b] += down ? 1 : -1;
+    var vk = [1, 4, 2][b];
+    Module.gdKeyState[vk] = buttonCounts[b] ? 1 : 0;
+    if (down && count === 0) push(downMsg[b], b === 2 ? 2 : b === 1 ? 16 : 1, lp, time);
+    if (!down && buttonCounts[b] === 0) { push(upMsg[b], 0, lp, time); push(0x200, 0, lp, time); }
+  }
+  function syncMouse(mask, lp, time) {
+    [1, 4, 2].forEach(function (bit, b) {
+      if ((mouseButtons & bit) !== (mask & bit)) setButton(b, !!(mask & bit), lp, time);
+    });
+    mouseButtons = mask;
+  }
+  function releasePointer(id, time) {
+    if (!pointers.has(id)) return;
+    var button = pointerButtons.get(id), lp = pointers.get(id);
+    pointers.delete(id); pointerButtons.delete(id);
+    setButton(button, false, lp, time);
+  }
+  el.addEventListener('pointerdown', function (e) {
+    if (!ready() || e.button > 2) return;
+    acknowledgeFocus();
+    el.focus({preventScroll: true});
+    var lp = position(e), b = e.pointerType === 'mouse' ? e.button : 0;
+    if (e.pointerType === 'mouse') {
+      syncMouse(e.buttons === undefined ? (mouseButtons | [1, 4, 2][b]) : e.buttons, lp, timestamp(e));
+      try { el.setPointerCapture(e.pointerId); } catch (_) {}
+      e.preventDefault(); return;
+    }
+    if (pointers.has(e.pointerId)) return;
+    pointers.set(e.pointerId, lp); pointerButtons.set(e.pointerId, b);
+    setButton(b, true, lp, timestamp(e));
+    try { el.setPointerCapture(e.pointerId); } catch (_) {}
+    e.preventDefault();
+  }, {passive: false});
+  el.addEventListener('pointermove', function (e) {
+    if (!ready()) return;
+    var lp = position(e);
+    if (e.pointerType === 'mouse' && e.buttons !== undefined) syncMouse(e.buttons, lp, timestamp(e));
+    if (pointers.has(e.pointerId)) pointers.set(e.pointerId, lp);
+    var wp = (buttonCounts[0] ? 1 : 0) | (buttonCounts[2] ? 2 : 0) | (buttonCounts[1] ? 16 : 0);
+    var q = Module.gdInputQueue, tail = q[q.length - 1];
+    if (q.length > head && tail[0] === 0x200) q[q.length - 1] = [0x200, wp, lp, timestamp(e)];
+    else push(0x200, wp, lp, timestamp(e));
+  }, {passive: true});
+  ['pointerup', 'pointercancel', 'lostpointercapture'].forEach(function (name) {
+    el.addEventListener(name, function (e) {
+      if (e.pointerType === 'mouse') syncMouse(name === 'pointerup' ? (e.buttons || 0) : 0, cursor(), timestamp(e));
+      else releasePointer(e.pointerId, timestamp(e));
+    });
+  });
+  el.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  el.addEventListener('wheel', function (e) {
+    if (!ready() || (!e.deltaX && !e.deltaY)) return;
+    var vertical = Math.abs(e.deltaY) >= Math.abs(e.deltaX);
+    var notch = (vertical ? -e.deltaY : -e.deltaX) > 0 ? 120 : -120;
+    push(vertical ? 0x20a : 0x20e, (notch & 65535) << 16, position(e), timestamp(e));
+    e.preventDefault();
+  }, {passive: false});
+  var VK = {Escape:27, Space:32, Enter:13, Backspace:8, Tab:9, ArrowLeft:37, ArrowUp:38, ArrowRight:39, ArrowDown:40};
+  var scan = {Escape:1, Space:57, Enter:28, Backspace:14, Tab:15, ArrowLeft:75, ArrowUp:72, ArrowRight:77, ArrowDown:80,
+    KeyW:17, KeyA:30, KeyS:31, KeyD:32, KeyQ:16, KeyE:18, KeyR:19, KeyF:33, KeyP:25};
+  // EscFix: intercept Escape on LEVEL COMPLETE for official/online levels
+  // Uses audio signal endStart_02.ogg which plays only on Main/Online level completion (not editor)
+  var escFixEnabled = !/[?&]noescfix(=|&|$)/.test(location.search);
+  var escFixDebug = /[?&]debug(=|&|$)/.test(location.search);
+  function escFixLog() { if (escFixDebug) console.log('[escfix]', ...arguments); }
+  function escFixIsLevelComplete() {
+    return window.gdLevelComplete === true;
+  }
+  function escFixSimulateListClick() {
+    var rect = canvasRect;
+    if (!rect) return false;
+    var canvas = Module.canvas;
+    // List button at 67.5% width, 87.7% height of visible canvas
+    var clientX = rect.left + 0.675 * rect.width;
+    var clientY = rect.top + 0.877 * rect.height;
+    escFixLog('Simulating list button click at client:', Math.round(clientX), Math.round(clientY), 'rect:', rect.left, rect.top, rect.width, rect.height);
+    var downEvent = new PointerEvent('pointerdown', {
+      clientX: clientX, clientY: clientY, button: 0, buttons: 1,
+      pointerType: 'mouse', pointerId: 1, isPrimary: true, bubbles: true, cancelable: true
+    });
+    var upEvent = new PointerEvent('pointerup', {
+      clientX: clientX, clientY: clientY, button: 0, buttons: 0,
+      pointerType: 'mouse', pointerId: 1, isPrimary: true, bubbles: true, cancelable: true
+    });
+    var clickEvent = new MouseEvent('click', {
+      clientX: clientX, clientY: clientY, button: 0, buttons: 0,
+      bubbles: true, cancelable: true
+    });
+    canvas.dispatchEvent(downEvent);
+    canvas.dispatchEvent(upEvent);
+    canvas.dispatchEvent(clickEvent);
+    return true;
+  }
+  function key(e, down) {
+    if (!ready()) return;
+    var vk = VK[e.code] || e.keyCode || 0;
+    // EscFix: intercept Escape on LEVEL COMPLETE for official/online levels
+    if (escFixEnabled && down && e.code === 'Escape' && escFixIsLevelComplete()) {
+      escFixLog('Escape intercepted on LEVEL COMPLETE, simulating list button click');
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      escFixSimulateListClick();
+      return;
+    }
+    if (!vk || vk > 255) return;
+    if (down && (e.ctrlKey || e.metaKey || e.altKey || e.target.closest && e.target.closest('button,input,textarea,select,a'))) return;
+    if (!down && !keys.has(vk)) return;
+    if (e.repeat && (e.code === 'Space' || e.code.indexOf('Arrow') === 0)) { e.preventDefault(); return; }
+    var lp = 1 | ((scan[e.code] || 0) << 16);
+    if (e.code.indexOf('Arrow') === 0) lp |= 0x1000000;
+    if (down && keys.has(vk)) lp |= 0x40000000;
+    if (!down) lp |= -1073741824;
+    Module.gdKeyState[vk] = down ? 1 : 0;
+    if (down) keys.set(vk, lp); else keys.delete(vk);
+    var time = timestamp(e);
+    push(down ? 0x100 : 0x101, vk, lp, time);
+    if (down) {
+      var ch = e.key && e.key.length === 1 ? e.key.charCodeAt(0) : e.code === 'Backspace' ? 8 : e.code === 'Enter' ? 13 : 0;
+      if (ch) push(0x102, ch, lp, time);
+    }
+    if (VK[e.code]) e.preventDefault();
+  }
+  window.addEventListener('keydown', function (e) { key(e, true); }, {capture: true});
+  window.addEventListener('keyup', function (e) { key(e, false); }, {capture: true});
+  window.addEventListener('paste', function (e) {
+    if (!ready() || document.activeElement !== el || !e.clipboardData) return;
+    var text;
+    try { text = e.clipboardData.getData('text/plain'); } catch (_) { return; }
+    if (typeof text !== 'string' || !text.length) return;
+    e.preventDefault();
+    text = text.replace(/[\r\n\u2028\u2029]/g, '');
+    for (var i = 0; i < text.length; i++) {
+      push(0x102, text.charCodeAt(i), 1, timestamp(e));
+    }
+  }, {capture: true});
+  function releaseAll() {
+    if (benchmark) {
+      benchmark = null;
+      Module.gdBenchmark = {running: false, error: 'Interrupted: keep the game focused for the test'};
+    }
+    syncMouse(0, cursor());
+    pointers.forEach(function (_, id) { releasePointer(id); });
+    keys.forEach(function (lp, vk) { push(0x101, vk, lp | -1073741824); });
+    keys.clear(); Module.gdKeyState.fill(0); focusAcked = false;
+    lastFrame = 0;
+    if (frameSamples) frameSamples.length = 0;
+  }
+  var autoPauseSent = false;
+  function maybeAutoPause() {
+    if (autoPauseSent || !ready() || !document.body.classList.contains('playing') || window.gdInLevel !== true) return;
+    var audio = Module.__gdAudio;
+    if (audio && audio.groups && audio.groups[1] && audio.groups[1].paused === true) return;
+    var channels = audio && audio.channels;
+    var sounds = audio && audio.sounds;
+    if (!channels || !sounds) return;
+    var channelIds = Object.keys(channels);
+    var soundIds = Object.keys(sounds);
+    for (var i = 0; i < channelIds.length; i++) {
+      var channel = channels[channelIds[i]];
+      if (!channel || channel.group !== 1) continue;
+      var sound = channel.sound;
+      if (sound != null && typeof sound !== 'object') sound = sounds[sound];
+      if (!sound && channel.soundId != null) sound = sounds[channel.soundId];
+      if (!sound) {
+        var source = channel.source || channel.node;
+        var buffer = source && source.buffer;
+        for (var j = 0; buffer && j < soundIds.length; j++) {
+          var candidate = sounds[soundIds[j]];
+          if (candidate && candidate.buf === buffer) {
+            sound = candidate;
+            break;
+          }
+        }
+      }
+      if (!sound || typeof sound.name !== 'string') continue;
+      var name = sound.name.replace(/^.*[\\/]/, '').toLowerCase();
+      if (!/\.mp3$/.test(name) || name.replace(/\.mp3$/, '') === 'menuloop') continue;
+      if (channel.paused || channel.pausedByGroup || channel.ended) continue;
+      autoPauseSent = true;
+      window.dispatchEvent(new KeyboardEvent('keydown', {key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true}));
+      window.dispatchEvent(new KeyboardEvent('keyup', {key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true}));
+      return;
+    }
+  }
+  window.addEventListener('blur', function () {
+    releaseAll();
+    maybeAutoPause();
+  });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      releaseAll();
+      maybeAutoPause();
+    }
+  });
+  window.addEventListener('focus', function () { autoPauseSent = false; });
+  el.tabIndex = 0;
+  var canvasRect = el.getBoundingClientRect();
+  function updateCanvasRect() { canvasRect = el.getBoundingClientRect(); }
+  if (typeof ResizeObserver === 'function') {
+    new ResizeObserver(updateCanvasRect).observe(el);
+  }
+  window.addEventListener('resize', updateCanvasRect, {passive: true});
+})();
+
+</script><script>(function(){var b=document.getElementById('fsBtn'),d=document,c=document.getElementById('canvas');function F(){return d.fullscreenElement||d.webkitFullscreenElement||d.mozFullScreenElement||d.msFullscreenElement;}function U(){b.textContent=F()?'Exit Fullscreen':'Fullscreen';}async function T(){try{if(F()){(d.exitFullscreen||d.webkitExitFullscreen||d.mozCancelFullScreen||d.msExitFullscreen).call(d);}else{await (document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen||document.documentElement.mozRequestFullScreen||document.documentElement.msRequestFullscreen).call(document.documentElement);try{if(navigator.keyboard&&navigator.keyboard.lock)await navigator.keyboard.lock(['Escape']);}catch(err){}}}catch(err){}}b.addEventListener('click',function(v){v.preventDefault();v.stopPropagation();T();b.blur();});['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','MSFullscreenChange'].forEach(function(n){d.addEventListener(n,U);});d.addEventListener('fullscreenchange',function(){if(d.fullscreenElement===null&&navigator.keyboard&&navigator.keyboard.unlock)navigator.keyboard.unlock();});U();})();</script><script>(function(){
+var ov=document.getElementById('errOverlay');
+function err(m){ if(ov){ov.textContent=m;ov.classList.add('on');} }
+try{
+  var c=document.createElement('canvas');
+  var gl=c.getContext('webgl2');
+  if(!gl) err('WebGL2 not available - use Chrome/Edge 137+ with hardware acceleration.');
+  if(!window.crossOriginIsolated) console.log('[page] note: page is not cross-origin isolated; threads may be limited.');
+  if(typeof WebAssembly.Suspending!=='function'||typeof WebAssembly.promising!=='function') err('This game needs a browser with WebAssembly JSPI support. Update Chrome or Edge.');
+  if(gl){var lose=gl.getExtension('WEBGL_lose_context');if(lose)lose.loseContext();}
+}catch(e){ err('Feature check failed: '+e); }
+window.addEventListener('error',function(e){ if(e&&e.message&&/JSPI|WebAssembly|wasm|memory/i.test(String(e.message))) err('Runtime error: '+e.message); });
+})();</script>
+<script>(function(){
+var load=document.getElementById('gdLoad');
+var pct=document.getElementById('gdLoadPct');
+var tip=document.createElement('div');
+tip.id='gdLoadTip';
+tip.style.position='fixed';
+tip.style.left='50%';
+tip.style.bottom='8%';
+tip.style.transform='translateX(-50%)';
+tip.style.width='calc(100vw - 32px)';
+tip.style.maxWidth='720px';
+tip.style.textAlign='center';
+tip.style.font='400 14.4px/1.5 system-ui,sans-serif';
+tip.style.color='#8aa6d4';
+tip.style.opacity='1';
+tip.style.transition='opacity .22s ease';
+tip.style.pointerEvents='auto';
+tip.style.cursor='pointer';
+tip.style.userSelect='none';
+load.appendChild(tip);
+var tips=[
+{text:'Press Tab to open the tools menu (export, import, clear cache).',weight:2},
+{text:'Lagging? Add ?res=low at the end of the URL.'},
+{text:'The downloaded version works offline after the first load.'},
+{text:"The game saves your progress automatically, so you don't have to."},
+{text:'Your progress is saved in this browser. Export a backup from the Tab menu.'},
+{text:'Clearing your browser data also deletes your progress.'},
+{text:'Click once to go fullscreen. Hold Esc to exit.'},
+{text:'Progress is saved per website address, so always play from the same one.'},
+{text:'Use Import in the Tab menu to move your progress to another browser or device.'},
+{text:'The first load is the slowest. After that, the game files are cached.'},
+{text:'Online levels failing? Wait a moment and try again.'},
+{text:'Press Save progress in the Tab menu to force a save.'},
+{text:'Feedback and bug reports are welcome on GitHub (Issues tab):',link:'https://github.com/Ale7208/Geometry-Dash-webport',weight:2},
+{text:'Pro tip: Avoid the pointy triangles.'},
+{text:'Remember: The 99% fail is part of the experience.'},
+{text:'Your spacebar is crying for help.'},
+{text:"Practice mode is not cheating, it's therapy."},
+{text:'Tip: Blame the hitbox, never yourself.'},
+{text:'Counting your attempts... Error: Number too big.'},
+{text:'Pro tip: Blink after you beat the level.'},
+{text:'Tip: If the screen turns upside down, just flip your monitor.'},
+{text:'Have you tried turning your skill off and on again?'},
+{text:'Do not trust the first jump of any level.'},
+{text:'Wave mode: Where straight lines go to die.'},
+{text:"Tip: Don't look at the percentage."},
+{text:'Please do not feed the Clubstep monsters.'},
+{text:'Never celebrate before the end wall.'},
+{text:'RubRub added one extra spike just to mess with you.'},
+{text:'Geometry Dash belongs to RobTop. Buy the original game to support him.'},
+{text:'Downloaded songs are stored in your browser, so you only download them once.'},
+{text:'Cloud saving and loading work with your Geometry Dash account.'},
+{text:"Login failed? Try again. The error often comes from RobTop's servers."},
+{text:'You can paste text into the game with Ctrl+V.'},
+{text:'Reset progress in the Tab menu deletes your save. Export a backup first.'},
+{text:"If your browser asks before closing the page, it's protecting your save."},
+{text:'Questions? Ask in the Q&A section of GitHub Discussions ',link:'https://github.com/Ale7208/Geometry-Dash-webport/discussions/categories/q-a',linkText:'https://github.com/Ale7208/Geometry-Dash-webport/discussions/categories/q-a',inlineLink:true},
+{text:'The official address is gd-webport.pages.dev. Any similar one is a copy made by someone else.'},
+{text:'Port by Bog. Modded by Ale7208.'},
+{text:'You can see my GitHub repositories at ',link:'https://github.com/Ale7208/',linkText:'https://github.com/Ale7208/',after:' I have very few repositories for now, but I may make more webports in the future.',inlineLink:true}
+];
+var previousTip=-1;
+var tipHovered=false;
+var tipTimer=null;
+var tipFadeTimer=null;
+function chooseTip(){
+var totalWeight=0;
+for(var i=0;i<tips.length;i++){
+if(i!==previousTip)totalWeight+=tips[i].weight||1;
+}
+var roll=Math.random()*totalWeight;
+for(var j=0;j<tips.length;j++){
+if(j===previousTip)continue;
+var weight=tips[j].weight||1;
+if(roll<weight)return j;
+roll-=weight;
+}
+throw new Error('Unable to select a loading tip.');
+}
+function showTip(){
+var next=chooseTip();
+previousTip=next;
+var item=tips[next];
+while(tip.firstChild)tip.removeChild(tip.firstChild);
+tip.appendChild(document.createTextNode(item.text));
+if(item.link){
+if(!item.inlineLink)tip.appendChild(document.createElement('br'));
+var link=document.createElement('a');
+link.href=item.link;
+link.target='_blank';
+link.rel='noopener noreferrer';
+link.textContent=item.linkText||'github.com/Ale7208/Geometry-Dash-webport';
+link.style.color='#6fc3ff';
+link.style.textDecoration='underline';
+link.style.pointerEvents='auto';
+tip.appendChild(link);
+if(item.after)tip.appendChild(document.createTextNode(item.after));
+}
+}
+function advanceTip(){
+if(tipFadeTimer!==null)clearTimeout(tipFadeTimer);
+tip.style.opacity='0';
+tipFadeTimer=setTimeout(function(){
+showTip();
+tip.style.opacity='1';
+tipFadeTimer=null;
+},220);
+}
+function startTipTimer(){
+if(tipTimer!==null)clearInterval(tipTimer);
+tipTimer=setInterval(function(){
+if(failed||tipHovered)return;
+advanceTip();
+},6000);
+}
+showTip();
+tip.addEventListener('mouseenter',function(){tipHovered=true;});
+tip.addEventListener('mouseleave',function(){tipHovered=false;});
+tip.addEventListener('click',function(e){
+e.stopPropagation();
+if(e.target.closest&&e.target.closest('a'))return;
+advanceTip();
+startTipTimer();
+});
+startTipTimer();
+var totals={wasm:123481510,data:322237583};
+var loaded={wasm:0,data:0};
+var shown=1;
+pct.style.setProperty('--p',shown);
+var completed=false;
+var failed=false;
+var completionTimer=null;
+var hideTimer=null;
+function update(){
+if(completed||failed)return;
+var value=Math.floor((loaded.wasm+loaded.data)/(totals.wasm+totals.data)*100);
+value=Math.max(1,Math.min(99,value));
+if(value>shown){shown=value;pct.style.setProperty('--p',shown);}
+}
+var originalSetAssetBar=window.setAssetBar;
+window.setAssetBar=function(which,amount,total){
+if(which==='wasm'||which==='data'){
+loaded[which]=Math.max(0,Number(amount)||0);
+if(Number(total)>0)totals[which]=Number(total);
+update();
+}
+return originalSetAssetBar.apply(this,arguments);
+};
+function hide(){
+if(failed)return;
+if(completionTimer!==null)clearTimeout(completionTimer);
+if(tipTimer!==null)clearInterval(tipTimer);
+if(tipFadeTimer!==null)clearTimeout(tipFadeTimer);
+pct.style.setProperty('--p',100);
+load.classList.add('off');
+hideTimer=setTimeout(function(){
+load.style.display='none';
+},700);
+}
+function complete(){
+if(completed||failed)return;
+completed=true;
+pct.style.setProperty('--p',100);
+completionTimer=setTimeout(hide,300);
+}
+var originalFirstFrame=window.gdFirstFrame;
+window.gdFirstFrame=function(){
+complete();
+if(typeof originalFirstFrame==='function')return originalFirstFrame.apply(this,arguments);
+};
+var bodyObserver=new MutationObserver(function(){
+if(document.body.classList.contains('playing'))complete();
+});
+bodyObserver.observe(document.body,{attributes:true,attributeFilter:['class']});
+var overlay=document.getElementById('errOverlay');
+function hideForError(){
+failed=true;
+if(completionTimer!==null)clearTimeout(completionTimer);
+if(hideTimer!==null)clearTimeout(hideTimer);
+if(tipTimer!==null)clearInterval(tipTimer);
+if(tipFadeTimer!==null)clearTimeout(tipFadeTimer);
+load.style.display='none';
+}
+var errorObserver=new MutationObserver(function(){
+if(overlay.classList.contains('on'))hideForError();
+});
+errorObserver.observe(overlay,{attributes:true,attributeFilter:['class']});
+if(overlay.classList.contains('on'))hideForError();
+if(document.body.classList.contains('playing'))complete();
+if (document.readyState === 'loading')
+document.addEventListener('DOMContentLoaded', gdStart, { once: true });
+else gdStart();
+window.addEventListener('beforeunload',function(e){
+if(window.__gdSkipBeforeUnloadSave)return;
+if(!window.__gdRuntimeReady)return;
+if(gdSaveTimer)clearTimeout(gdSaveTimer);
+gdSaveTimer=null;
+performSave();
+e.preventDefault();
+e.returnValue='';
+});
+/* iOS Safari never fires beforeunload, so a swipe-away or tab close could lose
+   the current run. pagehide does fire there (and on desktop it does not prompt),
+   so flush the save from both without the dialog. */
+window.addEventListener('pagehide',function(){
+if(window.__gdSkipBeforeUnloadSave)return;
+if(!window.__gdRuntimeReady)return;
+if(gdSaveTimer)clearTimeout(gdSaveTimer);
+gdSaveTimer=null;
+performSave();
+});
+document.addEventListener('contextmenu',function(e){e.preventDefault();});
+function firstPointerDown(e){
+var loadTip=document.getElementById('gdLoadTip');
+if(loadTip&&loadTip.contains(e.target)){e.stopImmediatePropagation();return;}
+var notice=document.getElementById('errOverlay');
+if(notice&&notice.contains(e.target))return;
+var menu=document.getElementById('gdUtilityMenu');
+if(menu&&menu.contains(e.target))return;
+document.removeEventListener('pointerdown',firstPointerDown,true);
+var audio=window.Module&&window.Module.gdAudioContext;
+if(audio&&audio.state==='suspended')audio.resume();
+if(!document.fullscreenElement){var button=document.getElementById('fsBtn');if(button)button.click();}
+}
+document.addEventListener('pointerdown',firstPointerDown,true);
+})();</script>
+<script>(function () {
+  'use strict';
+  /* iOS Safari ignores user-scalable=no, so a two-finger gesture still zooms the
+     page (and often leaves it zoomed mid-level). These events exist only on
+     WebKit/iOS and canceling them is the documented workaround. */
+  ['gesturestart', 'gesturechange', 'gestureend'].forEach(function (name) {
+    document.addEventListener(name, function (e) { e.preventDefault(); }, { passive: false });
+  });
+})();</script>
+<script>(function () {
+  'use strict';
+  /* Audio unlock: the boot path calls resume() before any user gesture, which
+     browsers reject. firstPointerDown retries exactly once and then removes
+     itself, so a tap that lands before the AudioContext exists (or a webview
+     that drops the gesture) leaves the game silent for the whole session.
+     Keep asking on every gesture until the context is actually running. */
+  function unlockAudio() {
+    var a = window.Module && window.Module.gdAudioContext;
+    if (!a || a.state !== 'suspended') return;
+    try {
+      var p = a.resume();
+      if (p && p.then) p.catch(function () {});
+    } catch (e) {}
+  }
+  ['pointerdown', 'keydown', 'click'].forEach(function (name) {
+    document.addEventListener(name, unlockAudio, true);
+  });
+})();</script>
+<style id="gd-mobile-keyboard">
+#gdKeyBtn{position:fixed;right:calc(10px + var(--gd-r));top:calc(10px + var(--gd-t));z-index:30;width:42px;height:42px;border-radius:50%;border:1px solid #555;background:rgba(10,10,10,.55);color:#eee;font:16px/1 monospace;display:none;padding:0;touch-action:manipulation;}
+@media (pointer:coarse){#gdKeyBtn.on{display:block;}}
+#gdKeyField{position:fixed;left:0;top:0;width:2px;height:2px;opacity:.01;border:0;padding:0;margin:0;background:transparent;color:transparent;caret-color:transparent;outline:none;z-index:-1;}
+</style>
+<script>(function () {
+  'use strict';
+  var isMobile = navigator.userAgentData
+    ? navigator.userAgentData.mobile
+    : /Android|iPhone|iPad|iPod|Mobile|IEMobile|Windows Phone/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isMobile || !window.matchMedia('(pointer: coarse)').matches) return;
+  /* On-canvas text fields: the search bar, level name, account login etc. are
+     drawn inside the canvas, so mobile browsers never open the system
+     keyboard. A hidden <input> is focused on demand; whatever is typed into it
+     is forwarded to the page as the same key events a physical keyboard would
+     produce (their handler listens on window in the capture phase, so the
+     synthesized events go through the normal input queue). */
+  var btn = document.createElement('button');
+  btn.id = 'gdKeyBtn';
+  btn.type = 'button';
+  btn.textContent = '\u2328';
+  btn.setAttribute('aria-label', 'Open keyboard');
+  var field = document.createElement('input');
+  field.id = 'gdKeyField';
+  field.type = 'text';
+  field.setAttribute('autocomplete', 'off');
+  field.setAttribute('autocapitalize', 'none');
+  field.setAttribute('autocorrect', 'off');
+  field.setAttribute('spellcheck', 'false');
+  field.setAttribute('inputmode', 'text');
+  field.setAttribute('tabindex', '-1');
+  document.body.appendChild(field);
+  document.body.appendChild(btn);
+
+  function keyEv(type, code, key, keyCode) {
+    document.body.dispatchEvent(new KeyboardEvent(type, {
+      code: code, key: key, keyCode: keyCode, which: keyCode, bubbles: true, cancelable: true
+    }));
+  }
+  var prev = '';
+  field.addEventListener('input', function () {
+    var v = field.value, s = 0, i;
+    /* diff against what was already forwarded; IME-safe */
+    while (s < prev.length && s < v.length && prev.charCodeAt(s) === v.charCodeAt(s)) s++;
+    var removed = prev.length - s, added = v.length - s;
+    for (i = 0; i < removed; i++) {
+      keyEv('keydown', 'Backspace', 'Backspace', 8);
+      keyEv('keyup', 'Backspace', 'Backspace', 8);
+    }
+    for (i = 0; i < added; i++) {
+      var ch = v.charAt(s + i);
+      keyEv('keydown', '', ch, v.charCodeAt(s + i));
+      keyEv('keyup', '', ch, v.charCodeAt(s + i));
+    }
+    prev = v;
+    if (v.length > 200) { field.value = v.slice(-100); prev = field.value; }
+  });
+  field.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      keyEv('keydown', 'Enter', 'Enter', 13);
+      setTimeout(function () { keyEv('keyup', 'Enter', 'Enter', 13); }, 40);
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      field.blur();
+    }
+    /* Backspace arrives through the input diff above */
+  });
+  field.addEventListener('blur', function () { prev = field.value = ''; });
+  btn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    field.focus({ preventScroll: true });
+    btn.blur();
+  });
+
+  /* The keyboard is only needed in menus; hide it during a run. The
+     gd-inlevel event is dispatched by the existing audio instrumentation; the
+     slow interval is only a fallback if that instrumentation is unavailable. */
+  function watchInLevel(el, visibleInLevel) {
+    var seen = false;
+    function sync() { el.classList.toggle('on', window.gdInLevel === visibleInLevel); }
+    window.addEventListener('gd-inlevel', function () { seen = true; sync(); });
+    sync();
+    var iv = setInterval(function () {
+      if (seen) { clearInterval(iv); return; }
+      sync();
+    }, 1500);
+  }
+  window.__gdWatchInLevel = watchInLevel;
+  watchInLevel(btn, false);
+})();</script>
+<script>(function () {
+  'use strict';
+  /* A lost WebGL context cannot be restored by the game. Report it like other
+     crashes and leave recovery to the user instead of reloading automatically. */
+  var canvas = document.getElementById('canvas');
+  var reported = false;
+  canvas.addEventListener('webglcontextlost', function (e) {
+    e.preventDefault();
+    if (reported) return;
+    reported = true;
+    var overlay = document.getElementById('errOverlay');
+    if (overlay) {
+      overlay.textContent = 'The game lost its WebGL context, so the browser can no longer render it. ' +
+        'This can happen when graphics memory runs low or the tab is suspended. Reload the page to recover; ' +
+        'saved progress may be restored, but the current run may be lost. Open with ?debug to see logs.';
+      overlay.classList.add('on');
+    }
+    if (!window.__gdRuntimeReady || typeof performSave !== 'function') return;
+    try {
+      Promise.resolve(performSave()).catch(function (err) {
+        console.error('Failed to save after WebGL context loss:', err);
+      });
+    } catch (err) {
+      console.error('Failed to save after WebGL context loss:', err);
+    }
+  });
+})();</script>
+<script>(function () {
+  'use strict';
+  /* Fullscreen on Android: keep the screen awake during a level and ask for
+     landscape. Both APIs are no-ops or rejected where unsupported, so every
+     call is guarded. The wake lock is dropped whenever the page is hidden and
+     re-requested on the next gesture/focus, which is how the platform expects
+     it to be used. */
+  var wake = null;
+  var orientationLocked = false;
+  function isFullscreen() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+  function requestWake() {
+    if (!navigator.wakeLock || wake || !isFullscreen()) return;
+    try {
+      navigator.wakeLock.request('screen').then(function (lock) {
+        wake = lock;
+        lock.addEventListener('release', function () { wake = null; });
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  function dropWake() {
+    if (!wake) return;
+    try { wake.release(); } catch (e) {}
+    wake = null;
+  }
+  function lockLandscape() {
+    if (orientationLocked || !isFullscreen()) return;
+    if (!screen.orientation || !screen.orientation.lock) return;
+    try {
+      var p = screen.orientation.lock('landscape');
+      if (p && p.then) p.then(function () { orientationLocked = true; }).catch(function () {});
+      else orientationLocked = true;
+    } catch (e) {}
+  }
+  function unlockOrientation() {
+    if (!orientationLocked) return;
+    try { screen.orientation.unlock(); } catch (e) {}
+    orientationLocked = false;
+  }
+  function sync() {
+    if (isFullscreen()) { requestWake(); lockLandscape(); }
+    else { dropWake(); unlockOrientation(); }
+  }
+  ['fullscreenchange', 'webkitfullscreenchange'].forEach(function (name) {
+    document.addEventListener(name, sync);
+  });
+  document.addEventListener('visibilitychange', function () {
+    /* the platform releases the wake lock when hidden; take it again on return */
+    if (!document.hidden) sync();
+  });
+  document.addEventListener('pointerdown', function () { if (isFullscreen()) sync(); }, true);
+})();</script>
+<style id="gd-mobile-pause">
+#gdPauseBtn{position:fixed;right:calc(10px + var(--gd-r));top:calc(10px + var(--gd-t));z-index:30;width:42px;height:42px;border-radius:50%;border:1px solid #555;background:rgba(10,10,10,.55);color:#eee;font:13px/1 monospace;display:none;padding:0;touch-action:manipulation;}
+@media (pointer:coarse){#gdPauseBtn.on{display:block;}}
+</style>
+<script>(function () {
+  'use strict';
+  var isMobile = navigator.userAgentData
+    ? navigator.userAgentData.mobile
+    : /Android|iPhone|iPad|iPod|Mobile|IEMobile|Windows Phone/i.test(navigator.userAgent) ||
+      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isMobile || !window.matchMedia('(pointer: coarse)').matches) return;
+  var b = document.createElement('button');
+  b.id = 'gdPauseBtn';
+  b.type = 'button';
+  b.textContent = '\u23F8';
+  b.setAttribute('aria-label', 'Pause');
+  document.body.appendChild(b);
+  function sendEscape() {
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true }));
+    window.dispatchEvent(new KeyboardEvent('keyup', { key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true }));
+  }
+  b.addEventListener('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    sendEscape();
+    b.blur();
+  });
+  if (typeof window.__gdWatchInLevel === 'function') {
+    window.__gdWatchInLevel(b, true);
+  } else {
+    syncPause();
+    setInterval(syncPause, 800);
+    function syncPause() { b.classList.toggle('on', window.gdInLevel === true); }
+  }
+})();</script>
+<script>(function () {
+  'use strict';
+  /* The loader already keeps every game chunk in Cache Storage, but the page
+     itself was only reachable online. Registering a shell worker makes the
+     cached game usable with no connection (sw.js). A downloaded copy opened
+     from disk cannot use service workers, which is why this is guarded by
+     protocol. ?sw=0 opts out. */
+  return; /* Budsin: sin service worker propio (el portal ya tiene el suyo en «/») */
+  if (new URLSearchParams(location.search).get('sw') === '0') return;
+  if (!(location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) return;
+  try {
+    /* Absolute: <base href> points at the asset CDN, so even a leading-slash
+       path would resolve to cdn.jsdelivr.net and be rejected as cross-origin. */
+    navigator.serviceWorker.register(location.origin + '/sw.js', {
+      scope: location.origin + '/',
+      updateViaCache: 'none'
+    }).catch(function (error) {
+      console.error('Service worker registration failed:', error);
+    });
+  } catch (e) {}
+  /* Cache Storage is evictable under disk pressure unless the origin asks for
+     persistent storage. Ask once per browser, after the first load so it never
+     competes with the boot. */
+  window.addEventListener('load', function () {
+    if (!navigator.storage || !navigator.storage.persist) return;
+    try {
+      if (localStorage.getItem('gdPersistAsked') === '1') return;
+      localStorage.setItem('gdPersistAsked', '1');
+      navigator.storage.persist().catch(function () {});
+    } catch (e) {}
+  });
+})();</script><script async src="https://games.budsin.dev/classroom-hotkey.js"></script>
+</body></html>
