@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WKVW2STJ');</script>
+<!-- End Google Tag Manager -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2866089236522641" crossorigin="anonymous"></script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+<title>Gamer's Mod | Budsin Games</title>
+
+<!-- THE BROWSER TAB LOGO (FAVICON) -->
+<link rel="icon" type="image/jpeg" href="https://games.budsin.dev/images.jpeg">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/style.css"/>
+<style>
+canvas:focus { outline: none; }
+html, body { padding: 0; margin: 0; overflow: hidden; overscroll-behavior: none; user-select: none; height: 100%; background: #000; }
+.credit { position: absolute; bottom: 15px; right: 15px; color: rgba(255,255,255,0.4); font-family: monospace; font-size: 14px; font-weight: bold; z-index: 9999; pointer-events: none; }
+</style>
+
+
+
+<!-- Joins the 4 split parts of the wasm file back into one file -->
+<script>
+const originalFetch = window.fetch;
+window.fetch = async function (url, options) {
+  const urlStr = url.toString();
+  if (urlStr.endsWith('1.4.wasm.br')) {
+    try {
+      const parts = await Promise.all([1, 2, 3, 4].map(n =>
+        originalFetch('https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.wasm.br.part' + n).then(r => r.arrayBuffer())));
+      const merged = new Uint8Array(parts.reduce((a, p) => a + p.byteLength, 0));
+      let offset = 0;
+      for (const p of parts) { merged.set(new Uint8Array(p), offset); offset += p.byteLength; }
+      return new Response(merged, { status: 200, headers: new Headers({ 'Content-Type': 'application/wasm' }) });
+    } catch (e) {
+      console.error('Merge failed:', e);
+    }
+  }
+  return originalFetch(url, options);
+};
+</script>
+</head>
+
+<body class="dark">
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WKVW2STJ"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<div id="unity-container"><canvas id="unity-canvas" tabindex="-1"></canvas></div>
+<div id="loading-cover" style="display:none;">
+  <div id="unity-loading-bar">
+    <div id="unity-logo"><img src="https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Images/logo.gif"/></div>
+    <div id="unity-progress-bar-empty" style="display:none;"><div id="unity-progress-bar-full"></div></div>
+    <div class="spinner"></div>
+  </div>
+</div>
+
+<!-- YOUR BRANDING ADDED HERE -->
+<div class="credit">Gamer's Mod © Its Jason Studio · port web: Onyx$oul-1 · <a href="https://yandex.com/games/app/448583" target="_blank" rel="noopener" style="color:inherit;pointer-events:auto">versión oficial</a> · No es Garry's Mod</div>
+
+<script>
+// ---------- The settings the original game gets from Yandex ("flags") ----------
+const REMOTE_BASE = "https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/StreamingAssets/aa/WebGL";
+const FLAGS = {
+  "MOBILE_TOUCH_PANEL_Y_AXIS_MULTIPLIER": "0.5",
+  "GAMEPLAY_ADV_INTERVAL": "240",
+  "GAMEPLAY_FIRST_ADV_INTERVAL": "90",
+  "MOUSE_SENSITIVITY_MULTIPLIER": "0.3",
+  "MOBILE_TOUCH_PANEL_SMOOTH_FACTOR": "18",
+  "MOBILE_TOUCH_PANEL_SENSITIVITY_MULTIPLIER": "0.175",
+  "FLAG_IS_COMMUNITY_BUTTON_ACTIVE": "true",
+  "FLAG_IS_ALL_GAMES_BUTTON_ACTIVE": "true",
+  "FLAG_COMMUNITY_LINK": "https://t.me/ItsJasonStudio",
+  "FLAG_ALL_GAMES_LINK": "https://yandex.ru/games/developer/97789",
+  "USE_CUSTOM_REMOTE_ADDRESSABLES_PATH": "false",
+  "CUSTOM_REMOTE_ADDRESSABLES_PATH": REMOTE_BASE,
+  "REMOTE_ADDRESSABLES_URL": REMOTE_BASE,
+  "VERSION_DEPENDENT_REMOTE_ADDRESSABLES_PATH_1_1": REMOTE_BASE,
+  "VERSION_DEPENDENT_REMOTE_ADDRESSABLES_PATH_1_2": REMOTE_BASE,
+  "VERSION_DEPENDENT_REMOTE_ADDRESSABLES_PATH_1_3": REMOTE_BASE,
+  "VERSION_DEPENDENT_REMOTE_ADDRESSABLES_PATH_1_4": REMOTE_BASE
+};
+
+const NO_DATA = 'no data';
+const SAVE_KEY = 'gmode_saves';
+let ysdk = null, initYSDK = false, ygGameInstance = null, initGame = false, isPausedGame = false;
+let cloudSaves = NO_DATA, flasgsData = NO_DATA, environmentData = NO_DATA, playerData = NO_DATA;
+let reviewData = 'false', gameLabelData = 'false', allGamesData = NO_DATA;
+let pending = [];
+
+function LogStyledMessage(m, style = 'color:#FFDF73;background:#454545') { console.log('%c' + m, style); }
+
+function sendYG2(method, arg) {
+  if (arg === undefined) ygGameInstance.SendMessage('YG2Instance', method);
+  else ygGameInstance.SendMessage('YG2Instance', method, arg);
+}
+function YG2Instance(method, arg) {
+  if (ygGameInstance == null) return;
+  if (!initGame) { pending.push([method, arg]); return; }
+  sendYG2(method, arg);
+}
+function InitGame() {
+  initGame = true;
+  pending.splice(0).forEach(([m, a]) => sendYG2(m, a));
+  if (isPausedGame) YG2Instance('SetPauseGame', 'true');
+}
+
+function RequestingEnvironmentData() {
+  const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  environmentData = JSON.stringify({
+    language: 'en', domain: 'com', deviceType: mobile ? 'mobile' : 'desktop',
+    isMobile: mobile, isDesktop: !mobile, isTablet: false, isTV: false, appID: '448583',
+    browserLang: navigator.language || 'en', payload: '', platform: navigator.platform, browser: 'Chrome'
+  });
+  YG2Instance('SetEnvirData', environmentData);
+}
+function InitPlayer() {
+  playerData = JSON.stringify({ playerAuth: 'rejected', playerName: 'unauthorized', playerId: 'unauthorized', playerPhoto: 'no data', payingStatus: 'unknown' });
+  YG2Instance('SetAuth', playerData);
+}
+function OpenAuthDialog() { LogStyledMessage('Login is not available in this port'); }
+
+function SaveCloud(jsonData) { try { localStorage.setItem(SAVE_KEY, jsonData); } catch (e) {} }
+function LoadCloud() {
+  let res = NO_DATA;
+  try { const v = localStorage.getItem(SAVE_KEY); if (v) res = JSON.stringify([v]); } catch (e) {}
+  cloudSaves = res;
+  YG2Instance('SetLoadSaves', res);
+}
+
+function InterAdvShow() { setTimeout(() => YG2Instance('CloseInterAdv', 'false'), 0); }
+function Review() { YG2Instance('ReviewSent', 'false'); }
+function GameLabelShowDialog() { YG2Instance('OnGameLabelFail'); }
+function SetLeaderboard() {}
+function GetLeaderboard() {}
+
+function fakeYandexInit() {
+  ysdk = {
+    environment: { i18n: { lang: 'en', tld: 'com' }, app: { id: '448583' }, browser: { lang: 'en' }, payload: '' },
+    features: { LoadingAPI: { ready() {} }, GameplayAPI: { start() {}, stop() {} } },
+    on() {},
+    getFlags: () => Promise.resolve(FLAGS)
+  };
+  RequestingEnvironmentData();
+  InitPlayer();
+  LoadCloud();
+  flasgsData = JSON.stringify({ names: Object.keys(FLAGS), values: Object.values(FLAGS) });
+  initYSDK = true;
+  LogStyledMessage('Fake Yandex SDK ready. Files are loaded from: ' + REMOTE_BASE);
+}
+
+const canvas = document.querySelector('#unity-canvas');
+const loadingCover = document.querySelector('#loading-cover');
+const barEmpty = document.querySelector('#unity-progress-bar-empty');
+const barFull = document.querySelector('#unity-progress-bar-full');
+const spinner = document.querySelector('.spinner');
+const config = {
+  dataUrl: 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.data.br', frameworkUrl: 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.framework.js.br', codeUrl: 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.wasm.br',
+  streamingAssetsUrl: 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/StreamingAssets', companyName: 'DefaultCompany', productName: 'sandbox', productVersion: '0.1.0'
+};
+
+function FocusGame() { requestAnimationFrame(() => canvas.focus({ preventScroll: true })); }
+function SetVisibility(v) { if (initGame) YG2Instance('SetFocusWindowGame', v ? 'true' : 'false'); }
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('visibilitychange', () => SetVisibility(!document.hidden));
+window.addEventListener('blur', () => SetVisibility(false));
+window.addEventListener('focus', () => SetVisibility(true));
+window.addEventListener('pointerdown', () => { FocusGame(); SetVisibility(true); });
+
+const oRequestPointerLock = Element.prototype.requestPointerLock;
+Element.prototype.requestPointerLock = async function (...args) {
+  try { (args[0] ||= {}).unadjustedMovement = true; await oRequestPointerLock.apply(this, args); }
+  catch (err) { try { await oRequestPointerLock.call(this); } catch (e) { console.log(e); } }
+};
+
+loadingCover.style.background = "url('https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Images/background.gif') center / cover";
+loadingCover.style.display = '';
+
+const loader = document.createElement('script');
+loader.src = 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.loader.js';
+loader.onload = () => {
+  fakeYandexInit();
+  createUnityInstance(canvas, config, (progress) => {
+    spinner.style.display = 'none';
+    barEmpty.style.display = '';
+    barFull.style.width = (100 * Math.max(progress, 0.05)) + '%';
+  }).then((unityInstance) => {
+    ygGameInstance = unityInstance;
+    ygGameInstance.SendMessage('YG2Instance', 'InitSDKComplete');
+    loadingCover.style.display = 'none';
+    FocusGame();
+  }).catch((message) => {
+    console.error(message);
+    spinner.style.display = 'none';
+  });
+};
+document.body.appendChild(loader);
+</script>
+<script async src="https://games.budsin.dev/classroom-hotkey.js"></script>
+</body>
+</html>
