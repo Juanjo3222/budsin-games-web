@@ -109,6 +109,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <h1>Geometry Dash</h1>
             <p>El adictivo juego de plataformas basado en ritmo. Salta, vuela y atraviesa niveles imposibles sincronizados con la música.</p>
         </div>
+        <div class="content-card" id="play-card">
+            <div style="text-align:center">
+                <button type="button" id="gd-play" class="play-btn" style="border:0;cursor:pointer;font:inherit">▶ Jugar Geometry Dash aquí</button>
+                <p style="margin:12px 0 0;font-size:.85rem;color:var(--muted)">Es el juego completo (niveles oficiales, editor y niveles online). La primera carga baja varios MB y puede tardar. Necesita un Chrome o Edge actualizado.</p>
+            </div>
+            <div id="gd-stage" hidden style="margin-top:16px">
+                <div style="position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:18px;overflow:hidden">
+                    <iframe id="gd-frame" title="Geometry Dash" allow="autoplay; fullscreen; gamepad; clipboard-write" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe>
+                </div>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:12px">
+                    <button type="button" id="gd-fs" class="play-btn" style="border:0;cursor:pointer;font:inherit;padding:10px 20px">⛶ Pantalla completa</button>
+                    <a class="play-btn" id="gd-tab" href="https://gd-webport.pages.dev/" target="_blank" rel="noopener" style="padding:10px 20px">↗ Abrir en otra pestaña</a>
+                </div>
+            </div>
+        </div>
         <div class="content-card">
             <h2>Acerca del juego</h2>
             <p>Geometry Dash es un juego de plataformas rítmico creado por Robert Topala (RobTop Games). Tu objetivo es guiar un cubo (u otra forma geométrica) a través de niveles llenos de obstáculos, sincronizando cada salto y movimiento con la banda sonora. Con millones de niveles creados por la comunidad, una banda sonora electrizante y una dificultad que va de fácil a casi imposible, Geometry Dash es uno de los juegos de habilidad más populares del mundo.</p>
@@ -142,18 +157,25 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <li>Explora los niveles de la comunidad: hay millones de creaciones con diferentes estilos y dificultades.</li>
             </ul>
 
-            <p style="text-align: center; margin-top: 28px; font-size: 1.1rem; color: var(--text);">
-                El juego se abrirá en una nueva página dedicada. ¡A jugar!
-            </p>
-            <div style="text-align: center;">
-                <a href="https://budsin-dash.pages.dev" class="play-btn">▶ Jugar Geometry Dash ahora</a>
-            </div>
-            <p style="text-align: center; margin-top: 16px; font-size: 0.85rem; color: var(--muted);">
-                Si no eres redirigido automáticamente en 8 segundos, haz clic en el botón de arriba.
+            <p style="text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--muted);">
+                Port web de <a href="https://github.com/Ale7208/Geometry-Dash-webport" target="_blank" rel="noopener">Ale7208</a> (Geometry Dash 2.2091, de RobTop Games). Si te falla, usa la <a href="https://budsin-dash.pages.dev" target="_blank" rel="noopener">versión anterior</a>.
             </p>
         </div>
     </main>
-    <script>setTimeout(function(){ window.location.href = "https://budsin-dash.pages.dev"; }, 8000);</script>
+    <script>
+    (function(){
+      var GAME = "https://gd-webport.pages.dev/";
+      var btn = document.getElementById("gd-play"), stage = document.getElementById("gd-stage"), frame = document.getElementById("gd-frame");
+      btn.addEventListener("click", function(){
+        if (!frame.src) frame.src = GAME;
+        stage.hidden = false; btn.hidden = true;
+        stage.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      document.getElementById("gd-fs").addEventListener("click", function(){
+        var el = frame.parentNode; (el.requestFullscreen || el.webkitRequestFullscreen).call(el);
+      });
+    })();
+    </script>
     <script src="classroom-hotkey.js"></script>
 </body>
 </html>
