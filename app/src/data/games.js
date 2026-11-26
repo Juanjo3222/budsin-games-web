@@ -1902,6 +1902,32 @@ export const GAMES = [
     "isNew": true
   },
   {
+    "id": "gamers-mod.html",
+    "name": "gamers mod",
+    "title": "Gamer's Mod",
+    "href": "gamers-mod.html",
+    "cover": "portadas/gamers-mod.svg",
+    "type": "multiplayer action",
+    "category": {
+      "es": "Multiplayer",
+      "en": "Multiplayer",
+      "pt": "Multiplayer"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Sandbox estilo Garry's Mod con mapas y modos (no es GMod oficial). Pesa ~80 MB.",
+      "en": "Garry's Mod-style sandbox with maps and modes (not the official GMod). About 80 MB.",
+      "pt": "Sandbox estilo Garry's Mod com mapas e modos (não é o GMod oficial). Cerca de 80 MB."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
     "id": "gta-vice-city.html",
     "name": "gta vice city",
     "title": "GTA Vice City",

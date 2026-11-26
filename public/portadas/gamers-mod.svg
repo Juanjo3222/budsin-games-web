@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-label="Gamer's Mod">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#101820"/><stop offset="1" stop-color="#1d2b3a"/></linearGradient>
+    <linearGradient id="top" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb4ff"/><stop offset="1" stop-color="#2f7fd0"/></linearGradient>
+    <linearGradient id="side" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset="1" stop-color="#d9731a"/></linearGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7be08a"/><stop offset="1" stop-color="#2f9e4a"/></linearGradient>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+  <rect width="640" height="400" fill="url(#bg)"/>
+  <g stroke="#ffffff" stroke-opacity=".06"><path d="M0 300h640M0 330h640M0 360h640M0 390h640"/><path d="M80 270 0 400M200 270 160 400M320 270v130M440 270 480 400M560 270 640 400"/></g>
+  <ellipse cx="320" cy="296" rx="150" ry="22" fill="#000" opacity=".5" filter="url(#sh)"/>
+  <!-- cubo isométrico -->
+  <g transform="translate(320 150)">
+    <polygon points="0,-78 90,-30 0,18 -90,-30" fill="url(#top)"/>
+    <polygon points="-90,-30 0,18 0,118 -90,70" fill="url(#side)"/>
+    <polygon points="90,-30 0,18 0,118 90,70" fill="url(#front)"/>
+    <g fill="#fff" fill-opacity=".85"><path d="M-22 -52 0 -41 22 -52 0 -63Z"/></g>
+  </g>
+  <!-- cubitos sueltos -->
+  <g><polygon points="120,120 148,104 176,120 148,136" fill="#5fb4ff"/><polygon points="120,120 148,136 148,166 120,150" fill="#d9731a"/><polygon points="176,120 148,136 148,166 176,150" fill="#2f9e4a"/></g>
+  <g><polygon points="478,96 502,82 526,96 502,110" fill="#5fb4ff"/><polygon points="478,96 502,110 502,136 478,122" fill="#d9731a"/><polygon points="526,96 502,110 502,136 526,122" fill="#2f9e4a"/></g>
+  <g text-anchor="middle" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif" font-weight="900">
+    <text x="320" y="352" font-size="52" letter-spacing="1" fill="#fff"><tspan fill="#5fb4ff">G</tspan>amer's <tspan fill="#5fb4ff">M</tspan>od</text>
+  </g>
+</svg>

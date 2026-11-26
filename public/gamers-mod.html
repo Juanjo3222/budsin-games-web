@@ -25,26 +25,7 @@ html, body { padding: 0; margin: 0; overflow: hidden; overscroll-behavior: none;
 
 
 
-<!-- Joins the 4 split parts of the wasm file back into one file -->
-<script>
-const originalFetch = window.fetch;
-window.fetch = async function (url, options) {
-  const urlStr = url.toString();
-  if (urlStr.endsWith('1.4.wasm.br')) {
-    try {
-      const parts = await Promise.all([1, 2, 3, 4].map(n =>
-        originalFetch('https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.wasm.br.part' + n).then(r => r.arrayBuffer())));
-      const merged = new Uint8Array(parts.reduce((a, p) => a + p.byteLength, 0));
-      let offset = 0;
-      for (const p of parts) { merged.set(new Uint8Array(p), offset); offset += p.byteLength; }
-      return new Response(merged, { status: 200, headers: new Headers({ 'Content-Type': 'application/wasm' }) });
-    } catch (e) {
-      console.error('Merge failed:', e);
-    }
-  }
-  return originalFetch(url, options);
-};
-</script>
+
 </head>
 
 <body class="dark">
@@ -161,7 +142,7 @@ const barEmpty = document.querySelector('#unity-progress-bar-empty');
 const barFull = document.querySelector('#unity-progress-bar-full');
 const spinner = document.querySelector('.spinner');
 const config = {
-  dataUrl: 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.data.br', frameworkUrl: 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.framework.js.br', codeUrl: 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.wasm.br',
+  dataUrl: '', frameworkUrl: '', codeUrl: '',
   streamingAssetsUrl: 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/StreamingAssets', companyName: 'DefaultCompany', productName: 'sandbox', productVersion: '0.1.0'
 };
 
@@ -182,25 +163,74 @@ Element.prototype.requestPointerLock = async function (...args) {
 loadingCover.style.background = "url('https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Images/background.gif') center / cover";
 loadingCover.style.display = '';
 
-const loader = document.createElement('script');
-loader.src = 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/Build/1.4.loader.js';
-loader.onload = () => {
-  fakeYandexInit();
-  createUnityInstance(canvas, config, (progress) => {
-    spinner.style.display = 'none';
-    barEmpty.style.display = '';
-    barFull.style.width = (100 * Math.max(progress, 0.05)) + '%';
-  }).then((unityInstance) => {
+// Los «.br» de este port en realidad NO están comprimidos (JS y WASM planos con otro nombre). jsDelivr los entrega como octet-stream y Chrome se niega a ejecutarlos como script: se bajan y se envuelven en blobs con el tipo correcto.
+const CDN = 'https://cdn.jsdelivr.net/gh/OnyxSoul-1/GMod-Port@69f848b72c45a5a57dfc4440134dc271a9f4735f/';
+const PARTS = [
+  ['Build/1.4.framework.js.br', 463546, 'text/javascript'],
+  ['Build/1.4.data.br', 15061226, 'application/octet-stream'],
+  ['Build/1.4.wasm.br', 64456684, 'application/wasm', 4]
+];
+async function fetchBytes(url, onBytes) {
+  for (let a = 0; a < 3; a++) {
+    try {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error('HTTP ' + r.status + ' ' + url.split('/').pop());
+      const rd = r.body.getReader(), chunks = []; let n = 0;
+      for (;;) { const x = await rd.read(); if (x.done) break; chunks.push(x.value); n += x.value.length; onBytes(x.value.length); }
+      const out = new Uint8Array(n); let o = 0; for (const c of chunks) { out.set(c, o); o += c.length; }
+      return out;
+    } catch (e) { if (a === 2) throw e; await new Promise(r => setTimeout(r, 1000 * (a + 1))); }
+  }
+}
+async function prepare(setProgress) {
+  const totalBytes = PARTS.reduce((s, p) => s + p[1], 0);
+  let got = 0;
+  const bump = n => { got += n; setProgress(0.95 * Math.min(1, got / totalBytes)); };
+  const urls = {};
+  for (const [file, , type, parts] of PARTS) {
+    let bytes;
+    if (parts) {
+      const arr = await Promise.all(Array.from({ length: parts }, (_, i) => fetchBytes(CDN + file + '.part' + (i + 1), bump)));
+      bytes = new Uint8Array(arr.reduce((s, a) => s + a.length, 0)); let o = 0; for (const a of arr) { bytes.set(a, o); o += a.length; }
+    } else bytes = await fetchBytes(CDN + file, bump);
+    urls[file] = URL.createObjectURL(new Blob([bytes], { type }));
+    setProgress(Math.min(0.99, 0.95 + 0.04 * Object.keys(urls).length / PARTS.length));
+  }
+  return urls;
+}
+
+(async () => {
+  try {
+    spinner.style.display = 'none'; barEmpty.style.display = '';
+    const setP = f => { barFull.style.width = (100 * Math.max(f, 0.03)) + '%'; };
+    setP(0.03);
+    const urls = await prepare(setP);
+    config.frameworkUrl = urls['Build/1.4.framework.js.br'];
+    config.dataUrl = urls['Build/1.4.data.br'];
+    config.codeUrl = urls['Build/1.4.wasm.br'];
+    await new Promise((ok, no) => {
+      const loader = document.createElement('script');
+      loader.src = CDN + 'Build/1.4.loader.js';
+      loader.onload = ok; loader.onerror = () => no(new Error('no se pudo cargar loader.js'));
+      document.body.appendChild(loader);
+    });
+    fakeYandexInit();
+    const unityInstance = await createUnityInstance(canvas, config, (progress) => {
+      barFull.style.width = (100 * Math.max(progress, 0.05)) + '%';
+    });
     ygGameInstance = unityInstance;
     ygGameInstance.SendMessage('YG2Instance', 'InitSDKComplete');
     loadingCover.style.display = 'none';
     FocusGame();
-  }).catch((message) => {
+  } catch (message) {
     console.error(message);
     spinner.style.display = 'none';
-  });
-};
-document.body.appendChild(loader);
+    const err = document.createElement('div');
+    err.style.cssText = 'position:fixed;left:50%;bottom:60px;transform:translateX(-50%);max-width:90vw;padding:12px 18px;border-radius:10px;background:rgba(0,0,0,.85);color:#fff;font:14px system-ui;z-index:99999;text-align:center';
+    err.textContent = 'No se pudo cargar el juego: ' + (message && message.message || message) + '. Recarga la página para reintentar.';
+    document.body.appendChild(err);
+  }
+})();
 </script>
 <script async src="https://games.budsin.dev/classroom-hotkey.js"></script>
 </body>
