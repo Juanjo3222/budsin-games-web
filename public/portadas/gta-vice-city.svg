@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" role="img" aria-label="Vice City">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1b0b4a"/><stop offset=".5" stop-color="#a1218f"/><stop offset=".78" stop-color="#ff5c8a"/><stop offset="1" stop-color="#ffb35c"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe27a"/><stop offset="1" stop-color="#ff4f9a"/></linearGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b0f5c"/><stop offset="1" stop-color="#0c0524"/></linearGradient>
+    <linearGradient id="txt" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#49f0ff"/><stop offset="1" stop-color="#ff5fd0"/></linearGradient>
+    <clipPath id="sunclip"><rect x="0" y="0" width="640" height="262"/></clipPath>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+  <rect width="640" height="400" fill="url(#sky)"/>
+  <g clip-path="url(#sunclip)">
+    <circle cx="320" cy="238" r="96" fill="url(#sun)"/>
+    <g fill="#a1218f" opacity=".9"><rect x="200" y="206" width="240" height="5"/><rect x="200" y="222" width="240" height="7"/><rect x="200" y="240" width="240" height="9"/></g>
+  </g>
+  <!-- ciudad -->
+  <g fill="#150637">
+    <rect x="0" y="236" width="40" height="26"/><rect x="46" y="214" width="30" height="48"/><rect x="82" y="228" width="38" height="34"/>
+    <rect x="130" y="222" width="26" height="40"/><rect x="480" y="226" width="34" height="36"/><rect x="520" y="206" width="30" height="56"/>
+    <rect x="556" y="224" width="40" height="38"/><rect x="600" y="234" width="40" height="28"/>
+  </g>
+  <rect y="262" width="640" height="138" fill="url(#sea)"/>
+  <g stroke="#ff9fc8" stroke-opacity=".5" stroke-width="3"><path d="M250 276h140M270 288h100M285 301h70"/></g>
+  <!-- palmeras -->
+  <g fill="#0c0524">
+    <path d="M70 400 C74 330 82 290 92 244 L100 246 C92 292 88 332 90 400Z"/>
+    <path d="M96 246 C70 226 40 232 22 252 C48 240 72 242 96 250Z"/><path d="M96 246 C84 218 58 208 34 214 C60 218 80 230 96 250Z"/>
+    <path d="M96 246 C112 220 140 212 164 220 C140 224 118 234 98 252Z"/><path d="M96 246 C126 240 152 252 166 274 C142 258 120 254 98 254Z"/>
+    <path d="M560 400 C556 340 548 300 538 256 L546 254 C556 300 562 340 568 400Z"/>
+    <path d="M542 256 C568 236 598 242 616 262 C590 250 566 252 542 260Z"/><path d="M542 256 C556 228 584 218 608 224 C582 228 562 240 544 262Z"/>
+    <path d="M542 256 C526 230 498 222 474 230 C498 234 520 244 540 262Z"/><path d="M542 256 C514 250 488 262 474 284 C498 268 520 264 540 264Z"/>
+  </g>
+  <!-- título -->
+  <g text-anchor="middle" font-family="system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif" font-weight="900">
+    <text x="320" y="332" font-size="62" letter-spacing="3" fill="#ff5fd0" opacity=".65" filter="url(#glow)">VICE CITY</text>
+    <text x="320" y="332" font-size="62" letter-spacing="3" fill="url(#txt)" stroke="#12062e" stroke-width="2" paint-order="stroke">VICE CITY</text>
+  </g>
+</svg>

@@ -1902,6 +1902,32 @@ export const GAMES = [
     "isNew": true
   },
   {
+    "id": "gta-vice-city.html",
+    "name": "gta vice city",
+    "title": "GTA Vice City",
+    "href": "gta-vice-city.html",
+    "cover": "portadas/gta-vice-city.svg",
+    "type": "port",
+    "category": {
+      "es": "Port",
+      "en": "Port",
+      "pt": "Port"
+    },
+    "label": {
+      "es": "Disponible",
+      "en": "Available",
+      "pt": "Disponível"
+    },
+    "desc": {
+      "es": "Los 80 en Vice City: port web de DOS.Zone con demo; se abre en otra pestaña.",
+      "en": "The 80s in Vice City: DOS.Zone web port with a demo; opens in a new tab.",
+      "pt": "Os anos 80 em Vice City: port web da DOS.Zone com demo; abre em outra aba."
+    },
+    "pro": false,
+    "proRelease": null,
+    "isNew": true
+  },
+  {
     "id": "gta-3/index.html",
     "name": "gta 3",
     "title": "GTA 3",
