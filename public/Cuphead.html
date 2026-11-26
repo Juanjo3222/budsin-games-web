@@ -108,88 +108,104 @@
     </ul>
   </div>
 </div>
-<div id="loading-text"
-    style="color: white; font-size: 48px; font-family: cursive; text-align: center; margin-top: 20px;"> LOADING...
+<canvas id="unity-canvas" tabindex="-1" style="position:fixed;inset:0;width:100%;height:100%;background:#000;display:block"></canvas>
+<div id="cup-load">
+  <div class="cup-card">
+    <div class="cup-title">CUPHEAD</div>
+    <div class="cup-status" id="cup-status">Preparando…</div>
+    <div class="cup-bar"><div class="cup-fill" id="cup-fill"></div></div>
+    <div class="cup-nums"><span id="cup-pct">0%</span><span id="cup-mb"></span><span id="cup-speed"></span></div>
+    <div class="cup-note" id="cup-note">La primera vez baja ~1.3 GB y se guarda en este navegador: después carga mucho más rápido. No cierres la pestaña. Necesita PC con buena memoria; no funciona en celular.</div>
+    <button id="cup-retry" type="button" hidden>Reintentar</button>
   </div>
-    <div id="gameContainer"></div>
-    <script src="Build/UnityLoader.js"></script>
-    <script>
-var loadingText = document.querySelector("#loading-text");
-    let totalBytes = 0;
-    let loadedBytes = 0;
-
-    async function fetchWithProgress(url) {
-      const response = await fetch(url);
-      const reader = response.body.getReader();
-      let chunks = [];
-      let received = 0;
-      while (true) {
-        const {
-          done,
-          value
-        } = await reader.read();
-        if (done) break;
-        received += value.length;
-        loadedBytes += value.length;
-        chunks.push(value);
-        let mbDone = (loadedBytes / (1024 * 1024)).toFixed(2);
-        let mbTotal = '2101.31';
-        loadingText.textContent = `LOADING... ${mbDone} MB / ${mbTotal} MB`;
-      }
-      let fullBuffer = new Uint8Array(received);
-      let offset = 0;
-      for (let chunk of chunks) {
-        fullBuffer.set(chunk, offset);
-        offset += chunk.length;
-      }
-      return fullBuffer.buffer;
+</div>
+<button id="cup-fs" type="button" title="Pantalla completa" hidden>⛶</button>
+<style>
+#cup-load{position:fixed;inset:0;z-index:40;background:radial-gradient(circle at 50% 35%,#3a2a12,#120c05);display:flex;align-items:center;justify-content:center;padding:20px;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#f6e7c1}
+#cup-load[hidden]{display:none}
+.cup-card{width:100%;max-width:520px;text-align:center}
+.cup-title{font-family:'Bebas Neue',Impact,sans-serif;font-size:3.4rem;letter-spacing:6px;color:#ffe08a;text-shadow:0 3px 0 #7a2a12}
+.cup-status{margin:6px 0 14px;font-weight:600}
+.cup-bar{height:18px;border-radius:999px;background:rgba(255,255,255,.12);border:2px solid #ffe08a;overflow:hidden}
+.cup-fill{height:100%;width:0;background:repeating-linear-gradient(45deg,#e9442b,#e9442b 12px,#ff7a3c 12px,#ff7a3c 24px);transition:width .25s ease}
+.cup-nums{display:flex;justify-content:space-between;gap:8px;margin-top:8px;font-size:.9rem;color:#ffe9b0;font-variant-numeric:tabular-nums}
+.cup-note{margin-top:16px;font-size:.82rem;line-height:1.45;color:#cbb98c}
+#cup-retry{margin-top:14px;padding:10px 22px;border:0;border-radius:10px;font-weight:800;background:#ffe08a;color:#3a1b08;cursor:pointer}
+#cup-fs{position:fixed;right:16px;bottom:16px;z-index:50;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.55);color:#fff;font-size:20px;cursor:pointer}
+</style>
+<script>
+(function(){
+  var BASE="https://raw.githubusercontent.com/woahhcrackers/CupheadWeb/main/Build/Cuphead";
+  var CACHE="budsin-cuphead-v1", MAXP=60, CONC=4;
+  var $=function(i){return document.getElementById(i)};
+  var st=$("cup-status"),fill=$("cup-fill"),pct=$("cup-pct"),mb=$("cup-mb"),spd=$("cup-speed"),retry=$("cup-retry");
+  var total=0,done=0,t0=0,lastT=0,lastB=0,rate=0,cache=null,phase="";
+  window.__cup={state:"init"};
+  function mbs(n){return (n/1048576).toFixed(n>1e9?0:1)+" MB"}
+  function setBar(f){f=Math.max(0,Math.min(1,f));fill.style.width=(f*100)+"%";pct.textContent=Math.floor(f*100)+"%";window.__cup.pct=Math.floor(f*100)}
+  function fail(msg,e){console.error(e||msg);st.textContent="⚠️ "+msg;spd.textContent="";retry.hidden=false;window.__cup.state="error";window.__cup.err=String(e||msg)}
+  function tick(){var n=performance.now();if(n-lastT>800){rate=(done-lastB)/((n-lastT)/1000);lastT=n;lastB=done}
+    setBar(total?done/total:0);mb.textContent=mbs(done)+" / "+mbs(total);
+    spd.textContent=rate>0?(mbs(rate)+"/s · "+Math.max(0,Math.round((total-done)/rate))+" s"):""}
+  async function size(u){try{var r=await fetch(u,{method:"HEAD"});if(!r.ok)return 0;return +r.headers.get("content-length")||0}catch(e){return 0}}
+  async function plan(){
+    st.textContent="Buscando archivos…";
+    var single=await size(BASE+".data"),parts=[];
+    if(single){parts.push({u:BASE+".data",n:single})}
+    else{for(var start=1;start<=MAXP;start+=6){var ids=[];for(var i=start;i<start+6&&i<=MAXP;i++)ids.push(i);
+        var sizes=await Promise.all(ids.map(function(i){return size(BASE+".data."+String(i).padStart(3,"0"))})),end=false;
+        for(var k=0;k<sizes.length;k++){if(!sizes[k]){end=true;break}parts.push({u:BASE+".data."+String(ids[k]).padStart(3,"0"),n:sizes[k]})}
+        if(end)break}}
+    if(!parts.length)throw new Error("no se encontraron los archivos del juego");
+    var wasm=await size(BASE+".wasm");if(!wasm)throw new Error("falta el archivo wasm");
+    var fw=await size(BASE+".framework.js"),ld=await size(BASE+".loader.js");
+    return {data:parts,wasm:{u:BASE+".wasm",n:wasm},fw:{u:BASE+".framework.js",n:fw,loose:1},ld:{u:BASE+".loader.js",n:ld,loose:1}};
+  }
+  async function getBlob(item,type){
+    if(cache){try{var hit=await cache.match(item.u);if(hit){var b=await hit.blob();if(item.loose||b.size===item.n){done+=item.n;tick();return type?new Blob([b],{type:type}):b}}}catch(e){}}
+    var lastErr;
+    for(var a=0;a<4;a++){
+      var got=0;
+      try{
+        var r=await fetch(item.u);if(!r.ok)throw new Error("HTTP "+r.status+" en "+item.u.split("/").pop());
+        var rd=r.body.getReader(),chunks=[];
+        for(;;){var x=await rd.read();if(x.done)break;chunks.push(x.value);got+=x.value.length;done+=x.value.length;tick()}
+        var blob=new Blob(chunks,type?{type:type}:{});
+        if(!item.loose&&item.n&&blob.size!==item.n)throw new Error("tamaño incorrecto");
+        if(item.loose){done+=item.n-got;got=item.n}
+        if(cache){try{await cache.put(item.u,new Response(blob))}catch(e){}}
+        return blob;
+      }catch(e){lastErr=e;done-=got;tick();st.textContent="Reintentando ("+Math.min(a+1,3)+"/3)…";await new Promise(function(r){setTimeout(r,1200*(a+1))})}
     }
-
-    async function mergeFiles(fileParts, cacheKey) {
-      const cache = await caches.open("cuphead-cache");
-      const cachedResponse = await cache.match(cacheKey);
-      if (cachedResponse) {
-        const blob = await cachedResponse.blob();
-        return URL.createObjectURL(blob);
-      }
-      const buffers = await Promise.all(
-        fileParts.map(part => fetchWithProgress(part))
-      );
-      const mergedBlob = new Blob(buffers);
-      const response = new Response(mergedBlob);
-      await cache.put(cacheKey, response);
-      return URL.createObjectURL(mergedBlob);
-    }
-
-    function getParts(file, start, end) {
-      let parts = [];
-      for (let i = start; i <= end; i++) {
-        parts.push(file + ".part" + i);
-      }
-      return parts;
-    }
-    (async () => {
-      const [dataUrl, wasmUrl, asmUrl] = await Promise.all([
-        mergeFiles(getParts("Build/CupheadPort.data.unityweb", 1, 103), "CupheadPort.data.unityweb"),
-        mergeFiles(getParts("Build/CupheadPort.wasm.code.unityweb", 1, 2), "CupheadPort.wasm.code.unityweb"),
-        mergeFiles(getParts("Build/CupheadPort.asm.code.unityweb", 1, 3), "CupheadPort.asm.code.unityweb"),
-      ]);
-
-      const originalOpen = XMLHttpRequest.prototype.open;
-      XMLHttpRequest.prototype.open = function (method, url, ...rest) {
-          if (url.includes("CupheadPort.data.unityweb")) {
-              url = dataUrl;
-          } else if (url.includes("CupheadPort.wasm.code.unityweb")) {
-              url = wasmUrl;
-          } else if (url.includes("CupheadPort.asm.code.unityweb")) {
-              url = asmUrl;
-          }
-          return originalOpen.call(this, method, url, ...rest);
-      };
-      var unityInstance = UnityLoader.instantiate("gameContainer", "Build/CupheadPort.json");
-      loadingText.remove();
-    })();
-    </script>
+    throw lastErr;
+  }
+  async function run(){
+    retry.hidden=true;window.__cup.state="running";
+    try{
+      if(!("fetch" in window)||!window.WebAssembly)throw new Error("tu navegador no es compatible");
+      try{cache=await caches.open(CACHE);if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){cache=null}
+      var pl=await plan();
+      total=pl.data.reduce(function(s,x){return s+x.n},0)+pl.wasm.n+pl.fw.n+pl.ld.n;
+      done=0;lastT=performance.now();lastB=0;t0=lastT;
+      st.textContent="Descargando el juego…";tick();
+      var queue=pl.data.slice(),dataBlobs=new Array(pl.data.length),idx=0;
+      var small=await Promise.all([getBlob(pl.ld,"text/javascript"),getBlob(pl.fw,"text/javascript"),getBlob(pl.wasm,"application/wasm")]);
+      await Promise.all(Array.from({length:CONC},async function(){
+        for(;;){var i=idx++;if(i>=pl.data.length)return;dataBlobs[i]=await getBlob(pl.data[i])}
+      }));
+      setBar(1);st.textContent="Iniciando Cuphead…";spd.textContent="";mb.textContent="";window.__cup.state="starting";
+      var dataUrl=URL.createObjectURL(new Blob(dataBlobs)),wasmUrl=URL.createObjectURL(small[2]),fwUrl=URL.createObjectURL(small[1]),ldUrl=URL.createObjectURL(small[0]);
+      await new Promise(function(ok,no){var sc=document.createElement("script");sc.src=ldUrl;sc.onload=ok;sc.onerror=function(){no(new Error("no se pudo ejecutar loader.js"))};document.body.appendChild(sc)});
+      setBar(0);
+      var canvas=$("unity-canvas");
+      var inst=await createUnityInstance(canvas,{dataUrl:dataUrl,frameworkUrl:fwUrl,codeUrl:wasmUrl,streamingAssetsUrl:"StreamingAssets",companyName:"crackers",productName:"Cuphead",productVersion:"1.0"},function(p){setBar(p);st.textContent="Iniciando Cuphead… "+Math.floor(p*100)+"%"});
+      $("cup-load").hidden=true;window.__cup.state="ready";
+      var fs=$("cup-fs");fs.hidden=false;fs.onclick=function(){inst.SetFullscreen(1)};canvas.focus();
+    }catch(e){fail("No se pudo cargar: "+(e&&e.message||e),e)}
+  }
+  retry.onclick=run;run();
+})();
+</script>
     <script src="https://games.budsin.dev/classroom-hotkey.js"></script>
     <script src="https://games.budsin.dev/save-system.js"></script>
   </body>
