@@ -373,9 +373,10 @@ async function prepare(setProgress) {
     config.frameworkUrl = urls['Build/1.4.framework.js.br'];
     config.dataUrl = urls['Build/1.4.data.br'];
     config.codeUrl = urls['Build/1.4.wasm.br'];
+    const loaderUrl = URL.createObjectURL(new Blob([await fetchBytes('Build/1.4.loader.js', () => {})], { type: 'text/javascript' }));
     await new Promise((ok, no) => {
       const loader = document.createElement('script');
-      loader.src = URL.createObjectURL(new Blob([await fetchBytes('Build/1.4.loader.js', () => {})], { type: 'text/javascript' }));
+      loader.src = loaderUrl;
       loader.onload = ok; loader.onerror = () => no(new Error('no se pudo cargar loader.js'));
       document.body.appendChild(loader);
     });
